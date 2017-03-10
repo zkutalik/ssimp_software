@@ -8,111 +8,30 @@ function
 	code1
 	code2
 	function
+	
+## Example
+	ssimp --data gwas.txt --out res.txt --refpanel EUR,EAS
 
-%=========================================================
-% Titel
+## Input 
+	--data filename, named columns "SNP", "Z", "N" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos)
+	--out filename
+	--names names of columns SNP, Z, N, ref.allele, effect.allele
+	--toimp what kind of summary stats to impute: p-value, Z-statistic, beta
+	--refpanel 1kg (default) or path to own LD structure (see below)
+	--pop.1kg (nodefautl) EUR, ASN, ...
+	--lambda 1/sqrt(n) (default) or number or "optimize" (loo)
+	--impute.maf 1/n (default): everthing above 1/n will be imputed
+	--impute.range NULL (default) chr:pos.start-chr:pos.end (if just chr:NA, then the whole chr is imputed)
+	--impute.snps NULL (default) txt file with a set of SNPs to impute (no header): rsid or chr:pos (no quotes)
+	--window.core.length 1e6 (default) main window
+	--window.flanking.length 250e3 (default) flanking region each side
 
-\title{SSimp user guide}
-\author{ Aaron McDaid\thanks{\texttt{<aaron.mcdaid@gmail.com>}}
- \and Zolt{\'a}n Kutalik\thanks{\texttt{<zoltan.kutalik@unil.ch>}}
-\and Sina R\"{u}eger\thanks{\texttt{<sina.rueeger@gmail.com>}}}
-\date{\today\\for \ssimp{} version \qversion}
+	pos on hg19
+	
+## checks
+[] names columns input
 
-
-%=========================================================
-
-\begin{document}
-
-\maketitle
-
-\clearpage
-\tableofcontents
-
-%=========================================================
-% installing ssimp
-\clearpage
-\section{Installing or compiling SSimp}
-
-
-
-%=========================================================
-% Simple default usage
-\section{Quick start}
-
-\begin{verbatim}
-ssimp --data gwas.txt --out qres.txt
-\end{verbatim}
-
-This just imputes all SNPs that are within the gwas SNPs and in the reference panel.
-
-\begin{verbatim}
-ssimp --data gwas.txt --snp file.with.all.snps.to.impute.txt --out qres.txt
-\end{verbatim}
-This will only impute SNPs mentioned in snp.
-
-
-
-%=========================================================
-% Parameters
-\section{Arguments}
-
-\begin{description}
-\item [\dash{data}] quicktest or snptest format or own format: identifier(SNP or Pos:Chr on hg18),
-  Z, N, A1, A2. Z= Z statistics, sample size N. If sample size is NA, Z will be imputed. Otherwise the standardized
-  effect size. If P, beta are provided, Z will be computed. If Z nor N is available, bst is
-  searched. A1 (reference allele) A2 (effect allele) can be in upper or lower case.
-\item [\dash{lambda}] sdfsdf
-\item [\dash{missings}] truncate SNPs
-\item [\dash{out}] sdfsdf
-\item [\dash{snps}] file with all snps to impute. no header, will guess wether SNP or SNP2. 
-\item [\dash{ref}] reference panel, either uk10k, 1kg, or own (see further down)
-\item [\dash{ref.pop}] subpopulation (in case of 1kg) [tsi, lkkjlk]
-\item [\dash{ref.allelematching}] allele matching
-\end{description}
-
-\subsection{ref}
-Provide your own vcf data, and the path to it.
-
-\subsection{identifier}
-working with SNP2
-
-%=========================================================
-% 
-\section{Output}
-There is an \texttt{.log} file providing the output and possible warning messages. The .out file has
-the following columns:
-
-\begin{description}
-\item [\dash{SNP}] SNP
-\item [\dash{Chr}] Chromosome (only 1 to 22 right now)
-\item [\dash{Pos}] Position (HG18?)
-\item [\dash{SNP2}] Chr:Pos
-\item [\dash{bst}] bst
-\item [\dash{N.est}] estimation of N
-\item [\dash{r2.pred}] impqual
-\item [\dash{A1}] reference allele
-\item [\dash{A2}] effect allele
-
-\end{description}
-
-\texttt{.out.not} lists all the SNPs that were not found in the reference panel 
-\texttt{.out.tnot} lists all the tSNPs that were not used as tSNPs (but needed): not found in the reference panel or had an NA in Z
-
-If SNP has an NA as bst, it means that there was no tagSNP present.
-
-%=========================================================
-% Anhang
-\newpage
-\appendix
-
-
-%=========================================================
-% Misc
-\section{Edge-cases}
-\label{misc}
-
-\begin{itemize}
-\item tSNP not in reference panel
+[] tSNP not in reference panel
 \item SNP not in reference panel
 \item ref alleles not swaped as in reference panel
 \item A1 and A2 are not matching with reference panel
@@ -121,8 +40,36 @@ If SNP has an NA as bst, it means that there was no tagSNP present.
 \item !is.na(SNP) but is.na(SNP2)
 \item types of missings: NA, "-"
 
-\end{itemize}
+## do
+- check if SNP is rsid or chr:pos
+- exclude all lines with NA either in SNP, Z or N, ref.allele, effect.allele
+- everthing to upper case
 
-%--------------------------------------
-\end{document}
-%--------------------------------------
+
+
+## how to store own LD structure?
+
+## Output
+
+There is an \texttt{.log} file providing the output and possible warning messages. The .out file has
+the following columns:
+
+- `SNP`
+- Chr Chromosome (only 1 to 22 right now)
+- Pos Position (HG19)
+- SNP2 Chr:Pos
+- bst.imp standardized effect sizes
+- P.imp P-value
+- Z.imp z
+- N.est estimation of N
+- r2.pred impqual
+- A1 reference allele
+- A2 effect allele
+- window.nbr in which window imputed
+
+
+\texttt{.out.not} lists all the SNPs that were not found in the reference panel 
+\texttt{.out.tnot} lists all the tSNPs that were not used as tSNPs (but needed): not found in the reference panel or had an NA in Z
+
+if P.imp NA and r2.pred 0 means that there was not tag SNP.
+
