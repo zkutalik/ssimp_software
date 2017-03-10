@@ -52,18 +52,26 @@ the following columns:
 
 if P.imp NA and r2.pred 0 means that there was not tag SNP.
 
+## Pseudocode
 
 ## checks
 [] names columns input
 
 [] tSNP not in reference panel
-\item SNP not in reference panel
-\item ref alleles not swaped as in reference panel
-\item A1 and A2 are not matching with reference panel
-\item NA in Z of tSNP
-\item two tSNPs or SNPs same Pos and chr
-\item !is.na(SNP) but is.na(SNP2)
-\item types of missings: NA, "-"
+
+[]  SNP not in reference panel
+
+[]  ref alleles not swaped as in reference panel
+
+[] A1 and A2 are not matching with reference panel
+
+[] NA in Z of tSNP
+
+[]  two tSNPs or SNPs same Pos and chr
+
+[]  !is.na(SNP) but is.na(SNP2)
+
+[]  types of missings: NA, "-"
 
 ## do
 - check if SNP is rsid or chr:pos
