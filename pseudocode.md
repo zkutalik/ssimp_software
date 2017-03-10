@@ -28,6 +28,31 @@ function
 
 	pos on hg19
 	
+## Output
+
+There is an `.log` file providing the output and possible warning messages. The .out file has
+the following columns:
+
+- `SNP`
+- `Chr` Chromosome (only 1 to 22 right now)
+- `Pos` Position (HG19)
+- `SNP2` Chr:Pos
+- `bst.imp` standardized effect sizes
+- `P.imp` P-value
+- `Z.imp` z
+- `N.est` estimation of N
+- `r2.pred` impqual
+- `A1` reference allele
+- `A2` effect allele
+- `window.nbr` in which window imputed
+
+
+`.out.not` lists all the SNPs that were not found in the reference panel 
+`.out.tnot` lists all the tSNPs that were not used as tSNPs (but needed): not found in the reference panel or had an NA in Z
+
+if P.imp NA and r2.pred 0 means that there was not tag SNP.
+
+
 ## checks
 [] names columns input
 
@@ -48,28 +73,3 @@ function
 
 
 ## how to store own LD structure?
-
-## Output
-
-There is an \texttt{.log} file providing the output and possible warning messages. The .out file has
-the following columns:
-
-- `SNP`
-- Chr Chromosome (only 1 to 22 right now)
-- Pos Position (HG19)
-- SNP2 Chr:Pos
-- bst.imp standardized effect sizes
-- P.imp P-value
-- Z.imp z
-- N.est estimation of N
-- r2.pred impqual
-- A1 reference allele
-- A2 effect allele
-- window.nbr in which window imputed
-
-
-\texttt{.out.not} lists all the SNPs that were not found in the reference panel 
-\texttt{.out.tnot} lists all the tSNPs that were not used as tSNPs (but needed): not found in the reference panel or had an NA in Z
-
-if P.imp NA and r2.pred 0 means that there was not tag SNP.
-
