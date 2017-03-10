@@ -1,5 +1,5 @@
 ~~Strike through~~
-- [] task lists
+[] task lists
 
 ```javascript
 function
