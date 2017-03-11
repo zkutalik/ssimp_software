@@ -12,22 +12,51 @@ function
 ## Minimal example
 `ssimp --data gwas.txt --refpanel EUR,EAS` will generate a `gwas.imp.log` file and a `gwas.imp.out` file.
 	
+	
+	
+	
+	
+	
+	
+	
 
 ## Input 
 `--data [filename.txt]`, named columns "SNP", "Z", "N" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19) space separated. If column names differ, define them in `--names`
+
 `--pop.1kg [pop]` needs to be defined: abbreviations of 1000genomes populations EUR, ASN, see http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
+
 `--out [filename.imp]` no extension needed, if not defined it will be `filename.imp`
+
 `--names [SNP, Z, N, ref.allele, effect.allele]` vector of names of columns SNP, Z, N, ref.allele, effect.allele
+
 `--refpanel [1kg]` (default) or path to own LD structure (see below)
+
 `--toimp [Z]` what kind of summary stats to impute: p-value (`P`), Z-statistic (`Z`), standardised beta (`b`)
+
 `--lambda [1/sqrt(n)]` if LD is prestored and n is known, or a number or "optimize" (loo)
+
 `--impute.maf [1/n]` lower limit for variants to be imputed: everthing above 1/n will be imputed
+
 `--impute.range [chr:pos.start-chr:pos.end]` NULL (default), if just chr:NA, then the whole chr is imputed
+
 `--impute.snps [snps2impute.txt]` NULL (default) or txt file with a set of SNPs to impute (no header): rsid or chr:pos.hg19 (no quotes)
+
 `--window.core.length [1e6]` main window
+
 `--window.flanking.length [250e3]` flanking region each side
 	
 **If no impute.range, not impute.snps is chosen, then all variants in the refpanel are imputed that are not provided as tag SNPs.**
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Output
@@ -54,6 +83,10 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 ## Pseudocode
 
+### Initial checks
+- check if SNP is rsid or chr:pos
+- exclude all lines with NA either in SNP, Z or N, ref.allele, effect.allele
+- everthing to upper case
 
 
 
@@ -79,11 +112,6 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 []  !is.na(SNP) but is.na(SNP2)
 
 []  types of missings: NA, "-"
-
-## do
-- check if SNP is rsid or chr:pos
-- exclude all lines with NA either in SNP, Z or N, ref.allele, effect.allele
-- everthing to upper case
 
 
 
