@@ -78,6 +78,7 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 - check if SNP is rsid or chr:pos
 - exclude all lines with NA either in SNP, Z or N, ref.allele, effect.allele
 - everthing to upper case
+- and much more...
 
 #### What is a tag SNP, what variants to impute, calculate windows
 1. Vector of valid tag SNPs, we define it as `tag.snps`
@@ -97,7 +98,7 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 #### wrap up all imputations
 
-#### checks
+#### write log file
 
 
 
