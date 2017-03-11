@@ -9,27 +9,28 @@ function
 	code2
 	function
 	
-## Example
-	ssimp --data gwas.txt --out res.txt --refpanel EUR,EAS
+## Minimal example
+	`ssimp --data gwas.txt --refpanel EUR,EAS` will generate a `gwas.imp.log` file and a `gwas.imp.out` file.
+	
 
 ## Input 
-	--data filename, named columns "SNP", "Z", "N" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos)
-	--out filename
-	--names names of columns SNP, Z, N, ref.allele, effect.allele
-	--toimp what kind of summary stats to impute: p-value, Z-statistic, beta
-	--refpanel 1kg (default) or path to own LD structure (see below)
-	--pop.1kg (nodefautl) EUR, ASN, ...
-	--lambda 1/sqrt(n) (default) or number or "optimize" (loo)
-	--impute.maf 1/n (default): everthing above 1/n will be imputed
-	--impute.range NULL (default) chr:pos.start-chr:pos.end (if just chr:NA, then the whole chr is imputed)
-	--impute.snps NULL (default) txt file with a set of SNPs to impute (no header): rsid or chr:pos (no quotes)
-	--window.core.length 1e6 (default) main window
-	--window.flanking.length 250e3 (default) flanking region each side
-
-	pos on hg19
+	`--data [filename.txt]`, named columns "SNP", "Z", "N" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19) space separated. If column names differ, define them in `--names`
+	`--pop.1kg [pop]` needs to be defined: abbreviations of 1000genomes populations EUR, ASN, see http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
+	`--out [filename.imp]` no extension needed, if not defined it will be `filename.imp`
+	`--names [SNP, Z, N, ref.allele, effect.allele]` vector of names of columns SNP, Z, N, ref.allele, effect.allele
+	`--refpanel [1kg]` (default) or path to own LD structure (see below)
+	`--toimp [Z]` what kind of summary stats to impute: p-value (`P`), Z-statistic (`Z`), standardised beta (`b`)
+	`--lambda [1/sqrt(n)]` if LD is prestored and n is known, or a number or "optimize" (loo)
+	`--impute.maf [1/n]` lower limit for variants to be imputed: everthing above 1/n will be imputed
+	`--impute.range [chr:pos.start-chr:pos.end]` NULL (default), if just chr:NA, then the whole chr is imputed
+	`--impute.snps [snps2impute.txt]` NULL (default) or txt file with a set of SNPs to impute (no header): rsid or chr:pos.hg19 (no quotes)
+	`--window.core.length [1e6]` main window
+	`--window.flanking.length [250e3]` flanking region each side
 	
-## Output
+	**If no impute.range, not impute.snps is chosen, then all variants in the refpanel are imputed that are not provided as tag SNPs.**
 
+
+## Output
 There is an `.log` file providing the output and possible warning messages. The .out file has
 the following columns:
 
@@ -46,13 +47,19 @@ the following columns:
 - `A2` effect allele
 - `window.nbr` in which window imputed
 
-
 `.out.not` lists all the SNPs that were not found in the reference panel 
 `.out.tnot` lists all the tSNPs that were not used as tSNPs (but needed): not found in the reference panel or had an NA in Z
 
-if P.imp NA and r2.pred 0 means that there was not tag SNP.
+if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 ## Pseudocode
+
+
+
+
+
+
+
 
 ## checks
 [] names columns input
@@ -80,4 +87,4 @@ if P.imp NA and r2.pred 0 means that there was not tag SNP.
 
 
 
-## how to store own LD structure?
+## How to store your own LD structure?
