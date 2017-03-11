@@ -1,13 +1,4 @@
-~~Strike through~~
-[] task lists
 
-```javascript
-function
-```
-
-	code1
-	code2
-	function
 	
 ## Minimal example
 `ssimp --data gwas.txt --refpanel EUR,EAS` will generate a `gwas.imp.log` file and a `gwas.imp.out` file.
@@ -60,7 +51,7 @@ function
 
 
 ## Output
-There is an `.log` file providing the output and possible warning messages. The .out file has
+There is an `.log` file providing the output and possible warning messages. The `.out` file has
 the following columns:
 
 - `SNP`
@@ -83,12 +74,30 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 ## Pseudocode
 
-### Initial checks
+#### Initial checks
 - check if SNP is rsid or chr:pos
 - exclude all lines with NA either in SNP, Z or N, ref.allele, effect.allele
 - everthing to upper case
 
+#### What is a tag SNP, what variants to impute, calculate windows
+1. Vector of valid tag SNPs, we define it as `tag.snps`
+2. Vector of SNPs to impute (consider arguments --impute.snps` and `--impute.range`), we define it as variable `imp.snps`
+3. Calculate `--window.core.length` of 1e6 core length
 
+#### LD structure
+1. What reference panel to use (`--refpanel`)
+2. Build correlation structure for selected SNPs (`tag.snps` and `imp.snps` and `--impute.maf`)`
+
+#### Swap sign's
+1. Based on the Alleles of the reference panel, swap the sign of the summary statistics of interest (if `b` or `Z`).
+
+#### For each window `k`
+1. do imputation
+
+
+#### wrap up all imputations
+
+#### checks
 
 
 
@@ -116,3 +125,27 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 
 ## How to store your own LD structure?
+I think its best if we provide the LD structure and MAF summaries for each population in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/, then we can calculate the LD matrix for, say, EUR. 
+
+Alternatively, users can provide a path to their own LD structure (estimated from...), and the summary of the variants (for allele swapping needed)
+
+
+
+
+
+
+
+
+
+
+
+~~Strike through~~
+[] task lists
+
+```javascript
+function
+```
+
+	code1
+	code2
+	function
