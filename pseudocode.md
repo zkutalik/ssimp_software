@@ -12,7 +12,7 @@
 	
 
 ## Input 
-`--data [filename.txt]`, named columns "SNP", "Z", "N" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19) space separated. If column names differ, define them in `--names`
+`--data [filename.txt]`, named columns "SNP", "Z", "N", "Chr", "Pos" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19, chr is numeric, pos.hg19 is numeric) space separated. If column names differ, define them in `--names`. If Chr is not among the 22, then ???. MIssings have to be marked as `NA`.
 
 `--pop.1kg [pop]` needs to be defined: abbreviations of 1000genomes populations EUR, ASN, see http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
 
@@ -36,8 +36,9 @@
 
 `--window.flanking.length [250e3]` flanking region each side
 	
-**If no impute.range, not impute.snps is chosen, then all variants in the refpanel are imputed that are not provided as tag SNPs.**
-
+### Note	
+- If no `impute.range`, not `impute.snps` is chosen, then all variants in the refpanel are imputed that are not provided as tag SNPs.
+- if your positions are not on hg19, you can use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
 
 
 
@@ -76,18 +77,37 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 #### Initial checks
 - check if SNP is rsid or chr:pos
+- Input checks: 
+??* if `data` is separated by space and a header, missings as NA (no dash, etc.)
+??* if `!is.null(names)` check if column names exist, if `is.null(names)` check if SNP, Pos, Chr, Z, N exists.
+??* `pop.1kg`: check if str is among the ones in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
+??* if `!is.null(refpanel)`: if valid path, and valid LD structure
+??* `pop.1kg`: if P, Z or b
+??* if `!is.null(lambda)`: numeric, between 0 and 1.
+??* if `!is.null(impute.maf)`: if between 0 and 1 
+??* if `is.null(impute.range) & is.null(impute.snps)`: impute all
+??* if `!is.null(impute.range) & is.null(impute.snps)`: check if range valid
+??* if `is.null(impute.range) & !is.null(impute.snps)`: check if valid txt file, no duplicates
+??* if `!is.null(impute.range) & !is.null(impute.snps)`: set impute.range to NULL
+??* `window.core.length`: numeric and large enough
+??* `window.flanking.length`: numeric
+??* write small protocol to `.log` file
+- rename columns to standard
+- check for duplicates in `data`
+- check for duplicates
+- if Z, P or b missing, compute
 - exclude all lines with NA either in SNP, Z or N, ref.allele, effect.allele
 - everthing to upper case
-- and much more...
 
 #### What is a tag SNP, what variants to impute, calculate windows
 1. Vector of valid tag SNPs, we define it as `tag.snps`
 2. Vector of SNPs to impute (consider arguments --impute.snps` and `--impute.range`), we define it as variable `imp.snps`
-3. Calculate `--window.core.length` of 1e6 core length
+3. Calculate the set of `--window.core.length` of 1e6 core length
 
 #### LD structure
 1. What reference panel to use (`--refpanel`)
 2. Build correlation structure for selected SNPs (`tag.snps` and `imp.snps` and `--impute.maf`)`
+3. Document in `.log` which tag and imp SNPs could not be used
 
 #### Swap sign's
 1. Based on the Alleles of the reference panel, swap the sign of the summary statistics of interest (if `b` or `Z`).
@@ -98,37 +118,18 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 #### wrap up all imputations
 
-#### write log file
+#### End checks
+- `0 >= r2.pred.adj <= 1`
+- impute some known tag SNPs and check whether that worked
+-  
 
-
-
-
-
-## checks
-[] names columns input
-
-[] tSNP not in reference panel
-
-[]  SNP not in reference panel
-
-[]  ref alleles not swaped as in reference panel
-
-[] A1 and A2 are not matching with reference panel
-
-[] NA in Z of tSNP
-
-[]  two tSNPs or SNPs same Pos and chr
-
-[]  !is.na(SNP) but is.na(SNP2)
-
-[]  types of missings: NA, "-"
-
+#### document all steps in log file
 
 
 ## How to store your own LD structure?
 I think its best if we provide the LD structure and MAF summaries for each population in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/, then we can calculate the LD matrix for, say, EUR. 
 
-Alternatively, users can provide a path to their own LD structure (estimated from...), and the summary of the variants (for allele swapping needed)
+Alternatively, users can provide a path to their own LD structure of a reference panel or their choice, and the summary of the variants (for allele swapping needed)
 
 
 
