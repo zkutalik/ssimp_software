@@ -79,19 +79,19 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 - check if SNP is rsid or chr:pos
 - Input checks: 
 	* if `data` is separated by space and a header, missings as NA (no dash, etc.)
-??* if `!is.null(names)` check if column names exist, if `is.null(names)` check if SNP, Pos, Chr, Z, N exists.
-??* `pop.1kg`: check if str is among the ones in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
-??* if `!is.null(refpanel)`: if valid path, and valid LD structure
-??* `pop.1kg`: if P, Z or b
-??* if `!is.null(lambda)`: numeric, between 0 and 1.
-??* if `!is.null(impute.maf)`: if between 0 and 1 
-??* if `is.null(impute.range) & is.null(impute.snps)`: impute all
-??* if `!is.null(impute.range) & is.null(impute.snps)`: check if range valid
-??* if `is.null(impute.range) & !is.null(impute.snps)`: check if valid txt file, no duplicates
-??* if `!is.null(impute.range) & !is.null(impute.snps)`: set impute.range to NULL
-??* `window.core.length`: numeric and large enough
-??* `window.flanking.length`: numeric
-??* write small protocol to `.log` file
+	* if `!is.null(names)` check if column names exist, if `is.null(names)` check if SNP, Pos, Chr, Z, N exists.	
+	* `pop.1kg`: check if str is among the ones in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
+	* if `!is.null(refpanel)`: if valid path, and valid LD structure
+	* `pop.1kg`: if P, Z or b
+	* if `!is.null(lambda)`: numeric, between 0 and 1.
+	* if `!is.null(impute.maf)`: if between 0 and 1 
+	* if `is.null(impute.range) & is.null(impute.snps)`: impute all
+	* if `!is.null(impute.range) & is.null(impute.snps)`: check if range valid
+	* if `is.null(impute.range) & !is.null(impute.snps)`: check if valid txt file, no duplicates
+	* if `!is.null(impute.range) & !is.null(impute.snps)`: set impute.range to NULL
+	* `window.core.length`: numeric and large enough
+	* `window.flanking.length`: numeric
+	* write small protocol to `.log` file
 - rename columns to standard
 - check for duplicates in `data`
 - check for duplicates
