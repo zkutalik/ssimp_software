@@ -78,7 +78,7 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 #### Initial checks
 - check if SNP is rsid or chr:pos
 - Input checks: 
-??* if `data` is separated by space and a header, missings as NA (no dash, etc.)
+	* if `data` is separated by space and a header, missings as NA (no dash, etc.)
 ??* if `!is.null(names)` check if column names exist, if `is.null(names)` check if SNP, Pos, Chr, Z, N exists.
 ??* `pop.1kg`: check if str is among the ones in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
 ??* if `!is.null(refpanel)`: if valid path, and valid LD structure
@@ -119,9 +119,8 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 #### wrap up all imputations
 
 #### End checks
-- `0 >= r2.pred.adj <= 1`
+- `0 >= r2.pred.adj <= 1` sdfsdf
 - impute some known tag SNPs and check whether that worked
--  
 
 #### document all steps in log file
 
