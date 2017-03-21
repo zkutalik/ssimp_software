@@ -12,7 +12,13 @@
 	
 
 ## Input 
-`--data [filename.txt]`, named columns "SNP", "Z", "N", "Chr", "Pos" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19, chr is numeric, pos.hg19 is numeric) space separated. If column names differ, define them in `--names`. If Chr is not among the 22, then ???. MIssings have to be marked as `NA`.
+`--data.quicktest [snptestfile]`, generic output from a quicktest file
+
+`--data.snptest [snptestfile]`, generic output from a snptest file
+
+`--data.plink [snptestfile]`, generic output from a plink file
+
+`--data [filename.txt]`, named columns "SNP", "Z", "N", "Chr", "Pos" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19, chr is numeric, pos.hg19 is numeric) space separated. If column names differ, define them in `--names`. If Chr is not among the 22, then ???. Missings have to be marked as `NA`.
 
 `--pop.1kg [pop]` needs to be defined: abbreviations of 1000genomes populations EUR, ASN, see http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
 
@@ -35,10 +41,13 @@
 `--window.core.length [1e6]` main window
 
 `--window.flanking.length [250e3]` flanking region each side
-	
+		
+`--missingness [TRUE]` enable variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
+
 ### Note	
 - If no `impute.range`, not `impute.snps` is chosen, then all variants in the refpanel are imputed that are not provided as tag SNPs.
 - if your positions are not on hg19, you can use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
+- The option `missingness` is automatically set to FALSE if `N` is not provided or `N` is set to `NA`.
 
 
 
@@ -52,7 +61,7 @@
 
 
 ## Output
-There is an `.log` file providing the output and possible warning messages. The `.out` file has
+The `.log` file provides the output and possible warning messages. The `.out` file has
 the following columns:
 
 - `SNP`
@@ -62,7 +71,7 @@ the following columns:
 - `bst.imp` standardized effect sizes
 - `P.imp` P-value
 - `Z.imp` z
-- `N.est` estimation of N
+- `N.est` estimation of N (if `missingness` option was set to `TRUE`)
 - `r2.pred` impqual
 - `A1` reference allele
 - `A2` effect allele
@@ -75,7 +84,7 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 ## Pseudocode
 
-#### Initial checks
+#### 1. Initial checks
 - check if SNP is rsid or chr:pos
 - Input checks: 
 	* if `data` is separated by space and a header, missings as NA (no dash, etc.)
@@ -92,37 +101,37 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 	* `window.core.length`: numeric and large enough
 	* `window.flanking.length`: numeric
 	* write small protocol to `.log` file
-- rename columns to standard
+- rename columns to standard or
+- make data input conform (e.g. it its data.snptest, turn it into a common data set)
 - check for duplicates in `data`
-- check for duplicates
 - if Z, P or b missing, compute
 - exclude all lines with NA either in SNP, Z or N, ref.allele, effect.allele
-- everthing to upper case
+- everything to upper case
 
-#### What is a tag SNP, what variants to impute, calculate windows
+#### 2. What is a tag SNP, which variants to impute, calculate windows
 1. Vector of valid tag SNPs, we define it as `tag.snps`
 2. Vector of SNPs to impute (consider arguments --impute.snps` and `--impute.range`), we define it as variable `imp.snps`
 3. Calculate the set of `--window.core.length` of 1e6 core length
 
-#### LD structure
+#### 3. Calculate LD structure
 1. What reference panel to use (`--refpanel`)
 2. Build correlation structure for selected SNPs (`tag.snps` and `imp.snps` and `--impute.maf`)`
 3. Document in `.log` which tag and imp SNPs could not be used
 
-#### Swap sign's
+#### 4. Swap sign's
 1. Based on the Alleles of the reference panel, swap the sign of the summary statistics of interest (if `b` or `Z`).
 
-#### For each window `k`
+#### 5. For each window `k`
 1. do imputation
 
 
-#### wrap up all imputations
+#### 6. wrap up all imputations
 
-#### End checks
-- `0 >= r2.pred.adj <= 1` sdfsdf
+#### 7. End checks
+- `0 >= r2.pred.adj <= 1` make sure imputation quality respects the range between 0 and 1.
 - impute some known tag SNPs and check whether that worked
 
-#### document all steps in log file
+#### 8. document all steps in log file
 
 
 ## How to store your own LD structure?
