@@ -12,13 +12,7 @@
 	
 
 ## Input 
-`--data.quicktest [snptestfile]`, generic output from a quicktest file
-
-`--data.snptest [snptestfile]`, generic output from a snptest file
-
-`--data.plink [snptestfile]`, generic output from a plink file
-
-`--data [filename.txt]`, named columns "SNP", "Z", "N", "Chr", "Pos" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19, chr is numeric, pos.hg19 is numeric) space separated. If column names differ, define them in `--names`. If Chr is not among the 22, then ???. Missings have to be marked as `NA`.
+`--data [filename.txt]`, named columns "SNP", "Z", "N", "Chr", "Pos", "EAF" (Z is numeric, N is numeric, SNP is a character, either rsid or chr:pos.hg19, chr is numeric, pos.hg19 is numeric) space separated. If column names differ, define them in `--names`. Missings have to be marked as `NA`. quicktest, snptest,metal and plink output files will be automatically recognised.
 
 `--pop.1kg [pop]` needs to be defined: abbreviations of 1000genomes populations EUR, ASN, see http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
 
@@ -56,10 +50,6 @@
 
 
 
-
-
-
-
 ## Output
 The `.log` file provides the output and possible warning messages. The `.out` file has
 the following columns:
@@ -88,6 +78,7 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 - check if SNP is rsid or chr:pos
 - Input checks: 
 	* if `data` is separated by space and a header, missings as NA (no dash, etc.)
+	* chr numeric, we cannot impute chr 23
 	* if `!is.null(names)` check if column names exist, if `is.null(names)` check if SNP, Pos, Chr, Z, N exists.	
 	* `pop.1kg`: check if str is among the ones in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/
 	* if `!is.null(refpanel)`: if valid path, and valid LD structure
