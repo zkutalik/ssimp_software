@@ -1,12 +1,12 @@
 #  Header translation
 
-There are at least four generic input types that we should consider:
+### There are at least four generic input types that we should consider:
 - `METAL` : tab-separated
 - `plink`: tab-separated
 - `snptest`: space-separated
 - `quicktest`: space-separated
 
-possible for the crucial variables are:
+### possible entries for the crucial variables are:
 - `SNP` rsid, MarkerName, snp, SNP, id1, Marker, MARKER
 - `Chr` CHR, chromosome
 - `Pos` BP, position
@@ -19,7 +19,10 @@ possible for the crucial variables are:
 - `N`  N, all_total 
 - `EAF` all_maf
 
-Plink only operates with A1
-Plink only has NMISS
-Plink has no EAF by default
-quicktest no N, no EAF
+### Things to consider
+- Plink only operates with A1
+- Plink only has NMISS
+- Plink has no EAF by default
+- quicktest no N, no EAF
+
+Maybe we should operate without EAF, as it is hardly ever reported...
