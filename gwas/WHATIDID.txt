@@ -21,6 +21,8 @@ genotype imputation)
 /data/sgg/sina/data/project.imputation/ukbb.comparison/gwas_gen_rs150341307_2016-09-01.out
 (>> genotype_gen)
 
+## plink
+/data/sgg/sina/teaching/gwas.sib.course/data/gwaa.pc.sex.assoc.linear
 
 2) run modify.R to shorten some files
 3) also, we should check if we can take the files from the project.eqtl
