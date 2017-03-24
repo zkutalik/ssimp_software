@@ -51,8 +51,13 @@ METAL
 
 
 
+## plink
+CHR         SNP         BP   A1       TEST    NMISS       BETA         STAT            P
+   1   rs3094315     742429    G        ADD      205      1.021       0.6523        0.515
+
+
+## in general
     SNP or SNP2 or (CHR + POS)
     Zscore or (P + Beta) or (beta + se)
     N
     Allele1, allele2
-
