@@ -16,7 +16,7 @@ using std:: vector;
 using utils:: ssize;
 using utils:: operator<<; // to print vectors
 
-#include "fwd/src/file.reading.hh"
+#define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
 namespace file_reading {
 
@@ -45,6 +45,8 @@ struct header_details {
             return *this = from;
         }
     };
+
+    char                     m_delimiter;
     offset_and_name    SNPname;
     offset_and_name    chromosome;
     offset_and_name    position;
@@ -55,6 +57,17 @@ struct header_details {
     offset_and_name    info;
     offset_and_name    format;
     vector<offset_and_name> unaccounted;
+};
+
+} // namespace file_reading
+
+#include "fwd/src/file.reading.hh"
+
+namespace file_reading {
+
+struct OneLineSummary {
+    ifstream:: pos_type      m_tellg_of_line_start;
+    string                   m_SNPname;
 };
 
 struct PlainVCFfile : public Genotypes_I {
@@ -71,29 +84,66 @@ static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     PP(file_name);
     ifstream f(file_name);
-    string line;
-    while(getline(f, line)) {
-        if(line.at(0) == '#' && line.at(1) == '#')
+    string current_line;
+
+    header_details hd;
+
+    // Skip past the '##' lines
+    while(getline(f, current_line)) {
+        if(current_line.at(0) == '#' && current_line.at(1) == '#')
             continue; // skip these ## lines
-        parse_header(line);
         break;
     }
+
+    // current_line is now the first line, i.e. the header
+    hd = parse_header(current_line);
+
+    // and tellg() gives us the offset, into the underlying vcf file, of the first line
+
+    auto initial_tellg = f.tellg();
+    PP(initial_tellg);
+
+    while(1) {
+        OneLineSummary ols;
+        ols.m_tellg_of_line_start = f.tellg();
+        getline(f, current_line);
+        if(!f) {
+            // nothing more to read, must leave the 'sentinal' OneLineSummary on the end
+            f.eof() || DIE("Error before reaching eof() in this file");
+            break;
+        }
+        auto all_split_up = tokenize(current_line, hd.m_delimiter);
+        LOOKUP(hd, SNPname, all_split_up);
+    };
+
     return {};
 }
 
 FWD(file_reading)
 static
-void   parse_header( string      const & header_line ) {
-    PP(header_line);
-    char delimiter = decide_delimiter(header_line);
-    auto field_names = tokenize(header_line, delimiter);
-    PP(field_names.size());
-    PP(field_names);
+string          lookup( header_details:: offset_and_name const &on
+                      , vector<string> const & all_split_up
+                      , const char *fieldname
+                      ) {
+    int offset = on.m_offset;
+    (offset >= 0 && offset < ssize(all_split_up)) || DIE("Cannot find ["<<fieldname<<"] field");
 
+    return all_split_up.at(offset);
+}
+
+FWD(file_reading)
+static
+file_reading::
+header_details   parse_header( string      const & header_line ) {
     header_details hd;
 
+    hd.m_delimiter = decide_delimiter(header_line);
+    auto header_names = tokenize(header_line, hd.m_delimiter);
+    PP(header_names.size());
+    PP(header_names);
+
     int field_counter = -1;
-    for(auto & one_field_name : field_names) {
+    for(auto & one_field_name : header_names) {
         ++field_counter;
         // go through each field name in turn and try to account for it
         if(false) {}
@@ -128,6 +178,7 @@ void   parse_header( string      const & header_line ) {
             hd.unaccounted.push_back( header_details:: offset_and_name(field_counter, one_field_name) );
         }
     }
+    return hd;
 }
 
 FWD(file_reading)
