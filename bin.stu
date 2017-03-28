@@ -49,3 +49,9 @@
     test -e "${path}" ||
         mkdir -p "${path}"
 }
+
+        @clean
+{
+    rm bin/ssimp
+    rm bin/o/CXX_WITH_FLAGS
+}
