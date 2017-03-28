@@ -13,6 +13,7 @@ using std:: ifstream;
 using std:: string;
 using std:: vector;
 using utils:: ssize;
+using utils:: operator<<; // to print vectors
 
 #include "fwd/src/file.reading.hh"
 
@@ -49,6 +50,7 @@ void   parse_header( string      const & header_line ) {
     char delimiter = decide_delimiter(header_line);
     auto field_names = tokenize(header_line, delimiter);
     PP(field_names.size());
+    PP(field_names);
 }
 
 FWD(file_reading)
@@ -60,7 +62,6 @@ vector<string>   tokenize( string      const & line
     vector<string> fields;
     while(1) {
         auto next_delim = line.find(delimiter, pos);
-        PP(line.substr(pos, next_delim-pos));
         fields.push_back( line.substr(pos, next_delim-pos) );
         if(next_delim== string:: npos)
             break;
