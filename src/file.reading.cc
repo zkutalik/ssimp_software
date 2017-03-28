@@ -29,6 +29,8 @@ struct header_details {
         {}
         offset_and_name(int offset, string name) : m_offset(offset), m_name(name)
         {}
+        offset_and_name(offset_and_name const &) = default;
+        offset_and_name(offset_and_name      &&) = default;
 
         void operator=(offset_and_name const & from) {
             if(m_offset != -1) {
