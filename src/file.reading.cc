@@ -72,10 +72,11 @@ struct OneLineSummary {
 
 struct PlainVCFfile : public file_reading:: Genotypes_I
 {
-    vector<OneLineSummary> each_SNP_and_its_offset;
+    vector<OneLineSummary> m_each_SNP_and_its_offset;
+    string                 m_underlying_file_name;
 
     virtual int         number_of_snps() const {
-        return each_SNP_and_its_offset.size();
+        return m_each_SNP_and_its_offset.size();
     }
 };
 
@@ -106,6 +107,8 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
 
     auto p = std:: make_shared<PlainVCFfile>();
+    p->m_underlying_file_name = file_name;
+
     while(1) {
         OneLineSummary ols;
         ols.m_tellg_of_line_start = f.tellg();
@@ -118,7 +121,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
         auto all_split_up = tokenize(current_line, hd.m_delimiter);
         ols.m_SNPname = LOOKUP(hd, SNPname, all_split_up);
 
-        p->each_SNP_and_its_offset.push_back(ols);
+        p->m_each_SNP_and_its_offset.push_back(ols);
     };
 
     return p;
