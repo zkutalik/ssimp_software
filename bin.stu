@@ -24,6 +24,7 @@
 :   src/${name}.cc
     $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
     [bin/o/LIST_OF_HH_FILES]
+    src/fwd/${name}.hh
 {
     echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
     ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
@@ -49,6 +50,15 @@
 
     #echo -n " -pg -ggdb                  " # For profiling
     echo
+}
+
+>       src/fwd/${name}.hh
+:   -t @mkdir..src/fwd
+        src/${name}.cc
+@all.stu.files
+{
+    echo '#define FWD'
+    grep -P -z -o '(?s)^FWD$.*?{'  src/${name}.cc | egrep -v '^FWD$' | tr '{' ';'
 }
 
 >       bin/local/gsl_cflags
