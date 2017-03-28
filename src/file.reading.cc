@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <cassert>
 
 #include "other/DIE.hh"
 #include "other/PP.hh"
@@ -18,6 +19,27 @@ using utils:: operator<<; // to print vectors
 #include "fwd/src/file.reading.hh"
 
 namespace file_reading {
+
+struct header_details {
+    struct offset_and_name {
+        int                  m_offset;
+        string               m_name;
+
+        offset_and_name() : m_offset(-1)
+        {}
+        offset_and_name(int offset, string name) : m_offset(offset), m_name(name)
+        {}
+    };
+    offset_and_name    SNPname;
+    offset_and_name    chromosome;
+    offset_and_name    position;
+    offset_and_name    allele_ref;
+    offset_and_name    allele_alt;
+    offset_and_name    qual;
+    offset_and_name    filter;
+    offset_and_name    info;
+    offset_and_name    format;
+};
 
 struct PlainVCFfile : public Genotypes_I {
 };
@@ -51,6 +73,71 @@ void   parse_header( string      const & header_line ) {
     auto field_names = tokenize(header_line, delimiter);
     PP(field_names.size());
     PP(field_names);
+
+    header_details hd;
+
+    int field_counter = -1;
+    for(auto & one_field_name : field_names) {
+        ++field_counter;
+        // go through each field name in turn and try to account for it
+        PP(one_field_name);
+        if(is_in_this_list(one_field_name, {"ID"})) {
+            hd.SNPname = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"#CHROM","chr"})) {
+            hd.chromosome = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"POS"})) {
+            hd.position = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"REF"})) {
+            hd.allele_ref = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"ALT"})) {
+            hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"QUAL"})) {
+            hd.qual = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"FILTER"})) {
+            hd.filter = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"INFO"})) {
+            hd.info = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(is_in_this_list(one_field_name, {"FORMAT"})) {
+            hd.format = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        if(field_counter>=20)
+            break;
+    }
+    auto checker = [&](auto & offset_and_name) {
+        if(offset_and_name.m_offset == -1) {
+            assert(offset_and_name.m_name == "");
+            return;
+        }
+        PP(offset_and_name.m_name);
+        PP(field_names.at(offset_and_name.m_offset));
+        assert(offset_and_name.m_name == field_names.at(offset_and_name.m_offset));
+    };
+    checker(hd.SNPname);
+    checker(hd.chromosome);
+    checker(hd.position);
+    checker(hd.allele_ref);
+    checker(hd.allele_alt);
+    checker(hd.qual);
+    checker(hd.filter);
+    checker(hd.info);
+    checker(hd.format);
+}
+
+FWD(file_reading)
+static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) {
+    for(auto cand : candidates) {
+        if(s==cand)
+            return true;
+    }
+    return false;
 }
 
 FWD(file_reading)
