@@ -128,25 +128,6 @@ void   parse_header( string      const & header_line ) {
             hd.unaccounted.push_back( header_details:: offset_and_name(field_counter, one_field_name) );
         }
     }
-    auto checker = [&](auto & offset_and_name) {
-        if(offset_and_name.m_offset == -1) {
-            assert(offset_and_name.m_name == "");
-            return;
-        }
-        PP(offset_and_name.m_name);
-        PP(field_names.at(offset_and_name.m_offset));
-        assert(offset_and_name.m_name == field_names.at(offset_and_name.m_offset));
-    };
-    checker(hd.SNPname);
-    checker(hd.chromosome);
-    checker(hd.position);
-    checker(hd.allele_ref);
-    checker(hd.allele_alt);
-    checker(hd.qual);
-    checker(hd.filter);
-    checker(hd.info);
-    checker(hd.format);
-    PP(hd.unaccounted.size());
 }
 
 FWD(file_reading)
