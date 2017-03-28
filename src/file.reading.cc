@@ -53,7 +53,18 @@ char   decide_delimiter( string      const & header_line ) {
     size_t commas = std::count(header_line.begin(), header_line.end(), ',');
     size_t tabs   = std::count(header_line.begin(), header_line.end(), '\t');
     size_t spaces = std::count(header_line.begin(), header_line.end(), ' ');
-    PP(commas, tabs, spaces);
+    char delimiter = '\0';
+    if(commas >  0 && tabs == 0 && spaces == 0) delimiter = ',';
+    if(commas == 0 && tabs >  0 && spaces == 0) delimiter = '\t';
+    if(commas == 0 && tabs == 0 && spaces >  0) delimiter = ' ';
+    if(delimiter == '\0') {
+        DIE("Couldn't decide what delimiter to use."
+                <<  " #commas:" << commas
+                << ", #tabs:"     << tabs
+                << ", #spaces:"     << spaces
+           );
+    }
+    return delimiter;
 }
 
 } // namespace file_reading
