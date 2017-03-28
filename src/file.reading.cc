@@ -121,8 +121,6 @@ void   parse_header( string      const & header_line ) {
         if(is_in_this_list(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(field_counter>=20)
-            break;
     }
     auto checker = [&](auto & offset_and_name) {
         if(offset_and_name.m_offset == -1) {
