@@ -29,6 +29,19 @@ struct header_details {
         {}
         offset_and_name(int offset, string name) : m_offset(offset), m_name(name)
         {}
+
+        void operator=(offset_and_name const & from) {
+            if(m_offset != -1) {
+                WARNING("Two fields with a similar name, using [" << m_name << "] and ignoring [" << from.m_name << "].");
+                return;
+            }
+            assert(m_offset == -1);
+            m_offset = from.m_offset;
+            m_name   = from.m_name;
+        }
+        void operator=(offset_and_name && from) {
+            return *this = from;
+        }
     };
     offset_and_name    SNPname;
     offset_and_name    chromosome;
