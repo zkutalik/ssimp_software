@@ -68,6 +68,8 @@ namespace file_reading {
 struct OneLineSummary {
     ifstream:: pos_type      m_tellg_of_line_start;
     string                   m_SNPname;
+    int                      m_chromosome;
+    int                      m_position;
 };
 
 struct PlainVCFfile : public file_reading:: Genotypes_I
@@ -119,9 +121,20 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             break;
         }
         auto all_split_up = tokenize(current_line, hd.m_delimiter);
-        ols.m_SNPname = LOOKUP(hd, SNPname, all_split_up);
+        try {
+            ols.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
+            ols.m_chromosome = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
+            ols.m_position   = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
 
-        p->m_each_SNP_and_its_offset.push_back(ols);
+            PP(ols.m_SNPname, ols.m_chromosome, ols.m_position);
+            p->m_each_SNP_and_its_offset.push_back(ols);
+        } catch (std:: invalid_argument &e) {
+            WARNING( "Ignoring this line, problem with the chromosome and/or position. ["
+                    << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
+                    << " chr:" << LOOKUP(hd, chromosome, all_split_up)
+                    << " pos:" << LOOKUP(hd, position  , all_split_up)
+                    << "]" );
+        }
     };
 
     return p;
