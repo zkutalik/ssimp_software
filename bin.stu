@@ -17,7 +17,7 @@
 :   -t @mkdir..bin/o
     @unconditional
 {
-    find src -name '*.hh'
+    find src -name '*.hh' | egrep -v '^src/fwd'
 }
 
     bin/o/${name}.o
