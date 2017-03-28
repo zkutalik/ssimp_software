@@ -1,0 +1,51 @@
+    bin/ssimp
+:   src/ssimp.cc
+    $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+{
+    echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
+    ${CXX_WITH_FLAGS} src/ssimp.cc -o bin/ssimp
+}
+
+>       bin/o/CXX_WITH_FLAGS
+:   -t @mkdir..bin/o
+        @all.stu.files
+        bin/local/gsl_cflags
+        bin/local/gsl_libs
+{
+    echo -n "g++"
+    echo -n " -O2"
+    echo -n " -Wall -Wextra -std=c++14"
+
+    echo -n ' '; cat bin/local/gsl_cflags
+    echo -n ' '; cat bin/local/gsl_libs
+
+    #echo -n "clang++ --gcc-toolchain=${HOME}/prefix-gcc-6.2.0 -Wl,-rpath  -Wl,${HOME}/prefix-gcc-6.2.0/lib64"
+    #echo -n "/home/amcdaid/prefix-gcc-6.1.0/bin/g++"
+    #echo -n " -Wl,-rpath,/software/lib64 "     # adding this causes the two linker errors
+    echo -n " -Wno-misleading-indentation" # not accepted by clang++
+
+    #echo -n " -pg -ggdb                  " # For profiling
+    echo
+}
+
+>       bin/local/gsl_cflags
+:   -t @mkdir..bin/local
+{
+    gsl-config --cflags # For example: "-I/usr/include"
+}
+>       bin/local/gsl_libs
+:   -t @mkdir..bin/local
+{
+    gsl-config --libs # For example: "-lgsl -lgslcblas -lm"
+}
+
+        @all.stu.files
+:       main.stu
+        bin.stu
+;
+
+@mkdir..${path}
+{
+    test -e "${path}" ||
+        mkdir -p "${path}"
+}
