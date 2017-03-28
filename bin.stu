@@ -39,6 +39,7 @@
     echo -n "g++"
     echo -n " -O2"
     echo -n " -Wall -Wextra -std=c++14"
+    [[ "$(whoami)" = 'amcdaid' ]] && echo -n ' -Werror'
 
     echo -n ' '; cat bin/local/gsl_cflags
     echo -n ' '; cat bin/local/gsl_libs
