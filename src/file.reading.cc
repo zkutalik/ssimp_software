@@ -126,7 +126,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             ols.m_chromosome = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
             ols.m_position   = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
 
-            PP(ols.m_SNPname, ols.m_chromosome, ols.m_position);
             p->m_each_SNP_and_its_offset.push_back(ols);
         } catch (std:: invalid_argument &e) {
             WARNING( "Ignoring this line, problem with the chromosome and/or position. ["
@@ -136,6 +135,17 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                     << "]" );
         }
     };
+
+    sort( p->m_each_SNP_and_its_offset.begin()
+        , p->m_each_SNP_and_its_offset.end()
+        , [](auto &l, auto &r) -> bool {
+            if(l.m_chromosome < r.m_chromosome) return true;
+            if(l.m_chromosome > r.m_chromosome) return false;
+            if(l.m_position   < r.m_position  ) return true;
+            if(l.m_position   > r.m_position  ) return false;
+            return false;
+        }
+        );
 
     return p;
 }
@@ -160,8 +170,6 @@ header_details   parse_header( string      const & header_line ) {
 
     hd.m_delimiter = decide_delimiter(header_line);
     auto header_names = tokenize(header_line, hd.m_delimiter);
-    PP(header_names.size());
-    PP(header_names);
 
     int field_counter = -1;
     for(auto & one_field_name : header_names) {
