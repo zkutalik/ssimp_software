@@ -6,9 +6,11 @@
 
 #include "other/DIE.hh"
 #include "other/PP.hh"
+#include "other/utils.hh"
 
 using std:: ifstream;
 using std:: string;
+using utils:: ssize;
 
 #include "fwd/src/file.reading.hh"
 
@@ -42,7 +44,15 @@ FWD(file_reading)
 static
 void   parse_header( string      const & header_line ) {
     PP(header_line);
-    decide_delimiter(header_line);
+    char delimiter = decide_delimiter(header_line);
+    int pos = 0;
+    while(1) {
+        auto next_delim = header_line.find(delimiter, pos);
+        PP(header_line.substr(pos, next_delim-pos));
+        if(next_delim== string:: npos)
+            break;
+        pos=next_delim+1;
+    }
 }
 
 FWD(file_reading)
