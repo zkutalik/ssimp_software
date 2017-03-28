@@ -13,7 +13,7 @@
     -o bin/ssimp
 }
 
->   bin/o/LIST_OF_HH_FILES
+>   bin/LIST_OF_HH_FILES
 :   -t @mkdir..bin/o
     @unconditional
 {
@@ -23,7 +23,7 @@
     bin/o/${name}.o
 :   src/${name}.cc
     $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
-    [bin/o/LIST_OF_HH_FILES]
+    [bin/LIST_OF_HH_FILES]
     src/fwd/src/${name}.hh
 {
     echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
