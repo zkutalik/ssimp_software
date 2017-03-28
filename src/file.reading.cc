@@ -20,8 +20,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
     return read_in_a_raw_ref_file_as_VCF(file_name);
 }
 
-FWD
-file_reading::
+FWD(file_reading)
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     return {};
 }

@@ -57,8 +57,13 @@
         src/${name}.cc
 @all.stu.files
 {
-    echo '#define FWD'
-    grep -P -z -o '(?s)^FWD$.*?{'  src/${name}.cc | egrep -v '^FWD$' | tr '{' ';'
+    echo
+    echo '#define FWD(namespace_) ' # 'namespace namespace_ {'
+    grep -P -z -o '(?s)^FWD.*?{'  src/${name}.cc | tr '{' ';'
+    #echo '} /*namespace*/'
+    echo '#undef  FWD'
+    echo '#define FWD(namespace)'
+    echo
 }
 
 >       bin/local/gsl_cflags
