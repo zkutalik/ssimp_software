@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <vector>
 
 #include "other/DIE.hh"
 #include "other/PP.hh"
@@ -10,6 +11,7 @@
 
 using std:: ifstream;
 using std:: string;
+using std:: vector;
 using utils:: ssize;
 
 #include "fwd/src/file.reading.hh"
@@ -45,14 +47,26 @@ static
 void   parse_header( string      const & header_line ) {
     PP(header_line);
     char delimiter = decide_delimiter(header_line);
+    auto field_names = tokenize(header_line, delimiter);
+    PP(field_names.size());
+}
+
+FWD(file_reading)
+static
+vector<string>   tokenize( string      const & line
+               , char                delimiter
+        ) {
     int pos = 0;
+    vector<string> fields;
     while(1) {
-        auto next_delim = header_line.find(delimiter, pos);
-        PP(header_line.substr(pos, next_delim-pos));
+        auto next_delim = line.find(delimiter, pos);
+        PP(line.substr(pos, next_delim-pos));
+        fields.push_back( line.substr(pos, next_delim-pos) );
         if(next_delim== string:: npos)
             break;
         pos=next_delim+1;
     }
+    return fields;
 }
 
 FWD(file_reading)
