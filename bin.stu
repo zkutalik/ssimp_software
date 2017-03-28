@@ -1,9 +1,18 @@
     bin/ssimp
 :   src/ssimp.cc
     $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+    bin/o/options.o
 {
     echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
-    ${CXX_WITH_FLAGS} src/ssimp.cc -o bin/ssimp
+    ${CXX_WITH_FLAGS} src/ssimp.cc bin/o/options.o -o bin/ssimp
+}
+
+    bin/o/${name}.o
+:   src/${name}.cc
+    $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+{
+    echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
+    ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
 }
 
 >       bin/o/CXX_WITH_FLAGS
