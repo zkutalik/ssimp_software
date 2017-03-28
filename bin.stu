@@ -59,8 +59,7 @@
 {
     echo
     echo '#define FWD(namespace_) namespace namespace_ {'
-    grep -P -z -o '(?s)^FWD.*?{'  src/${name}.cc | tr '{' ';'
-    echo '} /*namespace*/'
+    grep -P -z -o '(?s)^FWD.*?{'  src/${name}.cc | sed -re  's#\{#;\n} /*end namespace*/#'
     echo '#undef  FWD'
     echo '#define FWD(namespace)'
     echo
