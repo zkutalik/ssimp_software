@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 #include "other/DIE.hh"
 #include "other/PP.hh"
@@ -41,6 +42,18 @@ FWD(file_reading)
 static
 void   parse_header( string      const & header_line ) {
     PP(header_line);
+    decide_delimiter(header_line);
+}
+
+FWD(file_reading)
+static
+char   decide_delimiter( string      const & header_line ) {
+    // Which is comma, tab, or space, are most common here?
+
+    size_t commas = std::count(header_line.begin(), header_line.end(), ',');
+    size_t tabs   = std::count(header_line.begin(), header_line.end(), '\t');
+    size_t spaces = std::count(header_line.begin(), header_line.end(), ' ');
+    PP(commas, tabs, spaces);
 }
 
 } // namespace file_reading
