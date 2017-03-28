@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
 
     if(!options:: opt_raw_ref.empty()) {
         PP(options:: opt_raw_ref);
-        file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
+        auto raw_ref_file = file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
+        PP(raw_ref_file->number_of_snps());
     }
 }

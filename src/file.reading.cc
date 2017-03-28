@@ -70,7 +70,13 @@ struct OneLineSummary {
     string                   m_SNPname;
 };
 
-struct PlainVCFfile : public Genotypes_I {
+struct PlainVCFfile : public file_reading:: Genotypes_I
+{
+    vector<OneLineSummary> each_SNP_and_its_offset;
+
+    virtual int         number_of_snps() const {
+        return each_SNP_and_its_offset.size();
+    }
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
@@ -98,11 +104,8 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     // current_line is now the first line, i.e. the header
     hd = parse_header(current_line);
 
-    // and tellg() gives us the offset, into the underlying vcf file, of the first line
 
-    auto initial_tellg = f.tellg();
-    PP(initial_tellg);
-
+    auto p = std:: make_shared<PlainVCFfile>();
     while(1) {
         OneLineSummary ols;
         ols.m_tellg_of_line_start = f.tellg();
@@ -113,10 +116,12 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             break;
         }
         auto all_split_up = tokenize(current_line, hd.m_delimiter);
-        LOOKUP(hd, SNPname, all_split_up);
+        ols.m_SNPname = LOOKUP(hd, SNPname, all_split_up);
+
+        p->each_SNP_and_its_offset.push_back(ols);
     };
 
-    return {};
+    return p;
 }
 
 FWD(file_reading)
