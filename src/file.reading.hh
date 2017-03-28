@@ -4,8 +4,8 @@
 
 namespace file_reading {
 
-class Genotypes_I {
-    virtual int         number_of_snps() const;
+struct Genotypes_I {
+    virtual int         number_of_snps() const = 0;
 };
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const> const ;
