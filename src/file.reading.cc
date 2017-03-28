@@ -5,9 +5,7 @@
 #include "other/DIE.hh"
 #include "other/PP.hh"
 
-namespace file_reading {
 #include "fwd/src/file.reading.hh"
-}
 
 namespace file_reading {
 
