@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "options.hh"
+#include "file.reading.hh"
 
 #include "other/DIE.hh"
 #include "other/PP.hh"
@@ -12,5 +13,8 @@ int main(int argc, char **argv) {
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
 
-    PP(options:: opt_raw_ref);
+    if(!options:: opt_raw_ref.empty()) {
+        PP(options:: opt_raw_ref);
+        file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
+    }
 }

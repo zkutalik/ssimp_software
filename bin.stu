@@ -3,11 +3,13 @@
 
     bin/o/ssimp.o
     bin/o/options.o
+    bin/o/file.reading.o
 {
     echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
     ${CXX_WITH_FLAGS} \
         bin/o/options.o \
         bin/o/ssimp.o \
+        bin/o/file.reading.o \
     -o bin/ssimp
 }
 
