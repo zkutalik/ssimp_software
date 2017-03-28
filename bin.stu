@@ -11,9 +11,17 @@
     -o bin/ssimp
 }
 
+>   bin/o/LIST_OF_HH_FILES
+:   -t @mkdir..bin/o
+    @unconditional
+{
+    find src -name '*.hh'
+}
+
     bin/o/${name}.o
 :   src/${name}.cc
     $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+    [bin/o/LIST_OF_HH_FILES]
 {
     echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
     ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
@@ -62,6 +70,8 @@
     test -e "${path}" ||
         mkdir -p "${path}"
 }
+
+@unconditional {}
 
         @clean
 {

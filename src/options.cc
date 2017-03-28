@@ -2,10 +2,15 @@
 
 #include <getopt.h>
 #include <iostream>
+#include <cassert>
 
 #include "other/DIE.hh"
 
+using std:: string;
+
 namespace options {
+
+        std:: string            opt_raw_ref;
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
@@ -22,8 +27,8 @@ void read_in_all_command_line_options(int argc, char **argv) {
             DIE("There shouldn't be any non-options args to this program: ["<<optarg<<"]");
         }
         if (c == 2) {
-            //assert(string("z_compare") == long_options[long_option_index].name);
-            //zs_to_compare.emplace_back( optarg, read_in_a_vector(optarg) );
+            assert(string("z_compare") == long_options[long_option_index].name);
+            options:: opt_raw_ref = optarg;
         }
     }
 }
