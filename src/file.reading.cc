@@ -54,6 +54,7 @@ struct header_details {
     offset_and_name    filter;
     offset_and_name    info;
     offset_and_name    format;
+    vector<offset_and_name> unaccounted;
 };
 
 struct PlainVCFfile : public Genotypes_I {
@@ -95,33 +96,36 @@ void   parse_header( string      const & header_line ) {
     for(auto & one_field_name : field_names) {
         ++field_counter;
         // go through each field name in turn and try to account for it
-        PP(one_field_name);
-        if(is_in_this_list(one_field_name, {"ID"})) {
+        if(false) {}
+        else if(is_in_this_list(one_field_name, {"ID"})) {
             hd.SNPname = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"#CHROM","chr"})) {
+        else if(is_in_this_list(one_field_name, {"#CHROM","chr"})) {
             hd.chromosome = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"POS"})) {
+        else if(is_in_this_list(one_field_name, {"POS"})) {
             hd.position = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"REF"})) {
+        else if(is_in_this_list(one_field_name, {"REF"})) {
             hd.allele_ref = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"ALT"})) {
+        else if(is_in_this_list(one_field_name, {"ALT"})) {
             hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"QUAL"})) {
+        else if(is_in_this_list(one_field_name, {"QUAL"})) {
             hd.qual = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"FILTER"})) {
+        else if(is_in_this_list(one_field_name, {"FILTER"})) {
             hd.filter = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"INFO"})) {
+        else if(is_in_this_list(one_field_name, {"INFO"})) {
             hd.info = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        if(is_in_this_list(one_field_name, {"FORMAT"})) {
+        else if(is_in_this_list(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        else {
+            hd.unaccounted.push_back( header_details:: offset_and_name(field_counter, one_field_name) );
         }
     }
     auto checker = [&](auto & offset_and_name) {
@@ -142,6 +146,7 @@ void   parse_header( string      const & header_line ) {
     checker(hd.filter);
     checker(hd.info);
     checker(hd.format);
+    PP(hd.unaccounted.size());
 }
 
 FWD(file_reading)
