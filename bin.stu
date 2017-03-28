@@ -24,7 +24,7 @@
 :   src/${name}.cc
     $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
     [bin/o/LIST_OF_HH_FILES]
-    src/fwd/${name}.hh
+    src/fwd/src/${name}.hh
 {
     echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
     ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
@@ -52,8 +52,8 @@
     echo
 }
 
->       src/fwd/${name}.hh
-:   -t @mkdir..src/fwd
+>       src/fwd/src/${name}.hh
+:   -t @mkdir..src/fwd/src
         src/${name}.cc
 @all.stu.files
 {
