@@ -87,6 +87,7 @@
 
         @clean
 {
-    rm bin/ssimp
-    rm bin/o/CXX_WITH_FLAGS
+    rm bin/ssimp                 || :
+    rm bin/o/CXX_WITH_FLAGS      || :
+    rm src/fwd/src/*.hh          || :
 }
