@@ -124,7 +124,6 @@ if `P.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 #### 8. document all steps in log file
 
-
 ## How to store your own LD structure?
 I think its best if we provide the LD structure and MAF summaries for each population in http://www.internationalgenome.org/faq/which-populations-are-part-your-study/, then we can calculate the LD matrix for, say, EUR. 
 
