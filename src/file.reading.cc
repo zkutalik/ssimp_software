@@ -80,6 +80,13 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_offset.size();
     }
+    virtual chrpos      get_chrpos         (int i)     const {
+        assert(i>=0);
+        assert(i<number_of_snps());
+        OneLineSummary const & ols = m_each_SNP_and_its_offset.at(i);
+        return chrpos{ols.m_chromosome, ols.m_position};
+    }
+
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
