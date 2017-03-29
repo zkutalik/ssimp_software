@@ -31,7 +31,10 @@ struct SNPiterator {
     GenotypeFileHandle m_gfh;
     int                m_line_number; // 0 means the first SNP that was read, 1 the second ...
 
-    SNPiterator &       operator++()        ;
+    SNPiterator &       operator++();
+    bool                operator==(SNPiterator const & other);
+    bool                operator!=(SNPiterator const & other);
+    bool                operator< (SNPiterator const & other);
 
     chrpos get_chrpos() const {
         return m_gfh->get_chrpos(m_line_number);

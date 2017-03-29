@@ -24,6 +24,17 @@ namespace file_reading {
         ++m_line_number;
         return *this;
     }
+    bool                SNPiterator:: operator==(SNPiterator const & other) {
+        assert(m_gfh == other.m_gfh);
+        return m_line_number == other.m_line_number;
+    }
+    bool                SNPiterator:: operator!=(SNPiterator const & other) {
+        return !(*this == other);
+    }
+    bool                SNPiterator:: operator< (SNPiterator const & other) {
+        assert(m_gfh == other.m_gfh);
+        return m_line_number < other.m_line_number;
+    }
 
 struct header_details {
     struct offset_and_name {
