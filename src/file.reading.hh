@@ -42,6 +42,7 @@ struct AnyFile_I {
 struct Genotypes_I : public AnyFile_I {
 };
 struct Effects_I : public AnyFile_I {
+    virtual void        set_chrpos         (int, chrpos)  = 0; // so that we can fill them in from the ref data
 };
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
@@ -56,7 +57,9 @@ struct SNPiterator
     int                m_line_number; // 0 means the first SNP that was read, 1 the second, and so on
 
     static_assert(std::is_same< GWASorREF , GenotypeFileHandle >{}
-              ||  std::is_same< GWASorREF , GwasFileHandle     >{}, "");
+              ||  std::is_same< GWASorREF , GwasFileHandle_NONCONST     >{}
+              ||  std::is_same< GWASorREF , GwasFileHandle     >{}
+              , "");
 
     // Constructor
                         SNPiterator(GWASorREF gfh, int line_number) : m_gfh(gfh), m_line_number(line_number) {}
@@ -84,6 +87,13 @@ struct SNPiterator
     }
     std:: string      get_allele_alt() const {
         return m_gfh->get_allele_alt(m_line_number);
+    }
+
+    template<typename T = decltype(m_gfh)>
+    auto   set_chrpos(chrpos crps)
+        -> decltype ( std::declval<T>() -> set_chrpos(m_line_number, crps) )
+    {
+        return                    m_gfh -> set_chrpos(m_line_number, crps);
     }
 
     // Maybe I shouldn't have these static methods after all, might be confusing.

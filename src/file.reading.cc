@@ -165,8 +165,8 @@ GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unorde
     // I really should detect the file-type.
     // But for now, we'll just assume a plain (non-gzipped) vcf file.
     GwasFileHandle_NONCONST gwas = read_in_a_gwas_file_simple(file_name);
-    auto       b_gwas = file_reading:: SNPiterator<GwasFileHandle>:: begin_from_file(gwas);
-    auto const e_gwas = file_reading:: SNPiterator<GwasFileHandle>::   end_from_file(gwas);
+    auto       b_gwas = file_reading:: SNPiterator<GwasFileHandle_NONCONST>:: begin_from_file(gwas);
+    auto const e_gwas = file_reading:: SNPiterator<GwasFileHandle_NONCONST>::   end_from_file(gwas);
     for(;b_gwas < e_gwas; ++b_gwas) {
         auto nm= b_gwas.get_SNPname();
         auto x = b_gwas.get_chrpos();
@@ -175,6 +175,7 @@ GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unorde
             if(try_to_find_in_ref != m.end()) {
                 auto chrpos_in_ref = try_to_find_in_ref->second;
                 PP(nm,chrpos_in_ref);
+                b_gwas.set_chrpos(chrpos_in_ref);
             }
         }
     }
@@ -376,6 +377,14 @@ struct SimpleGwasFile : public file_reading:: Effects_I
     virtual std::string get_allele_alt        (int i)     const {
         auto const & ols = get_gls(i);
         return ols.m_allele_alt;
+    }
+    virtual void        set_chrpos        (int i, chrpos crps)  {
+        assert(i>=0);
+        assert(i<number_of_snps());
+        auto & existing = m_each_SNP_and_its_z.at(i);
+        assert(existing.m_chrpos.chr == -1);
+        assert(existing.m_chrpos.pos == -1);
+        existing.m_chrpos = crps;
     }
 
     GwasLineSummary  get_gls         (int i)     const {
