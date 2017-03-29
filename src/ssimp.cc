@@ -15,6 +15,8 @@ int main(int argc, char **argv) {
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
 
+    cout.imbue(std::locale("")); // apply the user's locale, for example the thousands separator
+
     if(!options:: opt_raw_ref.empty()) {
         PP(options:: opt_raw_ref);
         auto raw_ref_file = file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
