@@ -1,0 +1,98 @@
+    bin/ssimp
+:   $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+
+    bin/o/ssimp.o
+    bin/o/options.o
+    bin/o/file.reading.o
+{
+    echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
+    ${CXX_WITH_FLAGS} \
+        bin/o/options.o \
+        bin/o/ssimp.o \
+        bin/o/file.reading.o \
+    -o bin/ssimp
+}
+
+>   bin/LIST_OF_HH_FILES
+:   -t @mkdir..bin/o
+    @unconditional
+{
+    find src -name '*.hh' | egrep -v '^src/fwd'
+}
+
+    bin/o/${name}.o
+:   src/${name}.cc
+    $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+    [bin/LIST_OF_HH_FILES]
+    src/fwd/src/${name}.hh
+{
+    echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
+    ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
+}
+
+>       bin/o/CXX_WITH_FLAGS
+:   -t @mkdir..bin/o
+        @all.stu.files
+        bin/local/gsl_cflags
+        bin/local/gsl_libs
+{
+    echo -n "g++"
+    echo -n " -O2"
+    echo -n " -Wall -Wextra -std=c++14"
+    [[ "$(whoami)" = 'amcdaid' ]] && echo -n ' -Werror'
+
+    echo -n ' '; cat bin/local/gsl_cflags
+    echo -n ' '; cat bin/local/gsl_libs
+
+    #echo -n "clang++ --gcc-toolchain=${HOME}/prefix-gcc-6.2.0 -Wl,-rpath  -Wl,${HOME}/prefix-gcc-6.2.0/lib64"
+    #echo -n "/home/amcdaid/prefix-gcc-6.1.0/bin/g++"
+    #echo -n " -Wl,-rpath,/software/lib64 "     # adding this causes the two linker errors
+    echo -n " -Wno-misleading-indentation" # not accepted by clang++
+
+    #echo -n " -pg -ggdb                  " # For profiling
+    echo
+}
+
+>       src/fwd/src/${name}.hh
+:   -t @mkdir..src/fwd/src
+        src/${name}.cc
+@all.stu.files
+{
+    echo
+    echo '#define FWD(namespace_) namespace namespace_ {'
+    grep -P -z -o '(?s)^FWD.*?{'  src/${name}.cc | sed -re  's#\{#;\n} /*end namespace*/#'
+    echo '#undef  FWD'
+    echo '#define FWD(namespace)'
+    echo
+}
+
+>       bin/local/gsl_cflags
+:   -t @mkdir..bin/local
+{
+    gsl-config --cflags # For example: "-I/usr/include"
+}
+>       bin/local/gsl_libs
+:   -t @mkdir..bin/local
+{
+    gsl-config --libs # For example: "-lgsl -lgslcblas -lm"
+}
+
+        @all.stu.files
+:       main.stu
+        bin.stu
+;
+
+@mkdir..${path}
+{
+    test -e "${path}" ||
+        mkdir -p "${path}"
+}
+
+@unconditional {}
+
+        @clean
+{
+    rm bin/ssimp                 || :
+    rm bin/o/CXX_WITH_FLAGS      || :
+    rm src/fwd/src/*.hh          || :
+}

@@ -1,0 +1,10 @@
+# ssimp - summary statistic imputation. See README for more info
+
+# This is a 'stu' file.
+# 'stu' is a modern replacement for Make, making it much easier to write
+# parameterized recipes. https://github.com/kunegis/stu/blob/master/stu.text
+
+# For those unable to use 'stu', we may consider including a basic 'Makefile'
+# in this package.
+
+% include bin.stu
