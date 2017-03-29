@@ -169,7 +169,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
         ols.m_tellg_of_line_start = f.tellg();
         getline(f, current_line);
         if(!f) {
-            // nothing more to read, must leave the 'sentinal' OneLineSummary on the end
             f.eof() || DIE("Error before reaching eof() in this file");
             break;
         }
