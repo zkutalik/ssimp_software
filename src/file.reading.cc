@@ -98,6 +98,8 @@ struct OneLineSummary {
     string                   m_SNPname;
     int                      m_chromosome;
     int                      m_position;
+    string                   m_allele_alt;
+    string                   m_allele_ref;
 };
 
 struct PlainVCFfile : public file_reading:: Genotypes_I
@@ -109,10 +111,26 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         return m_each_SNP_and_its_offset.size();
     }
     virtual chrpos      get_chrpos         (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return chrpos{ols.m_chromosome, ols.m_position};
+    }
+    virtual std::string get_SNPname        (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return ols.m_SNPname;
+    }
+    virtual std::string get_allele_ref        (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return ols.m_allele_ref;
+    }
+    virtual std::string get_allele_alt        (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return ols.m_allele_alt;
+    }
+
+    OneLineSummary  get_ols         (int i)     const {
         assert(i>=0);
         assert(i<number_of_snps());
-        OneLineSummary const & ols = m_each_SNP_and_its_offset.at(i);
-        return chrpos{ols.m_chromosome, ols.m_position};
+        return m_each_SNP_and_its_offset.at(i);
     }
 
 };
@@ -160,6 +178,8 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             ols.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
             ols.m_chromosome = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
             ols.m_position   = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
+            ols.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
+            ols.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
 
             p->m_each_SNP_and_its_offset.push_back(ols);
         } catch (std:: invalid_argument &e) {

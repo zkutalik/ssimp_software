@@ -29,6 +29,9 @@ std:: ostream& operator<<(std:: ostream &o, chrpos const &c) {
 struct Genotypes_I {
     virtual int         number_of_snps     ()        const = 0;
     virtual chrpos      get_chrpos         (int)     const = 0;
+    virtual std::string get_SNPname        (int)     const = 0;
+    virtual std::string get_allele_ref     (int)     const = 0;
+    virtual std::string get_allele_alt     (int)     const = 0;
 };
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
@@ -56,6 +59,15 @@ struct SNPiterator
 
     chrpos get_chrpos() const {
         return m_gfh->get_chrpos(m_line_number);
+    }
+    std:: string      get_SNPname() const {
+        return m_gfh->get_SNPname(m_line_number);
+    }
+    std:: string      get_allele_ref() const {
+        return m_gfh->get_allele_ref(m_line_number);
+    }
+    std:: string      get_allele_alt() const {
+        return m_gfh->get_allele_alt(m_line_number);
     }
 
     // Maybe I shouldn't have these static methods after all, might be confusing.
