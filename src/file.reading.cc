@@ -103,7 +103,7 @@ struct OneLineSummary {
 };
 struct GwasLineSummary {
     string                   m_SNPname;
-    //chrpos                   m_chrpos;
+    chrpos                   m_chrpos;
     string                   m_allele_alt;
     string                   m_allele_ref;
     double                   m_z;
@@ -338,6 +338,10 @@ struct SimpleGwasFile : public file_reading:: Effects_I
         auto const & ols = get_gls(i);
         return ols.m_SNPname;
     }
+    virtual chrpos      get_chrpos        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_chrpos;
+    }
     virtual std::string get_allele_ref        (int i)     const {
         auto const & ols = get_gls(i);
         return ols.m_allele_ref;
@@ -382,10 +386,19 @@ GwasFileHandle      read_in_a_gwas_file_simple(std:: string file_name) {
         auto all_split_up = tokenize(current_line, hd.m_delimiter);
         try {
             gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
-            //gls.m_chromosome = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
-            //gls.m_position   = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
             gls.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
             gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
+
+            // Try to read in chromosome and position, but they may not be present
+            // If missing, we'll fill them in much later from the reference panel
+            gls.m_chrpos.chr = -1;
+            gls.m_chrpos.pos = -1;
+            if(hd.chromosome.m_offset != -1) {
+                gls.m_chrpos.chr = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
+            }
+            if(hd.position.m_offset != -1) {
+                gls.m_chrpos.pos = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
+            }
 
             p->m_each_SNP_and_its_z.push_back(gls);
         } catch (std:: invalid_argument &e) {
