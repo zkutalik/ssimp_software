@@ -25,6 +25,12 @@ int main(int argc, char **argv) {
         PP(raw_ref_file->number_of_snps());
 
         ssimp:: quickly_list_the_regions(raw_ref_file);
+
+        if(!   options:: opt_gwas_filename.empty()) {
+            PP(options:: opt_gwas_filename);
+            auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
+            PP(  gwas->number_of_snps());
+        }
     }
 }
 

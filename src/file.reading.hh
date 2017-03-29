@@ -33,8 +33,15 @@ struct Genotypes_I {
     virtual std::string get_allele_ref     (int)     const = 0;
     virtual std::string get_allele_alt     (int)     const = 0;
 };
+struct Effects_I {
+    virtual int         number_of_snps     ()        const = 0;
+    virtual std::string get_SNPname        (int)     const = 0;
+    virtual std::string get_allele_ref     (int)     const = 0;
+    virtual std::string get_allele_alt     (int)     const = 0;
+};
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
+using GwasFileHandle     = std:: shared_ptr<Effects_I   const>;
 
 struct SNPiterator
 : public std::iterator<std:: random_access_iterator_tag, chrpos>
@@ -80,5 +87,6 @@ struct SNPiterator
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name);
+GwasFileHandle          read_in_a_gwas_file(std:: string file_name);
 
 } // namespace file_reading

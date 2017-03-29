@@ -101,6 +101,13 @@ struct OneLineSummary {
     string                   m_allele_alt;
     string                   m_allele_ref;
 };
+struct GwasLineSummary {
+    string                   m_SNPname;
+    //chrpos                   m_chrpos;
+    string                   m_allele_alt;
+    string                   m_allele_ref;
+    double                   m_z;
+};
 
 struct PlainVCFfile : public file_reading:: Genotypes_I
 {
@@ -140,6 +147,13 @@ GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
     // But for now, we'll just assume a plain (non-gzipped) vcf file.
     return read_in_a_raw_ref_file_as_VCF(file_name);
 }
+
+GwasFileHandle      read_in_a_gwas_file(std:: string file_name) {
+    // I really should detect the file-type.
+    // But for now, we'll just assume a plain (non-gzipped) vcf file.
+    return read_in_a_gwas_file_simple(file_name);
+}
+
 
 FWD(file_reading)
 static
@@ -310,6 +324,82 @@ char   decide_delimiter( string      const & header_line ) {
            );
     }
     return delimiter;
+}
+
+struct SimpleGwasFile : public file_reading:: Effects_I
+{
+    vector<GwasLineSummary> m_each_SNP_and_its_z;
+    string                 m_underlying_file_name;
+
+    virtual int         number_of_snps() const {
+        return m_each_SNP_and_its_z.size();
+    }
+    virtual std::string get_SNPname        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_SNPname;
+    }
+    virtual std::string get_allele_ref        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_allele_ref;
+    }
+    virtual std::string get_allele_alt        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_allele_alt;
+    }
+
+    GwasLineSummary  get_gls         (int i)     const {
+        assert(i>=0);
+        assert(i<number_of_snps());
+        return m_each_SNP_and_its_z.at(i);
+    }
+
+};
+
+FWD(file_reading)
+static
+GwasFileHandle      read_in_a_gwas_file_simple(std:: string file_name) {
+    PP(file_name);
+    ifstream f(file_name);
+    string current_line;
+
+    header_details hd;
+
+    getline(f, current_line);
+
+    // current_line is now the first line, i.e. the header
+    hd = parse_header(current_line);
+
+    auto p = std:: make_shared<SimpleGwasFile>();
+    p->m_underlying_file_name = file_name;
+
+    while(1) {
+        GwasLineSummary gls;
+        getline(f, current_line);
+        if(!f) {
+            f.eof() || DIE("Error before reaching eof() in this file");
+            break;
+        }
+        auto all_split_up = tokenize(current_line, hd.m_delimiter);
+        try {
+            gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
+            //gls.m_chromosome = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
+            //gls.m_position   = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
+            gls.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
+            gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
+
+            p->m_each_SNP_and_its_z.push_back(gls);
+        } catch (std:: invalid_argument &e) {
+            WARNING( "Ignoring this line, problem with the chromosome and/or position. ["
+                    << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
+                    //<< " chr:" << LOOKUP(hd, chromosome, all_split_up)
+                    //<< " pos:" << LOOKUP(hd, position  , all_split_up)
+                    << "]" );
+        }
+    };
+
+    /* Note: Sort them by position here */
+
+    return p;
 }
 
 } // namespace file_reading
