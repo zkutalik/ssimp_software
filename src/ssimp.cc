@@ -48,12 +48,8 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
      * 16644620
      */
 
-    PP(* std:: lower_bound(b, e, file_reading:: chrpos{22,16050114}) );
-    PP(* std:: lower_bound(b, e, file_reading:: chrpos{22,16050115}) );
-    PP(* std:: lower_bound(b, e, file_reading:: chrpos{22,16050116}) );
-    PP(* std:: lower_bound(b, e, file_reading:: chrpos{22,16644604}) );
-    PP(* std:: lower_bound(b, e, file_reading:: chrpos{22,16644605}) );
-    PP(* std:: lower_bound(b, e, file_reading:: chrpos{22,16644606}) );
+    constexpr int width_window = 300'000;
+    PP(width_window);
 
     for(int chrm = 22; chrm <= 22; ++chrm) {
 
@@ -62,7 +58,6 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
         auto c_end   = std:: lower_bound(b, e, file_reading:: chrpos{chrm, std::numeric_limits<int>::max()  });
         assert(c_end >= c_begin);
 
-        constexpr int width_window = 300'000;
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * width_window;
             int current_window_end   = (w+1) * width_window;
@@ -73,6 +68,12 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
             if(w_begin == w_end)
                 continue; // Empty region, just skip it
             PP(chrm, w, current_window_start, current_window_end-1, w_end - w_begin);
+            // We have at least one SNP here, let's print some stuff about it
+            PP( *w_begin
+                    , w_begin.get_SNPname()
+                    , w_begin.get_allele_ref()
+                    , w_begin.get_allele_alt()
+                    );
         }
     }
 
