@@ -48,6 +48,7 @@ struct SNPiterator
     bool                operator==(SNPiterator const & other);
     bool                operator!=(SNPiterator const & other);
     bool                operator< (SNPiterator const & other);
+    bool                operator>=(SNPiterator const & other);
     int                 operator- (SNPiterator const & other);
     chrpos              operator* ()                           const;
     SNPiterator &       operator+=(long int            ran);

@@ -35,6 +35,7 @@ namespace file_reading {
         assert(m_gfh == other.m_gfh);
         return m_line_number < other.m_line_number;
     }
+    bool                SNPiterator:: operator>=(SNPiterator const & other) { return !(*this < other); }
     int                 SNPiterator:: operator- (SNPiterator const & other) {
         assert(m_gfh == other.m_gfh);
         return m_line_number - other.m_line_number;
