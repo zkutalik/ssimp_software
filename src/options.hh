@@ -3,6 +3,7 @@
 namespace options {
 
 extern  std:: string            opt_raw_ref;
+extern  std:: string            opt_gwas_filename;
 extern  int                     opt_window_width;
 extern  int                     opt_flanking_width;
 
