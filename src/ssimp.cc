@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
 #include <cassert>
+#include <unordered_map>
 
 #include "options.hh"
 #include "file.reading.hh"
@@ -10,6 +11,7 @@
 
 using std:: cout;
 using std:: endl;
+using std:: string;
 
 #include "fwd/src/ssimp.hh"
 
@@ -27,6 +29,7 @@ int main(int argc, char **argv) {
         ssimp:: quickly_list_the_regions(raw_ref_file);
 
         if(!   options:: opt_gwas_filename.empty()) {
+            auto m = ssimp:: map_rs_to_chrpos( raw_ref_file );
             PP(options:: opt_gwas_filename);
             auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
             PP(  gwas->number_of_snps());
@@ -82,6 +85,20 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
         }
     }
 
+}
+
+FWD(ssimp)
+std:: unordered_map<string, file_reading:: chrpos>
+            map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file ) {
+    auto       b = file_reading:: SNPiterator:: begin_from_file(raw_ref_file);
+    auto const e = file_reading:: SNPiterator::   end_from_file(raw_ref_file);
+    std:: unordered_map<string, file_reading:: chrpos> m;
+    for(;b<e; ++b) {
+        auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
+        rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
+    }
+    PP(m.size());
+    return m;
 }
 
 } // namespace ssimp
