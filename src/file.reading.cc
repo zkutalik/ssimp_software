@@ -19,6 +19,11 @@ using utils:: operator<<; // to print vectors
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
 namespace file_reading {
+    SNPiterator &       SNPiterator:: operator++()        {
+        assert(m_line_number < m_gfh->number_of_snps());
+        ++m_line_number;
+        return *this;
+    }
 
 struct header_details {
     struct offset_and_name {

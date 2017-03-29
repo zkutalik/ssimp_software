@@ -27,6 +27,25 @@ struct Genotypes_I {
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const> const ;
 
+struct SNPiterator {
+    GenotypeFileHandle m_gfh;
+    int                m_line_number; // 0 means the first SNP that was read, 1 the second ...
+
+    SNPiterator &       operator++()        ;
+
+    chrpos get_chrpos() const {
+        return m_gfh->get_chrpos(m_line_number);
+    }
+
+    // Maybe I shouldn't have these static methods after all, might be confusing.
+    static SNPiterator begin_from_file(GenotypeFileHandle gfh) {
+        return {gfh, 0};
+    }
+    static SNPiterator   end_from_file(GenotypeFileHandle gfh) {
+        return {gfh, gfh->number_of_snps()};
+    }
+};
+
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name);
 
 } // namespace file_reading
