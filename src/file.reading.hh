@@ -42,14 +42,18 @@ struct Effects_I : public AnyFile_I {
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
 using GwasFileHandle     = std:: shared_ptr<Effects_I   const>;
 
+template<typename GWASorREF> // GwasFileHandle *or* GenotypeFileHandle
 struct SNPiterator
 : public std::iterator<std:: random_access_iterator_tag, chrpos>
 {
-    GenotypeFileHandle m_gfh;
+    GWASorREF m_gfh;
     int                m_line_number; // 0 means the first SNP that was read, 1 the second, and so on
 
+    static_assert(std::is_same< GWASorREF , GenotypeFileHandle >{}
+              ||  std::is_same< GWASorREF , GwasFileHandle     >{}, "");
+
     // Constructor
-                        SNPiterator(GenotypeFileHandle gfh, int line_number) : m_gfh(gfh), m_line_number(line_number) {}
+                        SNPiterator(GWASorREF gfh, int line_number) : m_gfh(gfh), m_line_number(line_number) {}
 
 
     // operators
@@ -77,10 +81,10 @@ struct SNPiterator
     }
 
     // Maybe I shouldn't have these static methods after all, might be confusing.
-    static SNPiterator begin_from_file(GenotypeFileHandle gfh) {
+    static SNPiterator begin_from_file(GWASorREF gfh) {
         return {gfh, 0};
     }
-    static SNPiterator   end_from_file(GenotypeFileHandle gfh) {
+    static SNPiterator   end_from_file(GWASorREF gfh) {
         return {gfh, gfh->number_of_snps()};
     }
 };

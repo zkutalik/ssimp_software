@@ -39,13 +39,16 @@ int main(int argc, char **argv) {
 
 namespace ssimp{
 
+using file_reading:: GenotypeFileHandle;
+using file_reading:: GwasFileHandle;
+
 FWD(ssimp)
 void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
     int total_number_of_SNPs = raw_ref_file->number_of_snps();
     PP (total_number_of_SNPs);
 
-    auto const b = file_reading:: SNPiterator:: begin_from_file(raw_ref_file);
-    auto const e = file_reading:: SNPiterator::   end_from_file(raw_ref_file);
+    auto const b = file_reading:: SNPiterator<GenotypeFileHandle>:: begin_from_file(raw_ref_file);
+    auto const e = file_reading:: SNPiterator<GenotypeFileHandle>::   end_from_file(raw_ref_file);
 
     /*
      * 16050075
@@ -90,8 +93,8 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
 FWD(ssimp)
 std:: unordered_map<string, file_reading:: chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file ) {
-    auto       b = file_reading:: SNPiterator:: begin_from_file(raw_ref_file);
-    auto const e = file_reading:: SNPiterator::   end_from_file(raw_ref_file);
+    auto       b = file_reading:: SNPiterator<GenotypeFileHandle>:: begin_from_file(raw_ref_file);
+    auto const e = file_reading:: SNPiterator<GenotypeFileHandle>::   end_from_file(raw_ref_file);
     std:: unordered_map<string, file_reading:: chrpos> m;
     for(;b<e; ++b) {
         auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
