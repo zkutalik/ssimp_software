@@ -29,10 +29,14 @@ int main(int argc, char **argv) {
         ssimp:: quickly_list_the_regions(raw_ref_file);
 
         if(!   options:: opt_gwas_filename.empty()) {
+            // Build a map of the chrpos in the reference.
+            // Will be useful to fill in the blanks in the GWAS data
             auto m = ssimp:: map_rs_to_chrpos( raw_ref_file );
+
             PP(options:: opt_gwas_filename);
-            auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
+            auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename, m);
             PP(  gwas->number_of_snps());
+
         }
     }
 }

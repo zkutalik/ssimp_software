@@ -161,10 +161,24 @@ GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
     return read_in_a_raw_ref_file_as_VCF(file_name);
 }
 
-GwasFileHandle      read_in_a_gwas_file(std:: string file_name) {
+GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unordered_map<std:: string, file_reading:: chrpos> const & m) {
     // I really should detect the file-type.
     // But for now, we'll just assume a plain (non-gzipped) vcf file.
-    return read_in_a_gwas_file_simple(file_name);
+    GwasFileHandle_NONCONST gwas = read_in_a_gwas_file_simple(file_name);
+    auto       b_gwas = file_reading:: SNPiterator<GwasFileHandle>:: begin_from_file(gwas);
+    auto const e_gwas = file_reading:: SNPiterator<GwasFileHandle>::   end_from_file(gwas);
+    for(;b_gwas < e_gwas; ++b_gwas) {
+        auto nm= b_gwas.get_SNPname();
+        auto x = b_gwas.get_chrpos();
+        if(x == chrpos{-1,-1}) {
+            auto try_to_find_in_ref = m.find(nm);
+            if(try_to_find_in_ref != m.end()) {
+                auto chrpos_in_ref = try_to_find_in_ref->second;
+                PP(nm,chrpos_in_ref);
+            }
+        }
+    }
+    return gwas;
 }
 
 
@@ -374,7 +388,7 @@ struct SimpleGwasFile : public file_reading:: Effects_I
 
 FWD(file_reading)
 static
-GwasFileHandle      read_in_a_gwas_file_simple(std:: string file_name) {
+GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) {
     PP(file_name);
     ifstream f(file_name);
     string current_line;

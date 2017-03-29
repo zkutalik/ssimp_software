@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <ostream>
+#include <unordered_map>
 
 namespace file_reading {
 
@@ -13,6 +14,10 @@ struct chrpos {
         if(chr > other.chr) return false;
 
         return pos < other.pos;
+    }
+    bool operator==(chrpos const & other) {
+        return(chr == other.chr
+            && pos == other.pos);
     }
 };
 
@@ -41,6 +46,7 @@ struct Effects_I : public AnyFile_I {
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
 using GwasFileHandle     = std:: shared_ptr<Effects_I   const>;
+using GwasFileHandle_NONCONST     = std:: shared_ptr<Effects_I>;
 
 template<typename GWASorREF> // GwasFileHandle *or* GenotypeFileHandle
 struct SNPiterator
@@ -90,6 +96,6 @@ struct SNPiterator
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name);
-GwasFileHandle          read_in_a_gwas_file(std:: string file_name);
+GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unordered_map<std:: string, file_reading:: chrpos> const &);
 
 } // namespace file_reading
