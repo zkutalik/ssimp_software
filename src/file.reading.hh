@@ -8,6 +8,12 @@ namespace file_reading {
 struct chrpos {
     int chr;
     int pos;
+    bool operator< (chrpos const & other) {
+        if(chr < other.chr) return true;
+        if(chr > other.chr) return false;
+
+        return pos < other.pos;
+    }
 };
 
 inline
@@ -27,14 +33,25 @@ struct Genotypes_I {
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
 
-struct SNPiterator {
+struct SNPiterator
+: public std::iterator<std:: random_access_iterator_tag, chrpos>
+{
     GenotypeFileHandle m_gfh;
-    int                m_line_number; // 0 means the first SNP that was read, 1 the second ...
+    int                m_line_number; // 0 means the first SNP that was read, 1 the second, and so on
 
+    // Constructor
+                        SNPiterator(GenotypeFileHandle gfh, int line_number) : m_gfh(gfh), m_line_number(line_number) {}
+
+
+    // operators
     SNPiterator &       operator++();
     bool                operator==(SNPiterator const & other);
     bool                operator!=(SNPiterator const & other);
     bool                operator< (SNPiterator const & other);
+    int                 operator- (SNPiterator const & other);
+    chrpos              operator* ()                           const;
+    SNPiterator &       operator+=(long int            ran);
+
 
     chrpos get_chrpos() const {
         return m_gfh->get_chrpos(m_line_number);

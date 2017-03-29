@@ -35,6 +35,17 @@ namespace file_reading {
         assert(m_gfh == other.m_gfh);
         return m_line_number < other.m_line_number;
     }
+    int                 SNPiterator:: operator- (SNPiterator const & other) {
+        assert(m_gfh == other.m_gfh);
+        return m_line_number - other.m_line_number;
+    }
+    chrpos              SNPiterator:: operator* () const {
+        return get_chrpos();
+    }
+    SNPiterator &       SNPiterator:: operator+=(long int            ran)   {
+        m_line_number += ran;
+        return *this;
+    }
 
 struct header_details {
     struct offset_and_name {
