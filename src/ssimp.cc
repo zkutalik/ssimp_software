@@ -48,8 +48,7 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
      * 16644620
      */
 
-    constexpr int width_window = 300'000;
-    PP(width_window);
+    PP(options:: opt_window_width);
 
     for(int chrm = 22; chrm <= 22; ++chrm) {
 
@@ -59,8 +58,8 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
         assert(c_end >= c_begin);
 
         for(int w = 0; ; ++w ) {
-            int current_window_start = w     * width_window;
-            int current_window_end   = (w+1) * width_window;
+            int current_window_start = w     * options:: opt_window_width;
+            int current_window_end   = (w+1) * options:: opt_window_width;
             auto w_begin = std:: lower_bound(c_begin, c_end, file_reading:: chrpos{chrm,current_window_start});
             auto w_end   = std:: lower_bound(w_begin, c_end, file_reading:: chrpos{chrm,current_window_end  });
             if(w_begin == c_end)
