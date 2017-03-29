@@ -26,18 +26,17 @@ std:: ostream& operator<<(std:: ostream &o, chrpos const &c) {
     return o;
 }
 
-struct Genotypes_I {
+struct AnyFile_I {
     virtual int         number_of_snps     ()        const = 0;
-    virtual chrpos      get_chrpos         (int)     const = 0;
     virtual std::string get_SNPname        (int)     const = 0;
     virtual std::string get_allele_ref     (int)     const = 0;
     virtual std::string get_allele_alt     (int)     const = 0;
 };
-struct Effects_I {
-    virtual int         number_of_snps     ()        const = 0;
-    virtual std::string get_SNPname        (int)     const = 0;
-    virtual std::string get_allele_ref     (int)     const = 0;
-    virtual std::string get_allele_alt     (int)     const = 0;
+
+struct Genotypes_I : public AnyFile_I {
+    virtual chrpos      get_chrpos         (int)     const = 0;
+};
+struct Effects_I : public AnyFile_I {
 };
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
