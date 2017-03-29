@@ -25,7 +25,7 @@ struct Genotypes_I {
     virtual chrpos      get_chrpos         (int)     const = 0;
 };
 
-using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const> const ;
+using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
 
 struct SNPiterator {
     GenotypeFileHandle m_gfh;
