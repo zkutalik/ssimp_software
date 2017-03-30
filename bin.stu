@@ -5,7 +5,7 @@
     bin/o/options.o
     bin/o/file.reading.o
 {
-    echo LINKER:"${LINKER}"
+    echo LINKER:"${LINKER}" | tr '\n' ' '; echo
     ${LINKER} \
         bin/o/options.o \
         bin/o/ssimp.o \
@@ -25,12 +25,13 @@
     $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
     [bin/LIST_OF_HH_FILES]
 {
-    echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}"
+    echo CXX_WITH_FLAGS:"${CXX_WITH_FLAGS}" | tr '\n' ' '; echo
     ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
 }
 
 >       bin/o/GCC_OR_CLANG
-:       @all.stu.files
+:   -t @mkdir..bin/o
+       @all.stu.files
 {
     which clang++ g++ | head -n1 # find one of these compilers
 
@@ -45,22 +46,16 @@
 }
 
 >       bin/o/LINKER
-:   -t @mkdir..bin/o
-        bin/local/gsl_cflags
+:       bin/o/GCC_OR_CLANG
         bin/local/gsl_libs
-        bin/o/GCC_OR_CLANG
 {
-    cat bin/o/GCC_OR_CLANG
-    cat bin/local/gsl_libs
+    cat bin/o/GCC_OR_CLANG bin/local/gsl_libs
 }
 >       bin/o/CXX_WITH_FLAGS
-:   -t @mkdir..bin/o
+:       bin/o/GCC_OR_CLANG
         bin/local/gsl_cflags
-        bin/local/gsl_libs
-        bin/o/GCC_OR_CLANG
 {
-    cat bin/o/GCC_OR_CLANG
-    cat bin/local/gsl_cflags
+    cat bin/o/GCC_OR_CLANG bin/local/gsl_cflags
 }
 
 >       bin/local/gsl_cflags
