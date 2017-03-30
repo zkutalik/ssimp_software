@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <ostream>
+#include <stdexcept>
 #include <vector>
 
 namespace utils {
