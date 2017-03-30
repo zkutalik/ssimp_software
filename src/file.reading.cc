@@ -19,6 +19,49 @@ using utils:: operator<<; // to print vectors
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
 namespace file_reading {
+    template<typename G>
+    SNPiterator<G> &       SNPiterator<G>:: operator++()        {
+        assert(m_line_number < m_gfh->number_of_snps());
+        ++m_line_number;
+        return *this;
+    }
+    template<typename G>
+    bool                SNPiterator<G>:: operator==(SNPiterator<G> const & other) {
+        assert(m_gfh == other.m_gfh);
+        return m_line_number == other.m_line_number;
+    }
+    template<typename G>
+    bool                SNPiterator<G>:: operator!=(SNPiterator<G> const & other) {
+        return !(*this == other);
+    }
+    template<typename G>
+    bool                SNPiterator<G>:: operator< (SNPiterator<G> const & other) {
+        assert(m_gfh == other.m_gfh);
+        return m_line_number < other.m_line_number;
+    }
+    template<typename G>
+    bool                SNPiterator<G>:: operator>=(SNPiterator<G> const & other) { return !(*this < other); }
+    template<typename G>
+    int                 SNPiterator<G>:: operator- (SNPiterator<G> const & other) {
+        assert(m_gfh == other.m_gfh);
+        return m_line_number - other.m_line_number;
+    }
+    template<typename G>
+    chrpos              SNPiterator<G>:: operator* () const {
+        return get_chrpos();
+    }
+    template<typename G>
+    SNPiterator<G> &       SNPiterator<G>:: operator+=(long int            ran)   {
+        m_line_number += ran;
+        return *this;
+    }
+
+    template struct
+    SNPiterator<GenotypeFileHandle>;
+    template struct
+    SNPiterator<GwasFileHandle>;
+    template struct
+    SNPiterator<GwasFileHandle_NONCONST>;
 
 struct header_details {
     struct offset_and_name {
@@ -59,17 +102,42 @@ struct header_details {
     vector<offset_and_name> unaccounted;
 };
 
-} // namespace file_reading
 
-#include "fwd/src/file.reading.hh"
-
-namespace file_reading {
+// Some forward declarations
+static
+GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name);
+static
+string          lookup( header_details:: offset_and_name const &on
+                      , vector<string> const & all_split_up
+                      , const char *fieldname
+                      );
+static
+file_reading::
+header_details   parse_header( string      const & header_line );
+static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) ;
+static
+vector<string>   tokenize( string      const & line
+               , char                delimiter
+        );
+static
+GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
+static
+char   decide_delimiter( string      const & header_line );
 
 struct OneLineSummary {
     ifstream:: pos_type      m_tellg_of_line_start;
     string                   m_SNPname;
     int                      m_chromosome;
     int                      m_position;
+    string                   m_allele_alt;
+    string                   m_allele_ref;
+};
+struct GwasLineSummary {
+    string                   m_SNPname;
+    chrpos                   m_chrpos;
+    string                   m_allele_alt;
+    string                   m_allele_ref;
+    double                   m_z;
 };
 
 struct PlainVCFfile : public file_reading:: Genotypes_I
@@ -80,6 +148,29 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_offset.size();
     }
+    virtual chrpos      get_chrpos         (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return chrpos{ols.m_chromosome, ols.m_position};
+    }
+    virtual std::string get_SNPname        (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return ols.m_SNPname;
+    }
+    virtual std::string get_allele_ref        (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return ols.m_allele_ref;
+    }
+    virtual std::string get_allele_alt        (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        return ols.m_allele_alt;
+    }
+
+    OneLineSummary  get_ols         (int i)     const {
+        assert(i>=0);
+        assert(i<number_of_snps());
+        return m_each_SNP_and_its_offset.at(i);
+    }
+
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
@@ -88,7 +179,41 @@ GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
     return read_in_a_raw_ref_file_as_VCF(file_name);
 }
 
-FWD(file_reading)
+void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas, std:: unordered_map<std:: string, file_reading:: chrpos> const & m ) {
+    auto       b_gwas = begin_from_file(gwas);
+    auto const e_gwas =   end_from_file(gwas);
+    for(;b_gwas < e_gwas; ++b_gwas) {
+        auto nm= b_gwas.get_SNPname();
+        auto chrpos_in_gwas = b_gwas.get_chrpos();
+        auto try_to_find_in_ref = m.find(nm);
+
+        if(try_to_find_in_ref != m.end()) {
+            auto chrpos_in_ref = try_to_find_in_ref->second;
+
+            // If the gwas doesn't have chrpos, copy it from the ref panel,
+            // otherwise, check that they agree on the chrpos:
+            if(chrpos_in_gwas == chrpos{-1,-1}) {
+                    b_gwas.set_chrpos(chrpos_in_ref);
+            }
+            else {
+                (chrpos_in_gwas == chrpos_in_ref) || DIE("position mismatch between GWAS and RefPanel. "
+                        << "What should we do?. "
+                        << '[' << nm << ']'
+                        << ' ' << chrpos_in_ref
+                        << ' ' << chrpos_in_gwas
+                        );
+            }
+        }
+    }
+}
+
+GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name) {
+    // I really should detect the file-type.
+    // But for now, we'll just assume a plain (non-gzipped) vcf file.
+    return read_in_a_gwas_file_simple(file_name);
+}
+
+
 static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     PP(file_name);
@@ -116,7 +241,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
         ols.m_tellg_of_line_start = f.tellg();
         getline(f, current_line);
         if(!f) {
-            // nothing more to read, must leave the 'sentinal' OneLineSummary on the end
             f.eof() || DIE("Error before reaching eof() in this file");
             break;
         }
@@ -125,6 +249,8 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             ols.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
             ols.m_chromosome = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
             ols.m_position   = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
+            ols.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
+            ols.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
 
             p->m_each_SNP_and_its_offset.push_back(ols);
         } catch (std:: invalid_argument &e) {
@@ -150,7 +276,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     return p;
 }
 
-FWD(file_reading)
 static
 string          lookup( header_details:: offset_and_name const &on
                       , vector<string> const & all_split_up
@@ -162,7 +287,6 @@ string          lookup( header_details:: offset_and_name const &on
     return all_split_up.at(offset);
 }
 
-FWD(file_reading)
 static
 file_reading::
 header_details   parse_header( string      const & header_line ) {
@@ -176,7 +300,7 @@ header_details   parse_header( string      const & header_line ) {
         ++field_counter;
         // go through each field name in turn and try to account for it
         if(false) {}
-        else if(is_in_this_list(one_field_name, {"ID"})) {
+        else if(is_in_this_list(one_field_name, {"ID","rnpid"})) {
             hd.SNPname = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"#CHROM","chr"})) {
@@ -185,10 +309,10 @@ header_details   parse_header( string      const & header_line ) {
         else if(is_in_this_list(one_field_name, {"POS"})) {
             hd.position = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"REF"})) {
+        else if(is_in_this_list(one_field_name, {"REF","a1"})) {
             hd.allele_ref = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"ALT"})) {
+        else if(is_in_this_list(one_field_name, {"ALT","a2"})) {
             hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"QUAL"})) {
@@ -210,7 +334,6 @@ header_details   parse_header( string      const & header_line ) {
     return hd;
 }
 
-FWD(file_reading)
 static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) {
     for(auto cand : candidates) {
         if(s==cand)
@@ -219,7 +342,6 @@ static bool is_in_this_list(string const & s, std:: initializer_list<char const 
     return false;
 }
 
-FWD(file_reading)
 static
 vector<string>   tokenize( string      const & line
                , char                delimiter
@@ -236,7 +358,6 @@ vector<string>   tokenize( string      const & line
     return fields;
 }
 
-FWD(file_reading)
 static
 char   decide_delimiter( string      const & header_line ) {
     // Which is comma, tab, or space, are most common here?
@@ -256,6 +377,110 @@ char   decide_delimiter( string      const & header_line ) {
            );
     }
     return delimiter;
+}
+
+struct SimpleGwasFile : public file_reading:: Effects_I
+{
+    vector<GwasLineSummary> m_each_SNP_and_its_z;
+    string                 m_underlying_file_name;
+
+    virtual int         number_of_snps() const {
+        return m_each_SNP_and_its_z.size();
+    }
+    virtual std::string get_SNPname        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_SNPname;
+    }
+    virtual chrpos      get_chrpos        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_chrpos;
+    }
+    virtual std::string get_allele_ref        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_allele_ref;
+    }
+    virtual std::string get_allele_alt        (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_allele_alt;
+    }
+    virtual void        set_chrpos        (int i, chrpos crps)  {
+        assert(i>=0);
+        assert(i<number_of_snps());
+        auto & existing = m_each_SNP_and_its_z.at(i);
+        assert(existing.m_chrpos.chr == -1);
+        assert(existing.m_chrpos.pos == -1);
+        existing.m_chrpos = crps;
+    }
+    virtual void        sort_my_entries   () {
+        sort( m_each_SNP_and_its_z.begin()
+            , m_each_SNP_and_its_z.end()
+            , [](auto &l, auto &r) {
+                return l.m_chrpos < r.m_chrpos;
+            }
+            );
+    }
+
+    GwasLineSummary  get_gls         (int i)     const {
+        assert(i>=0);
+        assert(i<number_of_snps());
+        return m_each_SNP_and_its_z.at(i);
+    }
+
+};
+
+static
+GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) {
+    PP(file_name);
+    ifstream f(file_name);
+    string current_line;
+
+    header_details hd;
+
+    getline(f, current_line);
+
+    // current_line is now the first line, i.e. the header
+    hd = parse_header(current_line);
+
+    auto p = std:: make_shared<SimpleGwasFile>();
+    p->m_underlying_file_name = file_name;
+
+    while(1) {
+        GwasLineSummary gls;
+        getline(f, current_line);
+        if(!f) {
+            f.eof() || DIE("Error before reaching eof() in this file");
+            break;
+        }
+        auto all_split_up = tokenize(current_line, hd.m_delimiter);
+        try {
+            gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
+            gls.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
+            gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
+
+            // Try to read in chromosome and position, but they may not be present
+            // If missing, we'll fill them in much later from the reference panel
+            gls.m_chrpos.chr = -1;
+            gls.m_chrpos.pos = -1;
+            if(hd.chromosome.m_offset != -1) {
+                gls.m_chrpos.chr = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
+            }
+            if(hd.position.m_offset != -1) {
+                gls.m_chrpos.pos = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
+            }
+
+            p->m_each_SNP_and_its_z.push_back(gls);
+        } catch (std:: invalid_argument &e) {
+            WARNING( "Ignoring this line, problem with the chromosome and/or position. ["
+                    << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
+                    //<< " chr:" << LOOKUP(hd, chromosome, all_split_up)
+                    //<< " pos:" << LOOKUP(hd, position  , all_split_up)
+                    << "]" );
+        }
+    };
+
+    /* Note: Sort them by position here */
+
+    return p;
 }
 
 } // namespace file_reading
