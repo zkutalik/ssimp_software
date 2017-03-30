@@ -60,6 +60,8 @@ namespace file_reading {
     SNPiterator<GenotypeFileHandle>;
     template struct
     SNPiterator<GwasFileHandle>;
+    template struct
+    SNPiterator<GwasFileHandle_NONCONST>;
 
 struct header_details {
     struct offset_and_name {
