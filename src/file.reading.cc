@@ -410,6 +410,14 @@ struct SimpleGwasFile : public file_reading:: Effects_I
         assert(existing.m_chrpos.pos == -1);
         existing.m_chrpos = crps;
     }
+    virtual void        sort_my_entries   () {
+        sort( m_each_SNP_and_its_z.begin()
+            , m_each_SNP_and_its_z.end()
+            , [](auto &l, auto &r) {
+                return l.m_chrpos < r.m_chrpos;
+            }
+            );
+    }
 
     GwasLineSummary  get_gls         (int i)     const {
         assert(i>=0);

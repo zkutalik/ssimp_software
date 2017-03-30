@@ -40,6 +40,11 @@ int main(int argc, char **argv) {
         auto m            = ssimp:: map_rs_to_chrpos( raw_ref_file );
         update_positions_by_comparing_to_another_set( gwas, m );
 
+        // The RefPanel has already been automatically sorted by chrpos,
+        // but now we must do it for the GWAS, as the positions might have
+        // changed in the GWAS.
+        gwas->sort_my_entries();
+
         PP(  gwas->number_of_snps());
         PP(raw_ref_file->number_of_snps());
 

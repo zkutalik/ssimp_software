@@ -46,6 +46,7 @@ struct Genotypes_I : public AnyFile_I {
 };
 struct Effects_I : public AnyFile_I {
     virtual void        set_chrpos         (int, chrpos)  = 0; // so that we can fill them in from the ref data
+    virtual void        sort_my_entries    ()             = 0;
 };
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
