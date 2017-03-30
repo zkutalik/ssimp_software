@@ -113,12 +113,12 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
             if(w_begin == w_end)
                 continue; // Empty region, just skip it
 
-            // Look up this region in the GWAS
-            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_start});
-            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_end  });
+            // Look up this region in the GWAS (taking account of the flanking width also)
+            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_start - options:: opt_flanking_width});
+            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
             // We have at least one SNP here, so let's print some numbers about this region
-            auto number_of_snps_in_the_ref_panel_in_this_region = w_end - w_begin;
+            auto number_of_snps_in_the_ref_panel_in_this_region = w_end      - w_begin;
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
 
             PP(chrm, current_window_start, current_window_end-1
