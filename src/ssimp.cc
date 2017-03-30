@@ -2,7 +2,9 @@
 #include <limits>
 #include <cassert>
 #include <unordered_map>
+#include <vector>
 #include <algorithm>
+#include <iterator>
 
 #include "options.hh"
 #include "file.reading.hh"
@@ -13,6 +15,9 @@
 using std:: cout;
 using std:: endl;
 using std:: string;
+using std:: vector;
+
+using file_reading:: chrpos;
 
 namespace ssimp {
 // Some forward declarations
@@ -84,16 +89,6 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
     auto const b_gwas = begin_from_file(gwas);
     auto const e_gwas =   end_from_file(gwas);
 
-    /*
-     * 16050075
-     * 16050115
-     * 16050213
-     * ....
-     * 16644605
-     * 16644612
-     * 16644620
-     */
-
     PP(options:: opt_window_width);
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
@@ -117,6 +112,14 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
             auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
+            // Which SNPs are in both, i.e. useful as tag SNPs
+            vector<chrpos> SNPs_in_the_intersection;
+            std:: set_intersection( w_begin     , w_end
+                                  , w_gwas_begin, w_gwas_end
+                                  , std:: back_inserter( SNPs_in_the_intersection )
+                    );
+
+
             // We have at least one SNP here, so let's print some numbers about this region
             auto number_of_snps_in_the_ref_panel_in_this_region = w_end      - w_begin;
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
@@ -124,6 +127,7 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
             PP(chrm, current_window_start, current_window_end-1
                    , number_of_snps_in_the_ref_panel_in_this_region
                    , number_of_snps_in_the_gwas_in_this_region
+                   , SNPs_in_the_intersection.size()
                    );
         }
     }
