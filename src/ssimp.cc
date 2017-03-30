@@ -13,7 +13,12 @@ using std:: cout;
 using std:: endl;
 using std:: string;
 
-#include "fwd/src/ssimp.hh"
+namespace ssimp {
+// Some forward declarations
+void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file);
+std:: unordered_map<string, file_reading:: chrpos>
+            map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
+} // namespace ssimp
 
 int main(int argc, char **argv) {
     // all options now read. Start checking they are all present
@@ -46,7 +51,6 @@ namespace ssimp{
 using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
-FWD(ssimp)
 void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
     int total_number_of_SNPs = raw_ref_file->number_of_snps();
     PP (total_number_of_SNPs);
@@ -94,7 +98,6 @@ void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
 
 }
 
-FWD(ssimp)
 std:: unordered_map<string, file_reading:: chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file ) {
     auto       b = file_reading:: SNPiterator<GenotypeFileHandle>:: begin_from_file(raw_ref_file);

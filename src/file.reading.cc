@@ -100,11 +100,27 @@ struct header_details {
     vector<offset_and_name> unaccounted;
 };
 
-} // namespace file_reading
 
-#include "fwd/src/file.reading.hh"
-
-namespace file_reading {
+// Some forward declarations
+static
+GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name);
+static
+string          lookup( header_details:: offset_and_name const &on
+                      , vector<string> const & all_split_up
+                      , const char *fieldname
+                      );
+static
+file_reading::
+header_details   parse_header( string      const & header_line );
+static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) ;
+static
+vector<string>   tokenize( string      const & line
+               , char                delimiter
+        );
+static
+GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
+static
+char   decide_delimiter( string      const & header_line );
 
 struct OneLineSummary {
     ifstream:: pos_type      m_tellg_of_line_start;
@@ -183,7 +199,6 @@ GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unorde
 }
 
 
-FWD(file_reading)
 static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     PP(file_name);
@@ -246,7 +261,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     return p;
 }
 
-FWD(file_reading)
 static
 string          lookup( header_details:: offset_and_name const &on
                       , vector<string> const & all_split_up
@@ -258,7 +272,6 @@ string          lookup( header_details:: offset_and_name const &on
     return all_split_up.at(offset);
 }
 
-FWD(file_reading)
 static
 file_reading::
 header_details   parse_header( string      const & header_line ) {
@@ -306,7 +319,6 @@ header_details   parse_header( string      const & header_line ) {
     return hd;
 }
 
-FWD(file_reading)
 static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) {
     for(auto cand : candidates) {
         if(s==cand)
@@ -315,7 +327,6 @@ static bool is_in_this_list(string const & s, std:: initializer_list<char const 
     return false;
 }
 
-FWD(file_reading)
 static
 vector<string>   tokenize( string      const & line
                , char                delimiter
@@ -332,7 +343,6 @@ vector<string>   tokenize( string      const & line
     return fields;
 }
 
-FWD(file_reading)
 static
 char   decide_delimiter( string      const & header_line ) {
     // Which is comma, tab, or space, are most common here?
@@ -395,7 +405,6 @@ struct SimpleGwasFile : public file_reading:: Effects_I
 
 };
 
-FWD(file_reading)
 static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) {
     PP(file_name);
