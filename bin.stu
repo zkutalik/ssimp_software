@@ -40,13 +40,7 @@
     echo " -Wall -Wextra -std=c++14"
     [[ "$(whoami)" = 'amcdaid' ]] && echo ' -Werror'
 
-    echo ' '; cat bin/local/gsl_cflags
     echo ' '; cat bin/local/gsl_libs
-
-    #echo "clang++ --gcc-toolchain=${HOME}/prefix-gcc-6.2.0 -Wl,-rpath  -Wl,${HOME}/prefix-gcc-6.2.0/lib64"
-    #echo "/home/amcdaid/prefix-gcc-6.1.0/bin/g++"
-    #echo " -Wl,-rpath,/software/lib64 "     # adding this causes the two linker errors
-    echo " -Wno-misleading-indentation" # not accepted by clang++
 
     #echo " -pg -ggdb                  " # For profiling
 }
