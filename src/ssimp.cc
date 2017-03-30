@@ -2,6 +2,7 @@
 #include <limits>
 #include <cassert>
 #include <unordered_map>
+#include <algorithm>
 
 #include "options.hh"
 #include "file.reading.hh"
@@ -45,8 +46,18 @@ int main(int argc, char **argv) {
         // changed in the GWAS.
         gwas->sort_my_entries();
 
-        PP(  gwas->number_of_snps());
+        // Count how many GWAS SNPs have no position, and therefore
+        // will be ignored.
+        auto number_of_GWASsnps_with_unknown_position = std:: count_if(
+                begin_from_file(gwas)
+               ,  end_from_file(gwas)
+               , [](auto v) {
+                    return v == file_reading:: chrpos{-1,-1};
+               }
+               );
         PP(raw_ref_file->number_of_snps());
+        PP(        gwas->number_of_snps());
+        PP(number_of_GWASsnps_with_unknown_position);
 
         ssimp:: quickly_list_the_regions(raw_ref_file);
     }
