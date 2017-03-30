@@ -9,17 +9,17 @@ namespace file_reading {
 struct chrpos {
     int chr;
     int pos;
-    bool operator< (chrpos const & other) {
+    bool operator< (chrpos const & other) const {
         if(chr < other.chr) return true;
         if(chr > other.chr) return false;
 
         return pos < other.pos;
     }
-    bool operator==(chrpos const & other) {
+    bool operator==(chrpos const & other) const {
         return(chr == other.chr
             && pos == other.pos);
     }
-    bool operator!=(chrpos const & other) {
+    bool operator!=(chrpos const & other) const {
         return !(*this == other);
     }
 };
