@@ -185,15 +185,28 @@ GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unorde
     auto const e_gwas = file_reading:: SNPiterator<GwasFileHandle_NONCONST>::   end_from_file(gwas);
     for(;b_gwas < e_gwas; ++b_gwas) {
         auto nm= b_gwas.get_SNPname();
-        auto x = b_gwas.get_chrpos();
-        if(x == chrpos{-1,-1}) {
-            auto try_to_find_in_ref = m.find(nm);
-            if(try_to_find_in_ref != m.end()) {
-                auto chrpos_in_ref = try_to_find_in_ref->second;
-                PP(nm,chrpos_in_ref);
-                b_gwas.set_chrpos(chrpos_in_ref);
+        auto chrpos_in_gwas = b_gwas.get_chrpos();
+        auto try_to_find_in_ref = m.find(nm);
+
+        if(try_to_find_in_ref != m.end()) {
+            auto chrpos_in_ref = try_to_find_in_ref->second;
+
+            // If the gwas doesn't have chrpos, copy it from the ref panel,
+            // otherwise, check that they agree on the chrpos:
+            if(chrpos_in_gwas == chrpos{-1,-1}) {
+                    PP(nm,chrpos_in_ref);
+                    b_gwas.set_chrpos(chrpos_in_ref);
+            }
+            else {
+                (chrpos_in_gwas == chrpos_in_ref) || DIE("position mismatch between GWAS and RefPanel. "
+                        << "What should we do?. "
+                        << '[' << nm << ']'
+                        << ' ' << chrpos_in_ref
+                        << ' ' << chrpos_in_gwas
+                        );
             }
         }
+
     }
     return gwas;
 }

@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
             auto m = ssimp:: map_rs_to_chrpos( raw_ref_file );
 
             PP(options:: opt_gwas_filename);
+            // Load the GWAS file, filling in blanks
             auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename, m);
             PP(  gwas->number_of_snps());
 
