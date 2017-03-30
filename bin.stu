@@ -33,7 +33,7 @@
 :   -t @mkdir..bin/o
        @all.stu.files
 {
-    which clang++ g++ | head -n1 # find one of these compilers
+    which clang++ g++ c++ clang | head -n1 # find one of these compilers
 
     # Also, include some general args we want to always pass,
     # regardless of whether we're compiling or linking
