@@ -49,7 +49,9 @@
 :       bin/o/GCC_OR_CLANG
         bin/local/gsl_libs
 {
-    cat bin/o/GCC_OR_CLANG bin/local/gsl_libs
+    cat bin/o/GCC_OR_CLANG
+    echo  " -lstdc++"
+    cat bin/local/gsl_libs
 }
 >       bin/o/CXX_WITH_FLAGS
 :       bin/o/GCC_OR_CLANG
