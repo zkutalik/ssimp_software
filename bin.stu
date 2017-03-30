@@ -35,21 +35,20 @@
         bin/local/gsl_cflags
         bin/local/gsl_libs
 {
-    echo -n "g++"
-    echo -n " -O2"
-    echo -n " -Wall -Wextra -std=c++14"
-    [[ "$(whoami)" = 'amcdaid' ]] && echo -n ' -Werror'
+    echo "g++"
+    echo " -O2"
+    echo " -Wall -Wextra -std=c++14"
+    [[ "$(whoami)" = 'amcdaid' ]] && echo ' -Werror'
 
-    echo -n ' '; cat bin/local/gsl_cflags
-    echo -n ' '; cat bin/local/gsl_libs
+    echo ' '; cat bin/local/gsl_cflags
+    echo ' '; cat bin/local/gsl_libs
 
-    #echo -n "clang++ --gcc-toolchain=${HOME}/prefix-gcc-6.2.0 -Wl,-rpath  -Wl,${HOME}/prefix-gcc-6.2.0/lib64"
-    #echo -n "/home/amcdaid/prefix-gcc-6.1.0/bin/g++"
-    #echo -n " -Wl,-rpath,/software/lib64 "     # adding this causes the two linker errors
-    echo -n " -Wno-misleading-indentation" # not accepted by clang++
+    #echo "clang++ --gcc-toolchain=${HOME}/prefix-gcc-6.2.0 -Wl,-rpath  -Wl,${HOME}/prefix-gcc-6.2.0/lib64"
+    #echo "/home/amcdaid/prefix-gcc-6.1.0/bin/g++"
+    #echo " -Wl,-rpath,/software/lib64 "     # adding this causes the two linker errors
+    echo " -Wno-misleading-indentation" # not accepted by clang++
 
-    #echo -n " -pg -ggdb                  " # For profiling
-    echo
+    #echo " -pg -ggdb                  " # For profiling
 }
 
 >       bin/local/gsl_cflags
