@@ -29,35 +29,38 @@
     ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
 }
 
->       bin/o/LINKER
-:   -t @mkdir..bin/o
-        @all.stu.files
-        bin/local/gsl_cflags
-        bin/local/gsl_libs
+>       bin/o/GCC_OR_CLANG
+:       @all.stu.files
 {
     which clang++ g++ | head -n1 # find one of these compilers
+
+    # Also, include some general args we want to always pass,
+    # regardless of whether we're compiling or linking
+
     echo " -O2"
     echo " -Wall -Wextra -std=c++14"
     [[ "$(whoami)" = 'amcdaid' ]] && echo ' -Werror'
-
-    echo ' '; cat bin/local/gsl_libs
 
     #echo " -pg -ggdb                  " # For profiling
 }
->       bin/o/CXX_WITH_FLAGS
+
+>       bin/o/LINKER
 :   -t @mkdir..bin/o
-        @all.stu.files
         bin/local/gsl_cflags
         bin/local/gsl_libs
+        bin/o/GCC_OR_CLANG
 {
-    which clang++ g++ | head -n1 # find one of these compilers
-    echo " -O2"
-    echo " -Wall -Wextra -std=c++14"
-    [[ "$(whoami)" = 'amcdaid' ]] && echo ' -Werror'
-
-    echo ' '; cat bin/local/gsl_cflags
-
-    #echo " -pg -ggdb                  " # For profiling
+    cat bin/o/GCC_OR_CLANG
+    cat bin/local/gsl_libs
+}
+>       bin/o/CXX_WITH_FLAGS
+:   -t @mkdir..bin/o
+        bin/local/gsl_cflags
+        bin/local/gsl_libs
+        bin/o/GCC_OR_CLANG
+{
+    cat bin/o/GCC_OR_CLANG
+    cat bin/local/gsl_cflags
 }
 
 >       bin/local/gsl_cflags
