@@ -91,7 +91,9 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
     auto const b_gwas = begin_from_file(gwas);
     auto const e_gwas =   end_from_file(gwas);
 
-    PP(options:: opt_window_width);
+    PP(options:: opt_window_width
+      ,options:: opt_flanking_width
+            );
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
