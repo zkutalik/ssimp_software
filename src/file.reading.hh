@@ -19,6 +19,9 @@ struct chrpos {
         return(chr == other.chr
             && pos == other.pos);
     }
+    bool operator!=(chrpos const & other) {
+        return !(*this == other);
+    }
 };
 
 inline
