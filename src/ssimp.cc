@@ -26,24 +26,21 @@ int main(int argc, char **argv) {
 
     cout.imbue(std::locale("")); // apply the user's locale, for example the thousands separator
 
-    if(!options:: opt_raw_ref.empty()) {
-        PP(options:: opt_raw_ref);
+    if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
+        PP( options:: opt_raw_ref
+          , options:: opt_gwas_filename);
+
+        // Load the two files, and pass the chrpos information along so
+        // that we can check that the two files agree with each other
+        // on the positions of the SNPs.
         auto raw_ref_file = file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
+        auto m = ssimp:: map_rs_to_chrpos( raw_ref_file );
+        auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename, m);
+
+        PP(  gwas->number_of_snps());
         PP(raw_ref_file->number_of_snps());
 
         ssimp:: quickly_list_the_regions(raw_ref_file);
-
-        if(!   options:: opt_gwas_filename.empty()) {
-            // Build a map of the chrpos in the reference.
-            // Will be useful to fill in the blanks in the GWAS data
-            auto m = ssimp:: map_rs_to_chrpos( raw_ref_file );
-
-            PP(options:: opt_gwas_filename);
-            // Load the GWAS file, filling in blanks
-            auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename, m);
-            PP(  gwas->number_of_snps());
-
-        }
     }
 }
 
