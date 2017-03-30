@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <limits>
 #include <cassert>
 #include <unordered_map>
@@ -16,6 +17,7 @@ using std:: cout;
 using std:: endl;
 using std:: string;
 using std:: vector;
+using std:: setw;
 
 using file_reading:: chrpos;
 
@@ -124,11 +126,15 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
             auto number_of_snps_in_the_ref_panel_in_this_region = w_end      - w_begin;
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
 
-            PP(chrm, current_window_start, current_window_end-1
-                   , number_of_snps_in_the_ref_panel_in_this_region
-                   , number_of_snps_in_the_gwas_in_this_region
-                   , SNPs_in_the_intersection.size()
-                   );
+            cout
+                << '\n'
+                << "chrm" << chrm
+                << "\t   " << current_window_start << '-' << current_window_end
+                << '\n';
+
+            cout << setw(8) << number_of_snps_in_the_ref_panel_in_this_region << " # RefPanel SNPs in this window\n";
+            cout << setw(8) << number_of_snps_in_the_gwas_in_this_region      << " # GWAS     SNPs in this window (with "<<options:: opt_flanking_width<<" flanking)\n";
+            cout << setw(8) << SNPs_in_the_intersection.size()                << " # SNPs in both (i.e. useful as tags)\n";
         }
     }
 
