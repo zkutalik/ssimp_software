@@ -35,7 +35,7 @@
         bin/local/gsl_cflags
         bin/local/gsl_libs
 {
-    echo "g++"
+    which g++ clang clang++ g++ | head -n1 # find one of these compilers
     echo " -O2"
     echo " -Wall -Wextra -std=c++14"
     [[ "$(whoami)" = 'amcdaid' ]] && echo ' -Werror'
