@@ -24,7 +24,7 @@ namespace ssimp {
 void quickly_list_the_regions( file_reading:: GenotypeFileHandle         raw_ref_file
                              , file_reading:: GwasFileHandle             gwas
                              );
-std:: unordered_map<string, file_reading:: chrpos>
+std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 } // namespace ssimp
 
@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
         auto number_of_GWASsnps_with_unknown_position = std:: count_if(
                 begin_from_file(gwas)
                ,  end_from_file(gwas)
-               , [](auto v) { return v == file_reading:: chrpos{-1,-1}; }
+               , [](auto v) { return v == chrpos{-1,-1}; }
                );
 
         // Print the various SNP counts
@@ -94,23 +94,23 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
         // First, find the begin and end of this chromosome
-        auto c_begin = std:: lower_bound(b_ref, e_ref, file_reading:: chrpos{chrm, 0 });
-        auto c_end   = std:: lower_bound(b_ref, e_ref, file_reading:: chrpos{chrm, std::numeric_limits<int>::max()  });
+        auto c_begin = std:: lower_bound(b_ref, e_ref, chrpos{chrm, 0 });
+        auto c_end   = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::max()  });
         assert(c_end >= c_begin);
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
-            auto w_begin = std:: lower_bound(c_begin, c_end, file_reading:: chrpos{chrm,current_window_start});
-            auto w_end   = std:: lower_bound(c_begin, c_end, file_reading:: chrpos{chrm,current_window_end  });
+            auto w_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
+            auto w_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
             if(w_begin == c_end)
                 break; // Finished with this chromosome
             if(w_begin == w_end)
                 continue; // Empty region, just skip it
 
             // Look up this region in the GWAS (taking account of the flanking width also)
-            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_start - options:: opt_flanking_width});
-            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, file_reading:: chrpos{chrm,current_window_end   + options:: opt_flanking_width});
+            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
+            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
             // Which SNPs are in both, i.e. useful as tag SNPs
             vector<chrpos> SNPs_in_the_intersection;
@@ -134,11 +134,11 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
 
 }
 
-std:: unordered_map<string, file_reading:: chrpos>
+std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file ) {
     auto       b = begin_from_file(raw_ref_file);
     auto const e =   end_from_file(raw_ref_file);
-    std:: unordered_map<string, file_reading:: chrpos> m;
+    std:: unordered_map<string, chrpos> m;
     for(;b<e; ++b) {
         auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
         rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
