@@ -109,6 +109,7 @@ struct SNPiterator
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name);
-GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unordered_map<std:: string, file_reading:: chrpos> const &);
+GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name);
+void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas, std:: unordered_map<std:: string, file_reading:: chrpos> const & m );
 
 } // namespace file_reading

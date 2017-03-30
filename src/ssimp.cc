@@ -30,12 +30,15 @@ int main(int argc, char **argv) {
         PP( options:: opt_raw_ref
           , options:: opt_gwas_filename);
 
-        // Load the two files, and pass the chrpos information along so
-        // that we can check that the two files agree with each other
-        // on the positions of the SNPs.
+        // Load the two files
         auto raw_ref_file = file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
-        auto m = ssimp:: map_rs_to_chrpos( raw_ref_file );
-        auto gwas = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename, m);
+        auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
+
+        // Compare the chrpos in both files.
+        // If GWAS has chrpos, it should be the same as in the RefPanel.
+        // If GWAS doesn't have chrpos, copy it from the ref panel
+        auto m            = ssimp:: map_rs_to_chrpos( raw_ref_file );
+        update_positions_by_comparing_to_another_set( gwas, m );
 
         PP(  gwas->number_of_snps());
         PP(raw_ref_file->number_of_snps());

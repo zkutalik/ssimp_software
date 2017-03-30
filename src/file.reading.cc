@@ -177,10 +177,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
     return read_in_a_raw_ref_file_as_VCF(file_name);
 }
 
-GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unordered_map<std:: string, file_reading:: chrpos> const & m) {
-    // I really should detect the file-type.
-    // But for now, we'll just assume a plain (non-gzipped) vcf file.
-    GwasFileHandle_NONCONST gwas = read_in_a_gwas_file_simple(file_name);
+void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas, std:: unordered_map<std:: string, file_reading:: chrpos> const & m ) {
     auto       b_gwas = file_reading:: SNPiterator<GwasFileHandle_NONCONST>:: begin_from_file(gwas);
     auto const e_gwas = file_reading:: SNPiterator<GwasFileHandle_NONCONST>::   end_from_file(gwas);
     for(;b_gwas < e_gwas; ++b_gwas) {
@@ -206,9 +203,13 @@ GwasFileHandle          read_in_a_gwas_file(std:: string file_name, std:: unorde
                         );
             }
         }
-
     }
-    return gwas;
+}
+
+GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name) {
+    // I really should detect the file-type.
+    // But for now, we'll just assume a plain (non-gzipped) vcf file.
+    return read_in_a_gwas_file_simple(file_name);
 }
 
 
