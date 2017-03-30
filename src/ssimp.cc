@@ -16,7 +16,9 @@ using std:: string;
 
 namespace ssimp {
 // Some forward declarations
-void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file);
+void quickly_list_the_regions( file_reading:: GenotypeFileHandle         raw_ref_file
+                             , file_reading:: GwasFileHandle             gwas
+                             );
 std:: unordered_map<string, file_reading:: chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 } // namespace ssimp
@@ -65,7 +67,7 @@ int main(int argc, char **argv) {
         cout << '\n';
         // Go through regions, printing how many
         // SNPs there are in each region
-        ssimp:: quickly_list_the_regions(raw_ref_file);
+        ssimp:: quickly_list_the_regions(raw_ref_file, gwas);
     }
 }
 
@@ -74,7 +76,9 @@ namespace ssimp{
 using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
-void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
+void quickly_list_the_regions( file_reading:: GenotypeFileHandle         raw_ref_file
+                             , file_reading:: GwasFileHandle             //gwas
+                             ) {
     auto const b = begin_from_file(raw_ref_file);
     auto const e =   end_from_file(raw_ref_file);
 
