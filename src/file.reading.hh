@@ -99,15 +99,16 @@ struct SNPiterator
     {
         return                    m_gfh -> set_chrpos(m_line_number, crps);
     }
-
-    // Maybe I shouldn't have these static methods after all, might be confusing.
-    static SNPiterator begin_from_file(GWASorREF gfh) {
-        return {gfh, 0};
-    }
-    static SNPiterator   end_from_file(GWASorREF gfh) {
-        return {gfh, gfh->number_of_snps()};
-    }
 };
+
+template<typename GWASorREF>
+SNPiterator<GWASorREF> begin_from_file(GWASorREF fh) {
+    return {fh, 0};
+}
+template<typename GWASorREF>
+SNPiterator<GWASorREF>   end_from_file(GWASorREF fh) {
+    return {fh, fh->number_of_snps()};
+}
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name);
 GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name);

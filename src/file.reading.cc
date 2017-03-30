@@ -178,8 +178,8 @@ GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
 }
 
 void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas, std:: unordered_map<std:: string, file_reading:: chrpos> const & m ) {
-    auto       b_gwas = file_reading:: SNPiterator<GwasFileHandle_NONCONST>:: begin_from_file(gwas);
-    auto const e_gwas = file_reading:: SNPiterator<GwasFileHandle_NONCONST>::   end_from_file(gwas);
+    auto       b_gwas = begin_from_file(gwas);
+    auto const e_gwas =   end_from_file(gwas);
     for(;b_gwas < e_gwas; ++b_gwas) {
         auto nm= b_gwas.get_SNPname();
         auto chrpos_in_gwas = b_gwas.get_chrpos();
