@@ -29,7 +29,9 @@ int main(int argc, char **argv) {
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         PP( options:: opt_raw_ref
-          , options:: opt_gwas_filename);
+          , options:: opt_gwas_filename
+          , options:: opt_window_width
+          );
 
         // Load the two files
         auto raw_ref_file = file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
@@ -51,14 +53,18 @@ int main(int argc, char **argv) {
         auto number_of_GWASsnps_with_unknown_position = std:: count_if(
                 begin_from_file(gwas)
                ,  end_from_file(gwas)
-               , [](auto v) {
-                    return v == file_reading:: chrpos{-1,-1};
-               }
+               , [](auto v) { return v == file_reading:: chrpos{-1,-1}; }
                );
+
+        // Print the various SNP counts
+        cout << '\n';
         PP(raw_ref_file->number_of_snps());
         PP(        gwas->number_of_snps());
         PP(number_of_GWASsnps_with_unknown_position);
 
+        cout << '\n';
+        // Go through regions, printing how many
+        // SNPs there are in each region
         ssimp:: quickly_list_the_regions(raw_ref_file);
     }
 }
@@ -69,9 +75,6 @@ using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
 void quickly_list_the_regions(file_reading:: GenotypeFileHandle raw_ref_file) {
-    int total_number_of_SNPs = raw_ref_file->number_of_snps();
-    PP (total_number_of_SNPs);
-
     auto const b = begin_from_file(raw_ref_file);
     auto const e =   end_from_file(raw_ref_file);
 
@@ -124,7 +127,6 @@ std:: unordered_map<string, file_reading:: chrpos>
         auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
         rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
     }
-    PP(m.size());
     return m;
 }
 

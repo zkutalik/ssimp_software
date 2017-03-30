@@ -193,7 +193,6 @@ void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas,
             // If the gwas doesn't have chrpos, copy it from the ref panel,
             // otherwise, check that they agree on the chrpos:
             if(chrpos_in_gwas == chrpos{-1,-1}) {
-                    PP(nm,chrpos_in_ref);
                     b_gwas.set_chrpos(chrpos_in_ref);
             }
             else {
