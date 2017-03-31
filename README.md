@@ -19,5 +19,5 @@ The folder `ref` contains a mini reference panel used for test purposes. It has 
 ## things to consider
 File `thingstoconsider.md` A list of things we still need to discuss.
 
-## LD
-The folder `LD` contains the generated LD structure from `ref` folder.
+## src
+software 
