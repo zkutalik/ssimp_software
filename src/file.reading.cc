@@ -164,6 +164,14 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         OneLineSummary const & ols = get_ols(i);
         return ols.m_allele_alt;
     }
+    virtual void        get_calls          (int i)     const {
+        OneLineSummary const & ols = get_ols(i);
+        std:: ifstream f(m_underlying_file_name); // reopen the file
+        f.seekg(ols.m_tellg_of_line_start);
+        string line;
+        getline(f, line);
+        PP(line);
+    }
 
     OneLineSummary  get_ols         (int i)     const {
         assert(i>=0);
@@ -490,6 +498,7 @@ void CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     auto const e_ref  =   end_from_file(m_rfh);
     auto const    it  = std:: lower_bound(b_ref, e_ref, crps);
     assert(it.get_chrpos() == crps);
+    it.get_calls();
 }
 
 } // namespace file_reading

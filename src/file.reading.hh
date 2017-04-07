@@ -49,6 +49,7 @@ struct AnyFile_I {
 };
 
 struct Genotypes_I : public AnyFile_I {
+    virtual void        get_calls          (int)     const = 0;
 };
 struct Effects_I : public AnyFile_I {
     virtual void        set_chrpos         (int, chrpos)  = 0; // so that we can fill them in from the ref data
@@ -99,11 +100,17 @@ struct SNPiterator
         return m_gfh->get_allele_alt(m_line_number);
     }
 
-    template<typename T = decltype(m_gfh)>
+    template<typename T = void>
     auto   set_chrpos(chrpos crps)
-        -> decltype ( std::declval<T>() -> set_chrpos(m_line_number, crps) )
+        -> decltype ( (std::declval<T>(),m_gfh) -> set_chrpos(m_line_number, crps) )
     {
-        return                    m_gfh -> set_chrpos(m_line_number, crps);
+        return                           m_gfh  -> set_chrpos(m_line_number, crps);
+    }
+    template<typename T = void>
+    auto   get_calls()  const
+        -> decltype ( (std::declval<T>(),m_gfh) -> get_calls(m_line_number) )
+    {
+        return                           m_gfh  -> get_calls(m_line_number);
     }
 };
 
