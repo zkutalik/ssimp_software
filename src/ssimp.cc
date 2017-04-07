@@ -23,9 +23,11 @@ using file_reading:: chrpos;
 
 namespace ssimp {
 // Some forward declarations
+static
 void quickly_list_the_regions( file_reading:: GenotypeFileHandle         raw_ref_file
                              , file_reading:: GwasFileHandle             gwas
                              );
+static
 std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 } // namespace ssimp
@@ -98,9 +100,11 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
         // First, find the begin and end of this chromosome
-        auto c_begin = std:: lower_bound(b_ref, e_ref, chrpos{chrm, 0 });
+        auto c_begin = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::lowest() });
         auto c_end   = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::max()  });
         assert(c_end >= c_begin);
+        if(c_begin != c_end)
+            assert(c_begin.get_chrpos().pos >= 0); // first position is at least zero
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
@@ -142,6 +146,7 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
 
 }
 
+static
 std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file ) {
     auto       b = begin_from_file(raw_ref_file);
