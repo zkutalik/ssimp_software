@@ -218,6 +218,7 @@ static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     PP(file_name);
     ifstream f(file_name);
+    f || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
     header_details hd;
@@ -432,6 +433,7 @@ static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) {
     PP(file_name);
     ifstream f(file_name);
+    f || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
     header_details hd;
