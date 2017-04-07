@@ -28,8 +28,17 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         raw_ref
                              , file_reading:: GwasFileHandle             gwas
                              );
 static
+void impute_all_the_regions( file_reading:: GenotypeFileHandle         raw_ref_file
+                             , file_reading:: GwasFileHandle             gwas
+                             );
+static
 std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
+static
+vector<vector<int8_t>>
+lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
+                , file_reading:: CacheOfRefPanelData       &  cache
+                );
 } // namespace ssimp
 
 int main(int argc, char **argv) {
@@ -77,6 +86,7 @@ int main(int argc, char **argv) {
         // Go through regions, printing how many
         // SNPs there are in each region
         ssimp:: quickly_list_the_regions(raw_ref_file, gwas);
+        ssimp:: impute_all_the_regions(raw_ref_file, gwas);
     }
 }
 
@@ -122,10 +132,32 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
 
             // Which SNPs are in both, i.e. useful as tag SNPs
             vector<chrpos> SNPs_in_the_intersection;
-            std:: set_intersection( w_begin     , w_end
-                                  , w_gwas_begin, w_gwas_end
-                                  , std:: back_inserter( SNPs_in_the_intersection )
-                    );
+            {
+                auto r = w_begin;
+                auto g = w_gwas_begin;
+                while(r < w_end && g < w_gwas_end) {
+                    if(r.get_chrpos() == g.get_chrpos()) {
+                        SNPs_in_the_intersection.push_back(r.get_chrpos());
+                        ++g; // because g might have the same position multiple times, but the reference panel shouldn't
+                             // TODO: check that the reference panel doesn't indeed have unique chrpos.
+                    }
+                    else if(r.get_chrpos() <  g.get_chrpos()) {
+                        ++r; // skip this one
+                        r = std:: lower_bound(r, w_end, g.get_chrpos());
+                    }
+                    else if(r.get_chrpos() >  g.get_chrpos()) {
+                        ++g; // skip this one
+                        g = std:: lower_bound(g, w_gwas_end, r.get_chrpos());
+                    }
+                }
+            }
+            { // verify. Feel free to just delete these coming lines
+                vector<chrpos> SNPs_in_the_intersection_;
+                std:: set_intersection( w_begin     , w_end
+                                      , w_gwas_begin, w_gwas_end
+                                      , std:: back_inserter( SNPs_in_the_intersection_ ));
+                assert(SNPs_in_the_intersection == SNPs_in_the_intersection_);
+            }
 
 
             // We have at least one SNP here, so let's print some numbers about this region
@@ -145,6 +177,91 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
     }
 
 }
+static
+void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
+                             , file_reading:: GwasFileHandle             gwas
+                             ) {
+    auto const b_ref  = begin_from_file(ref_panel);
+    auto const e_ref  =   end_from_file(ref_panel);
+    auto const b_gwas = begin_from_file(gwas);
+    auto const e_gwas =   end_from_file(gwas);
+
+    PP(options:: opt_window_width
+      ,options:: opt_flanking_width
+            );
+
+    for(int chrm =  1; chrm <= 22; ++chrm) {
+        file_reading:: CacheOfRefPanelData cache(ref_panel);;
+
+        // First, find the begin and end of this chromosome
+        auto c_begin = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::lowest() });
+        auto c_end   = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::max()  });
+        assert(c_end >= c_begin);
+        if(c_begin != c_end)
+            assert(c_begin.get_chrpos().pos >= 0); // first position is at least zero
+
+        for(int w = 0; ; ++w ) {
+            int current_window_start = w     * options:: opt_window_width;
+            int current_window_end   = (w+1) * options:: opt_window_width;
+            auto w_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
+            auto w_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
+            if(w_begin == c_end)
+                break; // Finished with this chromosome
+            if(w_begin == w_end)
+                continue; // Empty region, just skip it
+
+            // Look up this region in the GWAS (taking account of the flanking width also)
+            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
+            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
+
+            // Which SNPs are in both, i.e. useful as tag SNPs
+            vector<chrpos> SNPs_in_the_intersection;
+            {
+                auto r = w_begin;
+                auto g = w_gwas_begin;
+                while(r < w_end && g < w_gwas_end) {
+                    if(r.get_chrpos() == g.get_chrpos()) {
+                        SNPs_in_the_intersection.push_back(r.get_chrpos());
+                        ++g; // because g might have the same position multiple times, but the reference panel shouldn't
+                             // TODO: check that the reference panel doesn't indeed have unique chrpos.
+                    }
+                    else if(r.get_chrpos() <  g.get_chrpos()) {
+                        ++r; // skip this one
+                        r = std:: lower_bound(r, w_end, g.get_chrpos());
+                    }
+                    else if(r.get_chrpos() >  g.get_chrpos()) {
+                        ++g; // skip this one
+                        g = std:: lower_bound(g, w_gwas_end, r.get_chrpos());
+                    }
+                }
+            }
+            { // verify. Feel free to just delete these coming lines
+                vector<chrpos> SNPs_in_the_intersection_;
+                std:: set_intersection( w_begin     , w_end
+                                      , w_gwas_begin, w_gwas_end
+                                      , std:: back_inserter( SNPs_in_the_intersection_ ));
+                assert(SNPs_in_the_intersection == SNPs_in_the_intersection_);
+            }
+
+
+            // We have at least one SNP here, so let's print some numbers about this region
+            auto number_of_snps_in_the_ref_panel_in_this_region = w_end      - w_begin;
+            auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
+
+            cout
+                << '\n'
+                << "chrm" << chrm
+                << "\t   " << current_window_start << '-' << current_window_end
+                << '\n';
+
+            cout << setw(8) << number_of_snps_in_the_ref_panel_in_this_region << " # RefPanel SNPs in this window\n";
+            cout << setw(8) << number_of_snps_in_the_gwas_in_this_region      << " # GWAS     SNPs in this window (with "<<options:: opt_flanking_width<<" flanking)\n";
+            cout << setw(8) << SNPs_in_the_intersection.size()                << " # SNPs in both (i.e. useful as tags)\n";
+
+            auto genotypes_for_the_tags = lookup_genotypes( SNPs_in_the_intersection, cache );
+        }
+    }
+}
 
 static
 std:: unordered_map<string, chrpos>
@@ -157,6 +274,17 @@ std:: unordered_map<string, chrpos>
         rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
     }
     return m;
+}
+static
+vector<vector<int8_t>>
+lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
+                , file_reading:: CacheOfRefPanelData       &  cache
+                ) {
+    vector<vector<int8_t>> many_calls;
+    for(auto crps : SNPs_in_the_intersection) {
+        cache.lookup_one_chr_pos(crps);
+    }
+    return many_calls;
 }
 
 } // namespace ssimp
