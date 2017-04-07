@@ -15,6 +15,12 @@ struct chrpos {
 
         return pos < other.pos;
     }
+    bool operator> (chrpos const & other) const {
+        if(chr > other.chr) return true;
+        if(chr < other.chr) return false;
+
+        return pos > other.pos;
+    }
     bool operator==(chrpos const & other) const {
         return(chr == other.chr
             && pos == other.pos);
