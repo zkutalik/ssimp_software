@@ -484,5 +484,12 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
     return p;
 }
+void CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
+    PP(crps);
+    auto const b_ref  = begin_from_file(m_rfh);
+    auto const e_ref  =   end_from_file(m_rfh);
+    auto const    it  = std:: lower_bound(b_ref, e_ref, crps);
+    assert(it.get_chrpos() == crps);
+}
 
 } // namespace file_reading
