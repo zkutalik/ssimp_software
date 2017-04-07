@@ -46,6 +46,7 @@ struct AnyFile_I {
     virtual chrpos      get_chrpos         (int)     const = 0;
     virtual std::string get_allele_ref     (int)     const = 0;
     virtual std::string get_allele_alt     (int)     const = 0;
+    //virtual char        get_delimiter      ()       const = 0;
 };
 
 struct Genotypes_I : public AnyFile_I {

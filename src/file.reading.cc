@@ -144,6 +144,7 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
 {
     vector<OneLineSummary> m_each_SNP_and_its_offset;
     string                 m_underlying_file_name;
+    char                   m_delimiter;
 
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_offset.size();
@@ -170,7 +171,12 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         f.seekg(ols.m_tellg_of_line_start);
         string line;
         getline(f, line);
-        PP(line);
+
+        auto all_split_up = tokenize(line, m_delimiter);
+
+        using utils:: operator<<;
+        PP(all_split_up);
+        PP(all_split_up.size());
     }
 
     OneLineSummary  get_ols         (int i)     const {
@@ -244,6 +250,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
     auto p = std:: make_shared<PlainVCFfile>();
     p->m_underlying_file_name = file_name;
+    p->m_delimiter            = hd.m_delimiter;
 
     while(1) {
         OneLineSummary ols;
@@ -391,7 +398,8 @@ char   decide_delimiter( string      const & header_line ) {
 struct SimpleGwasFile : public file_reading:: Effects_I
 {
     vector<GwasLineSummary> m_each_SNP_and_its_z;
-    string                 m_underlying_file_name;
+    string                  m_underlying_file_name;
+    char                    m_delimiter;
 
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_z.size();
@@ -453,6 +461,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
     auto p = std:: make_shared<SimpleGwasFile>();
     p->m_underlying_file_name = file_name;
+    p->m_delimiter            = hd.m_delimiter;
 
     while(1) {
         GwasLineSummary gls;
