@@ -40,7 +40,11 @@
 
     echo " -O2"
     echo " -Wall -Wextra -std=c++14"
-    [[ "$(whoami)" = 'amcdaid' ]] && echo ' -Werror'
+    if   test "$(whoami)" = 'amcdaid'  \
+           -o "$(whoami)" = 'aaron'
+    then
+           echo ' -Werror'
+    fi
 
     #echo " -pg -ggdb                  " # For profiling
 }
