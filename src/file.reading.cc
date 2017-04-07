@@ -144,7 +144,7 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
 {
     vector<OneLineSummary> m_each_SNP_and_its_offset;
     string                 m_underlying_file_name;
-    char                   m_delimiter;
+    header_details         m_header_details;
 
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_offset.size();
@@ -172,11 +172,21 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         string line;
         getline(f, line);
 
-        auto all_split_up = tokenize(line, m_delimiter);
+        auto all_split_up = tokenize(line, m_header_details.m_delimiter);
 
         using utils:: operator<<;
         PP(all_split_up);
         PP(all_split_up.size());
+
+
+        // From here one, just assume VCF, with 'unaccounted-for' fields starting at offset 9 (i.e. 10th column)
+        int N_ref = m_header_details.unaccounted.size();
+        for(int i = 0; i<N_ref; ++i) {
+            auto column_number = m_header_details.unaccounted.at(i).m_offset;
+            assert(column_number-9 == i);
+            auto & call_for_this_person = all_split_up.at(column_number);
+            PP(i, column_number, call_for_this_person);
+        }
     }
 
     OneLineSummary  get_ols         (int i)     const {
@@ -235,7 +245,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     f || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
-    header_details hd;
 
     // Skip past the '##' lines
     while(getline(f, current_line)) {
@@ -245,12 +254,13 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     }
 
     // current_line is now the first line, i.e. the header
-    hd = parse_header(current_line);
 
 
     auto p = std:: make_shared<PlainVCFfile>();
     p->m_underlying_file_name = file_name;
-    p->m_delimiter            = hd.m_delimiter;
+    p->m_header_details       = parse_header(current_line);
+
+    header_details &hd = p->m_header_details;
 
     while(1) {
         OneLineSummary ols;
