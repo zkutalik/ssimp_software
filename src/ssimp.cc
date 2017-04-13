@@ -187,7 +187,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // We have at least one SNP here, so let's print some numbers about this region
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
-            auto number_of_all_targets                          = SNPs_all_targets.size();
+            int  number_of_all_targets                          = SNPs_all_targets.size();
 
             cout
                 << '\n'
@@ -199,8 +199,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_tags                                 << " # SNPs in both (i.e. useful as tags)\n";
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
             auto genotypes_for_the_tags = lookup_genotypes( SNPs_in_the_intersection, cache );
+            auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
 
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
+            static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_unks) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
 
             int const N_ref = genotypes_for_the_tags.at(0).size();
             assert(N_ref > 0);
@@ -229,6 +231,28 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             }
             auto C_inv = invert_a_matrix(std::move(C)); // 'move' means we're not allowed to use 'C' again
             PP(C_inv);
+
+            mvn:: Matrix      c(number_of_tags, number_of_all_targets);
+            for(int k=0; k<number_of_tags; ++k) {
+                for(int u=0; u<number_of_all_targets; ++u) {
+                    assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
+                    assert(N_ref        == utils:: ssize(genotypes_for_the_unks.at(u)));
+                    double c_ku = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
+                                                           , &genotypes_for_the_unks.at(u).front(), 1
+                                                           , N_ref );
+                    if(c_ku > 1.0) {
+                        assert(c_ku-1.0 < 1e-5);
+                        c_ku = 1.0;
+                    }
+                    assert(c_ku >= -1.0);
+                    assert(c_ku <=  1.0);
+                    if(     SNPs_in_the_intersection.at(k)
+                         == SNPs_all_targets.at(u))
+                        assert(c_ku == 1.0);
+                    c.set(k,u,c_ku);
+                }
+            }
+            //PP(c);
         }
     }
 }
