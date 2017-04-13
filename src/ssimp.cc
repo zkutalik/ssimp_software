@@ -122,11 +122,11 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
-            auto w_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
-            auto w_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
-            if(w_begin == c_end)
+            auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
+            auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
+            if(w_ref_narrow_begin == c_end)
                 break; // Finished with this chromosome
-            if(w_begin == w_end)
+            if(w_ref_narrow_begin == w_ref_narrow_end)
                 continue; // Empty region, just skip it
 
             // Look up this region in the GWAS (taking account of the flanking width also)
@@ -136,9 +136,9 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
             // Which SNPs are in both, i.e. useful as tag SNPs
             vector<chrpos> SNPs_in_the_intersection;
             {
-                auto r = w_begin;
+                auto r = w_ref_narrow_begin;
                 auto g = w_gwas_begin;
-                while(r < w_end && g < w_gwas_end) {
+                while(r < w_ref_narrow_end && g < w_gwas_end) {
                     if(r.get_chrpos() == g.get_chrpos()) {
                         SNPs_in_the_intersection.push_back(r.get_chrpos());
                         ++g; // because g might have the same position multiple times, but the reference panel shouldn't
@@ -146,7 +146,7 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
                     }
                     else if(r.get_chrpos() <  g.get_chrpos()) {
                         ++r; // skip this one
-                        r = std:: lower_bound(r, w_end, g.get_chrpos());
+                        r = std:: lower_bound(r, w_ref_narrow_end, g.get_chrpos());
                     }
                     else if(r.get_chrpos() >  g.get_chrpos()) {
                         ++g; // skip this one
@@ -156,7 +156,7 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
             }
             { // verify. Feel free to just delete these coming lines
                 vector<chrpos> SNPs_in_the_intersection_;
-                std:: set_intersection( w_begin     , w_end
+                std:: set_intersection( w_ref_narrow_begin     , w_ref_narrow_end
                                       , w_gwas_begin, w_gwas_end
                                       , std:: back_inserter( SNPs_in_the_intersection_ ));
                 assert(SNPs_in_the_intersection == SNPs_in_the_intersection_);
@@ -164,7 +164,7 @@ void quickly_list_the_regions( file_reading:: GenotypeFileHandle         ref_pan
 
 
             // We have at least one SNP here, so let's print some numbers about this region
-            auto number_of_snps_in_the_ref_panel_in_this_region = w_end      - w_begin;
+            auto number_of_snps_in_the_ref_panel_in_this_region = w_ref_narrow_end      - w_ref_narrow_begin;
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
 
             cout
@@ -206,11 +206,11 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
-            auto w_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
-            auto w_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
-            if(w_begin == c_end)
+            auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
+            auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
+            if(w_ref_narrow_begin == c_end)
                 break; // Finished with this chromosome
-            if(w_begin == w_end)
+            if(w_ref_narrow_begin == w_ref_narrow_end)
                 continue; // Empty region, just skip it
 
             // Look up this region in the GWAS (taking account of the flanking width also)
@@ -220,9 +220,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // Which SNPs are in both, i.e. useful as tag SNPs
             vector<chrpos> SNPs_in_the_intersection;
             {
-                auto r = w_begin;
+                auto r = w_ref_narrow_begin;
                 auto g = w_gwas_begin;
-                while(r < w_end && g < w_gwas_end) {
+                while(r < w_ref_narrow_end && g < w_gwas_end) {
                     if(r.get_chrpos() == g.get_chrpos()) {
                         SNPs_in_the_intersection.push_back(r.get_chrpos());
                         ++g; // because g might have the same position multiple times, but the reference panel shouldn't
@@ -230,7 +230,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     }
                     else if(r.get_chrpos() <  g.get_chrpos()) {
                         ++r; // skip this one
-                        r = std:: lower_bound(r, w_end, g.get_chrpos());
+                        r = std:: lower_bound(r, w_ref_narrow_end, g.get_chrpos());
                     }
                     else if(r.get_chrpos() >  g.get_chrpos()) {
                         ++g; // skip this one
@@ -240,7 +240,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             }
             { // verify. Feel free to just delete these coming lines
                 vector<chrpos> SNPs_in_the_intersection_;
-                std:: set_intersection( w_begin     , w_end
+                std:: set_intersection( w_ref_narrow_begin     , w_ref_narrow_end
                                       , w_gwas_begin, w_gwas_end
                                       , std:: back_inserter( SNPs_in_the_intersection_ ));
                 assert(SNPs_in_the_intersection == SNPs_in_the_intersection_);
@@ -253,7 +253,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
 
             // We have at least one SNP here, so let's print some numbers about this region
-            auto number_of_snps_in_the_ref_panel_in_this_region = w_end      - w_begin;
+            auto number_of_snps_in_the_ref_panel_in_this_region = w_ref_narrow_end      - w_ref_narrow_begin;
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
 
             cout
