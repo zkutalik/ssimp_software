@@ -124,7 +124,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             if(w_ref_narrow_begin == c_end)
                 break; // Finished with this chromosome
             if(w_ref_narrow_begin == w_ref_narrow_end)
-                continue; // Empty region, just skip it
+                continue; // Nothing to impute, skip to the next region
 
             auto w_ref_wide_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_ref_wide_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width });
@@ -133,7 +133,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
-            // Which SNPs are in both wide windows, i.e. useful as tag SNPs
+            // Which SNPs are in both *wide* windows, i.e. useful as tag SNPs
             vector<chrpos> SNPs_in_the_intersection;
             {
                 auto r = w_ref_wide_begin;
@@ -167,10 +167,16 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 continue;
             assert(number_of_tags > 0);
 
+            // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
+            vector<chrpos>  SNPs_all_targets;
+            for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
+                SNPs_all_targets.push_back( it.get_chrpos() );
+            }
+
 
             // We have at least one SNP here, so let's print some numbers about this region
-            auto number_of_snps_in_the_ref_panel_in_this_region = w_ref_narrow_end      - w_ref_narrow_begin;
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
+            auto number_of_all_targets                          = SNPs_all_targets.size();
 
             cout
                 << '\n'
@@ -178,9 +184,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 << "\t   " << current_window_start << '-' << current_window_end
                 << '\n';
 
-            cout << setw(8) << number_of_snps_in_the_ref_panel_in_this_region << " # RefPanel SNPs in this window\n";
             cout << setw(8) << number_of_snps_in_the_gwas_in_this_region      << " # GWAS     SNPs in this window (with "<<options:: opt_flanking_width<<" flanking)\n";
             cout << setw(8) << number_of_tags                                 << " # SNPs in both (i.e. useful as tags)\n";
+            cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
             auto genotypes_for_the_tags = lookup_genotypes( SNPs_in_the_intersection, cache );
 
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
