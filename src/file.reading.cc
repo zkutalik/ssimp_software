@@ -180,13 +180,31 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
 
 
         // From here one, just assume VCF, with 'unaccounted-for' fields starting at offset 9 (i.e. 10th column)
+        vector<uint8_t> lefts ;
+        vector<uint8_t> rights;
         int N_ref = m_header_details.unaccounted.size();
         for(int i = 0; i<N_ref; ++i) {
             auto column_number = m_header_details.unaccounted.at(i).m_offset;
             assert(column_number-9 == i);
             auto & call_for_this_person = all_split_up.at(column_number);
             PP(i, column_number, call_for_this_person);
+            // parse 0|0
+            int d1, d2;
+            int n;
+            int ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
+            if(   ret == 2 // two digits
+               && n == ssize(call_for_this_person) // all characters of input were consumed
+               && d1 >= 0
+               && d2 >= 0
+                    ) {
+                lefts .push_back(d1);
+                rights.push_back(d2);
+            }
+            else
+                DIE("Couldn't parse \"" << call_for_this_person << "\" in column " << column_number << " in the " << i << "th SNP in the ref panel");
         }
+        //PP(lefts );
+        //PP(rights);
     }
 
     OneLineSummary  get_ols         (int i)     const {
