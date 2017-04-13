@@ -35,7 +35,7 @@ static
 std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 static
-vector<vector<int8_t>>
+vector<vector<int>>
 lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
                 , file_reading:: CacheOfRefPanelData       &  cache
                 );
@@ -276,14 +276,17 @@ std:: unordered_map<string, chrpos>
     return m;
 }
 static
-vector<vector<int8_t>>
-lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
+vector<vector<int>>
+lookup_genotypes( vector<chrpos>                     const &  snps
                 , file_reading:: CacheOfRefPanelData       &  cache
                 ) {
-    vector<vector<int8_t>> many_calls;
-    for(auto crps : SNPs_in_the_intersection) {
-        cache.lookup_one_chr_pos(crps);
+    vector<vector<int>> many_calls;
+    for(auto crps : snps) {
+        many_calls.push_back(
+            cache.lookup_one_chr_pos(crps)
+        );
     }
+    assert(many_calls.size() == snps.size());
     return many_calls;
 }
 
