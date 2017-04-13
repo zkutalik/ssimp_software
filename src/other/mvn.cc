@@ -529,6 +529,22 @@ double norm_2(const VecCol &x) {
 		}
 		return o;
 	}
+	std :: ostream& std :: operator << (std :: ostream & o, const mvn :: Matrix &v) {
+		for(size_t r=0; r < v.size1(); ++r) {
+			if(r==0)
+				std :: cout << "[[";
+			else
+				std :: cout << " [";
+			for(size_t c=0; c < v.size2(); ++c) {
+				std :: cout << '\t' << gsl_matrix_get(v.a, r, c);
+			}
+			if(r+1 == v.size1())
+				cout << "]]";
+			else
+				cout << "]" << endl;
+		}
+		return o;
+	}
 long double
 mvn:: calculate_lndeterminant(mvn:: SquareMatrix copy_with_which_to_do_LU) {
     const size_t D = copy_with_which_to_do_LU.size();

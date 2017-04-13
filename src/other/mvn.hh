@@ -155,6 +155,7 @@ calculate_lndeterminant(mvn:: SquareMatrix copy_with_which_to_do_LU);
 namespace std {
 	std :: ostream& operator << (std :: ostream & o, const mvn :: VecCol &);
 	std :: ostream& operator << (std :: ostream & o, const mvn :: SquareMatrix &);
+	std :: ostream& operator << (std :: ostream & o, const mvn :: Matrix &);
 }
 
 #endif
