@@ -230,9 +230,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 }
             }
             auto C_inv = invert_a_matrix(std::move(C)); // 'move' means we're not allowed to use 'C' again
-            PP(C_inv);
 
-            mvn:: Matrix      c(number_of_tags, number_of_all_targets);
+            mvn:: Matrix      c(number_of_all_targets, number_of_tags);
             for(int k=0; k<number_of_tags; ++k) {
                 for(int u=0; u<number_of_all_targets; ++u) {
                     assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
@@ -249,10 +248,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     if(     SNPs_in_the_intersection.at(k)
                          == SNPs_all_targets.at(u))
                         assert(c_ku == 1.0);
-                    c.set(k,u,c_ku);
+                    c.set(u,k,c_ku);
                 }
             }
-            //PP(c);
+            auto product = c * C_inv;
+
+            PP(C_inv, c, product);
         }
     }
 }
