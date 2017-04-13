@@ -212,8 +212,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
                     assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(l)));
                     double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
-                                                     , &genotypes_for_the_tags.at(l).front(), 1
-                                                     , N_ref );
+                                                           , &genotypes_for_the_tags.at(l).front(), 1
+                                                           , N_ref );
                     if(c_kl > 1.0) {
                         assert(c_kl-1.0 < 1e-5);
                         c_kl = 1.0;
