@@ -127,6 +127,8 @@ namespace mvn {
 #define invert_a_matrix(copy) invert_a_matrix_impl(copy, __FILE__, __LINE__)
 	SquareMatrix		cholesky_upper(SquareMatrix copy_with_which_to_do_LL) ;
 
+	Matrix operator*(const Matrix &lhs, const SquareMatrix &rhs);
+
 
 bool veccol_is_close_to_zero(const VecCol &x);
 bool matrix_is_close_to_zero(const SquareMatrix &x);

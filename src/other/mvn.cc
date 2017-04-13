@@ -420,6 +420,17 @@ SquareMatrix		cholesky_upper(SquareMatrix thematrix) {
 		}
 		return thematrix;
 }
+Matrix		operator* (const Matrix &lhs, const SquareMatrix &rhs) {
+	const size_t D1 = lhs.size1();
+	const size_t D2 = lhs.size2();
+	const size_t D3 = rhs.size();
+	assert(D2 == rhs.size());
+
+	Matrix answer(D1, D3);
+	const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, lhs.get(), rhs.get(), 0, answer.get());
+	assert(res_0 == 0);
+	return answer;
+}
 
 #if 0
 long double		l2_P_under_Normal		(const VecCol &value, const VecCol &mean, SquareMatrix precision) {
