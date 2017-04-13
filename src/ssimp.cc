@@ -6,10 +6,12 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <gsl/gsl_statistics_double.h>
 
 #include "options.hh"
 #include "file.reading.hh"
 
+#include "other/utils.hh"
 #include "other/DIE.hh"
 #include "other/PP.hh"
 
@@ -35,7 +37,7 @@ static
 std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 static
-vector<vector<int>>
+vector<vector<double>>
 lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
                 , file_reading:: CacheOfRefPanelData       &  cache
                 );
@@ -243,6 +245,11 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 assert(SNPs_in_the_intersection == SNPs_in_the_intersection_);
             }
 
+            int const number_of_tags = SNPs_in_the_intersection.size();
+            if(number_of_tags == 0)
+                continue;
+            assert(number_of_tags > 0);
+
 
             // We have at least one SNP here, so let's print some numbers about this region
             auto number_of_snps_in_the_ref_panel_in_this_region = w_end      - w_begin;
@@ -256,9 +263,36 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             cout << setw(8) << number_of_snps_in_the_ref_panel_in_this_region << " # RefPanel SNPs in this window\n";
             cout << setw(8) << number_of_snps_in_the_gwas_in_this_region      << " # GWAS     SNPs in this window (with "<<options:: opt_flanking_width<<" flanking)\n";
-            cout << setw(8) << SNPs_in_the_intersection.size()                << " # SNPs in both (i.e. useful as tags)\n";
-
+            cout << setw(8) << number_of_tags                                 << " # SNPs in both (i.e. useful as tags)\n";
             auto genotypes_for_the_tags = lookup_genotypes( SNPs_in_the_intersection, cache );
+
+            static_assert( std:: is_same< vector<vector<double>> , decltype(genotypes_for_the_tags) >{} ,"");
+
+            int const N_ref = genotypes_for_the_tags.at(0).size();
+            assert(N_ref > 0);
+            PP(N_ref);
+
+
+            for(int k=0; k<number_of_tags; ++k) {
+                for(int l=0; l<number_of_tags; ++l) {
+                    assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
+                    assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(l)));
+                    double c_kl = gsl_stats_correlation( &genotypes_for_the_tags.at(k).front(), 1
+                                                     , &genotypes_for_the_tags.at(l).front(), 1
+                                                     , N_ref );
+                    if(c_kl > 1.0) {
+                        assert(c_kl-1.0 < 1e-5);
+                        c_kl = 1.0;
+                    }
+                    PP(k,l,c_kl, c_kl-1.0);
+                    assert(c_kl >= 0.0);
+                    assert(c_kl <= 1.0);
+                    if(k==l)
+                        assert(c_kl == 1.0);
+                    else
+                        assert(c_kl <  1.0);
+                }
+            }
         }
     }
 }
@@ -276,14 +310,17 @@ std:: unordered_map<string, chrpos>
     return m;
 }
 static
-vector<vector<int>>
+vector<vector<double>>
 lookup_genotypes( vector<chrpos>                     const &  snps
                 , file_reading:: CacheOfRefPanelData       &  cache
                 ) {
-    vector<vector<int>> many_calls;
+    vector<vector<double>> many_calls;
     for(auto crps : snps) {
+        auto one_crps_as_ints = cache.lookup_one_chr_pos(crps);
+        vector<double> one_crps_as_doubles( one_crps_as_ints.begin(), one_crps_as_ints.end() );
+        assert(one_crps_as_ints.size() == one_crps_as_doubles.size());
         many_calls.push_back(
-            cache.lookup_one_chr_pos(crps)
+                one_crps_as_doubles
         );
     }
     assert(many_calls.size() == snps.size());
