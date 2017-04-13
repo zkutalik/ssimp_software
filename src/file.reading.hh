@@ -156,11 +156,12 @@ void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas,
 struct CacheOfRefPanelData {
 private:
     GenotypeFileHandle m_rfh;
+    std:: unordered_map< chrpos , std::vector<int> > m_cache_of_z12;
 
 public:
-    CacheOfRefPanelData(GenotypeFileHandle rfh) : m_rfh(rfh) {}
+                                    CacheOfRefPanelData     (GenotypeFileHandle rfh) : m_rfh(rfh) {}
 
-    void lookup_one_chr_pos(chrpos crps);
+    std::vector<int>                lookup_one_chr_pos      (chrpos crps);
 };
 
 } // namespace file_reading

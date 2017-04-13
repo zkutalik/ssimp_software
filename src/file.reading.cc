@@ -534,8 +534,13 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
     return p;
 }
 using utils:: operator<<;
-void CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
+vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     PP(crps);
+
+    if(m_cache_of_z12.count(crps) == 1) {
+        return m_cache_of_z12[crps];
+    }
+
     auto const b_ref  = begin_from_file(m_rfh);
     auto const e_ref  =   end_from_file(m_rfh);
     auto const    it  = std:: lower_bound(b_ref, e_ref, crps);
@@ -557,6 +562,11 @@ void CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
 
     auto max_z12 = *max_element(z12.begin(), z12.end());
     assert(max_z12 == 2 || max_z12 == 1);
+
+    assert(m_cache_of_z12.count(crps) == 0);
+    m_cache_of_z12[crps] = z12;
+    assert(m_cache_of_z12.count(crps) == 1);
+    return lookup_one_chr_pos(crps);
 }
 
 } // namespace file_reading
