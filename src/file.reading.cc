@@ -165,7 +165,10 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         OneLineSummary const & ols = get_ols(i);
         return ols.m_allele_alt;
     }
-    virtual void        get_calls          (int i)     const {
+    virtual std::pair<
+             std::vector<uint8_t>
+            ,std::vector<uint8_t>
+        > get_calls          (int i)                   const {
         OneLineSummary const & ols = get_ols(i);
         std:: ifstream f(m_underlying_file_name); // reopen the file
         f.seekg(ols.m_tellg_of_line_start);
@@ -205,6 +208,7 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         }
         //PP(lefts );
         //PP(rights);
+        return make_pair(lefts, rights);
     }
 
     OneLineSummary  get_ols         (int i)     const {

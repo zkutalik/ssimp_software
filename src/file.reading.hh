@@ -50,7 +50,10 @@ struct AnyFile_I {
 };
 
 struct Genotypes_I : public AnyFile_I {
-    virtual void        get_calls          (int)     const = 0;
+    virtual std::pair<
+             std::vector<uint8_t>
+            ,std::vector<uint8_t>
+        > get_calls          (int)     const = 0;
 };
 struct Effects_I : public AnyFile_I {
     virtual void        set_chrpos         (int, chrpos)  = 0; // so that we can fill them in from the ref data
