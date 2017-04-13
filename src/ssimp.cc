@@ -170,6 +170,11 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             vector<chrpos>  SNPs_all_targets;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
+                // actually, we should think about ignoring SNPs with allele problems
+                auto allele_alt =it.get_allele_alt();
+                auto has_more_than_one_alt_allele = allele_alt.find(',') != std::string::npos;
+                if(has_more_than_one_alt_allele)
+                    continue;
                 SNPs_all_targets.push_back( it.get_chrpos() );
             }
 
