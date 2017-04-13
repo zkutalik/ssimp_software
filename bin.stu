@@ -4,12 +4,14 @@
     bin/o/ssimp.o
     bin/o/options.o
     bin/o/file.reading.o
+    bin/o/other/mvn.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
     ${LINKER} \
         bin/o/options.o \
         bin/o/ssimp.o \
         bin/o/file.reading.o \
+        bin/o/other/mvn.o \
     -o bin/ssimp
 }
 

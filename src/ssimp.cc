@@ -12,6 +12,7 @@
 #include "file.reading.hh"
 
 #include "other/utils.hh"
+#include "other/mvn.hh"
 #include "other/DIE.hh"
 #include "other/PP.hh"
 
