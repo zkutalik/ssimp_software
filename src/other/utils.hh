@@ -21,6 +21,18 @@ std::ostream & operator<< (std:: ostream &o, const std:: vector<T> &v) {
     o << ']';
     return o;
 }
+template<>
+inline
+std::ostream & operator<< <uint8_t> (std:: ostream &o, const std:: vector<uint8_t> &v) {
+    o << '[';
+    for(auto & e : v) {
+        if(&e != &v.front())
+            o << ',';
+        o << (int)e;
+    }
+    o << ']';
+    return o;
+}
 
 template<typename T>
 int lexical_cast(std:: string const & s);
