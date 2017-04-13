@@ -555,7 +555,10 @@ vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     }
 
     auto max_z12 = *max_element(z12.begin(), z12.end());
-    assert(max_z12 == 2 || max_z12 == 1);
+    assert(max_z12 == 2
+            || max_z12 == 1
+            || max_z12 == 0
+            );
 
     assert(m_cache_of_z12.count(crps) == 0);
     m_cache_of_z12[crps] = z12;
