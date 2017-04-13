@@ -29,6 +29,28 @@ struct chrpos {
         return !(*this == other);
     }
 };
+} // end that namespace, in order to define std:: hash
+
+template<>
+struct :: std:: hash < file_reading:: chrpos >
+{
+    auto   operator() (file_reading:: chrpos const &crps) const
+        noexcept(noexcept(
+               hash< decltype(crps.chr) >{}(crps.chr)
+             + hash< decltype(crps.pos) >{}(crps.pos)
+                ))
+        -> decltype(
+               hash< decltype(crps.chr) >{}(crps.chr)
+             + hash< decltype(crps.pos) >{}(crps.pos)
+                )
+    {
+        return hash< decltype(crps.chr) >{}(crps.chr)
+             + hash< decltype(crps.pos) >{}(crps.pos);
+    }
+};
+
+
+namespace file_reading { // reopen this namespace
 
 inline
 std:: ostream& operator<<(std:: ostream &o, chrpos const &c) {
