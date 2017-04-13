@@ -274,7 +274,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             int const N_ref = genotypes_for_the_tags.at(0).size();
             assert(N_ref > 0);
-            PP(N_ref);
 
 
             mvn:: SquareMatrix C (number_of_tags);
@@ -289,7 +288,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         assert(c_kl-1.0 < 1e-5);
                         c_kl = 1.0;
                     }
-                    PP(k,l,c_kl);
                     assert(c_kl >= -1.0);
                     assert(c_kl <=  1.0);
                     if(k==l)
@@ -299,7 +297,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     C.set(k,l,c_kl);
                 }
             }
-            PP(C);
             auto C_inv = invert_a_matrix(std::move(C)); // 'move' means we're not allowed to use 'C' again
             PP(C_inv);
         }

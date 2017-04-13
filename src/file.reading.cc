@@ -530,7 +530,6 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 }
 using utils:: operator<<;
 vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
-    PP(crps);
 
     if(m_cache_of_z12.count(crps) == 1) {
         return m_cache_of_z12[crps];
