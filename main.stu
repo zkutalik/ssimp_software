@@ -8,3 +8,4 @@
 # in this package.
 
 % include bin.stu
+% include tests.stu

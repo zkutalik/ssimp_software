@@ -1,0 +1,11 @@
+    tests/${testname}/output.actual
+:       bin/ssimp
+{
+    export SSIMP="$(readlink -f bin/ssimp)" # store the full path, in order that it works after 'cd'
+    export   REF="$(readlink -f ref)"
+    export  GWAS="$(readlink -f gwas)"
+    cd    "tests/${testname}"
+    export OUTPUT=output.actual.tmp
+    bash command
+    mv output.actual.tmp output.actual
+}
