@@ -281,6 +281,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 assert(mx <  1e-10);
             }
 
+
+            cCzs =  c_Cinv_zs;
             PP(cCzs);
             assert(number_of_all_targets == ssize(cCzs));
         }
