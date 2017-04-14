@@ -66,10 +66,12 @@ static
 } // namespace ssimp
 
 int main(int argc, char **argv) {
+
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
 
     cout.imbue(std::locale("")); // apply the user's locale, for example the thousands separator
+    cout << std::setprecision(20);
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         PP( options:: opt_raw_ref
