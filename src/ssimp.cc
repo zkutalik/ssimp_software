@@ -46,16 +46,6 @@ lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_inters
                 );
 static
 mvn:: SquareMatrix
-make_C_tag_tag_matrix_and_invert(
-                    vector<vector<int>>              const & genotypes_for_the_tags );
-static
-mvn:: VecCol
-make_C_tag_tag_matrix_and_solve(
-                    vector<vector<int>>              const & genotypes_for_the_tags
-                  , mvn:: VecCol                             zs
-                    );
-static
-mvn:: SquareMatrix
 make_C_tag_tag_matrix(
                     vector<vector<int>>              const & genotypes_for_the_tags
                     );
@@ -258,8 +248,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             int const N_ref = genotypes_for_the_tags.at(0).size();
             assert(N_ref > 0);
 
-            mvn:: SquareMatrix C_inv = make_C_tag_tag_matrix_and_invert(genotypes_for_the_tags);
-            mvn:: VecCol C_inv_zs = make_C_tag_tag_matrix_and_solve(genotypes_for_the_tags, mvn:: make_VecCol(zs_for_the_tags));
+            mvn:: SquareMatrix C_inv = invert_a_matrix(make_C_tag_tag_matrix(genotypes_for_the_tags));
+            mvn:: VecCol C_inv_zs = solve_a_matrix( make_C_tag_tag_matrix(genotypes_for_the_tags)
+                                                  , mvn:: make_VecCol(zs_for_the_tags)
+                                                  );
             auto old_way =
                     multiply_matrix_by_colvec_giving_colvec
                                               ( C_inv
@@ -315,22 +307,6 @@ lookup_genotypes( vector<chrpos>                     const &  snps
     return many_calls;
 }
 
-static
-mvn:: SquareMatrix
-make_C_tag_tag_matrix_and_invert(
-                    vector<vector<int>>              const & genotypes_for_the_tags ) {
-                mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags);
-                return invert_a_matrix(std::move(C));
-}
-static
-mvn:: VecCol
-make_C_tag_tag_matrix_and_solve(
-                    vector<vector<int>>              const & genotypes_for_the_tags
-                  , mvn:: VecCol                             zs
-                    ) {
-                mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags);
-                return solve_a_matrix(std::move(C), zs);
-}
 static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_the_tags
