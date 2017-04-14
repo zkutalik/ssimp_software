@@ -35,7 +35,7 @@ std::ostream & operator<< <uint8_t> (std:: ostream &o, const std:: vector<uint8_
 }
 
 template<typename T>
-int lexical_cast(std:: string const & s);
+T lexical_cast(std:: string const & s);
 
 template<>
 inline
@@ -48,6 +48,18 @@ int lexical_cast<int>(std:: string const & s) {
     }
     else
         throw std:: invalid_argument{"can't parse this int"};
+}
+template<>
+inline
+double lexical_cast<double>(std:: string const & s) {
+    double val;
+    int n;
+    int ret = sscanf(s.c_str(), "%lg %n", &val, &n);
+    if(ret == 1 && n == ssize(s)) {
+        return val;
+    }
+    else
+        throw std:: invalid_argument{std::string("Can't parse this double [") + s + ']'};
 }
 
 } // namespace utils
