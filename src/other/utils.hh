@@ -62,4 +62,9 @@ double lexical_cast<double>(std:: string const & s) {
         throw std:: invalid_argument{std::string("Can't parse this double [") + s + ']'};
 }
 
+template<typename T>
+void print_type(T&&) {
+    std:: cout << __PRETTY_FUNCTION__ << std:: endl;
+}
+
 } // namespace utils
