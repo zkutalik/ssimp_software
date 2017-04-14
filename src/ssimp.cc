@@ -192,13 +192,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     }
                 }
             }
-            { // verify. Feel free to just delete these coming lines
-                vector<chrpos> SNPs_in_the_intersection_;
-                std:: set_intersection( w_ref_wide_begin     , w_ref_wide_end
-                                      , w_gwas_begin, w_gwas_end
-                                      , std:: back_inserter( SNPs_in_the_intersection_ ));
-                assert(SNPs_in_the_intersection == SNPs_in_the_intersection_);
-            }
 
             int const number_of_tags = SNPs_in_the_intersection.size();
             if(number_of_tags == 0)
