@@ -291,6 +291,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     cout
                         << crps
                         << '\t' << c_Cinv_zs(i)
+                        << '\t' << SNPname
                         << endl;
                     ++it;
                 }
