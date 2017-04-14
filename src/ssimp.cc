@@ -251,8 +251,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     ,genotypes_for_the_unks
                     );
 
-            auto product = c * C_inv;
-            PP(C_inv, c, product);
         }
     }
 }
