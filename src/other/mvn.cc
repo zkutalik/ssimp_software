@@ -569,3 +569,12 @@ mvn:: calculate_lndeterminant(mvn:: SquareMatrix copy_with_which_to_do_LU) {
     assert(std::isfinite(determinant));
     return determinant;
 }
+namespace mvn {
+mvn:: VecCol make_VecCol(std::vector<double> const & in) {
+	VecCol v(in.size());
+	for(size_t i=0; i<in.size(); ++i) {
+		v.set(i, in.at(i));
+	}
+	return v;
+}
+}

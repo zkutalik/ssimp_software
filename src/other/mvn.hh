@@ -149,6 +149,8 @@ bool    operator==(VecCol const& lhs, VecCol const &rhs) {
 long double
 calculate_lndeterminant(mvn:: SquareMatrix copy_with_which_to_do_LU);
 
+mvn:: VecCol make_VecCol(std::vector<double> const & in);
+
 #ifdef USE_GPERF_CPUPROFILE
 	void dump_final_destruct_Square_counters();
 #endif
