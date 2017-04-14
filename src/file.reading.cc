@@ -99,6 +99,7 @@ struct header_details {
     offset_and_name    filter;
     offset_and_name    info;
     offset_and_name    format;
+    offset_and_name    effect_z;
     vector<offset_and_name> unaccounted;
 };
 
@@ -370,6 +371,9 @@ header_details   parse_header( string      const & header_line ) {
         else if(is_in_this_list(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
         }
+        else if(is_in_this_list(one_field_name, {"z.from.peff"})) {
+            hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
+        }
         else {
             hd.unaccounted.push_back( header_details:: offset_and_name(field_counter, one_field_name) );
         }
@@ -506,6 +510,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
             gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
             gls.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
             gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
+            gls.m_z          = utils:: lexical_cast<double> (LOOKUP( hd, effect_z, all_split_up));
 
             // Try to read in chromosome and position, but they may not be present
             // If missing, we'll fill them in much later from the reference panel
