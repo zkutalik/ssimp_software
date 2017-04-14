@@ -156,6 +156,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // Which SNPs are in both *wide* windows, i.e. useful as tag SNPs
             vector<chrpos> SNPs_in_the_intersection;
+            vector<double> zs_for_the_tags;
             {
                 auto r = w_ref_wide_begin;
                 auto g = w_gwas_begin;
@@ -169,12 +170,14 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                                         auto z_in_ref_direction = -g.get_z();
                                         (void)z_in_ref_direction;
                                         SNPs_in_the_intersection.push_back(r.get_chrpos());
+                                        zs_for_the_tags.push_back(z_in_ref_direction);
                                     }
                                 break; case which_direction_t:: DIRECTION_AS_IS:
                                     {
                                         auto z_in_ref_direction =  g.get_z();
                                         (void)z_in_ref_direction;
                                         SNPs_in_the_intersection.push_back(r.get_chrpos());
+                                        zs_for_the_tags.push_back(z_in_ref_direction);
                                     }
                                 break; case which_direction_t:: NO_ALLELE_MATCH: ; // Just ignore this
                             }
@@ -192,6 +195,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     }
                 }
             }
+            assert(SNPs_in_the_intersection.size() == zs_for_the_tags.size());
 
             int const number_of_tags = SNPs_in_the_intersection.size();
             if(number_of_tags == 0)
