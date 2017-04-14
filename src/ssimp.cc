@@ -23,6 +23,9 @@ using std:: vector;
 using std:: setw;
 
 using file_reading:: chrpos;
+using file_reading:: SNPiterator;
+using file_reading:: GenotypeFileHandle;
+using file_reading:: GwasFileHandle;
 
 namespace ssimp {
 // Some forward declarations
@@ -47,6 +50,15 @@ mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int>>              const & genotypes_for_the_tags
         , vector<vector<int>>              const & genotypes_for_the_unks
         );
+
+enum class which_direction_t { DIRECTION_SHOULD_BE_REVERSED
+                             , NO_ALLELE_MATCH
+                             , DIRECTION_AS_IS };
+static
+    which_direction_t decide_on_a_direction
+    ( SNPiterator<GenotypeFileHandle> const & //r
+    , SNPiterator<GwasFileHandle>     const & //g
+    );
 } // namespace ssimp
 
 int main(int argc, char **argv) {
@@ -149,7 +161,16 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 auto g = w_gwas_begin;
                 while(r < w_ref_wide_end && g < w_gwas_end) {
                     if(r.get_chrpos() == g.get_chrpos()) {
-                        SNPs_in_the_intersection.push_back(r.get_chrpos());
+                        { // one last check, that the alleles match up
+                            //PP(r.get_chrpos() ,r.get_allele_alt() ,r.get_allele_ref() ,g.get_allele_alt() ,g.get_allele_ref());
+                            which_direction_t which_dir = decide_on_a_direction(r, g);
+                            switch(which_dir) {
+                                break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED: ;
+                                break; case which_direction_t:: NO_ALLELE_MATCH: ;
+                                break; case which_direction_t:: DIRECTION_AS_IS: ;
+                                SNPs_in_the_intersection.push_back(r.get_chrpos());
+                            }
+                        }
                         ++g; // because g might have the same position multiple times, but the reference panel shouldn't
                              // TODO: check that the reference panel doesn't indeed have unique chrpos.
                     }
@@ -316,5 +337,12 @@ mvn:: Matrix make_c_unkn_tags_matrix
     }
     return c;
 };
+static
+    which_direction_t decide_on_a_direction
+    ( SNPiterator<GenotypeFileHandle> const & //r
+    , SNPiterator<GwasFileHandle>     const & //g
+    ) {
+        return which_direction_t:: DIRECTION_AS_IS;
+    }
 
 } // namespace ssimp
