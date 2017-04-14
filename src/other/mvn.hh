@@ -125,6 +125,7 @@ namespace mvn {
 	SquareMatrix operator/(SquareMatrix lhs, long double);
 	SquareMatrix		invert_a_matrix_impl(SquareMatrix copy_with_which_to_do_LU, const char * file, const size_t line) ;
 #define invert_a_matrix(copy) invert_a_matrix_impl(copy, __FILE__, __LINE__)
+	VecCol      		solve_a_matrix(SquareMatrix copy_with_which_to_do_LU, VecCol const &b) ;
 	SquareMatrix		cholesky_upper(SquareMatrix copy_with_which_to_do_LL) ;
 
 	Matrix operator*(const Matrix &lhs, const SquareMatrix &rhs);

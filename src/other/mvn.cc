@@ -409,6 +409,17 @@ SquareMatrix			invert_a_matrix_impl(SquareMatrix another_copy_for_cholesky, cons
 	//assert(matrix_is_close_to_zero(inverse));
 	return another_copy_for_cholesky;
 }
+VecCol
+solve_a_matrix(SquareMatrix another_copy_for_cholesky, VecCol const &b) {
+	assert(is_symmetric(another_copy_for_cholesky));
+
+	VecCol result(b.size());
+
+	gsl_linalg_cholesky_decomp(another_copy_for_cholesky.get());
+	gsl_linalg_cholesky_solve (another_copy_for_cholesky.get() , b.get() , result.get());
+
+	return result;
+}
 SquareMatrix		cholesky_upper(SquareMatrix thematrix) {
 		gsl_linalg_cholesky_decomp(thematrix.get());
 		const size_t D = thematrix.size();
