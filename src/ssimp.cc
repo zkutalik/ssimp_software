@@ -38,6 +38,10 @@ vector<vector<int>>
 lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
                 , file_reading:: CacheOfRefPanelData       &  cache
                 );
+static
+mvn:: SquareMatrix
+make_C_tag_tag_matrix_and_invert(
+                    vector<vector<int>>              const & genotypes_for_the_tags );
 } // namespace ssimp
 
 int main(int argc, char **argv) {
@@ -200,6 +204,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
             auto genotypes_for_the_tags = lookup_genotypes( SNPs_in_the_intersection, cache );
             auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
+            assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
 
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_unks) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
@@ -207,29 +212,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             int const N_ref = genotypes_for_the_tags.at(0).size();
             assert(N_ref > 0);
 
-
-            mvn:: SquareMatrix C (number_of_tags);
-            for(int k=0; k<number_of_tags; ++k) {
-                for(int l=0; l<number_of_tags; ++l) {
-                    assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
-                    assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(l)));
-                    double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
-                                                           , &genotypes_for_the_tags.at(l).front(), 1
-                                                           , N_ref );
-                    if(c_kl > 1.0) {
-                        assert(c_kl-1.0 < 1e-5);
-                        c_kl = 1.0;
-                    }
-                    assert(c_kl >= -1.0);
-                    assert(c_kl <=  1.0);
-                    if(k==l)
-                        assert(c_kl == 1.0);
-                    else
-                        assert(c_kl <  1.0);
-                    C.set(k,l,c_kl);
-                }
-            }
-            auto C_inv = invert_a_matrix(std::move(C)); // 'move' means we're not allowed to use 'C' again
+            mvn:: SquareMatrix C_inv = make_C_tag_tag_matrix_and_invert(genotypes_for_the_tags);
 
             mvn:: Matrix      c(number_of_all_targets, number_of_tags);
             for(int k=0; k<number_of_tags; ++k) {
@@ -281,6 +264,38 @@ lookup_genotypes( vector<chrpos>                     const &  snps
     }
     assert(many_calls.size() == snps.size());
     return many_calls;
+}
+
+static
+mvn:: SquareMatrix
+make_C_tag_tag_matrix_and_invert(
+                    vector<vector<int>>              const & genotypes_for_the_tags ) {
+                int const number_of_tags = genotypes_for_the_tags.size();
+                int const N_ref = genotypes_for_the_tags.at(0).size();
+                assert(N_ref > 0);
+
+                mvn:: SquareMatrix C (number_of_tags);
+                for(int k=0; k<number_of_tags; ++k) {
+                    for(int l=0; l<number_of_tags; ++l) {
+                        assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
+                        assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(l)));
+                        double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
+                                                               , &genotypes_for_the_tags.at(l).front(), 1
+                                                               , N_ref );
+                        if(c_kl > 1.0) {
+                            assert(c_kl-1.0 < 1e-5);
+                            c_kl = 1.0;
+                        }
+                        assert(c_kl >= -1.0);
+                        assert(c_kl <=  1.0);
+                        if(k==l)
+                            assert(c_kl == 1.0);
+                        else
+                            assert(c_kl <  1.0);
+                        C.set(k,l,c_kl);
+                    }
+                }
+                return invert_a_matrix(std::move(C));
 }
 
 } // namespace ssimp
