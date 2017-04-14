@@ -255,34 +255,25 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
 
-            auto cCzs = multiply_matrix_by_colvec_giving_colvec
-                        ( c
-                        , multiply_matrix_by_colvec_giving_colvec
-                          ( invert_a_matrix(C)
-                          , mvn:: make_VecCol(zs_for_the_tags)
-                          )
-                        );
-            {
-                auto diff = C_inv_zs -
-                        multiply_matrix_by_colvec_giving_colvec
-                                              ( invert_a_matrix(C)
-                                              , mvn:: make_VecCol(zs_for_the_tags)
-                                              );
-                double mn, mx;
-                gsl_vector_minmax(diff.get(), &mn, &mx);
-                assert(mn > -1e-10);
-                assert(mx <  1e-10);
-            }
-            {
+#if 0
+            { // verify that this gets the same results
+                auto cCzs = multiply_matrix_by_colvec_giving_colvec
+                            ( c
+                            , multiply_matrix_by_colvec_giving_colvec
+                              ( invert_a_matrix(C)
+                              , mvn:: make_VecCol(zs_for_the_tags)
+                              )
+                            );
+                assert(number_of_all_targets == ssize(cCzs));
                 auto diff = c_Cinv_zs - cCzs;
                 double mn, mx;
                 gsl_vector_minmax(diff.get(), &mn, &mx);
                 assert(mn > -1e-10);
                 assert(mx <  1e-10);
             }
+#endif
 
 
-            assert(number_of_all_targets == ssize(cCzs));
             assert(number_of_all_targets == ssize(c_Cinv_zs));
             for(int i=0; i<number_of_all_targets; ++i) {
                 cout
