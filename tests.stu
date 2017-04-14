@@ -6,6 +6,6 @@
     export  GWAS="$(readlink -f gwas)"
     cd    "tests/${testname}"
     export OUTPUT=output.actual.tmp
-    bash command
+    time -p -o time.txt bash command
     mv output.actual.tmp output.actual
 }
