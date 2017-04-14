@@ -40,6 +40,9 @@ static
 std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 static
+std:: unordered_multimap<chrpos, string>
+            make_map_chrpos_to_SNPname( file_reading:: GenotypeFileHandle raw_ref_file);
+static
 vector<vector<int>>
 lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
                 , file_reading:: CacheOfRefPanelData       &  cache
@@ -132,6 +135,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
     PP(options:: opt_window_width
       ,options:: opt_flanking_width
             );
+
+    auto const map_chrpos_to_SNPname           = ssimp:: make_map_chrpos_to_SNPname( ref_panel );
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
         file_reading:: CacheOfRefPanelData cache(ref_panel);;
@@ -296,6 +301,17 @@ std:: unordered_map<string, chrpos>
     for(;b<e; ++b) {
         auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
         rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
+    }
+    return m;
+}
+static
+std:: unordered_multimap<chrpos, string>
+            make_map_chrpos_to_SNPname( file_reading:: GenotypeFileHandle raw_ref_file ) {
+    auto       b = begin_from_file(raw_ref_file);
+    auto const e =   end_from_file(raw_ref_file);
+    std:: unordered_multimap<chrpos, string> m;
+    for(;b<e; ++b) {
+        m.insert( std:: make_pair(b.get_chrpos(), b.get_SNPname()) );
     }
     return m;
 }
