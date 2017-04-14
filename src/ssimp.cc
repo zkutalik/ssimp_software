@@ -27,6 +27,8 @@ using file_reading:: SNPiterator;
 using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
+using utils:: ssize;
+
 namespace ssimp {
 // Some forward declarations
 static
@@ -251,6 +253,15 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     ,genotypes_for_the_unks
                     );
 
+            auto cCzs = multiply_matrix_by_colvec_giving_colvec
+                        ( c
+                        , multiply_matrix_by_colvec_giving_colvec
+                          ( C_inv
+                          , mvn:: make_VecCol(zs_for_the_tags)
+                          )
+                        );
+            PP(cCzs);
+            assert(number_of_all_targets == ssize(cCzs));
         }
     }
 }
