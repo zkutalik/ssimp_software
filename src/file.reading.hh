@@ -80,6 +80,7 @@ struct Genotypes_I : public AnyFile_I {
 struct Effects_I : public AnyFile_I {
     virtual void        set_chrpos         (int, chrpos)  = 0; // so that we can fill them in from the ref data
     virtual void        sort_my_entries    ()             = 0;
+    virtual double      get_z              (int) const    = 0;
 };
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
@@ -137,6 +138,12 @@ struct SNPiterator
         -> decltype ( (std::declval<T>(),m_gfh) -> get_calls(m_line_number) )
     {
         return                           m_gfh  -> get_calls(m_line_number);
+    }
+    template<typename T = void>
+    auto   get_z()  const
+        -> decltype ( (std::declval<T>(),m_gfh) -> get_z(m_line_number) )
+    {
+        return                           m_gfh  -> get_z(m_line_number);
     }
 };
 

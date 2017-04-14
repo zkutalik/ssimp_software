@@ -447,6 +447,10 @@ struct SimpleGwasFile : public file_reading:: Effects_I
         auto const & ols = get_gls(i);
         return ols.m_allele_alt;
     }
+    virtual double      get_z                 (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_z;
+    }
     virtual void        set_chrpos        (int i, chrpos crps)  {
         assert(i>=0);
         assert(i<number_of_snps());
