@@ -164,10 +164,18 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         { // one last check, that the alleles match up
                             which_direction_t which_dir = decide_on_a_direction(r, g);
                             switch(which_dir) {
-                                break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED: ;
+                                break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED:
+                                    {
+                                        auto z_in_ref_direction = -g.get_z();
+                                        (void)z_in_ref_direction;
                                         SNPs_in_the_intersection.push_back(r.get_chrpos());
-                                break; case which_direction_t:: DIRECTION_AS_IS: ;
+                                    }
+                                break; case which_direction_t:: DIRECTION_AS_IS:
+                                    {
+                                        auto z_in_ref_direction =  g.get_z();
+                                        (void)z_in_ref_direction;
                                         SNPs_in_the_intersection.push_back(r.get_chrpos());
+                                    }
                                 break; case which_direction_t:: NO_ALLELE_MATCH: ; // Just ignore this
                             }
                         }
