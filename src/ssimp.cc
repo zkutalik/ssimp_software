@@ -282,9 +282,14 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             }
 
 
-            cCzs =  c_Cinv_zs;
-            PP(cCzs);
             assert(number_of_all_targets == ssize(cCzs));
+            assert(number_of_all_targets == ssize(c_Cinv_zs));
+            for(int i=0; i<number_of_all_targets; ++i) {
+                cout
+                    << SNPs_all_targets.at(i)
+                    << '\t' << c_Cinv_zs(i)
+                    << endl;
+            }
         }
     }
 }
