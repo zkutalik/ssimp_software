@@ -55,6 +55,11 @@ make_C_tag_tag_matrix_and_solve(
                   , mvn:: VecCol                             zs
                     );
 static
+mvn:: SquareMatrix
+make_C_tag_tag_matrix(
+                    vector<vector<int>>              const & genotypes_for_the_tags
+                    );
+static
 mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int>>              const & genotypes_for_the_tags
         , vector<vector<int>>              const & genotypes_for_the_unks
@@ -314,31 +319,7 @@ static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix_and_invert(
                     vector<vector<int>>              const & genotypes_for_the_tags ) {
-                int const number_of_tags = genotypes_for_the_tags.size();
-                int const N_ref = genotypes_for_the_tags.at(0).size();
-                assert(N_ref > 0);
-
-                mvn:: SquareMatrix C (number_of_tags);
-                for(int k=0; k<number_of_tags; ++k) {
-                    for(int l=0; l<number_of_tags; ++l) {
-                        assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
-                        assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(l)));
-                        double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
-                                                               , &genotypes_for_the_tags.at(l).front(), 1
-                                                               , N_ref );
-                        if(c_kl > 1.0) {
-                            assert(c_kl-1.0 < 1e-5);
-                            c_kl = 1.0;
-                        }
-                        assert(c_kl >= -1.0);
-                        assert(c_kl <=  1.0);
-                        if(k==l)
-                            assert(c_kl == 1.0);
-                        else
-                            assert(c_kl <  1.0);
-                        C.set(k,l,c_kl);
-                    }
-                }
+                mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags);
                 return invert_a_matrix(std::move(C));
 }
 static
@@ -347,32 +328,39 @@ make_C_tag_tag_matrix_and_solve(
                     vector<vector<int>>              const & genotypes_for_the_tags
                   , mvn:: VecCol                             zs
                     ) {
-                int const number_of_tags = genotypes_for_the_tags.size();
-                int const N_ref = genotypes_for_the_tags.at(0).size();
-                assert(N_ref > 0);
-
-                mvn:: SquareMatrix C (number_of_tags);
-                for(int k=0; k<number_of_tags; ++k) {
-                    for(int l=0; l<number_of_tags; ++l) {
-                        assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
-                        assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(l)));
-                        double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
-                                                               , &genotypes_for_the_tags.at(l).front(), 1
-                                                               , N_ref );
-                        if(c_kl > 1.0) {
-                            assert(c_kl-1.0 < 1e-5);
-                            c_kl = 1.0;
-                        }
-                        assert(c_kl >= -1.0);
-                        assert(c_kl <=  1.0);
-                        if(k==l)
-                            assert(c_kl == 1.0);
-                        else
-                            assert(c_kl <  1.0);
-                        C.set(k,l,c_kl);
-                    }
-                }
+                mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags);
                 return solve_a_matrix(std::move(C), zs);
+}
+static
+mvn:: SquareMatrix
+make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_the_tags
+                    ) {
+    int const number_of_tags = genotypes_for_the_tags.size();
+    int const N_ref = genotypes_for_the_tags.at(0).size();
+    assert(N_ref > 0);
+
+    mvn:: SquareMatrix C (number_of_tags);
+    for(int k=0; k<number_of_tags; ++k) {
+        for(int l=0; l<number_of_tags; ++l) {
+            assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
+            assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(l)));
+            double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
+                                                   , &genotypes_for_the_tags.at(l).front(), 1
+                                                   , N_ref );
+            if(c_kl > 1.0) {
+                assert(c_kl-1.0 < 1e-5);
+                c_kl = 1.0;
+            }
+            assert(c_kl >= -1.0);
+            assert(c_kl <=  1.0);
+            if(k==l)
+                assert(c_kl == 1.0);
+            else
+                assert(c_kl <  1.0);
+            C.set(k,l,c_kl);
+        }
+    }
+    return C;
 }
 static
 mvn:: Matrix make_c_unkn_tags_matrix
