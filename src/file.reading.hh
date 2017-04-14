@@ -105,12 +105,12 @@ struct SNPiterator
 
     // operators
     SNPiterator &       operator++();
-    bool                operator==(SNPiterator const & other);
-    bool                operator!=(SNPiterator const & other);
-    bool                operator< (SNPiterator const & other);
-    bool                operator>=(SNPiterator const & other);
-    int                 operator- (SNPiterator const & other);
-    chrpos              operator* ()                           const;
+    bool                operator==(SNPiterator const & other) const;
+    bool                operator!=(SNPiterator const & other) const;
+    bool                operator< (SNPiterator const & other) const;
+    bool                operator>=(SNPiterator const & other) const;
+    int                 operator- (SNPiterator const & other) const;
+    chrpos              operator* ()                          const;
     SNPiterator &       operator+=(long int            ran);
 
 

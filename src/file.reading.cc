@@ -26,23 +26,23 @@ namespace file_reading {
         return *this;
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator==(SNPiterator<G> const & other) {
+    bool                SNPiterator<G>:: operator==(SNPiterator<G> const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number == other.m_line_number;
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator!=(SNPiterator<G> const & other) {
+    bool                SNPiterator<G>:: operator!=(SNPiterator<G> const & other) const {
         return !(*this == other);
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator< (SNPiterator<G> const & other) {
+    bool                SNPiterator<G>:: operator< (SNPiterator<G> const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number < other.m_line_number;
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator>=(SNPiterator<G> const & other) { return !(*this < other); }
+    bool                SNPiterator<G>:: operator>=(SNPiterator<G> const & other) const { return !(*this < other); }
     template<typename G>
-    int                 SNPiterator<G>:: operator- (SNPiterator<G> const & other) {
+    int                 SNPiterator<G>:: operator- (SNPiterator<G> const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number - other.m_line_number;
     }
