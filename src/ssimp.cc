@@ -248,34 +248,39 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             int const N_ref = genotypes_for_the_tags.at(0).size();
             assert(N_ref > 0);
 
-            mvn:: SquareMatrix C_inv = invert_a_matrix(make_C_tag_tag_matrix(genotypes_for_the_tags));
-            mvn:: VecCol C_inv_zs = solve_a_matrix( make_C_tag_tag_matrix(genotypes_for_the_tags)
-                                                  , mvn:: make_VecCol(zs_for_the_tags)
-                                                  );
-            auto old_way =
-                    multiply_matrix_by_colvec_giving_colvec
-                                              ( C_inv
+            mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags);
+            mvn:: VecCol C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(zs_for_the_tags));
+            mvn:: Matrix      c = make_c_unkn_tags_matrix( genotypes_for_the_tags
+                                                         , genotypes_for_the_unks);
+
+            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
+
+            auto cCzs = multiply_matrix_by_colvec_giving_colvec
+                        ( c
+                        , multiply_matrix_by_colvec_giving_colvec
+                          ( invert_a_matrix(C)
+                          , mvn:: make_VecCol(zs_for_the_tags)
+                          )
+                        );
+            {
+                auto diff = C_inv_zs -
+                        multiply_matrix_by_colvec_giving_colvec
+                                              ( invert_a_matrix(C)
                                               , mvn:: make_VecCol(zs_for_the_tags)
                                               );
-            {
-                auto diff = old_way - C_inv_zs;
                 double mn, mx;
                 gsl_vector_minmax(diff.get(), &mn, &mx);
                 assert(mn > -1e-10);
                 assert(mx <  1e-10);
             }
-            mvn:: Matrix      c = make_c_unkn_tags_matrix(
-                    genotypes_for_the_tags
-                    ,genotypes_for_the_unks
-                    );
+            {
+                auto diff = c_Cinv_zs - cCzs;
+                double mn, mx;
+                gsl_vector_minmax(diff.get(), &mn, &mx);
+                assert(mn > -1e-10);
+                assert(mx <  1e-10);
+            }
 
-            auto cCzs = multiply_matrix_by_colvec_giving_colvec
-                        ( c
-                        , multiply_matrix_by_colvec_giving_colvec
-                          ( C_inv
-                          , mvn:: make_VecCol(zs_for_the_tags)
-                          )
-                        );
             PP(cCzs);
             assert(number_of_all_targets == ssize(cCzs));
         }
