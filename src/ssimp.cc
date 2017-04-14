@@ -42,6 +42,11 @@ static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix_and_invert(
                     vector<vector<int>>              const & genotypes_for_the_tags );
+static
+mvn:: Matrix make_c_unkn_tags_matrix
+        ( vector<vector<int>>              const & genotypes_for_the_tags
+        , vector<vector<int>>              const & genotypes_for_the_unks
+        );
 } // namespace ssimp
 
 int main(int argc, char **argv) {
@@ -205,6 +210,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             auto genotypes_for_the_tags = lookup_genotypes( SNPs_in_the_intersection, cache );
             auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
+            assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
 
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_unks) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
@@ -214,28 +220,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             mvn:: SquareMatrix C_inv = make_C_tag_tag_matrix_and_invert(genotypes_for_the_tags);
 
-            mvn:: Matrix      c(number_of_all_targets, number_of_tags);
-            for(int k=0; k<number_of_tags; ++k) {
-                for(int u=0; u<number_of_all_targets; ++u) {
-                    assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
-                    assert(N_ref        == utils:: ssize(genotypes_for_the_unks.at(u)));
-                    double c_ku = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
-                                                           , &genotypes_for_the_unks.at(u).front(), 1
-                                                           , N_ref );
-                    if(c_ku > 1.0) {
-                        assert(c_ku-1.0 < 1e-5);
-                        c_ku = 1.0;
-                    }
-                    assert(c_ku >= -1.0);
-                    assert(c_ku <=  1.0);
-                    if(     SNPs_in_the_intersection.at(k)
-                         == SNPs_all_targets.at(u))
-                        assert(c_ku == 1.0);
-                    c.set(u,k,c_ku);
-                }
-            }
-            auto product = c * C_inv;
+            mvn:: Matrix      c = make_c_unkn_tags_matrix(
+                    genotypes_for_the_tags
+                    ,genotypes_for_the_unks
+                    );
 
+            auto product = c * C_inv;
             PP(C_inv, c, product);
         }
     }
@@ -297,5 +287,34 @@ make_C_tag_tag_matrix_and_invert(
                 }
                 return invert_a_matrix(std::move(C));
 }
+static
+mvn:: Matrix make_c_unkn_tags_matrix
+        ( vector<vector<int>>              const & genotypes_for_the_tags
+        , vector<vector<int>>              const & genotypes_for_the_unks
+        ) {
+    int const number_of_tags = genotypes_for_the_tags.size();
+    int const number_of_all_targets = genotypes_for_the_unks.size();
+    int const N_ref = genotypes_for_the_tags.at(0).size();
+    assert(N_ref > 0);
+
+    mvn:: Matrix      c(number_of_all_targets, number_of_tags);
+    for(int k=0; k<number_of_tags; ++k) {
+        for(int u=0; u<number_of_all_targets; ++u) {
+            assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
+            assert(N_ref        == utils:: ssize(genotypes_for_the_unks.at(u)));
+            double c_ku = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
+                                                   , &genotypes_for_the_unks.at(u).front(), 1
+                                                   , N_ref );
+            if(c_ku > 1.0) {
+                assert(c_ku-1.0 < 1e-5);
+                c_ku = 1.0;
+            }
+            assert(c_ku >= -1.0);
+            assert(c_ku <=  1.0);
+            c.set(u,k,c_ku);
+        }
+    }
+    return c;
+};
 
 } // namespace ssimp
