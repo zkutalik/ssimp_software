@@ -584,5 +584,38 @@ vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     assert(m_cache_of_z12.count(crps) == 1);
     return lookup_one_chr_pos(crps);
 }
+vector<int> lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
+
+    auto pv = it.get_calls();
+
+    auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
+    int fst_max = *max_element(pv.first .begin(), pv.first .end());
+    int snd_max = *max_element(pv.second.begin(), pv.second.end());
+    if(fst_max>1 || snd_max>1) {
+        assert(has_more_than_one_alt_allele);
+        return {};
+    }
+
+    assert(fst_max <= 1);
+    assert(snd_max <= 1);
+
+    assert(pv.first.size() == pv.second.size());
+    assert(!has_more_than_one_alt_allele);
+
+    int const N = pv.first.size();
+
+    vector<int> z12;
+    for(int i=0; i<N; ++i) {
+        z12.push_back( pv.first.at(i) + pv.second.at(i) );
+    }
+
+    auto max_z12 = *max_element(z12.begin(), z12.end());
+    assert(max_z12 == 2
+            || max_z12 == 1
+            || max_z12 == 0
+            );
+
+    return z12;
+}
 
 } // namespace file_reading
