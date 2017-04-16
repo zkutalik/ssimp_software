@@ -16,6 +16,7 @@
 #include "other/mvn.hh"
 #include "other/DIE.hh"
 #include "other/PP.hh"
+#include "other/range.hh"
 
 using std:: cout;
 using std:: endl;
@@ -61,6 +62,13 @@ mvn:: Matrix make_c_unkn_tags_matrix
 enum class which_direction_t { DIRECTION_SHOULD_BE_REVERSED
                              , NO_ALLELE_MATCH
                              , DIRECTION_AS_IS };
+string to_string(which_direction_t dir) {
+    switch(dir) {
+        break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED: return "DIRECTION_SHOULD_BE_REVERSED";
+        break; case which_direction_t:: NO_ALLELE_MATCH:              return "NO_ALLELE_MATCH";
+        break; case which_direction_t:: DIRECTION_AS_IS:              return "DIRECTION_AS_IS";
+    }
+}
 static
     which_direction_t decide_on_a_direction
     ( SNPiterator<GenotypeFileHandle> const & //r
@@ -165,6 +173,48 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
+            // New, more flexible, method for finding tags
+            vector<double>                          tag_zs;
+            vector<SNPiterator<GenotypeFileHandle>> tag_its;
+            for(auto tag_candidate = range:: range_from_begin_end( w_gwas_begin, w_gwas_end )
+                    ; ! tag_candidate.empty()
+                    ;   tag_candidate.advance()
+                    ) {
+                auto crps = tag_candidate.current_it().get_chrpos();
+                // Find the ref panel entries in the same range
+                auto ref_candidates = range:: range_from_begin_end(
+                         std:: lower_bound( w_ref_wide_begin , w_ref_wide_end, crps )
+                        ,std:: upper_bound( w_ref_wide_begin , w_ref_wide_end, crps )
+                        );
+                vector<double> one_tag_zs;
+                vector<SNPiterator<GenotypeFileHandle>> one_tag_its;
+                for(; ! ref_candidates.empty(); ref_candidates.advance()) {
+                    assert( ref_candidates.current_it().get_chrpos() == crps );
+                    auto dir = decide_on_a_direction( ref_candidates.current_it()
+                                         , tag_candidate .current_it() );
+                    switch(dir) {
+                        break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED:
+                            one_tag_zs.push_back( -tag_candidate.current_it().get_z() );
+                            one_tag_its.push_back( ref_candidates.current_it()        );
+                        break; case which_direction_t:: DIRECTION_AS_IS             :
+                            one_tag_zs.push_back(  tag_candidate.current_it().get_z() );
+                            one_tag_its.push_back( ref_candidates.current_it()        );
+                        break; case which_direction_t:: NO_ALLELE_MATCH             : ;
+                    }
+                }
+                assert(one_tag_zs.size() == one_tag_its.size());
+                assert(one_tag_zs.size() <= 1);
+                if(1==one_tag_zs.size()) {
+                    for(auto z : one_tag_zs)
+                        tag_zs.push_back(z);
+                    for(auto it : one_tag_its)
+                        tag_its.push_back(it);
+                }
+            }
+            assert(tag_zs.size() == tag_its.size());
+            if(tag_zs.empty())
+                continue;
+
             // Which SNPs are in both *wide* windows, i.e. useful as tag SNPs
             vector<chrpos> SNPs_in_the_intersection;
             vector<double> zs_for_the_tags;
@@ -207,6 +257,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 }
             }
             assert(SNPs_in_the_intersection.size() == zs_for_the_tags.size());
+
+            assert(tag_zs.size() == zs_for_the_tags.size());
+            assert(tag_zs        == zs_for_the_tags       );
 
             int const number_of_tags = SNPs_in_the_intersection.size();
             if(number_of_tags == 0)
