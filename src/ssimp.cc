@@ -212,59 +212,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 }
             }
             assert(tag_zs.size() == tag_its.size());
-            if(tag_zs.empty())
-                continue;
 
-            // Which SNPs are in both *wide* windows, i.e. useful as tag SNPs
-            vector<chrpos> SNPs_in_the_intersection;
-            vector<double> zs_for_the_tags;
-            {
-                auto r = w_ref_wide_begin;
-                auto g = w_gwas_begin;
-                while(r < w_ref_wide_end && g < w_gwas_end) {
-                    if(r.get_chrpos() == g.get_chrpos()) {
-                        { // one last check, that the alleles match up
-                            which_direction_t which_dir = decide_on_a_direction(r, g);
-                            switch(which_dir) {
-                                break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED:
-                                    {
-                                        auto z_in_ref_direction = -g.get_z();
-                                        (void)z_in_ref_direction;
-                                        SNPs_in_the_intersection.push_back(r.get_chrpos());
-                                        zs_for_the_tags.push_back(z_in_ref_direction);
-                                    }
-                                break; case which_direction_t:: DIRECTION_AS_IS:
-                                    {
-                                        auto z_in_ref_direction =  g.get_z();
-                                        (void)z_in_ref_direction;
-                                        SNPs_in_the_intersection.push_back(r.get_chrpos());
-                                        zs_for_the_tags.push_back(z_in_ref_direction);
-                                    }
-                                break; case which_direction_t:: NO_ALLELE_MATCH: ; // Just ignore this
-                            }
-                        }
-                        ++g; // because g might have the same position multiple times, but the reference panel shouldn't
-                             // TODO: check that the reference panel doesn't indeed have unique chrpos.
-                    }
-                    else if(r.get_chrpos() <  g.get_chrpos()) {
-                        ++r; // skip this one
-                        r = std:: lower_bound(r, w_ref_wide_end, g.get_chrpos());
-                    }
-                    else if(r.get_chrpos() >  g.get_chrpos()) {
-                        ++g; // skip this one
-                        g = std:: lower_bound(g, w_gwas_end, r.get_chrpos());
-                    }
-                }
-            }
-            assert(SNPs_in_the_intersection.size() == zs_for_the_tags.size());
-
-            assert(tag_zs.size() == zs_for_the_tags.size());
-            assert(tag_zs        == zs_for_the_tags       );
-
-            int const number_of_tags = SNPs_in_the_intersection.size();
+            int const number_of_tags = tag_zs.size();
             if(number_of_tags == 0)
                 continue;
-            assert(number_of_tags > 0);
 
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             vector<chrpos>  SNPs_all_targets;
@@ -298,7 +249,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_snps_in_the_gwas_in_this_region      << " # GWAS     SNPs in this window (with "<<options:: opt_flanking_width<<" flanking)\n";
             cout << setw(8) << number_of_tags                                 << " # SNPs in both (i.e. useful as tags)\n";
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
-            auto genotypes_for_the_tags = lookup_genotypes( SNPs_in_the_intersection, cache );
+            vector<vector<int>> genotypes_for_the_tags;
+            for(auto it : tag_its) {
+                genotypes_for_the_tags.push_back( lookup_one_ref_get_calls(it) );
+            }
             auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
@@ -310,7 +264,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             assert(N_ref > 0);
 
             mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags);
-            mvn:: VecCol C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(zs_for_the_tags));
+            mvn:: VecCol C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs));
             mvn:: Matrix      c = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks);
 
@@ -322,7 +276,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                             ( c
                             , multiply_matrix_by_colvec_giving_colvec
                               ( invert_a_matrix(C)
-                              , mvn:: make_VecCol(zs_for_the_tags)
+                              , mvn:: make_VecCol(tag_zs)
                               )
                             );
                 assert(number_of_all_targets == ssize(cCzs));
