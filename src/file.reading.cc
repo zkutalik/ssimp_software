@@ -552,11 +552,19 @@ vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     assert(it.get_chrpos() == crps);
     auto pv = it.get_calls();
 
+    auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
     int fst_max = *max_element(pv.first .begin(), pv.first .end());
     int snd_max = *max_element(pv.second.begin(), pv.second.end());
+    if(fst_max>1 || snd_max>1) {
+        assert(has_more_than_one_alt_allele);
+        return {};
+    }
+
     assert(fst_max <= 1);
     assert(snd_max <= 1);
+
     assert(pv.first.size() == pv.second.size());
+    assert(!has_more_than_one_alt_allele);
 
     int const N = pv.first.size();
 

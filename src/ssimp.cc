@@ -218,11 +218,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
                 auto allele_alt =it.get_allele_alt();
-                auto has_more_than_one_alt_allele = allele_alt.find(',') != std::string::npos;
-                if(has_more_than_one_alt_allele)
-                    continue;
 
                 auto const & z12_for_this_SNP = cache.lookup_one_chr_pos(it.get_chrpos());
+                if (z12_for_this_SNP.empty()) {
+                    // empty vector means the SNP is not binary in the reference panel
+                    continue;
+                }
                 auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
                 if  (*z12_minmax.first == *z12_minmax.second){
                     continue; // no variation in this SNP within the ref panel, therefore useless for imputation
