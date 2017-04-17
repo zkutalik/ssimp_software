@@ -26,23 +26,23 @@ namespace file_reading {
         return *this;
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator==(SNPiterator<G> const & other) {
+    bool                SNPiterator<G>:: operator==(SNPiterator<G> const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number == other.m_line_number;
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator!=(SNPiterator<G> const & other) {
+    bool                SNPiterator<G>:: operator!=(SNPiterator<G> const & other) const {
         return !(*this == other);
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator< (SNPiterator<G> const & other) {
+    bool                SNPiterator<G>:: operator< (SNPiterator<G> const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number < other.m_line_number;
     }
     template<typename G>
-    bool                SNPiterator<G>:: operator>=(SNPiterator<G> const & other) { return !(*this < other); }
+    bool                SNPiterator<G>:: operator>=(SNPiterator<G> const & other) const { return !(*this < other); }
     template<typename G>
-    int                 SNPiterator<G>:: operator- (SNPiterator<G> const & other) {
+    int                 SNPiterator<G>:: operator- (SNPiterator<G> const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number - other.m_line_number;
     }
@@ -99,6 +99,7 @@ struct header_details {
     offset_and_name    filter;
     offset_and_name    info;
     offset_and_name    format;
+    offset_and_name    effect_z;
     vector<offset_and_name> unaccounted;
 };
 
@@ -123,6 +124,8 @@ static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 static
 char   decide_delimiter( string      const & header_line );
+static
+vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it);
 
 struct OneLineSummary {
     ifstream:: pos_type      m_tellg_of_line_start;
@@ -144,6 +147,7 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
 {
     vector<OneLineSummary> m_each_SNP_and_its_offset;
     string                 m_underlying_file_name;
+    header_details         m_header_details;
 
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_offset.size();
@@ -163,6 +167,46 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
     virtual std::string get_allele_alt        (int i)     const {
         OneLineSummary const & ols = get_ols(i);
         return ols.m_allele_alt;
+    }
+    virtual std::pair<
+             std::vector<uint8_t>
+            ,std::vector<uint8_t>
+        > get_calls          (int i)                   const {
+        OneLineSummary const & ols = get_ols(i);
+        std:: ifstream f(m_underlying_file_name); // reopen the file
+        f.seekg(ols.m_tellg_of_line_start);
+        string line;
+        getline(f, line);
+
+        auto all_split_up = tokenize(line, m_header_details.m_delimiter);
+
+        using utils:: operator<<;
+
+
+        // From here one, just assume VCF, with 'unaccounted-for' fields starting at offset 9 (i.e. 10th column)
+        vector<uint8_t> lefts ;
+        vector<uint8_t> rights;
+        int N_ref = m_header_details.unaccounted.size();
+        for(int i = 0; i<N_ref; ++i) {
+            auto column_number = m_header_details.unaccounted.at(i).m_offset;
+            assert(column_number-9 == i);
+            auto & call_for_this_person = all_split_up.at(column_number);
+
+            int d1, d2;
+            int n;
+            int ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
+            if(   ret == 2 // two digits
+               && n == ssize(call_for_this_person) // all characters of input were consumed
+               && d1 >= 0
+               && d2 >= 0
+                    ) {
+                lefts .push_back(d1);
+                rights.push_back(d2);
+            }
+            else
+                DIE("Couldn't parse \"" << call_for_this_person << "\" in column " << column_number << " in the " << i << "th SNP in the ref panel");
+        }
+        return make_pair(lefts, rights);
     }
 
     OneLineSummary  get_ols         (int i)     const {
@@ -218,9 +262,9 @@ static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     PP(file_name);
     ifstream f(file_name);
+    f || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
-    header_details hd;
 
     // Skip past the '##' lines
     while(getline(f, current_line)) {
@@ -230,11 +274,13 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     }
 
     // current_line is now the first line, i.e. the header
-    hd = parse_header(current_line);
 
 
     auto p = std:: make_shared<PlainVCFfile>();
     p->m_underlying_file_name = file_name;
+    p->m_header_details       = parse_header(current_line);
+
+    header_details &hd = p->m_header_details;
 
     while(1) {
         OneLineSummary ols;
@@ -327,6 +373,9 @@ header_details   parse_header( string      const & header_line ) {
         else if(is_in_this_list(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
         }
+        else if(is_in_this_list(one_field_name, {"z.from.peff"})) {
+            hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
+        }
         else {
             hd.unaccounted.push_back( header_details:: offset_and_name(field_counter, one_field_name) );
         }
@@ -382,7 +431,8 @@ char   decide_delimiter( string      const & header_line ) {
 struct SimpleGwasFile : public file_reading:: Effects_I
 {
     vector<GwasLineSummary> m_each_SNP_and_its_z;
-    string                 m_underlying_file_name;
+    string                  m_underlying_file_name;
+    char                    m_delimiter;
 
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_z.size();
@@ -402,6 +452,10 @@ struct SimpleGwasFile : public file_reading:: Effects_I
     virtual std::string get_allele_alt        (int i)     const {
         auto const & ols = get_gls(i);
         return ols.m_allele_alt;
+    }
+    virtual double      get_z                 (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_z;
     }
     virtual void        set_chrpos        (int i, chrpos crps)  {
         assert(i>=0);
@@ -432,6 +486,7 @@ static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) {
     PP(file_name);
     ifstream f(file_name);
+    f || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
     header_details hd;
@@ -443,6 +498,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
     auto p = std:: make_shared<SimpleGwasFile>();
     p->m_underlying_file_name = file_name;
+    p->m_delimiter            = hd.m_delimiter;
 
     while(1) {
         GwasLineSummary gls;
@@ -456,6 +512,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
             gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
             gls.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
             gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
+            gls.m_z          = utils:: lexical_cast<double> (LOOKUP( hd, effect_z, all_split_up));
 
             // Try to read in chromosome and position, but they may not be present
             // If missing, we'll fill them in much later from the reference panel
@@ -470,17 +527,112 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
             p->m_each_SNP_and_its_z.push_back(gls);
         } catch (std:: invalid_argument &e) {
-            WARNING( "Ignoring this line, problem with the chromosome and/or position. ["
+            WARNING( "Ignoring this line, problem with the chromosome and/or position ["
                     << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
                     //<< " chr:" << LOOKUP(hd, chromosome, all_split_up)
                     //<< " pos:" << LOOKUP(hd, position  , all_split_up)
-                    << "]" );
+                    << "], "
+                    << e.what()
+                    );
         }
     };
 
     /* Note: Sort them by position here */
 
     return p;
+}
+using utils:: operator<<;
+vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
+
+    if(m_cache_of_z12.count(crps) == 1) {
+        return m_cache_of_z12[crps];
+    }
+
+    auto const b_ref  = begin_from_file(m_rfh);
+    auto const e_ref  =   end_from_file(m_rfh);
+    auto const    it  = std:: lower_bound(b_ref, e_ref, crps);
+    assert(it.get_chrpos() == crps);
+    auto pv = it.get_calls();
+
+    auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
+    int fst_max = *max_element(pv.first .begin(), pv.first .end());
+    int snd_max = *max_element(pv.second.begin(), pv.second.end());
+    if(fst_max>1 || snd_max>1) {
+        assert(has_more_than_one_alt_allele);
+        return {};
+    }
+
+    assert(fst_max <= 1);
+    assert(snd_max <= 1);
+
+    assert(pv.first.size() == pv.second.size());
+    assert(!has_more_than_one_alt_allele);
+
+    int const N = pv.first.size();
+
+    vector<int> z12;
+    for(int i=0; i<N; ++i) {
+        z12.push_back( pv.first.at(i) + pv.second.at(i) );
+    }
+
+    auto max_z12 = *max_element(z12.begin(), z12.end());
+    assert(max_z12 == 2
+            || max_z12 == 1
+            || max_z12 == 0
+            );
+
+    assert(m_cache_of_z12.count(crps) == 0);
+    m_cache_of_z12[crps] = z12;
+    assert(m_cache_of_z12.count(crps) == 1);
+    return lookup_one_chr_pos(crps);
+}
+vector<int> CacheOfRefPanelData:: lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
+    auto cache_key = it.m_line_number;
+    if(        m_cache_of_z12_line_number.count(cache_key)==1) {
+        return m_cache_of_z12_line_number.at(cache_key);
+    }
+
+
+    m_cache_of_z12_line_number.insert(
+                make_pair(cache_key, actual_lookup_one_ref_get_calls(it))
+            );
+
+    assert(m_cache_of_z12_line_number.count(cache_key)==1);
+    return lookup_one_ref_get_calls(it);
+}
+static
+vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
+
+    auto pv = it.get_calls();
+
+    auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
+    int fst_max = *max_element(pv.first .begin(), pv.first .end());
+    int snd_max = *max_element(pv.second.begin(), pv.second.end());
+    if(fst_max>1 || snd_max>1) {
+        assert(has_more_than_one_alt_allele);
+        return {};
+    }
+
+    assert(fst_max <= 1);
+    assert(snd_max <= 1);
+
+    assert(pv.first.size() == pv.second.size());
+    assert(!has_more_than_one_alt_allele);
+
+    int const N = pv.first.size();
+
+    vector<int> z12;
+    for(int i=0; i<N; ++i) {
+        z12.push_back( pv.first.at(i) + pv.second.at(i) );
+    }
+
+    auto max_z12 = *max_element(z12.begin(), z12.end());
+    assert(max_z12 == 2
+            || max_z12 == 1
+            || max_z12 == 0
+            );
+
+    return z12;
 }
 
 } // namespace file_reading

@@ -1,0 +1,24 @@
+options:: opt_raw_ref,options:: opt_gwas_filename,options:: opt_window_width:	/home/aaron/Research/Code/Imputation/ssimp_software/ref/small.vcf.sample.vcf , /home/aaron/Research/Code/Imputation/ssimp_software/gwas/fixup.UKBB.both.smry..fdr , 300'000
+file_name:/home/aaron/Research/Code/Imputation/ssimp_software/ref/small.vcf.sample.vcf
+file_name:/home/aaron/Research/Code/Imputation/ssimp_software/gwas/fixup.UKBB.both.smry..fdr
+
+raw_ref_file->number_of_snps():9'747
+gwas->number_of_snps():718'712
+number_of_GWASsnps_with_unknown_position:718'708
+
+options:: opt_window_width,options:: opt_flanking_width:	300'000 , 250'000
+
+chrm22	   15'900'000-16'200'000
+       3 # GWAS     SNPs in this window (with 250'000 flanking)
+       3 # SNPs in both (i.e. useful as tags)
+   1'630 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   16'200'000-16'500'000
+       4 # GWAS     SNPs in this window (with 250'000 flanking)
+       4 # SNPs in both (i.e. useful as tags)
+   4'421 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   16'500'000-16'800'000
+       3 # GWAS     SNPs in this window (with 250'000 flanking)
+       3 # SNPs in both (i.e. useful as tags)
+   3'619 # target SNPs (anything in narrow window, will include some tags)
