@@ -20,7 +20,7 @@
 using void_t_and_related:: can_apply;
 using void_t_and_related:: void_t;
 
-namespace amd {
+namespace range {
     struct range_tag {}; // *all* ranges will inherit this, if nothing else
     template<typename R>
     using is_of_range_tag = std:: enable_if_t<std::is_base_of<range_tag, std::remove_reference_t<R>>{}>;
@@ -243,39 +243,6 @@ namespace amd {
     range_from_beginend(C& c)
     {
         return range_from_beginend(c.begin(), c.end());
-    }
-
-    template<typename T
-        , class...
-        , typename = std:: enable_if_t<  std:: is_rvalue_reference< T&& >{} >
-        , typename = decltype(  range( std:: declval<T&>() ) )
-        > // this one is ugly, should perhaps rename to 'range-of-rvalue' until I fully replace it
-    auto range_from_rvalue( T &&v) {
-        // For any rvalue, move the underlying object such that
-        // it's pointed to by a unique_ptr,
-        // then build a (noncopyable) range from that.
-        using type_of_corresponding_lvalue_range = decltype(range(v));
-        struct non_copyable_holder_range
-            : public type_of_corresponding_lvalue_range
-        {
-            static_assert( std::is_base_of<range_tag, type_of_corresponding_lvalue_range>{} ,"");
-            static_assert( !std:: is_reference<T>{} ,"");
-            std:: unique_ptr<T> container;
-            static_assert( std:: is_same<type_of_corresponding_lvalue_range,decltype(range(*container))>{} ,"");
-
-            non_copyable_holder_range( std:: unique_ptr<T> container_) :
-                  type_of_corresponding_lvalue_range(*container_)
-                , container( std::move(container_))
-            {
-                // the unique_ptr is moved *after* the base is constructed,
-                // but that's OK because the base is constructed on a reference
-                // to the pointed-to data, not a reference to the unique pointer
-                // The data will never move, even if this range object is moved
-            }
-        };
-        return non_copyable_holder_range{
-            std:: make_unique<T>(std::move(v))
-        };
     }
 
     template<typename getter, typename underlying_type, typename underlying_refs_type, size_t ...is>
@@ -566,7 +533,7 @@ namespace amd {
                 !m_is_empty || [](){throw std:: runtime_error("trying to advance an already-exhausted pull-range");return false;}();
                 try {
                     m_current_value = m_range_with_pull.pull();
-                } catch (amd:: pull_from_empty_range_error &e) {
+                } catch (range:: pull_from_empty_range_error &e) {
                     // not sure what start m_current_value will be in.
                     // Don't care either I guess!
                     m_is_empty = true;
@@ -632,7 +599,7 @@ namespace amd {
             try {
                 output.emplace_back( f(r.pull()) );
             }
-            catch (amd:: pull_from_empty_range_error &e) {
+            catch (range:: pull_from_empty_range_error &e) {
                 return output;
             }
         }
@@ -663,7 +630,7 @@ namespace amd {
 
     template<typename Source, typename State, typename L>
     auto generic_thing_to__front_range(Source&& t, State && s, L && l) {
-        struct gttfr : public amd:: range_tag {
+        struct gttfr : public range:: range_tag {
 
             Source m_src;
             State  m_st;
@@ -789,4 +756,4 @@ namespace amd {
     auto range_from_begin_end(Ib_t b, Ie_t e) {
         return range_from_begin_end_t<Ib_t,Ie_t>{move(b),move(e)};
     }
-} // namespace amd
+} // namespace range
