@@ -124,6 +124,8 @@ static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 static
 char   decide_delimiter( string      const & header_line );
+static
+vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it);
 
 struct OneLineSummary {
     ifstream:: pos_type      m_tellg_of_line_start;
@@ -585,6 +587,21 @@ vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     return lookup_one_chr_pos(crps);
 }
 vector<int> CacheOfRefPanelData:: lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
+    auto cache_key = it.m_line_number;
+    if(        m_cache_of_z12_line_number.count(cache_key)==1) {
+        return m_cache_of_z12_line_number.at(cache_key);
+    }
+
+
+    m_cache_of_z12_line_number.insert(
+                make_pair(cache_key, actual_lookup_one_ref_get_calls(it))
+            );
+
+    assert(m_cache_of_z12_line_number.count(cache_key)==1);
+    return lookup_one_ref_get_calls(it);
+}
+static
+vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
 
     auto pv = it.get_calls();
 

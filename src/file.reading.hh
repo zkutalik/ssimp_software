@@ -164,6 +164,7 @@ struct CacheOfRefPanelData {
 private:
     GenotypeFileHandle m_rfh;
     std:: unordered_map< chrpos , std::vector<int> > m_cache_of_z12;
+    std:: unordered_map< int    , std::vector<int> > m_cache_of_z12_line_number;
 
 public:
                                     CacheOfRefPanelData     (GenotypeFileHandle rfh) : m_rfh(rfh) {}
