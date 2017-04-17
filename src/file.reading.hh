@@ -169,7 +169,7 @@ public:
                                     CacheOfRefPanelData     (GenotypeFileHandle rfh) : m_rfh(rfh) {}
 
     std::vector<int>                lookup_one_chr_pos      (chrpos crps);
+    std:: vector<int>               lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it);
 };
-std:: vector<int> lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it);
 
 } // namespace file_reading

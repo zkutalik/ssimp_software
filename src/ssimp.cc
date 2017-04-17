@@ -251,7 +251,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
             vector<vector<int>> genotypes_for_the_tags;
             for(auto it : tag_its) {
-                genotypes_for_the_tags.push_back( lookup_one_ref_get_calls(it) );
+                genotypes_for_the_tags.push_back( cache.lookup_one_ref_get_calls(it) );
             }
             auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));

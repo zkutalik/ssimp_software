@@ -584,7 +584,7 @@ vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     assert(m_cache_of_z12.count(crps) == 1);
     return lookup_one_chr_pos(crps);
 }
-vector<int> lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
+vector<int> CacheOfRefPanelData:: lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
 
     auto pv = it.get_calls();
 
