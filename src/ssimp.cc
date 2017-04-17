@@ -52,11 +52,15 @@ static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix(
                     vector<vector<int>>              const & genotypes_for_the_tags
+                    , double lambda
                     );
 static
 mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int>>              const & genotypes_for_the_tags
         , vector<vector<int>>              const & genotypes_for_the_unks
+        , vector<SNPiterator<GenotypeFileHandle>> const & tag_its
+        , vector<SNPiterator<GenotypeFileHandle>> const & unk_its
+        , double                                          lambda
         );
 
 enum class which_direction_t { DIRECTION_SHOULD_BE_REVERSED
@@ -265,10 +269,14 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             int const N_ref = genotypes_for_the_tags.at(0).size();
             assert(N_ref > 0);
 
-            mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags);
+            mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
             mvn:: VecCol C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs));
             mvn:: Matrix      c = make_c_unkn_tags_matrix( genotypes_for_the_tags
-                                                         , genotypes_for_the_unks);
+                                                         , genotypes_for_the_unks
+                                                         , tag_its
+                                                         , unk_its
+                                                         , options:: opt_lambda
+                                                         );
 
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
 
@@ -349,7 +357,8 @@ lookup_many_ref_rows( vector<SNPiterator<GenotypeFileHandle>>   const &  snps
 static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_the_tags
-                    ) {
+                     , double                                   lambda
+                     ) {
     int const number_of_tags = genotypes_for_the_tags.size();
     int const N_ref = genotypes_for_the_tags.at(0).size();
     assert(N_ref > 0);
@@ -362,17 +371,20 @@ make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_th
             double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
                                                    , &genotypes_for_the_tags.at(l).front(), 1
                                                    , N_ref );
-            if(c_kl > 1.0) {
+            if(c_kl > 1.0) { // sometimes it sneaks above one, don't really know how
                 assert(c_kl-1.0 < 1e-5);
                 c_kl = 1.0;
             }
             assert(c_kl >= -1.0);
             assert(c_kl <=  1.0);
-            if(k==l)
+            if(k==l) {
                 assert(c_kl == 1.0);
-            else
+                C.set(k,l,c_kl);
+            }
+            else {
                 assert(c_kl <  1.0);
-            C.set(k,l,c_kl);
+                C.set(k,l,c_kl * (1.0-lambda));
+            }
         }
     }
     return C;
@@ -381,9 +393,14 @@ static
 mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int>>              const & genotypes_for_the_tags
         , vector<vector<int>>              const & genotypes_for_the_unks
+        , vector<SNPiterator<GenotypeFileHandle>> const & tag_its
+        , vector<SNPiterator<GenotypeFileHandle>> const & unk_its
+        , double                                          lambda
         ) {
     int const number_of_tags = genotypes_for_the_tags.size();
     int const number_of_all_targets = genotypes_for_the_unks.size();
+    assert(number_of_tags        == ssize(tag_its));
+    assert(number_of_all_targets == ssize(unk_its));
     int const N_ref = genotypes_for_the_tags.at(0).size();
     assert(N_ref > 0);
 
@@ -399,9 +416,16 @@ mvn:: Matrix make_c_unkn_tags_matrix
                 assert(c_ku-1.0 < 1e-5);
                 c_ku = 1.0;
             }
-            assert(c_ku >= -1.0);
-            assert(c_ku <=  1.0);
-            c.set(u,k,c_ku);
+
+            if(tag_its.at(k).m_line_number == unk_its.at(u).m_line_number) {
+                assert(c_ku ==  1.0);
+                c.set(u,k,c_ku);
+            }
+            else {
+                assert(c_ku >= -1.0);
+                assert(c_ku <=  1.0);
+                c.set(u,k,c_ku * (1.0-lambda));
+            }
         }
     }
     return c;
