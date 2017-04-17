@@ -1,3 +1,6 @@
+#ifndef UTILS_HH__
+#define UTILS_HH__
+
 #include <cstdint>
 #include <ostream>
 #include <iostream>
@@ -73,3 +76,4 @@ std:: vector<std:: string>   tokenize       ( std:: string      const & line
         );
 
 } // namespace utils
+#endif
