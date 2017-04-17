@@ -15,6 +15,7 @@ using std:: string;
 using std:: vector;
 using utils:: ssize;
 using utils:: operator<<; // to print vectors
+using utils:: tokenize;
 
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
@@ -116,10 +117,6 @@ static
 file_reading::
 header_details   parse_header( string      const & header_line );
 static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) ;
-static
-vector<string>   tokenize( string      const & line
-               , char                delimiter
-        );
 static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 static
@@ -391,21 +388,6 @@ static bool is_in_this_list(string const & s, std:: initializer_list<char const 
     return false;
 }
 
-static
-vector<string>   tokenize( string      const & line
-               , char                delimiter
-        ) {
-    int pos = 0;
-    vector<string> fields;
-    while(1) {
-        auto next_delim = line.find(delimiter, pos);
-        fields.push_back( line.substr(pos, next_delim-pos) );
-        if(next_delim== string:: npos)
-            break;
-        pos=next_delim+1;
-    }
-    return fields;
-}
 
 static
 char   decide_delimiter( string      const & header_line ) {

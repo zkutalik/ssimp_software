@@ -68,4 +68,8 @@ void print_type(T&&) {
     std:: cout << __PRETTY_FUNCTION__ << std:: endl;
 }
 
+std:: vector<std:: string>   tokenize       ( std:: string      const & line
+                                            , char                delimiter
+        );
+
 } // namespace utils
