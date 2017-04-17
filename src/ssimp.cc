@@ -222,7 +222,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             vector<SNPiterator<GenotypeFileHandle>> unk_its;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
-                auto allele_alt =it.get_allele_alt();
 
                 auto const & z12_for_this_SNP = cache.lookup_one_ref_get_calls(it);
                 if (z12_for_this_SNP.empty()) {
@@ -264,6 +263,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 assert(!x.empty());
                 genotypes_for_the_unks_.push_back( x );
             }
+
+            assert(genotypes_for_the_unks.size() == genotypes_for_the_unks_.size());
 
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
