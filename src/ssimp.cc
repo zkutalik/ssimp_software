@@ -223,7 +223,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 // actually, we should think about ignoring SNPs in certain situations
                 auto allele_alt =it.get_allele_alt();
 
-                auto const & z12_for_this_SNP = cache.lookup_one_chr_pos(it.get_chrpos());
+                auto const & z12_for_this_SNP = cache.lookup_one_ref_get_calls(it);
                 if (z12_for_this_SNP.empty()) {
                     // empty vector means the SNP is not binary in the reference panel
                     continue;
@@ -251,7 +251,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
             vector<vector<int>> genotypes_for_the_tags;
             for(auto it : tag_its) {
-                genotypes_for_the_tags.push_back( cache.lookup_one_ref_get_calls(it) );
+                auto x = cache.lookup_one_ref_get_calls(it);
+                assert(!x.empty());
+                genotypes_for_the_tags.push_back( x );
             }
             auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
