@@ -13,6 +13,7 @@ namespace options {
 
         std:: string            opt_raw_ref;
         std:: string            opt_gwas_filename;
+        std:: string            opt_out;
         int                     opt_window_width = 1'000'000;
         int                     opt_flanking_width = 250'000;
         double                  opt_lambda  = 0.0;
@@ -27,6 +28,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"flanking.width"     ,  required_argument, 0,  4 },
             {"gwas"               ,  required_argument, 0,  5 },
             {"lambda"             ,  required_argument, 0,  6 },
+            {"out"                ,  required_argument, 0,  7 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -54,6 +56,10 @@ void read_in_all_command_line_options(int argc, char **argv) {
         if (c == 6) {
             assert(string("lambda") == long_options[long_option_index].name);
             options::  opt_lambda  = utils:: lexical_cast<double>(optarg);
+        }
+        if (c == 7) {
+            assert(string("out") == long_options[long_option_index].name);
+            options::  opt_out = optarg;
         }
     }
 }

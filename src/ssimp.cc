@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <limits>
 #include <cassert>
@@ -23,6 +24,10 @@ using std:: endl;
 using std:: string;
 using std:: vector;
 using std:: setw;
+using std:: unique_ptr;
+using std:: make_unique;
+using std:: ofstream;
+using std:: ostream;
 
 using file_reading:: chrpos;
 using file_reading:: SNPiterator;
@@ -143,6 +148,18 @@ static
 void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                              , file_reading:: GwasFileHandle             gwas
                              ) {
+    unique_ptr<ofstream>   out_stream_for_imputations;
+    ostream              * out_stream_ptr = nullptr;
+    if(!options:: opt_out.empty()) {
+        out_stream_for_imputations = make_unique<ofstream>( options:: opt_out. c_str() );
+        (*out_stream_for_imputations) || DIE("Couldn't open the --out file [" + options:: opt_out + "]");
+        out_stream_ptr = &*out_stream_for_imputations;
+    }
+    else {
+        // If --out isn't specified, just print to stdout
+        out_stream_ptr = & cout;
+    }
+    assert(out_stream_ptr);
     auto const b_ref  = begin_from_file(ref_panel);
     auto const e_ref  =   end_from_file(ref_panel);
     auto const b_gwas = begin_from_file(gwas);
@@ -310,7 +327,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 assert(it != map_chrpos_to_SNPname.end());
                 while (it != map_chrpos_to_SNPname.end() && it->first == crps) {
                     auto SNPname = it->second;
-                    cout
+                    (*out_stream_ptr)
                         << crps
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
