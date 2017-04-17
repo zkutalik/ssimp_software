@@ -219,6 +219,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             vector<chrpos>  SNPs_all_targets;
+            vector<SNPiterator<GenotypeFileHandle>> unk_its;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
                 auto allele_alt =it.get_allele_alt();
@@ -233,12 +234,13 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     continue; // no variation in this SNP within the ref panel, therefore useless for imputation
                 }
                 SNPs_all_targets.push_back( it.get_chrpos() );
+                unk_its         .push_back( it              );
             }
 
 
             // We have at least one SNP here, so let's print some numbers about this region
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
-            int  number_of_all_targets                          = SNPs_all_targets.size();
+            int  number_of_all_targets                          = unk_its.size();
 
             cout
                 << '\n'
@@ -256,6 +258,13 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 genotypes_for_the_tags.push_back( x );
             }
             auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
+            vector<vector<int>> genotypes_for_the_unks_;
+            for(auto it : unk_its) {
+                auto x = cache.lookup_one_ref_get_calls(it);
+                assert(!x.empty());
+                genotypes_for_the_unks_.push_back( x );
+            }
+
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
 
