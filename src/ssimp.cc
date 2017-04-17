@@ -45,8 +45,8 @@ std:: unordered_multimap<chrpos, string>
             make_map_chrpos_to_SNPname( file_reading:: GenotypeFileHandle raw_ref_file);
 static
 vector<vector<int>>
-lookup_genotypes( vector<chrpos>                     const &  SNPs_in_the_intersection
-                , file_reading:: CacheOfRefPanelData       &  cache
+lookup_many_ref_rows( vector<SNPiterator<GenotypeFileHandle>>   const &  snps
+                , file_reading:: CacheOfRefPanelData              &  cache
                 );
 static
 mvn:: SquareMatrix
@@ -250,22 +250,11 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_snps_in_the_gwas_in_this_region      << " # GWAS     SNPs in this window (with "<<options:: opt_flanking_width<<" flanking)\n";
             cout << setw(8) << number_of_tags                                 << " # SNPs in both (i.e. useful as tags)\n";
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
-            vector<vector<int>> genotypes_for_the_tags;
-            for(auto it : tag_its) {
-                auto x = cache.lookup_one_ref_get_calls(it);
-                assert(!x.empty());
-                genotypes_for_the_tags.push_back( x );
-            }
-            auto genotypes_for_the_unks = lookup_genotypes( SNPs_all_targets        , cache );
-            vector<vector<int>> genotypes_for_the_unks_;
-            for(auto it : unk_its) {
-                auto x = cache.lookup_one_ref_get_calls(it);
-                assert(!x.empty());
-                genotypes_for_the_unks_.push_back( x );
-            }
 
-            assert(genotypes_for_the_unks.size() == genotypes_for_the_unks_.size());
-            swap(genotypes_for_the_unks, genotypes_for_the_unks_);
+            // Next, copy the calls in from the reference panel, ready for computation of correlation
+            vector<vector<int>> genotypes_for_the_tags = lookup_many_ref_rows(tag_its, cache);
+            vector<vector<int>> genotypes_for_the_unks = lookup_many_ref_rows(unk_its, cache);
+
 
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
@@ -346,12 +335,12 @@ std:: unordered_multimap<chrpos, string>
 }
 static
 vector<vector<int>>
-lookup_genotypes( vector<chrpos>                     const &  snps
-                , file_reading:: CacheOfRefPanelData       &  cache
+lookup_many_ref_rows( vector<SNPiterator<GenotypeFileHandle>>   const &  snps
+                , file_reading:: CacheOfRefPanelData              &  cache
                 ) {
     vector<vector<int>> many_calls;
     for(auto crps : snps) {
-        many_calls.push_back( cache.lookup_one_chr_pos(crps));
+        many_calls.push_back( cache.lookup_one_ref_get_calls(crps));
     }
     assert(many_calls.size() == snps.size());
     return many_calls;
