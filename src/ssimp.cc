@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
     cout << std::setprecision(20);
 
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {
-        DIE("Should pass two args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0");
+        DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
     }
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
