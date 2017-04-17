@@ -1,1 +1,1 @@
-"$SSIMP"  --ref "$REF"/small.vcf.sample.vcf --wind 300000 --gwas "$GWAS"/fixup.UKBB.both.smry..fdr --out ${OUT_IMPUTATIONS} > "$OUTPUT"
+"$SSIMP"  --ref "$REF"/small.vcf.sample.vcf --wind 300000 --gwas "$GWAS"/fixup.UKBB.both.smry..fdr --out ${OUT_IMPUTATIONS} --lambda 0.01 > "$OUTPUT"
