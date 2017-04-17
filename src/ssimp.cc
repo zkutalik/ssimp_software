@@ -265,6 +265,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             }
 
             assert(genotypes_for_the_unks.size() == genotypes_for_the_unks_.size());
+            swap(genotypes_for_the_unks, genotypes_for_the_unks_);
 
             assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
