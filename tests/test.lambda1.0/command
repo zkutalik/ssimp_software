@@ -1,0 +1,1 @@
+"$SSIMP"  --raw.ref "$REF"/small.vcf.sample.vcf --wind 300000 --gwas "$GWAS"/fixup.UKBB.both.smry..fdr --lambda 1.0 > "$OUTPUT"
