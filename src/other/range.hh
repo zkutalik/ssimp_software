@@ -37,37 +37,30 @@ namespace range {
      *
      *   bool empty()      - no more input can be read, or output written
      *   T    pull()       - like from an input stream (front_val followed by advance) {might throw pull_from_empty_range_error}
-     *   T&&  pull_move()
      *   T    front_val()  - repeated reads read from the same location
      *   T&   front_ref()  - repeated reads read from the same location
-     *
-     *        push(T)      - like to an output stream
-     *        write(T)     - repeated writes write to the same location
      *
      *   void advance()    - skip the current value
      */
     struct pull_from_empty_range_error : public std:: runtime_error {
         pull_from_empty_range_error() : std:: runtime_error("attempted pull() from an empty range") {}
     };
-    template<typename T, template<typename...> class Tmpl>
-    struct is_instance_of_a_given_class_template : std:: false_type {};
-    template<template<typename...> class Tmpl, typename ...Args>
-    struct is_instance_of_a_given_class_template< Tmpl<Args...>, Tmpl > : std:: true_type {};
 
-    // test whether the range has a front_ref method
+    // test whether the object has particular methods
     namespace {
-        template<typename R> using tester_has_method_front_ref = decltype( std:: declval<R&>().front_ref() );
-        template<typename R> using tester_has_method_front_val = decltype( std:: declval<R&>().front_val() );
-        template<typename R> using tester_has_method_pull      = decltype( std:: declval<R>().pull() );
+        template<typename R> using tester_lval_has_method_front_ref = decltype( std:: declval<R&>().front_ref() );
+        template<typename R> using tester_lval_has_method_front_val = decltype( std:: declval<R&>().front_val() );
+        template<typename R> using tester_rval_has_method_pull      = decltype( std:: declval<R>().pull() );
         template<typename R> using tester_has_front_ref        = decltype( front_ref(std:: declval<R&>()) );
         template<typename R> using tester_has_front_val        = decltype( front_val(std:: declval<R&>()) );
         template<typename R> using tester_has_method_is_infinite  = decltype( std:: declval<R&>().is_infinite() );
     }
-    template<typename R> using has_method_front_ref = can_apply<tester_has_method_front_ref,R>;
-    template<typename R> using has_method_front_val = can_apply<tester_has_method_front_val,R>;
-    template<typename R> using has_method_pull = can_apply<tester_has_method_pull,R>;
-    template<typename R> using has_front_ref = can_apply<tester_has_front_ref,R>;
-    template<typename R> using has_front_val = can_apply<tester_has_front_val,R>;
+    // in the next few tests, I should think more about lval/rval of the range itself
+    template<typename R> using has_method_front_ref = can_apply<tester_lval_has_method_front_ref,R>;
+    template<typename R> using has_method_front_val = can_apply<tester_lval_has_method_front_val,R>;
+    template<typename R> using has_method_pull      = can_apply<tester_rval_has_method_pull,R>;
+    template<typename R> using has_front_ref        = can_apply<tester_has_front_ref,R>;
+    template<typename R> using has_front_val        = can_apply<tester_has_front_val,R>;
     template<typename R> using has_method_is_infinite = can_apply<tester_has_method_is_infinite,R>;
 
     /* Now a few free functions, for use with zip at first */
@@ -152,97 +145,6 @@ namespace range {
             >
     constexpr bool is_infinite(R&&) {
         return false;
-    }
-
-    template<typename T
-        , class ...
-        , typename = std:: enable_if_t<  is_instance_of_a_given_class_template< std::decay_t<T>, std:: vector>{} >
-        //, int = 0 // pointless thing so that the later thing doesn't look like a redefinition
-    > // must be a vector
-    auto range_from_vector( T &v) {
-        static_assert( is_instance_of_a_given_class_template< std::decay_t<T>, std:: vector>{} ,"");
-
-        using container_ref_type = decltype(v); // I think the & is redundant here
-        static_assert( std:: is_reference< container_ref_type >:: value, "");
-        using container_type_non_ref = std:: remove_reference_t<container_ref_type>;
-
-        struct nest : public range_tag {
-            public:
-            container_ref_type underlying; // Note: this stores a reference!
-            private:
-            std:: size_t current_offset;
-            public:
-
-            using value_type = typename container_type_non_ref :: value_type; // look it up in the vector
-            static_assert( !std:: is_reference<value_type> :: value, "value_type must be a non-reference type");
-
-            nest(container_ref_type underlying_) : underlying(underlying_), current_offset(0) {
-                // just "copy" the reference
-            }
-
-            bool empty() const {
-                return current_offset >= underlying.size();
-            }
-            value_type front_val() const {
-                return this->front_ref();
-            }
-            auto front_ref() const
-                -> decltype(auto) // should return a reference
-            {
-                (!this->empty()) || [](){throw std:: runtime_error("range:: front_ref() called on empty range");return false;}();
-                return underlying.at(current_offset);
-            }
-            void advance() {
-                ++current_offset;
-            }
-            value_type pull() { // 'copy-and-paste' pull
-                if(empty()) {
-                    throw pull_from_empty_range_error();
-                }
-                value_type ret = front_val();
-                advance();
-                return ret;
-            }
-
-        };
-        return nest{v};
-    }
-    template<typename B, typename E>
-    auto range_from_beginend(B b, E e) { // do not take these by reference
-
-        struct nest : public range_tag {
-            private:
-                B m_current;
-                E m_e;
-            public:
-
-            using value_type = std:: remove_reference_t< decltype(*b) >;
-            static_assert( !std:: is_reference<value_type> :: value, "value_type must be a non-reference type");
-
-            nest(B b, E e) : m_current(b), m_e(e) { }
-
-            bool empty() const {
-                return m_current == m_e;
-            }
-            value_type front_val() const {
-                return this->front_ref();
-            }
-            value_type& front_ref() const {
-                (!this->empty()) || [](){throw std:: runtime_error("range:: front_ref() called on empty range");return false;}();
-                return *m_current;
-            }
-            void advance() {
-                ++m_current;
-            }
-
-        };
-        return nest{std:: move(b),std:: move(e)};
-    }
-    template<typename C>
-    decltype( range_from_beginend( std::declval<C>() .begin(),  std::declval<C>() .end() ) )
-    range_from_beginend(C& c)
-    {
-        return range_from_beginend(c.begin(), c.end());
     }
 
     template<typename getter, typename underlying_type, typename underlying_refs_type, size_t ...is>
@@ -715,8 +617,6 @@ namespace range {
     auto infinite_range(T b = 0)
     { return range_impl<T, true>(b, std::numeric_limits<T>::max() ,1); }
 
-    template        <typename T >
-    auto range(T &&t) -> AMD_RANGE_DECLTYPE_AND_RETURN( range_from_vector(std::forward<T>(t)) )
     template        <typename R >
     auto max_element(R &&r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
            std::max_element( std::forward<R>(r).underlying.begin()
