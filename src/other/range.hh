@@ -12,23 +12,21 @@
 #include<iostream> // just so I can implement operator <<
 
 #include"utils.hh"
-//#include"little.hh"
-#include "void_t_and_related.hh"
 
 #define AMD_RANGE_DECLTYPE_AND_RETURN( expr )    decltype( expr ) { return expr ; }
 
-using void_t_and_related:: can_apply;
-using void_t_and_related:: void_t;
+using utils:: can_apply;
+using utils:: void_t;
 
-namespace range {
+namespace amd {
     struct range_tag {}; // *all* ranges will inherit this, if nothing else
     template<typename R>
     using is_of_range_tag = std:: enable_if_t<std::is_base_of<range_tag, std::remove_reference_t<R>>{}>;
     // A range is either non-owning:
     //   - initialized with lvalue container (or an lvalue range)
-    //   - the range itself is non-copyable
+    //   - the range itself is copyable
     // or, is owning:
-    //   - move-constructs it's argument in
+    //   - move-constructs it's argument in (to a unique_ptr perhaps)
     //   - the range cannot be (implicitly) copied
 
     //   the value_type may not be a reference
@@ -42,25 +40,52 @@ namespace range {
      *
      *   void advance()    - skip the current value
      */
+
+    // First, I'll give an example of a simple range-like object. What could be simpler than a pair of iterators?
+    template<typename b_t, typename e_t>
+    struct range_from_begin_end_t : public range_tag {
+        b_t m_b;
+        e_t m_e;
+
+        range_from_begin_end_t(b_t b, e_t e) : m_b(move(b)), m_e(move(e)) {}
+
+        auto begin() const { return m_b; }
+        auto end  () const { return m_e; }
+        bool empty() const { return m_b == m_e; }
+        void advance()     { ++m_b; }
+        auto current_it() const { return m_b; }
+    };
+    template<typename b_t, typename e_t>
+    range_from_begin_end_t<b_t,e_t> range_from_begin_end(b_t b, e_t e) {
+        return {move(b), move(e)};
+    }
+    template<typename C>
+    auto range_from_begin_end(C &c) {
+        return range_from_begin_end(c.begin(), c.end());
+    }
+
     struct pull_from_empty_range_error : public std:: runtime_error {
         pull_from_empty_range_error() : std:: runtime_error("attempted pull() from an empty range") {}
     };
+    template<typename T, template<typename...> class Tmpl>
+    struct is_instance_of_a_given_class_template : std:: false_type {};
+    template<template<typename...> class Tmpl, typename ...Args>
+    struct is_instance_of_a_given_class_template< Tmpl<Args...>, Tmpl > : std:: true_type {};
 
-    // test whether the object has particular methods
+    // test whether the range has a front_ref method
     namespace {
-        template<typename R> using tester_lval_has_method_front_ref = decltype( std:: declval<R&>().front_ref() );
-        template<typename R> using tester_lval_has_method_front_val = decltype( std:: declval<R&>().front_val() );
-        template<typename R> using tester_rval_has_method_pull      = decltype( std:: declval<R>().pull() );
+        template<typename R> using tester_has_method_front_ref = decltype( std:: declval<R&>().front_ref() );
+        template<typename R> using tester_has_method_front_val = decltype( std:: declval<R&>().front_val() );
+        template<typename R> using tester_has_method_pull      = decltype( std:: declval<R>().pull() );
         template<typename R> using tester_has_front_ref        = decltype( front_ref(std:: declval<R&>()) );
         template<typename R> using tester_has_front_val        = decltype( front_val(std:: declval<R&>()) );
         template<typename R> using tester_has_method_is_infinite  = decltype( std:: declval<R&>().is_infinite() );
     }
-    // in the next few tests, I should think more about lval/rval of the range itself
-    template<typename R> using has_method_front_ref = can_apply<tester_lval_has_method_front_ref,R>;
-    template<typename R> using has_method_front_val = can_apply<tester_lval_has_method_front_val,R>;
-    template<typename R> using has_method_pull      = can_apply<tester_rval_has_method_pull,R>;
-    template<typename R> using has_front_ref        = can_apply<tester_has_front_ref,R>;
-    template<typename R> using has_front_val        = can_apply<tester_has_front_val,R>;
+    template<typename R> using has_method_front_ref = can_apply<tester_has_method_front_ref,R>;
+    template<typename R> using has_method_front_val = can_apply<tester_has_method_front_val,R>;
+    template<typename R> using has_method_pull = can_apply<tester_has_method_pull,R>;
+    template<typename R> using has_front_ref = can_apply<tester_has_front_ref,R>;
+    template<typename R> using has_front_val = can_apply<tester_has_front_val,R>;
     template<typename R> using has_method_is_infinite = can_apply<tester_has_method_is_infinite,R>;
 
     /* Now a few free functions, for use with zip at first */
@@ -145,6 +170,97 @@ namespace range {
             >
     constexpr bool is_infinite(R&&) {
         return false;
+    }
+
+    template<typename T
+        , class ...
+        , typename = std:: enable_if_t<  is_instance_of_a_given_class_template< std::decay_t<T>, std:: vector>{} >
+        //, int = 0 // pointless thing so that the later thing doesn't look like a redefinition
+    > // must be a vector
+    auto range_from_vector( T &v) {
+        static_assert( is_instance_of_a_given_class_template< std::decay_t<T>, std:: vector>{} ,"");
+
+        using container_ref_type = decltype(v); // I think the & is redundant here
+        static_assert( std:: is_reference< container_ref_type >:: value, "");
+        using container_type_non_ref = std:: remove_reference_t<container_ref_type>;
+
+        struct nest : public range_tag {
+            public:
+            container_ref_type underlying; // Note: this stores a reference!
+            private:
+            std:: size_t current_offset;
+            public:
+
+            using value_type = typename container_type_non_ref :: value_type; // look it up in the vector
+            static_assert( !std:: is_reference<value_type> :: value, "value_type must be a non-reference type");
+
+            nest(container_ref_type underlying_) : underlying(underlying_), current_offset(0) {
+                // just "copy" the reference
+            }
+
+            bool empty() const {
+                return current_offset >= underlying.size();
+            }
+            value_type front_val() const {
+                return this->front_ref();
+            }
+            auto front_ref() const
+                -> decltype(auto) // should return a reference
+            {
+                (!this->empty()) || [](){throw std:: runtime_error("range:: front_ref() called on empty range");return false;}();
+                return underlying.at(current_offset);
+            }
+            void advance() {
+                ++current_offset;
+            }
+            value_type pull() { // 'copy-and-paste' pull
+                if(empty()) {
+                    throw pull_from_empty_range_error();
+                }
+                value_type ret = front_val();
+                advance();
+                return ret;
+            }
+
+        };
+        return nest{v};
+    }
+    template<typename B, typename E>
+    auto range_from_beginend(B b, E e) { // do not take these by reference
+
+        struct nest : public range_tag {
+            private:
+                B m_current;
+                E m_e;
+            public:
+
+            using value_type = std:: remove_reference_t< decltype(*b) >;
+            static_assert( !std:: is_reference<value_type> :: value, "value_type must be a non-reference type");
+
+            nest(B b, E e) : m_current(b), m_e(e) { }
+
+            bool empty() const {
+                return m_current == m_e;
+            }
+            value_type front_val() const {
+                return this->front_ref();
+            }
+            value_type& front_ref() const {
+                (!this->empty()) || [](){throw std:: runtime_error("range:: front_ref() called on empty range");return false;}();
+                return *m_current;
+            }
+            void advance() {
+                ++m_current;
+            }
+
+        };
+        return nest{std:: move(b),std:: move(e)};
+    }
+    template<typename C>
+    decltype( range_from_beginend( std::declval<C>() .begin(),  std::declval<C>() .end() ) )
+    range_from_beginend(C& c)
+    {
+        return range_from_beginend(c.begin(), c.end());
     }
 
     template<typename getter, typename underlying_type, typename underlying_refs_type, size_t ...is>
@@ -435,7 +551,7 @@ namespace range {
                 !m_is_empty || [](){throw std:: runtime_error("trying to advance an already-exhausted pull-range");return false;}();
                 try {
                     m_current_value = m_range_with_pull.pull();
-                } catch (range:: pull_from_empty_range_error &e) {
+                } catch (amd:: pull_from_empty_range_error &e) {
                     // not sure what start m_current_value will be in.
                     // Don't care either I guess!
                     m_is_empty = true;
@@ -501,7 +617,7 @@ namespace range {
             try {
                 output.emplace_back( f(r.pull()) );
             }
-            catch (range:: pull_from_empty_range_error &e) {
+            catch (amd:: pull_from_empty_range_error &e) {
                 return output;
             }
         }
@@ -532,7 +648,7 @@ namespace range {
 
     template<typename Source, typename State, typename L>
     auto generic_thing_to__front_range(Source&& t, State && s, L && l) {
-        struct gttfr : public range:: range_tag {
+        struct gttfr : public amd:: range_tag {
 
             Source m_src;
             State  m_st;
@@ -617,43 +733,17 @@ namespace range {
     auto infinite_range(T b = 0)
     { return range_impl<T, true>(b, std::numeric_limits<T>::max() ,1); }
 
-    template        <typename R >
-    auto max_element(R &&r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
-           std::max_element( std::forward<R>(r).underlying.begin()
-                           , std::forward<R>(r).underlying.end()
-                           ))
-    template        <typename R, typename G >
-    auto shuffle(R &&r, G &&g) -> AMD_RANGE_DECLTYPE_AND_RETURN(
-           std::shuffle( std::forward<R>(r).underlying.begin()
-                       , std::forward<R>(r).underlying.end()
-                       , std::forward<G>(g)
-                       ))
-    template        <typename R, typename G >
-    auto accumulate(R &&r, G &&g) -> AMD_RANGE_DECLTYPE_AND_RETURN(
-           std::accumulate( std::forward<R>(r).underlying.begin()
-                       , std::forward<R>(r).underlying.end()
-                       , std::forward<G>(g)
-                       ))
-    template        <typename R>
-    auto next_permutation(R &&r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
-    std::next_permutation( std::forward<R>(r).underlying.begin()
-                         , std::forward<R>(r).underlying.end()
-                         ))
+    template        <typename Rb, typename Re>
+    auto max_element(range_from_begin_end_t<Rb,Re> r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+           std::max_element( r.m_b , r.m_e))
+    template        <typename Rb, typename Re, typename G >
+    auto shuffle(range_from_begin_end_t<Rb,Re> r, G &&g) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+           std::shuffle( r.m_b , r.m_e , std::forward<G>(g)))
+    template        <typename Rb, typename Re, typename G >
+    auto accumulate(range_from_begin_end_t<Rb,Re> r, G &&init) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+           std::accumulate( r.m_b , r.m_e , std::forward<G>(init)))
+    template        <typename Rb, typename Re>
+    auto next_permutation(range_from_begin_end_t<Rb,Re> r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+           std::next_permutation( r.m_b , r.m_e))
 
-    // a simpler begin/end thing. Wrote it from scratch within the ssimp project
-    template <typename Ib_t, typename Ie_t>
-    struct range_from_begin_end_t {
-        Ib_t m_b;
-        Ie_t m_e;
-        auto begin() const { return m_b; }
-        auto end  () const { return m_e; }
-        bool empty() const { return m_b == m_e; }
-        void advance()     { ++m_b; }
-        auto current_it() const { return m_b; }
-    };
-
-    template <typename Ib_t, typename Ie_t>
-    auto range_from_begin_end(Ib_t b, Ie_t e) {
-        return range_from_begin_end_t<Ib_t,Ie_t>{move(b),move(e)};
-    }
-} // namespace range
+} // namespace amd
