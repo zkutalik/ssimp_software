@@ -126,10 +126,13 @@ namespace range {
     }
 
     template<typename R >
-    auto front_val_impl(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+    auto front_val_impl(R&& r, utils:: priority_tag<0>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
             std::forward<R>(r).front_val() )
     template<typename R >
-    auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r)) );
+    auto front_val_impl(R&& r, utils:: priority_tag<1>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+            *std::forward<R>(r).begin() )
+    template<typename R >
+    auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r), utils:: priority_tag<9>()) );
 
     template<typename R
             , class ...
