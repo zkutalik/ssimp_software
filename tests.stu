@@ -8,6 +8,6 @@
     cd    "tests/${testname}"
     export OUTPUT=output.actual.tmp
     export OUT_IMPUTATIONS=imputations.txt
-    time -p -o time.txt bash command
+    bash command
     mv output.actual.tmp output.actual
 }
