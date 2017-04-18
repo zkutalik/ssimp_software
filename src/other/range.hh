@@ -62,6 +62,29 @@ namespace range {
     template<typename C>
     auto range_from_begin_end(C &c) -> AMD_RANGE_DECLTYPE_AND_RETURN( range_from_begin_end(c.begin(), c.end()) )
 
+    struct range_ints_t {
+        struct iter_impl {
+            int m_i;
+
+            bool    operator!=  (iter_impl const & other) const {
+                return m_i != other.m_i;
+            }
+            void    operator++  ()          { ++m_i; }
+            int     operator*   () const    { return m_i; }
+        };
+        int m_b;
+        int m_e;
+
+        range_ints_t(int e)        : m_b(0), m_e(e) {}
+        range_ints_t(int b, int e) : m_b(b), m_e(e) {}
+
+        iter_impl begin() const { return {m_b}; }
+        iter_impl end  () const { return {m_e}; }
+    };
+    range_ints_t ints(int e) {
+        return {e};
+    }
+
     struct pull_from_empty_range_error : public std:: runtime_error {
         pull_from_empty_range_error() : std:: runtime_error("attempted pull() from an empty range") {}
     };

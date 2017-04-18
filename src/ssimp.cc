@@ -427,8 +427,8 @@ mvn:: Matrix make_c_unkn_tags_matrix
     assert(N_ref > 0);
 
     mvn:: Matrix      c(number_of_all_targets, number_of_tags);
-    for(int k=0; k<number_of_tags; ++k) {
-        for(int u=0; u<number_of_all_targets; ++u) {
+    for(int k : range:: ints(number_of_tags)) {
+        for(int u : range:: ints(number_of_all_targets)) {
             assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
             assert(N_ref        == utils:: ssize(genotypes_for_the_unks.at(u)));
             double c_ku = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
