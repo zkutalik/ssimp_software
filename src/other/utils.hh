@@ -123,4 +123,11 @@ std:: vector<std:: string>   tokenize       ( std:: string      const & line
                                             , char                delimiter
         );
 
+template<int i>
+struct priority_tag;
+template<int i>
+struct priority_tag : public priority_tag<i-1> {};
+template<>
+struct priority_tag<0> {};
+
 } // namespace utils
