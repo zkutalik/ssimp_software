@@ -18,7 +18,7 @@
 using utils:: can_apply;
 using utils:: void_t;
 
-namespace amd {
+namespace range {
     struct range_tag {}; // *all* ranges will inherit this, if nothing else
     template<typename R>
     using is_of_range_tag = std:: enable_if_t<std::is_base_of<range_tag, std::remove_reference_t<R>>{}>;
@@ -60,9 +60,7 @@ namespace amd {
         return {move(b), move(e)};
     }
     template<typename C>
-    auto range_from_begin_end(C &c) {
-        return range_from_begin_end(c.begin(), c.end());
-    }
+    auto range_from_begin_end(C &c) -> AMD_RANGE_DECLTYPE_AND_RETURN( range_from_begin_end(c.begin(), c.end()) )
 
     struct pull_from_empty_range_error : public std:: runtime_error {
         pull_from_empty_range_error() : std:: runtime_error("attempted pull() from an empty range") {}
@@ -551,7 +549,7 @@ namespace amd {
                 !m_is_empty || [](){throw std:: runtime_error("trying to advance an already-exhausted pull-range");return false;}();
                 try {
                     m_current_value = m_range_with_pull.pull();
-                } catch (amd:: pull_from_empty_range_error &e) {
+                } catch (pull_from_empty_range_error &e) {
                     // not sure what start m_current_value will be in.
                     // Don't care either I guess!
                     m_is_empty = true;
@@ -617,7 +615,7 @@ namespace amd {
             try {
                 output.emplace_back( f(r.pull()) );
             }
-            catch (amd:: pull_from_empty_range_error &e) {
+            catch (pull_from_empty_range_error &e) {
                 return output;
             }
         }
@@ -648,7 +646,7 @@ namespace amd {
 
     template<typename Source, typename State, typename L>
     auto generic_thing_to__front_range(Source&& t, State && s, L && l) {
-        struct gttfr : public amd:: range_tag {
+        struct gttfr : public range_tag {
 
             Source m_src;
             State  m_st;
@@ -746,4 +744,4 @@ namespace amd {
     auto next_permutation(range_from_begin_end_t<Rb,Re> r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
            std::next_permutation( r.m_b , r.m_e))
 
-} // namespace amd
+} // namespace range

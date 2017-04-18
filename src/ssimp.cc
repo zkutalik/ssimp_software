@@ -202,13 +202,13 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // New, more flexible, method for finding tags
             vector<double>                          tag_zs;
             vector<SNPiterator<GenotypeFileHandle>> tag_its;
-            for(auto tag_candidate = amd:: range_from_begin_end( w_gwas_begin, w_gwas_end )
+            for(auto tag_candidate = range:: range_from_begin_end( w_gwas_begin, w_gwas_end )
                     ; ! tag_candidate.empty()
                     ;   tag_candidate.advance()
                     ) {
                 auto crps = tag_candidate.current_it().get_chrpos();
                 // Find the ref panel entries in the same range
-                auto ref_candidates = amd:: range_from_begin_end(
+                auto ref_candidates = range:: range_from_begin_end(
                          std:: lower_bound( w_ref_wide_begin , w_ref_wide_end, crps )
                         ,std:: upper_bound( w_ref_wide_begin , w_ref_wide_end, crps )
                         );
