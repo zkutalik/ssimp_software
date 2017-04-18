@@ -47,6 +47,8 @@ namespace range {
         b_t m_b;
         e_t m_e;
 
+        using value_type = decltype(*m_b);
+
         range_from_begin_end_t(b_t b, e_t e) : m_b(move(b)), m_e(move(e)) {}
 
         auto begin() const { return m_b; }
@@ -74,6 +76,8 @@ namespace range {
         };
         int m_b;
         int m_e;
+
+        using value_type = int;
 
         range_ints_t(int e)        : m_b(0), m_e(e) {}
         range_ints_t(int b, int e) : m_b(b), m_e(e) {}
