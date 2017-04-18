@@ -124,16 +124,12 @@ namespace range {
     {
         return std::forward<R>(r).front_ref();
     }
-    template<typename R
-            , class ...
-            , typename = std::enable_if_t< has_method_front_val<R>{} >
-            , typename = is_of_range_tag<R>
-            >
-    auto front_val(R&& r)
-        -> decltype( std::forward<R>(r).front_val() )
-    {
-        return std::forward<R>(r).front_val();
-    }
+
+    template<typename R >
+    auto front_val_impl(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+            std::forward<R>(r).front_val() )
+    template<typename R >
+    auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r)) );
 
     template<typename R
             , class ...
