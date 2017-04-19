@@ -112,14 +112,12 @@ namespace range {
         template<typename R> using tester_has_method_pull      = decltype( std:: declval<R>().pull() );
         template<typename R> using tester_has_front_ref        = decltype( front_ref(std:: declval<R&>()) );
         template<typename R> using tester_has_front_val        = decltype( front_val(std:: declval<R&>()) );
-        template<typename R> using tester_has_method_is_infinite  = decltype( std:: declval<R&>().is_infinite() );
     }
     template<typename R> using has_method_front_ref = can_apply<tester_has_method_front_ref,R>;
     template<typename R> using has_method_front_val = can_apply<tester_has_method_front_val,R>;
     template<typename R> using has_method_pull = can_apply<tester_has_method_pull,R>;
     template<typename R> using has_front_ref = can_apply<tester_has_front_ref,R>;
     template<typename R> using has_front_val = can_apply<tester_has_front_val,R>;
-    template<typename R> using has_method_is_infinite = can_apply<tester_has_method_is_infinite,R>;
 
     template<typename R>
     auto front_ref(R&& r)
@@ -132,8 +130,11 @@ namespace range {
     auto front_val_impl(R&& r, utils:: priority_tag<2>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
             std::forward<R>(r).front_val() )
     template<typename R >
-    auto front_val_impl(R&& r, utils:: priority_tag<1>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
-            *std::forward<R>(r).begin() )
+    auto front_val_impl(R&& r, utils:: priority_tag<1>)
+    -> std:: decay_t<decltype( *std::forward<R>(r).begin() )>
+    {
+        return *std::forward<R>(r).begin();
+    }
 
     // Next, synthesize range::empty, for those with an empty() method
     template<typename R >
@@ -205,198 +206,6 @@ namespace range {
     auto pull(R&& r) {
         return impl:: pull_impl(std::forward<R>(r), utils:: priority_tag<9>{});
     }
-
-    template<typename R
-            , class ...
-            , typename = is_of_range_tag<R>
-            , typename = std::enable_if_t< has_method_is_infinite<R>{} >
-            , typename = void // just to disambig with the next one
-            >
-    constexpr bool is_infinite(R&& r) {
-        return r.is_infinite();
-    }
-    template<typename R
-            , class ...
-            , typename = is_of_range_tag<R>
-            , typename = std::enable_if_t<!has_method_is_infinite<R>{} >
-            >
-    constexpr bool is_infinite(R&&) {
-        return false;
-    }
-
-    template<typename T
-        , class ...
-        , typename = std:: enable_if_t<  is_instance_of_a_given_class_template< std::decay_t<T>, std:: vector>{} >
-        //, int = 0 // pointless thing so that the later thing doesn't look like a redefinition
-    > // must be a vector
-    auto range_from_vector( T &v) {
-        static_assert( is_instance_of_a_given_class_template< std::decay_t<T>, std:: vector>{} ,"");
-
-        using container_ref_type = decltype(v); // I think the & is redundant here
-        static_assert( std:: is_reference< container_ref_type >:: value, "");
-        using container_type_non_ref = std:: remove_reference_t<container_ref_type>;
-
-        struct nest : public range_tag {
-            public:
-            container_ref_type underlying; // Note: this stores a reference!
-            private:
-            std:: size_t current_offset;
-            public:
-
-            using value_type = typename container_type_non_ref :: value_type; // look it up in the vector
-            static_assert( !std:: is_reference<value_type> :: value, "value_type must be a non-reference type");
-
-            nest(container_ref_type underlying_) : underlying(underlying_), current_offset(0) {
-                // just "copy" the reference
-            }
-
-            bool empty() const {
-                return current_offset >= underlying.size();
-            }
-            value_type front_val() const {
-                return this->front_ref();
-            }
-            auto front_ref() const
-                -> decltype(auto) // should return a reference
-            {
-                (!this->empty()) || [](){throw std:: runtime_error("range:: front_ref() called on empty range");return false;}();
-                return underlying.at(current_offset);
-            }
-            void advance() {
-                ++current_offset;
-            }
-            value_type pull() { // 'copy-and-paste' pull
-                if(empty()) {
-                    throw pull_from_empty_range_error();
-                }
-                value_type ret = front_val();
-                advance();
-                return ret;
-            }
-
-        };
-        return nest{v};
-    }
-    template<typename B, typename E>
-    auto range_from_beginend(B b, E e) { // do not take these by reference
-
-        struct nest : public range_tag {
-            private:
-                B m_current;
-                E m_e;
-            public:
-
-            using value_type = std:: remove_reference_t< decltype(*b) >;
-            static_assert( !std:: is_reference<value_type> :: value, "value_type must be a non-reference type");
-
-            nest(B b, E e) : m_current(b), m_e(e) { }
-
-            bool empty() const {
-                return m_current == m_e;
-            }
-            value_type front_val() const {
-                return this->front_ref();
-            }
-            value_type& front_ref() const {
-                (!this->empty()) || [](){throw std:: runtime_error("range:: front_ref() called on empty range");return false;}();
-                return *m_current;
-            }
-            void advance() {
-                ++m_current;
-            }
-
-        };
-        return nest{std:: move(b),std:: move(e)};
-    }
-    template<typename C>
-    decltype( range_from_beginend( std::declval<C>() .begin(),  std::declval<C>() .end() ) )
-    range_from_beginend(C& c)
-    {
-        return range_from_beginend(c.begin(), c.end());
-    }
-
-    template<typename getter, typename underlying_type, typename underlying_refs_type, size_t ...is>
-    struct zipped_range : public range_tag {
-        private:
-            underlying_type underlying;
-        public:
-
-            using value_type = std:: tuple<
-                //typename std:: tuple_element<is, underlying_type>::type ::value_type & ...
-                decltype(getter:: getter(std::get<is>(underlying))) ...
-            >;
-
-            zipped_range(underlying_refs_type &&underlying_) : underlying( std:: move(underlying_)) {
-                // constructing a tuple of non-refs from a tuple of [lr]v-refs
-            }
-
-            bool empty() const {
-                bool are_any_empty = std:: max( {std::get<is>(underlying).empty() ...} );
-                if(! are_any_empty) {
-                    // they're all non-empty, just return
-                }
-                else {
-                    // at least one is empty. return true.
-                    // But check first that they are *all* empty or infinite
-                    bool all_are_empty_or_infinite = std:: min( {is_infinite(std::get<is>(underlying))||std::get<is>(underlying).empty() ... } );
-                    all_are_empty_or_infinite || [](){throw std:: runtime_error("range:: imbalanced sources in zip range");return false;}();
-                }
-                return are_any_empty;
-            }
-            template<class ..., typename = void_t<decltype( getter:: getter( std::get<is>(underlying) ) ) ... >>
-            value_type front_val() const {
-                (!this->empty()) || [](){throw std:: runtime_error("range:: front_val() called on empty zip range");return false;}();
-                return value_type{ getter:: getter(std::get<is>(underlying)) ... };
-            }
-            void advance() {
-                int just_for_side_effects[] = { ((void)
-                        std::get<is>(underlying).advance()
-                        ,0)... };
-                (void)just_for_side_effects;
-            }
-
-    };
-    template<typename getter, size_t ...is, typename ...RangesRef>
-    auto impl_zip(
-            std:: integer_sequence<size_t, is...>
-            ,std::tuple< RangesRef ... > &&underlying_refs
-            ) {
-
-        using underlying_refs_type = std:: remove_reference_t< decltype(underlying_refs) >;
-        using underlying_type = std:: tuple<
-            std:: remove_reference_t<
-                typename std:: tuple_element<is, underlying_refs_type>::type
-                > ... >;
-
-        return zipped_range<getter, underlying_type, underlying_refs_type, is...>{ std:: move(underlying_refs) };
-    }
-    struct get_the_ref_not_val {
-        template<typename R>
-        static
-        auto getter(R&& r)
-            -> decltype( front_ref( std::forward<R>(r) ) )
-        {
-            return front_ref( std::forward<R>(r) );
-        }
-    };
-    struct get_the_val_not_ref {
-        template<typename R>
-        static
-        auto getter(R&& r)
-            -> decltype( front_val( std::forward<R>(r) ) )
-        {
-            return front_val( std::forward<R>(r) );
-        }
-    };
-    struct get_the_ref_OR_val {
-        template<typename R>
-        static
-        auto getter(R&& r)
-            -> decltype( front_ref_then_val( std::forward<R>(r) ) )
-        {
-            return front_ref_then_val( std::forward<R>(r) );
-        }
-    };
 
     template<typename R>
     struct begin_end_for_range_for {
@@ -471,95 +280,6 @@ namespace range {
         }
         o << ']';
         return o;
-    }
-    template<typename R, class..., typename Rnonref = std::remove_reference_t<R>, typename = std:: enable_if_t<std::is_base_of<range_tag, Rnonref >{}> >
-    auto sum (R r) {
-        using value_type = typename R :: value_type;
-        static_assert( !std::is_same<value_type, bool>{} , "" ); // using bool here is pretty dumb. Usually.
-        value_type t = 0;
-        for(;!r.empty(); r.advance()) {
-            t += r.front_val();
-        }
-        return t;
-    }
-    template<typename value_type, typename R, class..., typename Rnonref = std::remove_reference_t<R>, typename = std:: enable_if_t<std::is_base_of<range_tag, Rnonref >{}> >
-    auto sum (R r, value_type t) {
-        for(;!r.empty(); r.advance()) {
-            t += r.front_val();
-        }
-        return t;
-    }
-
-    template<typename R, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R >{}> >
-    auto adapt_from_pull(R range_with_pull) {
-        struct adaptor_from_pull : public range_tag {
-            using value_type = typename R :: value_type;
-            R m_range_with_pull;
-            value_type m_current_value;
-            bool m_is_empty = false;
-            adaptor_from_pull(R && range_with_pull) : m_range_with_pull(std:: move(range_with_pull)) {
-                advance();
-            }
-            bool empty() const {
-                return m_is_empty;
-            }
-            void advance() {
-                !m_is_empty || [](){throw std:: runtime_error("trying to advance an already-exhausted pull-range");return false;}();
-                try {
-                    m_current_value = m_range_with_pull.pull();
-                } catch (pull_from_empty_range_error &e) {
-                    // not sure what start m_current_value will be in.
-                    // Don't care either I guess!
-                    m_is_empty = true;
-                }
-            }
-            value_type front_val() const {
-                !m_is_empty || [](){throw std:: runtime_error("trying to advance an already-exhausted pull-range");return false;}();
-                return m_current_value;
-            }
-            value_type pull() {
-                if(empty())
-                    throw pull_from_empty_range_error();
-                value_type ret = front_val();
-                advance();
-                return ret;
-            }
-        };
-        return adaptor_from_pull( std:: move(range_with_pull) );
-    }
-
-
-    inline
-    auto pull_token_range_from_line(std:: string &full_line, std:: string delims = " \t\n\r") {
-        using std:: string;
-        using std:: cout;
-        using std:: endl;
-        struct string_range : public range_tag {
-            using value_type = string;
-            string const &m_full_line_ref;
-            size_t m_pos;
-            std:: string m_delims;
-            string_range(string &full_line, std:: string delims) :m_full_line_ref(full_line), m_pos(0), m_delims(delims) {
-            }
-            value_type pull() {
-                if(m_pos == string:: npos)
-                    throw pull_from_empty_range_error();
-                size_t next_white_space = m_full_line_ref.find_first_of(m_delims.c_str(), m_pos);
-                string the_token = m_full_line_ref.substr(m_pos, next_white_space-m_pos);
-                if(next_white_space == string::npos) {
-                    m_pos = string:: npos;
-                }
-                else {
-                    m_pos = next_white_space+1;
-                }
-                return the_token;
-            }
-        };
-        return string_range(full_line, delims);
-    }
-    inline
-    auto token_range_from_line(std:: string &full_line, std:: string delims = " \t\n\r") {
-        return adapt_from_pull(pull_token_range_from_line(full_line, delims));
     }
 
     template        <typename Rb, typename Re>
