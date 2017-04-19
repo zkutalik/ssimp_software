@@ -210,7 +210,7 @@ namespace range {
     template<typename R>
     struct begin_end_for_range_for {
 
-        std:: unique_ptr<R> m_range_pointer;
+        R * m_range_pointer;
 
         bool operator != ( const begin_end_for_range_for & other ) const {
             if(other.m_range_pointer == nullptr && this->m_range_pointer == nullptr) {
@@ -256,22 +256,17 @@ namespace range {
                    operator_star_impl(utils:: priority_tag<9>{})
             )
     };
-    template<typename R>
-    auto end  (R &&)
-    ->decltype(begin_end_for_range_for<std::decay_t<R>>{nullptr})
-    {
-        return begin_end_for_range_for<std::decay_t<R>>{nullptr};
-    }
-    template<typename R
-        , class...
-        , typename R_decayed = std:: decay_t<R>
-        >
-    auto begin(R &&r)
-    ->decltype(begin_end_for_range_for<R_decayed> { std:: make_unique<R_decayed>( std::forward<R_decayed>(r) ) })
-    {
-        return begin_end_for_range_for<R_decayed> { std:: make_unique<R_decayed>( std::forward<R_decayed>(r) ) };
-    }
 
+    template<typename R>
+    auto end  (R &)
+    -> AMD_RANGE_DECLTYPE_AND_RETURN(begin_end_for_range_for<R> { nullptr })
+    template<typename R >
+    auto begin(R &r)
+    -> AMD_RANGE_DECLTYPE_AND_RETURN(begin_end_for_range_for<R> { &r })
+
+    // These next two are deliberately to cause linker failures.
+    // Instead I should do the priority_tag thing to directly use
+    // .begin and .end methods when present
     template<typename R>
     auto end  (R && r) -> decltype(r.end()  );
     template<typename R>
