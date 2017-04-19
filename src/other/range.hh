@@ -184,27 +184,6 @@ namespace range {
         return { std::forward<decltype(ranges)>(ranges)... };
     }
 
-    template<typename R
-            , class ...
-            , typename = std::enable_if_t< has_front_ref<R>{} >
-            , typename = is_of_range_tag<R>
-            >
-    auto front_ref_then_val(R&& r)
-    -> decltype( front_ref(std::forward<R>(r)) )
-    {
-        return front_ref(std::forward<R>(r));
-    }
-    template<typename R
-            , class ...
-            , typename = std::enable_if_t< !has_front_ref<R>{} && has_front_val<R>{} >
-            , typename = is_of_range_tag<R>
-            >
-    auto front_ref_then_val(R&& r)
-    -> decltype( front_val(std::forward<R>(r)) )
-    {
-        return front_val(std::forward<R>(r));
-    }
-
     namespace impl {
     template<typename R>
     auto pull_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN (
@@ -415,40 +394,7 @@ namespace range {
             return front_ref_then_val( std::forward<R>(r) );
         }
     };
-    template<typename ...Ranges
-        , class..., typename = void_t< has_method_front_ref<Ranges> ...  >
-        >
-    auto zip_the_refs(Ranges&& ...ranges) {
-        return impl_zip<get_the_ref_not_val>(
-                std:: make_index_sequence< sizeof...(ranges) >{}
-               ,std:: tuple< Ranges&&... >{ std::forward<Ranges>(ranges) ... }
-               );
-    }
-    template<typename ...Ranges
-        , class..., typename = void_t< has_method_front_val<Ranges> ...  >
-        >
-    auto zip_the_vals(Ranges&& ...ranges) {
-        return impl_zip<get_the_val_not_ref>(
-                std:: make_index_sequence< sizeof...(ranges) >{}
-               ,std:: tuple< Ranges&&... >{ std::forward<Ranges>(ranges) ... }
-               );
-    }
-    template<typename ...Ranges
-        , class..., typename = void_t< has_method_front_val<Ranges> ...  >
-        >
-    auto zip(Ranges&& ...ranges)
-    -> decltype(
-               impl_zip<get_the_ref_OR_val>(
-                std:: make_index_sequence< sizeof...(ranges) >{}
-               ,std:: tuple< Ranges&&... >{ std::forward<Ranges>(ranges) ... }
-               )
-    )
-    {
-        return impl_zip<get_the_ref_OR_val>(
-                std:: make_index_sequence< sizeof...(ranges) >{}
-               ,std:: tuple< Ranges&&... >{ std::forward<Ranges>(ranges) ... }
-               );
-    }
+
     template<typename R>
     struct begin_end_for_range_for {
         std:: unique_ptr<R> m_range_pointer;
@@ -504,69 +450,6 @@ namespace range {
         auto the_end = end(r);
         the_end.m_range_pointer = std:: make_unique<R>( std::move(r) );
         return the_end;
-    }
-
-    template<typename R, typename Rnonref, typename F>
-    struct filtered_range : private Rnonref {
-        static_assert( std:: is_same<Rnonref, std:: remove_reference_t<R>>{} ,"");
-        F filter;
-        using value_type = typename Rnonref :: value_type;
-        static_assert( std:: is_same<value_type, typename Rnonref :: value_type>{} ,""); // just to suppress a gcc warning
-        using Rnonref :: empty;
-        using Rnonref :: front_val;
-        //using Rnonref :: front_ref;
-        template<class..., typename U = Rnonref>
-        auto front_ref() const -> decltype( U:: front_ref() ) {
-            return Rnonref:: front_ref();
-        }
-        filtered_range(R &&r_, F filter_) : Rnonref( std::forward<R>(r_) ), filter(filter_) {
-            skip_unmatching_ones();
-        }
-        template<class..., typename U = Rnonref>
-        auto skip_unmatching_ones() -> std:: enable_if_t< has_method_front_ref< U >{}>
-        {
-            while(!empty() && !filter(Rnonref:: front_ref())) { // BUG - should make this ref, if possible
-                Rnonref:: advance(); // must be done to the base class, as advance will also be replaced
-            }
-        }
-        template<class..., typename U = Rnonref>
-        auto skip_unmatching_ones() -> std:: enable_if_t< !has_method_front_ref< U >{}>
-        {
-            while(!empty() && !filter(Rnonref:: front_val())) { // BUG - should make this ref, if possible
-                Rnonref:: advance(); // must be done to the base class, as advance will also be replaced
-            }
-        }
-        void advance() {
-            // do at least one advance, but also skipping ones that don't match
-            Rnonref :: advance();
-            skip_unmatching_ones();
-        }
-    };
-    template<typename R, typename F, class..., typename Rnonref = std::remove_reference_t<R>, typename = std:: enable_if_t<std::is_base_of<range_tag, Rnonref >{}> >
-    auto filter(R &&r, F filter) {
-        return filtered_range<R, Rnonref, F>{ std::forward<R>(r), filter };
-    }
-
-    template<typename R, typename Rnonref, typename F>
-    struct transformed_range : private Rnonref {
-        static_assert( std:: is_same<Rnonref, std:: remove_reference_t<R>>{} ,"");
-        using value_type = decltype(  std:: declval<F>()( std:: declval<typename Rnonref::value_type>() ) );
-
-        F transform;
-
-        transformed_range(R &&r_, F transform_) : Rnonref( std::forward<R>(r_) ), transform(std::move(transform_)) {
-        }
-
-        using Rnonref :: empty;
-        using Rnonref :: advance;
-
-        value_type front_val() const {
-            return transform( Rnonref:: front_val() );
-        }
-    };
-    template<typename R, typename F, class..., typename Rnonref = std::remove_reference_t<R>, typename = std:: enable_if_t<std::is_base_of<range_tag, Rnonref >{}> >
-    auto transform(R && r, F && f) {
-        return transformed_range<R, Rnonref, F>{ std::forward<R>(r), std:: forward<F>(f) };
     }
 
     template<typename R, class..., typename Rnonref = std::remove_reference_t<R>, typename = std:: enable_if_t<std::is_base_of<range_tag, Rnonref >{}> >
