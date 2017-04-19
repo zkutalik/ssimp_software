@@ -146,9 +146,9 @@ namespace range {
     struct zip_val_t<std::index_sequence<Is...>, Rs...> : public range_tag {
         std:: tuple<Rs...> m_ranges;
 
-        //static_assert( ( 0,  std:: is_same<Rs, std::decay_t<Rs> >{} ... )  , "");
-
         using value_type = std:: tuple< decltype( front_val(std::get<Is>(m_ranges)) ) ... >;
+
+        static_assert( utils:: and_all( std:: is_same<Rs, std::decay_t<Rs> >{}... ), "");
 
         template<typename ...Ts>
         zip_val_t(Ts&& ...ranges)
@@ -160,6 +160,7 @@ namespace range {
                                 , range:: front_val(std::get<1>(m_ranges))
                                 };
         }
+
         bool                empty()         const {
             bool e0 = range:: empty(std::get<0>(m_ranges));
             bool e1 = range:: empty(std::get<1>(m_ranges));
