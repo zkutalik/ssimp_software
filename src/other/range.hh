@@ -142,17 +142,16 @@ namespace range {
 
     template<typename idx, typename ... range_types>
     struct zip_val_t;
-    template<size_t ...Is, typename R0, typename R1>
-    struct zip_val_t<std::index_sequence<Is...>, R0, R1> : public range_tag {
-        std:: tuple<R0,R1> m_ranges;
+    template<size_t ...Is, typename ...Rs>
+    struct zip_val_t<std::index_sequence<Is...>, Rs...> : public range_tag {
+        std:: tuple<Rs...> m_ranges;
 
-        static_assert( std:: is_same<R0, std::decay_t<R0> >{} , "");
-        static_assert( std:: is_same<R1, std::decay_t<R1> >{} , "");
+        //static_assert( ( 0,  std:: is_same<Rs, std::decay_t<Rs> >{} ... )  , "");
 
         using value_type = std:: tuple< decltype( front_val(std::get<Is>(m_ranges)) ) ... >;
 
-        template<typename ...Rs>
-        zip_val_t(Rs&& ...ranges)
+        template<typename ...Ts>
+        zip_val_t(Ts&& ...ranges)
             : m_ranges( std::forward<decltype(ranges)>(ranges)... )
             {}
 
