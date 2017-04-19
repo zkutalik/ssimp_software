@@ -47,7 +47,7 @@ namespace range {
         b_t m_b;
         e_t m_e;
 
-        using value_type = decltype(*m_b);
+        using value_type = std::decay_t<decltype(*m_b)>;
 
         range_from_begin_end_t(b_t b, e_t e) : m_b(move(b)), m_e(move(e)) {}
 
