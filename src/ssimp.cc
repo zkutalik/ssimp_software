@@ -427,10 +427,9 @@ mvn:: Matrix make_c_unkn_tags_matrix
     assert(N_ref > 0);
 
     mvn:: Matrix      c(number_of_all_targets, number_of_tags);
-    auto ints_range_for_tags = range:: ints(number_of_tags);
-    auto range_over_tag_its  = range:: range_from_begin_end(tag_its);
-    for(auto tags : zip_val( ints_range_for_tags
-                            ,range_over_tag_its
+
+    for(auto tags : zip_val( range:: ints(number_of_tags)
+                           , range:: range_from_begin_end(tag_its)
                 )) {
         int  k          = std::get<0>(tags);
         auto tag_its_k  = std::get<1>(tags);
@@ -446,7 +445,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
                 c_ku = 1.0;
             }
 
-            if(tag_its.at(k).m_line_number == unk_its.at(u).m_line_number) {
+            if(tag_its_k.m_line_number == unk_its.at(u).m_line_number) {
                 assert(c_ku ==  1.0);
                 c.set(u,k,c_ku);
             }
