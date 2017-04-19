@@ -31,8 +31,9 @@ struct chrpos {
 };
 } // end that namespace, in order to define std:: hash
 
+namespace std {
 template<>
-struct :: std:: hash < file_reading:: chrpos >
+struct hash < file_reading:: chrpos >
 {
     auto   operator() (file_reading:: chrpos const &crps) const
         noexcept(noexcept(
@@ -48,6 +49,7 @@ struct :: std:: hash < file_reading:: chrpos >
              + hash< decltype(crps.pos) >{}(crps.pos);
     }
 };
+}
 
 
 namespace file_reading { // reopen this namespace
