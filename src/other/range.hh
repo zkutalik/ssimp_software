@@ -162,9 +162,7 @@ namespace range {
             : m_ranges( std::forward<decltype(ranges)>(ranges)... )
             {}
 
-        value_type          front_val()     const {
-            return  value_type  { range:: front_val(std::get<Is>(m_ranges)) ...  };
-        }
+        value_type          front_val()     const;
 
         bool                empty()         const {
             bool e0 = range:: empty(std::get<0>(m_ranges));
@@ -177,6 +175,13 @@ namespace range {
             (void)ignore_me;
         }
     };
+    template<size_t ...Is, typename ...Rs>
+    typename zip_val_t<std::index_sequence<Is...>, Rs...> ::
+        value_type
+    zip_val_t<std::index_sequence<Is...>, Rs...> ::
+        front_val()     const {
+            return  value_type  { range:: front_val(std::get<Is>(m_ranges)) ...  };
+        }
 
     template<typename ...Rs>
     zip_val_t< std:: index_sequence_for<Rs...> ,std::decay_t<Rs>... >
