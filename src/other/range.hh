@@ -166,7 +166,7 @@ namespace range {
             return e0;
         }
         void                advance() {
-            auto ignore_me = {(std::get<Is>(m_ranges).advance(),0)...};
+            auto ignore_me = {((void)std::get<Is>(m_ranges).advance(),false)...};
             (void)ignore_me;
         }
     };
