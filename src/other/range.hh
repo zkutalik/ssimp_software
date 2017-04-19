@@ -209,7 +209,9 @@ namespace range {
 
     template<typename R>
     struct begin_end_for_range_for {
+
         std:: unique_ptr<R> m_range_pointer;
+
         bool operator != ( const begin_end_for_range_for & other ) const {
             if(other.m_range_pointer == nullptr && this->m_range_pointer == nullptr) {
                 // both are end-iterators.
@@ -224,32 +226,35 @@ namespace range {
             // BUG INCOMPLETE
             throw std:: runtime_error("range:: range-based-for (incomplete checks here)");
         }
-        begin_end_for_range_for& operator++() {
-            this->m_range_pointer             || [](){throw std:: runtime_error("range:: range-based-for (++end)"    );return false;}();
+        void error_now_if_I_am_empty() const {
+              this->m_range_pointer           || [](){throw std:: runtime_error("range:: range-based-for (++end)"    );return false;}();
             (!this->m_range_pointer->empty()) || [](){throw std:: runtime_error("range:: range-based-for (++empty())");return false;}();
+        }
+        begin_end_for_range_for& operator++() {
+            error_now_if_I_am_empty();
             this->m_range_pointer->advance();
             return *this;
         }
 
-        // Of the following two, only will is allowed to exist.
-        // Same signature, apart from the return value
-        template<class..., typename Myself = const R&, typename = std:: enable_if_t<has_method_front_ref< Myself >{}>>
-        auto operator*() const
-            -> decltype(auto) // should return a reference
+        template<class...  , typename Myself =              const R& >
+        auto operator_star_impl(utils:: priority_tag<2>)    const
+        -> decltype( std::declval<Myself>().front_ref() )
         {
-            static_assert(       has_method_front_ref<Myself>{}  ,"");
-            this->m_range_pointer             || [](){throw std:: runtime_error("range:: range-based-for (*end)"    );return false;}();
-            (!this->m_range_pointer->empty()) || [](){throw std:: runtime_error("range:: range-based-for (*empty())");return false;}();
-            return this->m_range_pointer->front_ref();
+            error_now_if_I_am_empty();
+            return   this->m_range_pointer->front_ref();
         }
 
-        template<class..., typename Myself = const R&, typename = std:: enable_if_t<!has_method_front_ref< Myself >{}>>
-        auto operator*() const -> typename R::value_type {
-            static_assert(      !has_method_front_ref<Myself>{}  ,"");
-            this->m_range_pointer             || [](){throw std:: runtime_error("range:: range-based-for (*end)"    );return false;}();
-            (!this->m_range_pointer->empty()) || [](){throw std:: runtime_error("range:: range-based-for (*empty())");return false;}();
-            return this->m_range_pointer->front_val();
+        template<class...  , typename Myself =              const R& >
+        auto operator_star_impl(utils:: priority_tag<1>)    const
+        -> decltype( std::declval<Myself>().front_val() )
+        {
+            error_now_if_I_am_empty();
+            return   this->m_range_pointer->front_val();
         }
+        auto operator*() const
+            -> AMD_RANGE_DECLTYPE_AND_RETURN(
+                   operator_star_impl(utils:: priority_tag<9>{})
+            )
     };
     template<typename R, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R>{}> >
     auto end(R &) {
