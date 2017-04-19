@@ -257,16 +257,25 @@ namespace range {
             )
     };
     template<typename R>
-    auto end(R &&) {
+    auto end_impl  (utils::priority_tag<1>, R &&)
+    ->decltype(begin_end_for_range_for<std::decay_t<R>>{nullptr})
+    {
         return begin_end_for_range_for<std::decay_t<R>>{nullptr};
     }
-    template<typename R>
-    auto begin(R &&r) {
-        using R_decayed = std:: decay_t<R>;
-        begin_end_for_range_for<R_decayed> the_end;
-        the_end.m_range_pointer = std:: make_unique<R_decayed>( std::forward<R_decayed>(r) );
-        return the_end;
+    template<typename R
+        , class...
+        , typename R_decayed = std:: decay_t<R>
+        >
+    auto begin_impl(utils::priority_tag<1>, R &&r)
+    ->decltype(begin_end_for_range_for<R_decayed> { std:: make_unique<R_decayed>( std::forward<R_decayed>(r) ) })
+    {
+        return begin_end_for_range_for<R_decayed> { std:: make_unique<R_decayed>( std::forward<R_decayed>(r) ) };
     }
+
+    template<typename R>
+    auto end  (R && r) -> AMD_RANGE_DECLTYPE_AND_RETURN( end_impl  (utils:: priority_tag<9>{}, std::forward<R>(r)) )
+    template<typename R>
+    auto begin(R && r) -> AMD_RANGE_DECLTYPE_AND_RETURN( begin_impl(utils:: priority_tag<9>{}, std::forward<R>(r)) )
 
     template<typename R, class..., typename Rnonref = std::remove_reference_t<R>, typename = std:: enable_if_t<std::is_base_of<range_tag, Rnonref >{}> >
     decltype(auto) operator<< (std:: ostream &o, R r) {
