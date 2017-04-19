@@ -4,6 +4,7 @@
 namespace view {
     struct {} ref_wraps;
     struct {} unzip_and_apply_and_collectvoid;
+    struct {} collect;
 
     template<typename R, typename tag>
     struct temporary_tagged_holder {
@@ -32,6 +33,17 @@ namespace view {
     auto operator| (R r, decltype(unzip_and_apply_and_collectvoid) ) {
         return temporary_tagged_holder<R, decltype(unzip_and_apply_and_collectvoid)> { std::move(r) };
     }
+    template<typename R>
+    auto operator| (R r, decltype(collect) )
+    //-> std:: vector<int>
+    {
+        using value_type = std:: decay_t< decltype( range:: pull(r) ) >;
+        std:: vector<value_type> v;
+        while(!r.empty()) {
+            v.push_back( range:: pull(r) );
+        }
+        return v;
+    }
 
     template<typename R, typename F
         , class ...
@@ -50,4 +62,5 @@ namespace view {
             );
         }
     }
+
 } // namespace view
