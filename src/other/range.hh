@@ -140,46 +140,43 @@ namespace range {
     template<typename R >
     auto empty(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).empty() )
 
-    template<typename R0, typename R1>
-    struct zip_val_t : public range_tag {
-        R0 m_0;
-        R1 m_1;
+    template<typename idx, typename ... range_types>
+    struct zip_val_t;
+    template<size_t ...Is, typename R0, typename R1>
+    struct zip_val_t<std::index_sequence<Is...>, R0, R1> : public range_tag {
+        std:: tuple<R0,R1> m_ranges;
 
         static_assert( std:: is_same<R0, std::decay_t<R0> >{} , "");
         static_assert( std:: is_same<R1, std::decay_t<R1> >{} , "");
 
-        using value_type = std:: tuple< decltype( front_val(m_0) )
-                                      , decltype( front_val(m_1) )
-                                      >;
+        using value_type = std:: tuple< decltype( front_val(std::get<Is>(m_ranges)) ) ... >;
 
-        template<typename T0, typename T1>
-        zip_val_t(T0&& r0, T1&& r1)
-            : m_0(std::forward<decltype(r0)>(r0))
-            , m_1(std::forward<decltype(r1)>(r1))
+        template<typename ...Rs>
+        zip_val_t(Rs&& ...ranges)
+            : m_ranges( std::forward<decltype(ranges)>(ranges)... )
             {}
 
         value_type          front_val()     const {
-            return  value_type  { range:: front_val(m_0)
-                                , range:: front_val(m_1)
+            return  value_type  { range:: front_val(std::get<0>(m_ranges))
+                                , range:: front_val(std::get<1>(m_ranges))
                                 };
         }
         bool                empty()         const {
-            bool e0 = range:: empty(m_0);
-            bool e1 = range:: empty(m_1);
+            bool e0 = range:: empty(std::get<0>(m_ranges));
+            bool e1 = range:: empty(std::get<1>(m_ranges));
             assert(e0==e1);
             return e0;
         }
         void                advance() {
-            m_0.advance();
-            m_1.advance();
+            std::get<0>(m_ranges).advance();
+            std::get<1>(m_ranges).advance();
         }
     };
-    template<typename R0, typename R1>
-    zip_val_t<std::decay_t<R0>
-             ,std::decay_t<R1>
-             > zip_val(R0 && r0, R1 && r1) {
-        return { std::forward<decltype(r0)>(r0)
-                ,std::forward<decltype(r1)>(r1) };
+
+    template<typename ...Rs>
+    zip_val_t< std:: index_sequence_for<Rs...> ,std::decay_t<Rs>... >
+    zip_val(Rs && ...ranges) {
+        return { std::forward<decltype(ranges)>(ranges)... };
     }
 
     template<typename R
