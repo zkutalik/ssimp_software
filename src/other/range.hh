@@ -140,6 +140,10 @@ namespace range {
     template<typename R >
     auto empty(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).empty() )
 
+    // Synthesize range:: advance
+    template<typename R >
+    auto advance(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).advance() )
+
     template<typename idx, typename ... range_types>
     struct zip_val_t;
     template<size_t ...Is, typename ...Rs>
