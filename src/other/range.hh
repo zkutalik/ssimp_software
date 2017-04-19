@@ -136,6 +136,10 @@ namespace range {
     template<typename R >
     auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r), utils:: priority_tag<9>()) );
 
+    // Next, synthesize range::empty, for those with an empty() method
+    template<typename R >
+    auto empty(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).empty() )
+
     template<typename R0, typename R1>
     struct zip_val_t : public range_tag {
         R0 m_0;
@@ -160,8 +164,8 @@ namespace range {
                                 };
         }
         bool                empty()         const {
-            bool e0 = m_0. empty();
-            bool e1 = m_1. empty();
+            bool e0 = range:: empty(m_0);
+            bool e1 = range:: empty(m_1);
             assert(e0==e1);
             return e0;
         }
