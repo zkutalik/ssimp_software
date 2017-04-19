@@ -84,6 +84,8 @@ namespace range {
 
         iter_impl begin() const { return {m_b}; }
         iter_impl end  () const { return {m_e}; }
+        bool        empty()     const   { return m_b == m_e; }
+        void        advance()           { ++m_b; }
     };
     range_ints_t ints(int e) {
         return {e};
