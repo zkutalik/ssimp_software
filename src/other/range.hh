@@ -156,20 +156,18 @@ namespace range {
             {}
 
         value_type          front_val()     const {
-            return  value_type  { range:: front_val(std::get<0>(m_ranges))
-                                , range:: front_val(std::get<1>(m_ranges))
-                                };
+            return  value_type  { range:: front_val(std::get<Is>(m_ranges)) ...  };
         }
 
         bool                empty()         const {
             bool e0 = range:: empty(std::get<0>(m_ranges));
-            bool e1 = range:: empty(std::get<1>(m_ranges));
-            assert(e0==e1);
+            bool all_the_same = utils:: and_all( e0 == range:: empty(std::get<Is>(m_ranges)) ...);
+            assert(all_the_same);
             return e0;
         }
         void                advance() {
-            std::get<0>(m_ranges).advance();
-            std::get<1>(m_ranges).advance();
+            auto ignore_me = {(std::get<Is>(m_ranges).advance(),0)...};
+            (void)ignore_me;
         }
     };
 
