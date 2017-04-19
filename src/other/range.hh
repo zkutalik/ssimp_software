@@ -152,8 +152,8 @@ namespace range {
                                     {}
 
         value_type          front_val()     const {
-            return  value_type  { range:: front_val(std:: forward<R0>(m_0) )
-                                , range:: front_val(std:: forward<R1>(m_1) )
+            return  value_type  { range:: front_val(std:: forward<decltype((m_0))>(m_0) )
+                                , range:: front_val(std:: forward<decltype((m_1))>(m_1) )
                                 };
         }
         bool                empty()         const {
