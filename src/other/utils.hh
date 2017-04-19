@@ -130,36 +130,18 @@ struct priority_tag : public priority_tag<i-1> {};
 template<>
 struct priority_tag<0> {};
 
-template<typename T>
-struct comma_is_actually_AND_t;
-template<typename T>
-constexpr
-auto comma_is_actually_AND(T &&t) -> comma_is_actually_AND_t<T>
-{
-    return {std::forward<decltype(t)>(t)};
-}
+template<typename T0>
+static constexpr
+T0   and_all(T0 t0) { return t0; }
 
-template<typename T>
-struct comma_is_actually_AND_t {
-    // Note, T might be a reference type,
-    // hence we should always use
-    //    std::forward<decltype(m_x)>(m_x)
+template<typename T0, typename T1>
+static constexpr
+auto and_all(T0 t0, T1 t1) -> decltype( t0 && t1 )
+                              { return  t0 && t1;}
 
-    T m_x;
-
-    constexpr
-    comma_is_actually_AND_t(T x) : m_x(std::forward<T>(x)) {}
-
-    template<typename U>
-    constexpr
-    auto operator, (U &&u)
-    -> decltype(
-               comma_is_actually_AND( (std::forward<decltype((m_x))>(m_x) && std::forward<decltype(u)>(u)) )
-    ) {
-        return comma_is_actually_AND( (std::forward<decltype((m_x))>(m_x) && std::forward<decltype(u)>(u)) );
-    }
-
-    constexpr T get() { return std::forward<decltype(m_x)>(m_x); }
-};
+template<typename T0, typename T1, typename ...T2>
+static constexpr
+auto and_all(T0 t0, T1 t1, T2 ...t2) -> decltype( and_all(t0 && t1, t2...) )
+                                        { return  and_all(t0 && t1, t2...);}
 
 } // namespace utils
