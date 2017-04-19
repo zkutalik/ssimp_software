@@ -443,36 +443,36 @@ mvn:: Matrix make_c_unkn_tags_matrix
 
         assert(tag_its_k == tag_its.at(k));
 
-        for(auto unks : zip_val ( range:: ints(number_of_all_targets)
-                                , range:: range_from_begin_end(unk_its)
-                                , range:: range_from_begin_end(genotypes_for_the_unks) | view:: ref_wraps
-                    )) {
-            int     u           = std::get<0>(unks);
-            auto    unk_its_u   = std::get<1>(unks);
-            auto &  calls_at_u  = std::get<2>(unks) .get();
+        zip_val ( range:: ints(number_of_all_targets)
+                , range:: range_from_begin_end(unk_its)
+                , range:: range_from_begin_end(genotypes_for_the_unks) | view:: ref_wraps
+                )
+        |view:: unzip_and_apply_and_collect|
+        [&](auto u, auto unk_its_u, auto calls_at_u_rw) {
+                auto &  calls_at_u  = calls_at_u_rw .get();
 
-            assert(&calls_at_u == &genotypes_for_the_unks.at(u));
+                assert(&calls_at_u == &genotypes_for_the_unks.at(u));
 
-            assert(N_ref        == utils:: ssize(calls_at_k));
-            assert(N_ref        == utils:: ssize(calls_at_u));
-            double c_ku = gsl_stats_int_correlation( &calls_at_k.at(0), 1
-                                                   , &calls_at_u.at(0), 1
-                                                   , N_ref );
-            if(c_ku > 1.0) {
-                assert(c_ku-1.0 < 1e-5);
-                c_ku = 1.0;
-            }
+                assert(N_ref        == utils:: ssize(calls_at_k));
+                assert(N_ref        == utils:: ssize(calls_at_u));
+                double c_ku = gsl_stats_int_correlation( &calls_at_k.at(0), 1
+                                                       , &calls_at_u.at(0), 1
+                                                       , N_ref );
+                if(c_ku > 1.0) {
+                    assert(c_ku-1.0 < 1e-5);
+                    c_ku = 1.0;
+                }
 
-            if(tag_its_k.m_line_number == unk_its_u.m_line_number) {
-                assert(c_ku ==  1.0);
-                c.set(u,k,c_ku);
-            }
-            else {
-                assert(c_ku >= -1.0);
-                assert(c_ku <=  1.0);
-                c.set(u,k,c_ku * (1.0-lambda));
-            }
-        }
+                if(tag_its_k.m_line_number == unk_its_u.m_line_number) {
+                    assert(c_ku ==  1.0);
+                    c.set(u,k,c_ku);
+                }
+                else {
+                    assert(c_ku >= -1.0);
+                    assert(c_ku <=  1.0);
+                    c.set(u,k,c_ku * (1.0-lambda));
+                }
+         };
     }
     return c;
 };
