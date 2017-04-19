@@ -429,16 +429,21 @@ mvn:: Matrix make_c_unkn_tags_matrix
 
     mvn:: Matrix      c(number_of_all_targets, number_of_tags);
 
-    for(auto tags : zip_val( range:: ints(number_of_tags)
-                           , range:: range_from_begin_end(tag_its)
+    for(auto tags : zip_val ( range:: ints(number_of_tags)
+                            , range:: range_from_begin_end(tag_its)
+                            , range:: range_from_begin_end(genotypes_for_the_tags) | view:: ref_wraps
                 )) {
-        int  k          = std::get<0>(tags);
-        auto tag_its_k  = std::get<1>(tags);
+        int     k           = std::get<0>(tags);
+        auto    tag_its_k   = std::get<1>(tags);
+        auto &  calls_at_k  = std::get<2>(tags) .get();
+
+        assert(&calls_at_k == &genotypes_for_the_tags.at(k)); // double check that we're getting it by-reference, i.e via the .get() on the previous line
+
         assert(tag_its_k == tag_its.at(k));
         for(int u : range:: ints(number_of_all_targets)) {
-            assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
+            assert(N_ref        == utils:: ssize(calls_at_k));
             assert(N_ref        == utils:: ssize(genotypes_for_the_unks.at(u)));
-            double c_ku = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
+            double c_ku = gsl_stats_int_correlation( &calls_at_k.front(), 1
                                                    , &genotypes_for_the_unks.at(u).front(), 1
                                                    , N_ref );
             if(c_ku > 1.0) {
