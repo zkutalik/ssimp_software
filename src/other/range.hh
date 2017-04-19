@@ -118,16 +118,11 @@ namespace range {
     template<typename R> using has_front_val = can_apply<tester_has_front_val,R>;
     template<typename R> using has_method_is_infinite = can_apply<tester_has_method_is_infinite,R>;
 
-    /* Now a few free functions, for use with zip at first */
-    template<typename R
-            , class ...
-            , typename = std::enable_if_t< has_method_front_ref<R>{} >
-            , typename = is_of_range_tag<R>
-            >
+    template<typename R>
     auto front_ref(R&& r)
-        -> decltype( std::forward<R>(r).front_ref() )
+    -> decltype( std::forward<R>(r).front_ref() )
     {
-        return std::forward<R>(r).front_ref();
+        return   std::forward<R>(r).front_ref();
     }
 
     template<typename R >
