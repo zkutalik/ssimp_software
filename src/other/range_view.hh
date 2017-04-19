@@ -33,14 +33,21 @@ namespace view {
         return temporary_tagged_holder<R, decltype(unzip_and_apply_and_collect)> { std::move(r) };
     }
 
-    template<typename R, typename F>
-    void operator| (temporary_tagged_holder<R, decltype(unzip_and_apply_and_collect)> r_holder, F && f) {
-        // TODO: I should make this use 'pull' instead
+    template<typename R, typename F
+        , class ...
+        , typename applied_value_type =
+            decltype( utils:: apply   ( std::declval<F>()
+                                      , range:: pull(std::declval<R>())
+            ))
+        , bool is_it_void = std:: is_same<void, applied_value_type>{}
+        , typename = std:: enable_if_t<is_it_void>
+        >
+    void operator| (temporary_tagged_holder<R, decltype(unzip_and_apply_and_collect)> r_holder, F && f)
+    {
         while(!r_holder.m_r.empty()) {
             utils:: apply   ( std::forward<F>(f)
-                            , front_val(r_holder.m_r)
+                            , range:: pull(r_holder.m_r)
             );
-            advance( r_holder.m_r );
         }
     }
 } // namespace view
