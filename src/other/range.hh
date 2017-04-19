@@ -100,24 +100,6 @@ namespace range {
     struct pull_from_empty_range_error : public std:: runtime_error {
         pull_from_empty_range_error() : std:: runtime_error("attempted pull() from an empty range") {}
     };
-    template<typename T, template<typename...> class Tmpl>
-    struct is_instance_of_a_given_class_template : std:: false_type {};
-    template<template<typename...> class Tmpl, typename ...Args>
-    struct is_instance_of_a_given_class_template< Tmpl<Args...>, Tmpl > : std:: true_type {};
-
-    // test whether the range has a front_ref method
-    namespace {
-        template<typename R> using tester_has_method_front_ref = decltype( std:: declval<R&>().front_ref() );
-        template<typename R> using tester_has_method_front_val = decltype( std:: declval<R&>().front_val() );
-        template<typename R> using tester_has_method_pull      = decltype( std:: declval<R>().pull() );
-        template<typename R> using tester_has_front_ref        = decltype( front_ref(std:: declval<R&>()) );
-        template<typename R> using tester_has_front_val        = decltype( front_val(std:: declval<R&>()) );
-    }
-    template<typename R> using has_method_front_ref = can_apply<tester_has_method_front_ref,R>;
-    template<typename R> using has_method_front_val = can_apply<tester_has_method_front_val,R>;
-    template<typename R> using has_method_pull = can_apply<tester_has_method_pull,R>;
-    template<typename R> using has_front_ref = can_apply<tester_has_front_ref,R>;
-    template<typename R> using has_front_val = can_apply<tester_has_front_val,R>;
 
     template<typename R>
     auto front_ref(R&& r)
