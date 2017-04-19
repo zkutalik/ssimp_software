@@ -1,5 +1,6 @@
     bin/ssimp
 :   $[LINKER=bin/o/LINKER]
+    $[LD_FLAGS=bin/o/LD_FLAGS]
 
     bin/o/ssimp.o
     bin/o/options.o
@@ -8,12 +9,14 @@
     bin/o/other/utils.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
+    echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
     ${LINKER} \
         bin/o/options.o \
         bin/o/ssimp.o \
         bin/o/file.reading.o \
         bin/o/other/mvn.o \
         bin/o/other/utils.o       \
+        ${LD_FLAGS}               \
     -o bin/ssimp
 }
 
@@ -55,10 +58,13 @@
 
 >       bin/o/LINKER
 :       bin/o/GCC_OR_CLANG
-        bin/local/gsl_libs
 {
     cat bin/o/GCC_OR_CLANG
     echo  " -lstdc++"
+}
+>       bin/o/LD_FLAGS
+:       bin/local/gsl_libs
+{
     cat bin/local/gsl_libs
 }
 >       bin/o/CXX_WITH_FLAGS
