@@ -18,6 +18,7 @@
 #include "other/DIE.hh"
 #include "other/PP.hh"
 #include "other/range.hh"
+#include "other/range_view.hh"
 
 using std:: cout;
 using std:: endl;
