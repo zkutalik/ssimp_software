@@ -130,18 +130,21 @@ struct priority_tag : public priority_tag<i-1> {};
 template<>
 struct priority_tag<0> {};
 
+template<typename ...>
+struct and_all_impl;
+
+template<typename ...Ts>
+constexpr
+auto and_all(Ts ...ts) { return and_all_impl<Ts...>::impl(ts...); }
+
 template<typename T0>
-static constexpr
-T0   and_all(T0 t0) { return t0; }
-
-template<typename T0, typename T1>
-static constexpr
-auto and_all(T0 t0, T1 t1) -> decltype( t0 && t1 )
-                              { return  t0 && t1;}
-
-template<typename T0, typename T1, typename ...T2>
-static constexpr
-auto and_all(T0 t0, T1 t1, T2 ...t2) -> decltype( and_all(t0 && t1, t2...) )
-                                        { return  and_all(t0 && t1, t2...);}
-
+struct and_all_impl<T0> {
+    static constexpr
+    T0  impl(T0 t0) { return t0; }
+};
+template<typename T0, typename T1, typename ...Ts>
+struct and_all_impl<T0, T1, Ts...> {
+    static constexpr
+    auto  impl(T0 t0, T1 t1, Ts ...ts) { return and_all(t0 && t1, ts...); }
+};
 } // namespace utils
