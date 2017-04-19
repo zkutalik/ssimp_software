@@ -136,8 +136,6 @@ namespace range {
     template<typename R >
     auto front_val_impl(R&& r, utils:: priority_tag<1>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
             *std::forward<R>(r).begin() )
-    template<typename R >
-    auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r), utils:: priority_tag<9>()) );
 
     // Next, synthesize range::empty, for those with an empty() method
     template<typename R >
@@ -175,6 +173,8 @@ namespace range {
             (void)ignore_me;
         }
     };
+    template<typename R >
+    auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r), utils:: priority_tag<9>()) );
     template<size_t ...Is, typename ...Rs>
     typename zip_val_t<std::index_sequence<Is...>, Rs...> ::
         value_type
