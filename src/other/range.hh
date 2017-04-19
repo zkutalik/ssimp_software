@@ -138,22 +138,25 @@ namespace range {
 
     template<typename R0, typename R1>
     struct zip_val_t : public range_tag {
-        static_assert( !std::is_rvalue_reference<R0>() ,"");
-        static_assert( !std::is_rvalue_reference<R1>() ,"");
         R0 m_0;
         R1 m_1;
 
-        using value_type = std:: tuple< decltype( front_val(std:: forward<R0>(m_0) ) )
-                                      , decltype( front_val(std:: forward<R1>(m_1) ) )
+        static_assert( std:: is_same<R0, std::decay_t<R0> >{} , "");
+        static_assert( std:: is_same<R1, std::decay_t<R1> >{} , "");
+
+        using value_type = std:: tuple< decltype( front_val(m_0) )
+                                      , decltype( front_val(m_1) )
                                       >;
 
-        zip_val_t(R0 r0, R1 r1) : m_0(std::forward<R0>(r0))
-                                , m_1(std::forward<R1>(r1))
-                                    {}
+        template<typename T0, typename T1>
+        zip_val_t(T0&& r0, T1&& r1)
+            : m_0(std::forward<decltype(r0)>(r0))
+            , m_1(std::forward<decltype(r1)>(r1))
+            {}
 
         value_type          front_val()     const {
-            return  value_type  { range:: front_val(std:: forward<decltype((m_0))>(m_0) )
-                                , range:: front_val(std:: forward<decltype((m_1))>(m_1) )
+            return  value_type  { range:: front_val(m_0)
+                                , range:: front_val(m_1)
                                 };
         }
         bool                empty()         const {
@@ -168,9 +171,11 @@ namespace range {
         }
     };
     template<typename R0, typename R1>
-    zip_val_t<R0, R1> zip_val(R0 && r0, R1 && r1) {
-        return { std::forward<R0>(r0)
-                ,std::forward<R1>(r1) };
+    zip_val_t<std::decay_t<R0>
+             ,std::decay_t<R1>
+             > zip_val(R0 && r0, R1 && r1) {
+        return { std::forward<decltype(r0)>(r0)
+                ,std::forward<decltype(r1)>(r1) };
     }
 
     template<typename R
