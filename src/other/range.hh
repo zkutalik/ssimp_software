@@ -210,27 +210,23 @@ namespace range {
         return front_val(std::forward<R>(r));
     }
 
-    template<typename R
-            , class ...
-            , typename = std::enable_if_t< has_method_pull<R>{} >
-            , typename = is_of_range_tag<R>
-            >
-    auto pull(R&& r)
-        -> decltype( std::forward<R>(r).pull() )
+    namespace impl {
+    template<typename R>
+    auto pull_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN (
+        std:: forward<R>(r).pull()
+    )
+    template<typename R>
+    auto pull_impl(R&& r, utils:: priority_tag<2>) -> decltype( range:: front_val( std:: forward<R>(r) ) )
     {
-              return std::forward<R>(r).pull();
+        auto x = range:: front_val( std:: forward<R>(r) );
+                 range:: advance  ( std:: forward<R>(r) );
+        return x;
     }
-    template<typename R
-            , class ...
-            , typename = std::enable_if_t< !has_method_pull<R>{} >
-            , typename = is_of_range_tag<R>
-            >
-    auto pull(R&& r)
-        -> decltype( std::forward<R>(r).front_val() )
-    {
-              auto val = std::forward<R>(r).front_val();
-              std::forward<R>(r).advance();
-              return val;
+    }
+
+    template<typename R>
+    auto pull(R&& r) {
+        return impl:: pull_impl(std::forward<R>(r), utils:: priority_tag<9>{});
     }
 
     template<typename R
