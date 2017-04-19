@@ -67,30 +67,33 @@ namespace range {
     template<typename C>
     auto range_from_begin_end(C &c) -> AMD_RANGE_DECLTYPE_AND_RETURN( range_from_begin_end(c.begin(), c.end()) )
 
-    struct range_ints_t {
-        struct iter_impl {
-            int m_i;
+    template<typename I>
+    struct range_ints_t : public range_tag {
+        struct iter_is_own_value {
+            I m_i;
 
-            bool    operator!=  (iter_impl const & other) const {
+            bool    operator!=  (iter_is_own_value const & other) const {
                 return m_i != other.m_i;
             }
             void    operator++  ()          { ++m_i; }
-            int     operator*   () const    { return m_i; }
+            I     operator*   () const    { return m_i; }
         };
-        int m_b;
-        int m_e;
+        I m_b;
+        I m_e;
 
-        using value_type = int;
+        using value_type = I;
 
-        range_ints_t(int e)        : m_b(0), m_e(e) {}
-        range_ints_t(int b, int e) : m_b(b), m_e(e) {}
+        range_ints_t(I e)        : m_b(0), m_e(e) {}
+        range_ints_t(I b, I e) : m_b(b), m_e(e) {}
 
-        iter_impl begin() const { return {m_b}; }
-        iter_impl end  () const { return {m_e}; }
-        bool        empty()     const   { return m_b == m_e; }
-        void        advance()           { ++m_b; }
+        iter_is_own_value begin() const { return {m_b}; }
+        iter_is_own_value end  () const { return {m_e}; }
+        bool        empty()     const   { return  m_b == m_e; }
+        void        advance()           {       ++m_b; }
+        I           front_val  () const { return  m_b; }
     };
-    range_ints_t ints(int e) {
+    inline
+    range_ints_t<int> ints(int e) {
         return {e};
     }
 
@@ -558,133 +561,6 @@ namespace range {
     auto token_range_from_line(std:: string &full_line, std:: string delims = " \t\n\r") {
         return adapt_from_pull(pull_token_range_from_line(full_line, delims));
     }
-
-
-    template<typename R, class F, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R >{} && has_method_pull<R>{} > >
-    auto transform_to_vector(R r, F f)
-    ->  std:: vector< decltype(f(r.pull())) >
-    {
-        std:: vector< decltype(f(r.pull())) > output;
-        static_assert( has_method_pull<R>{}, "decltype shoulda caught this");
-        for(;;) {
-            try {
-                output.emplace_back( f(r.pull()) );
-            }
-            catch (pull_from_empty_range_error &e) {
-                return output;
-            }
-        }
-    }
-    template<typename R, class F, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R >{} && !has_method_pull<R>{} > >
-    auto transform_to_vector(R r, F f) -> std:: vector< decltype(f(r.front_val())) >
-    {
-        static_assert( !has_method_pull<R>{}, "decltype shoulda caught this");
-        std:: vector< decltype(f(r.front_val())) > output;
-        while(!r.empty()) {
-            output.emplace_back( f(r.front_val()) );
-            r.advance();
-        }
-        return output;
-    }
-    template<typename R, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R >{} > >
-    auto transform_to_vector(R r) {
-        return transform_to_vector( std::move(r), [](auto x){return x;} );
-    }
-
-    template<typename R, class...
-        , typename = std:: enable_if_t<std::is_base_of<range_tag, R >{} >
-        , typename = decltype(R :: underlying)
-        >
-    auto sort(R &r) {
-        sort(r.underlying.begin(), r.underlying.end());
-    }
-
-    template<typename Source, typename State, typename L>
-    auto generic_thing_to__front_range(Source&& t, State && s, L && l) {
-        struct gttfr : public range_tag {
-
-            Source m_src;
-            State  m_st;
-            L      m_l;
-
-            gttfr(Source&&t, State&&s, L&&l) : m_src(std::forward<decltype(t)>(t))
-                                             , m_st (std::forward<decltype(s)>(s))
-                                             , m_l  (std::forward<decltype(l)>(l)) { }
-
-            using value_type = decltype( m_l(m_src,m_st) );
-
-            static_assert(  !std::  is_reference< value_type > :: value   , "");
-
-            value_type pull()
-            { return m_l(m_src,m_st); }
-        };
-        return gttfr(std::forward<Source>(t), std::forward<State>(s), std::forward<L>(l));
-    };
-    template<typename T, typename S, typename L>
-    auto adapt_pull_function_to_range       (T&& t, S && s, L && l) {
-        return adapt_from_pull( generic_thing_to__front_range(std::forward<T>(t), std::forward<S>(s), std::forward<L>(l)) );
-    }
-
-    template<typename R, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R >{} > >
-    R copy(R r) {
-        return r;
-    }
-
-    template<typename T
-            , bool is_infinite_ = false
-            , class ...
-            , typename = std:: enable_if_t<
-                                            std:: is_same<T, int64_t>::value
-                                          ||std:: is_same<T, int    >::value
-                                          ||std:: is_same<T, size_t >::value
-                                          ||std:: is_same<T, float>::value
-                                          ||std:: is_same<T, double>::value
-                                          ||std:: is_same<T, long double>::value
-                                          >
-            >
-    auto range_impl(T b, T e, T step) {
-        struct range_impl_struct
-            : public range_tag
-        {
-            using value_type = T;
-
-            struct Members {
-                value_type current;
-                value_type e;
-                value_type step;
-            } m_;
-            range_impl_struct(Members&& members) : m_( std::move(members) ) {}
-
-            bool empty() const {
-                // I guess I should also check for is_infinite here!
-                return  m_.current >= m_.e;
-            }
-            void advance() {
-                m_.current += m_.step;
-            }
-            value_type front_val() const {
-                return m_.current;
-            }
-            static constexpr bool is_infinite() {
-                return is_infinite_;
-            }
-        };
-        return range_impl_struct({{b,e,step}});
-    }
-    template<typename T
-            , class ...
-            , typename = std:: enable_if_t< std:: is_same<T, int64_t>::value
-                                          ||std:: is_same<T, int    >::value
-                                          ||std:: is_same<T, size_t >::value
-                                          ||std:: is_same<T, float>::value
-                                          ||std:: is_same<T, double>::value
-                                          ||std:: is_same<T, long double>::value > >
-    inline auto iota(T e)
-    { return range_impl<T>(0,e,1); }
-
-    template<typename T = int>
-    auto infinite_range(T b = 0)
-    { return range_impl<T, true>(b, std::numeric_limits<T>::max() ,1); }
 
     template        <typename Rb, typename Re>
     auto max_element(range_from_begin_end_t<Rb,Re> r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
