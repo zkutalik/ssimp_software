@@ -130,4 +130,36 @@ struct priority_tag : public priority_tag<i-1> {};
 template<>
 struct priority_tag<0> {};
 
+template<typename T>
+struct comma_is_actually_AND_t;
+template<typename T>
+constexpr
+auto comma_is_actually_AND(T &&t) -> comma_is_actually_AND_t<T>
+{
+    return {std::forward<decltype(t)>(t)};
+}
+
+template<typename T>
+struct comma_is_actually_AND_t {
+    // Note, T might be a reference type,
+    // hence we should always use
+    //    std::forward<decltype(m_x)>(m_x)
+
+    T m_x;
+
+    constexpr
+    comma_is_actually_AND_t(T x) : m_x(std::forward<T>(x)) {}
+
+    template<typename U>
+    constexpr
+    auto operator, (U &&u)
+    -> decltype(
+               comma_is_actually_AND( (std::forward<decltype((m_x))>(m_x) && std::forward<decltype(u)>(u)) )
+    ) {
+        return comma_is_actually_AND( (std::forward<decltype((m_x))>(m_x) && std::forward<decltype(u)>(u)) );
+    }
+
+    constexpr T get() { return std::forward<decltype(m_x)>(m_x); }
+};
+
 } // namespace utils
