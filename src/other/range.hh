@@ -256,16 +256,15 @@ namespace range {
                    operator_star_impl(utils:: priority_tag<9>{})
             )
     };
-    template<typename R, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R>{}> >
-    auto end(R &) {
-        static_assert( !std:: is_reference< R >{}, "");
-        static_assert( std::is_base_of<range_tag, R>{}, "" );
-        return begin_end_for_range_for<R>{nullptr};
+    template<typename R>
+    auto end(R &&) {
+        return begin_end_for_range_for<std::decay_t<R>>{nullptr};
     }
-    template<typename R, class..., typename = std:: enable_if_t<std::is_base_of<range_tag, R>{}> >
-    auto begin(R &r) {
-        auto the_end = end(r);
-        the_end.m_range_pointer = std:: make_unique<R>( std::move(r) );
+    template<typename R>
+    auto begin(R &&r) {
+        using R_decayed = std:: decay_t<R>;
+        begin_end_for_range_for<R_decayed> the_end;
+        the_end.m_range_pointer = std:: make_unique<R_decayed>( std::forward<R_decayed>(r) );
         return the_end;
     }
 
