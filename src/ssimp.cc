@@ -427,7 +427,14 @@ mvn:: Matrix make_c_unkn_tags_matrix
     assert(N_ref > 0);
 
     mvn:: Matrix      c(number_of_all_targets, number_of_tags);
-    for(int k : range:: ints(number_of_tags)) {
+    auto ints_range_for_tags = range:: ints(number_of_tags);
+    auto range_over_tag_its  = range:: range_from_begin_end(tag_its);
+    for(auto tags : zip_val( ints_range_for_tags
+                            ,range_over_tag_its
+                )) {
+        int  k          = std::get<0>(tags);
+        auto tag_its_k  = std::get<1>(tags);
+        assert(tag_its_k == tag_its.at(k));
         for(int u : range:: ints(number_of_all_targets)) {
             assert(N_ref        == utils:: ssize(genotypes_for_the_tags.at(k)));
             assert(N_ref        == utils:: ssize(genotypes_for_the_unks.at(u)));
