@@ -373,8 +373,9 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
     [&](int person, string const & call_for_this_person) {
         auto call_pair = parse_call_pair(call_for_this_person, person, i);
 
-        push_back(l_r,call_pair.first);
-        push_back(r_r,call_pair.second);
+        zip_val( l_r, r_r )
+            .push_back( std:: make_tuple(call_pair.first, call_pair.second) )
+            ;
     };
     return make_pair(lefts, rights);
 };

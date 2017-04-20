@@ -193,6 +193,13 @@ namespace range {
             auto ignore_me = {((void)std::get<Is>(m_ranges).advance(),false)...};
             (void)ignore_me;
         }
+
+        template<typename id = utils:: id>
+        auto push_back(value_type p)
+        -> AMD_RANGE_DECLTYPE_AND_RETURN
+        (
+                   utils:: ignore( ((void)range:: push_back(std::get<Is>( id{}(m_ranges)), std::get<Is>(p)),0) ... )
+        )
     };
     template<typename R >
     auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r), utils:: priority_tag<9>()) );
