@@ -276,6 +276,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
         OneLineSummary ols;
         ols.m_tellg_of_line_start = f.tellg();
         getline(f, current_line);
+        // TODO: Should store a real 'line number' field directly in the 'ols' object
 
         if(!f) {
             f.eof() || DIE("Error before reaching eof() in this file");
