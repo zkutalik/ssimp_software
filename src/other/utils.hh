@@ -30,6 +30,22 @@ namespace impl {
 template<template<class...> class Template, typename ...Args>
 using can_apply = impl:: can_apply_impl<void, Template, Args...>;
 
+template<typename T>
+std::ostream & operator<< (std:: ostream &o, const std:: vector<T> &v);
+template<typename F, typename G>
+std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr);
+template<typename F, typename G, typename H>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr);
+
+template<typename F, typename G>
+std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr) {
+    o << '<'
+        << std::get<0>(pr)
+        << ','
+        << std::get<1>(pr)
+        << '>';
+    return o;
+}
 template<typename F, typename G, typename H>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr) {
     o << '('
@@ -49,6 +65,20 @@ std::ostream & operator<< (std:: ostream &o, const std:: vector<T> &v) {
         if(&e != &v.front())
             o << ',';
         o << e;
+    }
+    o << ']';
+
+
+    return o;
+}
+template<>
+inline
+std::ostream & operator<< <uint8_t> (std:: ostream &o, const std:: vector<uint8_t> &v) {
+    o << '[';
+    for(auto & e : v) {
+        if(&e != &v.front())
+            o << ',';
+        o << (int)e;
     }
     o << ']';
 
