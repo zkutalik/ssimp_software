@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <map>
 #include <cassert>
 
 #include "other/DIE.hh"
@@ -14,6 +15,7 @@
 using std:: ifstream;
 using std:: string;
 using std:: vector;
+using std:: map;
 using utils:: ssize;
 using utils:: operator<<; // to print vectors
 using utils:: tokenize;
@@ -291,6 +293,50 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             ols.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
 
             p->m_each_SNP_and_its_offset.push_back(ols);
+
+            { // Now, store a 'compressed' version of the 'unaccounted' fields
+
+                int const N_ref = hd.unaccounted.size();
+                vector<string> calls_as_strings;
+                range:: ints(N_ref) |view:: foreach| [&](int person) {
+                    auto column_number = hd.unaccounted.at(person).m_offset;
+                    assert(column_number-9 == person);
+                    string & call_for_this_person = all_split_up.at(column_number);
+                    calls_as_strings.push_back(call_for_this_person);
+                };
+
+                auto lefts_and_rights = parse_many_calls(calls_as_strings, -1);
+
+                // Count each distinct observed call type
+                using call_type = std::pair<uint8_t,uint8_t>;
+                map<call_type, int> count_the_call_types;
+                zip_val( range:: range_from_begin_end(lefts_and_rights.first)
+                       , range:: range_from_begin_end(lefts_and_rights.second))
+                |view:: foreach|
+                [&](auto x) {
+                    ++ count_the_call_types[ std:: make_pair(std::get<0>(x)
+                                                            ,std::get<1>(x)
+                                                            ) ];
+                };
+                struct count_and_call_t {
+                    int count;
+                    int left;
+                    int right;
+                };
+                vector<count_and_call_t> count_and_call;
+                for(auto & abc : count_the_call_types) {
+                    count_and_call.push_back( count_and_call_t{ abc.second
+                    ,abc.first.first
+                    ,abc.first.second}
+                    );
+                }
+                range:: sort(range:: range_from_begin_end(count_and_call), [](auto &l, auto &r) {
+                        return l.count > r.count;
+                });
+                /*
+                 * I'll pause this now
+                */
+            }
         } catch (std:: invalid_argument &e) {
             WARNING( "Ignoring this line, problem with the chromosome and/or position. ["
                     << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
