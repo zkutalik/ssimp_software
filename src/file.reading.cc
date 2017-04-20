@@ -609,6 +609,8 @@ vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
     auto const    it  = std:: lower_bound(b_ref, e_ref, crps);
     assert(it.get_chrpos() == crps);
     auto pv = it.get_calls();
+    assert(!pv.first.empty());
+    assert(!pv.second.empty());
 
     auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
     int fst_max = *max_element(pv.first .begin(), pv.first .end());
@@ -660,6 +662,8 @@ static
 vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
 
     auto pv = it.get_calls();
+    assert(!pv.first.empty());
+    assert(!pv.second.empty());
 
     auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
     int fst_max = *max_element(pv.first .begin(), pv.first .end());
