@@ -9,6 +9,7 @@
 #include "other/DIE.hh"
 #include "other/PP.hh"
 #include "other/utils.hh"
+#include "other/range_view.hh"
 
 using std:: ifstream;
 using std:: string;
@@ -182,18 +183,27 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
 
 
         // From here one, just assume VCF, with 'unaccounted-for' fields starting at offset 9 (i.e. 10th column)
+        int N_ref = m_header_details.unaccounted.size();
+        vector<string> calls_as_strings;
+        range:: ints(N_ref) |view:: foreach| [&](int i) {
+            auto column_number = m_header_details.unaccounted.at(i).m_offset;
+            assert(column_number-9 == i);
+            string & call_for_this_person = all_split_up.at(column_number);
+            calls_as_strings.push_back(call_for_this_person);
+        };
+
         vector<uint8_t> lefts ;
         vector<uint8_t> rights;
-        int N_ref = m_header_details.unaccounted.size();
-        for(int i = 0; i<N_ref; ++i) {
+        range:: ints(N_ref) |view:: foreach| [&](int i) {
             auto column_number = m_header_details.unaccounted.at(i).m_offset;
             assert(column_number-9 == i);
             string & call_for_this_person = all_split_up.at(column_number);
 
             auto call_pair = parse_call_pair(call_for_this_person, column_number, i);
+
             lefts .push_back(call_pair.first);
             rights.push_back(call_pair.second);
-        }
+        };
         return make_pair(lefts, rights);
     }
 
@@ -274,6 +284,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
         OneLineSummary ols;
         ols.m_tellg_of_line_start = f.tellg();
         getline(f, current_line);
+
         if(!f) {
             f.eof() || DIE("Error before reaching eof() in this file");
             break;
