@@ -366,6 +366,7 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
     vector<uint8_t> rights;
     auto l_r = range:: from_vector(lefts);
     auto r_r = range:: from_vector(rights);
+    auto z   = zip_val( l_r, r_r );
 
     zip_val( range:: ints(calls_as_strings.size())
            , range:: range_from_begin_end(calls_as_strings) )
@@ -373,9 +374,7 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
     [&](int person, string const & call_for_this_person) {
         auto call_pair = parse_call_pair(call_for_this_person, person, i);
 
-        zip_val( l_r, r_r )
-            .push_back( std:: make_tuple(call_pair.first, call_pair.second) )
-            ;
+        z .push_back( std:: make_tuple(call_pair.first, call_pair.second) ) ;
     };
     return make_pair(lefts, rights);
 };
