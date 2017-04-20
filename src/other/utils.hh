@@ -206,6 +206,15 @@ constexpr decltype(auto) apply(F &&f, Tuple &&t)
         std::make_index_sequence<std::tuple_size<std::decay_t<Tuple>>{}>{});
 }
 
+struct non_copyable_empty {
+    non_copyable_empty             ()                           = default;
+    non_copyable_empty             (non_copyable_empty const &) = delete;
+    non_copyable_empty             (non_copyable_empty      &&) = default;
+    non_copyable_empty & operator= (non_copyable_empty const &) = delete;
+    non_copyable_empty & operator= (non_copyable_empty      &&) = default;
+};
+struct empty {
+};
 
 
 } // namespace utils
