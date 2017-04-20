@@ -272,6 +272,9 @@ namespace range {
         return o;
     }
 
+    template        <typename Rb, typename Re, typename G >
+    auto sort(range_from_begin_end_t<Rb,Re> r, G &&init) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+           std::sort( r.m_b , r.m_e , std::forward<G>(init)))
     template        <typename Rb, typename Re>
     auto max_element(range_from_begin_end_t<Rb,Re> r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
            std::max_element( r.m_b , r.m_e))
