@@ -108,6 +108,7 @@ struct header_details {
 // Some forward declarations
 static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name);
+std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int i);
 static
 string          lookup( header_details:: offset_and_name const &on
                       , vector<string> const & all_split_up
@@ -187,21 +188,11 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         for(int i = 0; i<N_ref; ++i) {
             auto column_number = m_header_details.unaccounted.at(i).m_offset;
             assert(column_number-9 == i);
-            auto & call_for_this_person = all_split_up.at(column_number);
+            string & call_for_this_person = all_split_up.at(column_number);
 
-            int d1, d2;
-            int n;
-            int ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
-            if(   ret == 2 // two digits
-               && n == ssize(call_for_this_person) // all characters of input were consumed
-               && d1 >= 0
-               && d2 >= 0
-                    ) {
-                lefts .push_back(d1);
-                rights.push_back(d2);
-            }
-            else
-                DIE("Couldn't parse \"" << call_for_this_person << "\" in column " << column_number << " in the " << i << "th SNP in the ref panel");
+            auto call_pair = parse_call_pair(call_for_this_person, column_number, i);
+            lefts .push_back(call_pair.first);
+            rights.push_back(call_pair.second);
         }
         return make_pair(lefts, rights);
     }
@@ -318,6 +309,20 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
     return p;
 }
+
+std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int i) {
+    int d1, d2;
+    int n;
+    int ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
+    if(   ret == 2 // two digits
+       && n == ssize(call_for_this_person) // all characters of input were consumed
+       && d1 >= 0
+       && d2 >= 0)
+    {} else
+        DIE("Couldn't parse \"" << call_for_this_person << "\" in column " << column_number << " in the " << i << "th SNP in the ref panel");
+
+    return {d1,d2};
+};
 
 static
 string          lookup( header_details:: offset_and_name const &on
