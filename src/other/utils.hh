@@ -1,3 +1,6 @@
+#ifndef UTILS_HH__
+#define UTILS_HH__
+
 #include <cstdint>
 #include <ostream>
 #include <iostream>
@@ -68,4 +71,9 @@ void print_type(T&&) {
     std:: cout << __PRETTY_FUNCTION__ << std:: endl;
 }
 
+std:: vector<std:: string>   tokenize       ( std:: string      const & line
+                                            , char                delimiter
+        );
+
 } // namespace utils
+#endif

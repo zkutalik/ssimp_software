@@ -36,6 +36,7 @@ using file_reading:: GwasFileHandle;
 
 using utils:: ssize;
 
+
 namespace ssimp {
 // Some forward declarations
 static
