@@ -3,6 +3,7 @@
 
 namespace view {
     struct {} ref_wraps;
+    struct {} foreach;
     struct {} unzip_foreach;
     struct {} collect;
 
@@ -34,6 +35,10 @@ namespace view {
         return temporary_tagged_holder<R, decltype(unzip_foreach)> { std::move(r) };
     }
     template<typename R>
+    auto operator| (R r, decltype(foreach) ) {
+        return temporary_tagged_holder<R, decltype(foreach)> { std::move(r) };
+    }
+    template<typename R>
     auto operator| (R r, decltype(collect) )
     //-> std:: vector<int>
     {
@@ -51,6 +56,15 @@ namespace view {
         while(!r_holder.m_r.empty()) {
             utils:: apply   ( std::forward<F>(f)
                             , range:: pull(r_holder.m_r)
+            );
+        }
+    }
+    template<typename R, typename F>
+    void operator| (temporary_tagged_holder<R, decltype(foreach)> r_holder, F && f)
+    {
+        while(!r_holder.m_r.empty()) {
+            std::forward<F>(f)(
+                range:: pull(r_holder.m_r)
             );
         }
     }
