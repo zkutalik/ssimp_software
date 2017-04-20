@@ -34,16 +34,27 @@ template<typename T>
 std::ostream & operator<< (std:: ostream &o, const std:: vector<T> &v);
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr);
+template<typename F, typename G>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G> &pr);
 template<typename F, typename G, typename H>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr);
 
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr) {
-    o << '<'
+    o << '('
         << std::get<0>(pr)
         << ','
         << std::get<1>(pr)
-        << '>';
+        << ')';
+    return o;
+}
+template<typename F, typename G>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G> &pr) {
+    o << '('
+        << std::get<0>(pr)
+        << ','
+        << std::get<1>(pr)
+        << ')';
     return o;
 }
 template<typename F, typename G, typename H>
