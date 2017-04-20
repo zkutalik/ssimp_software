@@ -321,7 +321,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     return p;
 }
 
-std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int i) {
+std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int line_number) {
     int d1, d2;
     int n;
     int ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
@@ -330,7 +330,7 @@ std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int co
        && d1 >= 0
        && d2 >= 0)
     {} else
-        DIE("Couldn't parse \"" << call_for_this_person << "\" in column " << column_number << " in the " << i << "th SNP in the ref panel");
+        DIE("Couldn't parse \"" << call_for_this_person << "\" in the " << 1+column_number << "th column in the " << 1+line_number << "th SNP in the ref panel");
 
     return {d1,d2};
 };
