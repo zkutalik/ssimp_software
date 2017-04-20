@@ -216,5 +216,13 @@ struct non_copyable_empty {
 struct empty {
 };
 
+template<typename ...Ts>
+void ignore(Ts && ...) {}
+
+struct id {
+    template<typename T>
+    decltype(auto) operator() (T &&t) { return std::forward<T>(t); }
+};
+
 
 } // namespace utils
