@@ -14,6 +14,7 @@
 #include"utils.hh"
 
 #define AMD_RANGE_DECLTYPE_AND_RETURN( expr )    decltype( expr ) { return expr ; }
+#define AMD_FORWARD(                   expr )    std::forward<decltype(expr)>(expr)
 
 using utils:: can_apply;
 using utils:: void_t;
@@ -100,6 +101,25 @@ namespace range {
     struct pull_from_empty_range_error : public std:: runtime_error {
         pull_from_empty_range_error() : std:: runtime_error("attempted pull() from an empty range") {}
     };
+
+    template<typename V>
+    struct from_vector_t { // V may, not may not, be a reference
+        V m_v;
+        size_t m_i;
+
+        decltype(auto) get_fwd() {
+            return std::forward<V>(m_v);
+        }
+
+        template<typename T>
+        auto push_back(T &&t) -> AMD_RANGE_DECLTYPE_AND_RETURN( get_fwd().push_back( AMD_FORWARD(t) ) );
+    };
+
+    template<typename V>
+    auto from_vector(V &&v) {
+        return from_vector_t<V>
+                { std::forward<V>(v), 0 };
+    }
 
     template<typename R>
     auto front_ref(R&& r)

@@ -364,14 +364,17 @@ static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int i) {
     vector<uint8_t> lefts ;
     vector<uint8_t> rights;
+    auto l_r = range:: from_vector(lefts);
+    auto r_r = range:: from_vector(rights);
+
     zip_val( range:: ints(calls_as_strings.size())
            , range:: range_from_begin_end(calls_as_strings) )
     |view:: unzip_foreach|
     [&](int person, string const & call_for_this_person) {
         auto call_pair = parse_call_pair(call_for_this_person, person, i);
 
-        lefts .push_back(call_pair.first);
-        rights.push_back(call_pair.second);
+        l_r.push_back(call_pair.first);
+        r_r.push_back(call_pair.second);
     };
     return make_pair(lefts, rights);
 };
