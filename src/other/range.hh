@@ -137,6 +137,13 @@ namespace range {
         return   std::forward<R>(r).front_ref();
     }
 
+    template<typename R, typename T>
+    auto push_back(R&& r, T &&t)
+    -> decltype( std::forward<R>(r).push_back(std::forward<T>(t)) )
+    {
+        return   std::forward<R>(r).push_back(std::forward<T>(t));
+    }
+
     template<typename R >
     auto front_val_impl(R&& r, utils:: priority_tag<2>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
             std::forward<R>(r).front_val() )
