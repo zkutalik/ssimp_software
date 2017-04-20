@@ -109,7 +109,11 @@ struct header_details {
 // Some forward declarations
 static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name);
+static
+std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int i);
+static
 std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int i);
+
 static
 string          lookup( header_details:: offset_and_name const &on
                       , vector<string> const & all_split_up
@@ -192,19 +196,7 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
             calls_as_strings.push_back(call_for_this_person);
         };
 
-        vector<uint8_t> lefts ;
-        vector<uint8_t> rights;
-        zip_val(
-            range:: ints(N_ref)
-            , range:: range_from_begin_end(calls_as_strings) | view:: ref_wraps)
-        |view:: unzip_foreach|
-        [&](int person, string const & call_for_this_person) {
-            auto call_pair = parse_call_pair(call_for_this_person, person, i);
-
-            lefts .push_back(call_pair.first);
-            rights.push_back(call_pair.second);
-        };
-        return make_pair(lefts, rights);
+        return parse_many_calls(calls_as_strings, i);
     }
 
     OneLineSummary  get_ols         (int i)     const {
@@ -321,6 +313,22 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     return p;
 }
 
+static
+std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int i) {
+    vector<uint8_t> lefts ;
+    vector<uint8_t> rights;
+    zip_val( range:: ints(calls_as_strings.size())
+           , range:: range_from_begin_end(calls_as_strings) )
+    |view:: unzip_foreach|
+    [&](int person, string const & call_for_this_person) {
+        auto call_pair = parse_call_pair(call_for_this_person, person, i);
+
+        lefts .push_back(call_pair.first);
+        rights.push_back(call_pair.second);
+    };
+    return make_pair(lefts, rights);
+};
+static
 std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int line_number) {
     int d1, d2;
     int n;
