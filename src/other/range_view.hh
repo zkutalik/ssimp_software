@@ -3,7 +3,7 @@
 
 namespace view {
     struct {} ref_wraps;
-    struct {} unzip_and_apply_and_collectvoid;
+    struct {} unzip_foreach;
     struct {} collect;
 
     template<typename R, typename tag>
@@ -30,8 +30,8 @@ namespace view {
     }
 
     template<typename R>
-    auto operator| (R r, decltype(unzip_and_apply_and_collectvoid) ) {
-        return temporary_tagged_holder<R, decltype(unzip_and_apply_and_collectvoid)> { std::move(r) };
+    auto operator| (R r, decltype(unzip_foreach) ) {
+        return temporary_tagged_holder<R, decltype(unzip_foreach)> { std::move(r) };
     }
     template<typename R>
     auto operator| (R r, decltype(collect) )
@@ -45,16 +45,8 @@ namespace view {
         return v;
     }
 
-    template<typename R, typename F
-        , class ...
-        , typename applied_value_type =
-            decltype( utils:: apply   ( std::declval<F>()
-                                      , range:: pull(std::declval<R>())
-            ))
-        , bool is_it_void = std:: is_same<void, applied_value_type>{}
-        , typename = std:: enable_if_t<is_it_void>
-        >
-    void operator| (temporary_tagged_holder<R, decltype(unzip_and_apply_and_collectvoid)> r_holder, F && f)
+    template<typename R, typename F>
+    void operator| (temporary_tagged_holder<R, decltype(unzip_foreach)> r_holder, F && f)
     {
         while(!r_holder.m_r.empty()) {
             utils:: apply   ( std::forward<F>(f)

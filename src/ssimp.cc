@@ -447,7 +447,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
                 , range:: range_from_begin_end(unk_its)
                 , range:: range_from_begin_end(genotypes_for_the_unks) | view:: ref_wraps
                 )
-        |view:: unzip_and_apply_and_collectvoid|
+        |view:: unzip_foreach|
         [&](auto u, auto unk_its_u, auto calls_at_u_rw) -> void {
                 auto &  calls_at_u  = calls_at_u_rw .get();
 
