@@ -103,9 +103,18 @@ namespace range {
     };
 
     template<typename V>
-    struct from_vector_t { // V may, not may not, be a reference
+    struct from_vector_t
+        // If V is *not* a reference, we want this to be non-copyable
+        : public std:: conditional_t<  std:: is_reference<V>{}, utils:: empty, utils:: non_copyable_empty >
+    { // V may, not may not, be a reference
         V m_v;
         size_t m_i;
+
+        static_assert( !std:: is_rvalue_reference<V>{} ,"");
+
+        template<typename V2>
+        from_vector_t(V2 &&v, size_t i) : m_v(AMD_FORWARD(v)), m_i(i) {}
+
 
         decltype(auto) get_fwd() {
             return std::forward<V>(m_v);
@@ -118,7 +127,7 @@ namespace range {
     template<typename V>
     auto from_vector(V &&v) {
         return from_vector_t<V>
-                { std::forward<V>(v), 0 };
+                ( std::forward<V>(v), 0 );
     }
 
     template<typename R>
