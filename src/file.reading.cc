@@ -312,7 +312,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             if(l.m_chromosome > r.m_chromosome) return false;
             if(l.m_position   < r.m_position  ) return true;
             if(l.m_position   > r.m_position  ) return false;
-            return false;
+            return l.m_tellg_of_line_start <  r.m_tellg_of_line_start;
         }
         );
 
