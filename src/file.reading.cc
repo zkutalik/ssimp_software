@@ -185,21 +185,21 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         // From here one, just assume VCF, with 'unaccounted-for' fields starting at offset 9 (i.e. 10th column)
         int N_ref = m_header_details.unaccounted.size();
         vector<string> calls_as_strings;
-        range:: ints(N_ref) |view:: foreach| [&](int i) {
-            auto column_number = m_header_details.unaccounted.at(i).m_offset;
-            assert(column_number-9 == i);
+        range:: ints(N_ref) |view:: foreach| [&](int person) {
+            auto column_number = m_header_details.unaccounted.at(person).m_offset;
+            assert(column_number-9 == person);
             string & call_for_this_person = all_split_up.at(column_number);
             calls_as_strings.push_back(call_for_this_person);
         };
 
         vector<uint8_t> lefts ;
         vector<uint8_t> rights;
-        range:: ints(N_ref) |view:: foreach| [&](int i) {
-            auto column_number = m_header_details.unaccounted.at(i).m_offset;
-            assert(column_number-9 == i);
-            string & call_for_this_person = all_split_up.at(column_number);
-
-            auto call_pair = parse_call_pair(call_for_this_person, column_number, i);
+        zip_val(
+            range:: ints(N_ref)
+            , range:: range_from_begin_end(calls_as_strings) | view:: ref_wraps)
+        |view:: unzip_foreach|
+        [&](int person, string const & call_for_this_person) {
+            auto call_pair = parse_call_pair(call_for_this_person, person, i);
 
             lefts .push_back(call_pair.first);
             rights.push_back(call_pair.second);
