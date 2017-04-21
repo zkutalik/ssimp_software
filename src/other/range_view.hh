@@ -80,23 +80,24 @@ namespace view {
         }
     }
     template<typename R, typename F>
+    struct unzip_map_t {
+        R m_r;
+        F f;
+        bool empty() const {
+            return m_r.empty();
+        }
+        auto front_val() {
+            return
+            utils:: apply   ( std::forward<F>(f)
+                            , range:: front_val(m_r)
+                            );
+        }
+        void advance() { m_r.advance(); }
+    };
+    template<typename R, typename F>
     auto operator| (temporary_tagged_holder<R, decltype(unzip_map)> r_holder, F f)
     {
-        struct unzip_map_t {
-            R m_r;
-            F f;
-            bool empty() const {
-                return m_r.empty();
-            }
-            auto front_val() {
-                return
-                utils:: apply   ( std::forward<F>(f)
-                                , range:: front_val(m_r)
-                                );
-            }
-            void advance() { m_r.advance(); }
-        };
-        return unzip_map_t{ move(r_holder.m_r), std:: move(f) };
+        return unzip_map_t<R,F>{ move(r_holder.m_r), std:: move(f) };
     }
     template<typename R, typename F>
     void operator| (temporary_tagged_holder<R, decltype(foreach)> r_holder, F && f)
