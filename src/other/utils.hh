@@ -244,5 +244,7 @@ struct add_const_under_ref<T&&> {
     static_assert( !std:: is_reference<T>{} ,"");
     using type = std:: add_const_t<T> &&;
 };
+template<typename T>
+using add_const_under_ref_t = typename add_const_under_ref<T>::type;
 
 } // namespace utils
