@@ -39,12 +39,21 @@ std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G> &pr);
 template<typename F, typename G, typename H>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr);
 
+template<typename T>
+auto nice_operator_shift_left(T &&t)
+-> decltype( std:: forward<T>(t)){ return std:: forward<T>(t); }
+
+inline
+auto nice_operator_shift_left(uint8_t t)
+-> int
+{ return t; }
+
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr) {
     o << '('
-        << std::get<0>(pr)
+        << nice_operator_shift_left( std::get<0>(pr) )
         << ','
-        << std::get<1>(pr)
+        << nice_operator_shift_left( std::get<1>(pr) )
         << ')';
     return o;
 }
