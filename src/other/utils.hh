@@ -96,6 +96,20 @@ std::ostream & operator<< <uint8_t> (std:: ostream &o, const std:: vector<uint8_
 
     return o;
 }
+template<>
+inline
+std::ostream & operator<< <bool> (std:: ostream &o, const std:: vector<bool> &v) {
+    o << '[';
+    for(size_t i = 0; i<v.size(); ++i) {
+        if(i!=0)
+            o << ',';
+        o << (v.at(i) ? 'T' : 'F');
+    }
+    o << ']';
+
+
+    return o;
+}
 template<typename T, typename ...Ts>
 auto mk_vector(T t, Ts ...ts) -> std:: vector<T> {
     return std:: vector<T>{t, ts...};
