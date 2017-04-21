@@ -42,11 +42,14 @@ std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr);
 template<typename T>
 auto nice_operator_shift_left(T &&t)
 -> decltype( std:: forward<T>(t)){ return std:: forward<T>(t); }
-
 inline
 auto nice_operator_shift_left(uint8_t t)
 -> int
 { return t; }
+inline
+auto nice_operator_shift_left(bool t)
+-> char
+{ return t?'T':'F'; }
 
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr) {
@@ -112,7 +115,7 @@ std::ostream & operator<< <bool> (std:: ostream &o, const std:: vector<bool> &v)
     for(size_t i = 0; i<v.size(); ++i) {
         if(i!=0)
             o << ',';
-        o << (v.at(i) ? 'T' : 'F');
+        o << nice_operator_shift_left(v.at(i));
     }
     o << ']';
 
