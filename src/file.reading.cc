@@ -17,12 +17,13 @@ using std:: string;
 using std:: vector;
 using std:: map;
 using utils:: ssize;
-using utils:: operator<<; // to print vectors
 using utils:: tokenize;
 
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
 namespace file_reading {
+    using utils:: operator<<; // to print vectors
+
     template<typename G>
     SNPiterator<G> &       SNPiterator<G>:: operator++()        {
         assert(m_line_number < m_gfh->number_of_snps());
