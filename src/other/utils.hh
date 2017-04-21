@@ -228,5 +228,21 @@ struct id {
     decltype(auto) operator() (T &&t) { return std::forward<T>(t); }
 };
 
+template<typename T>
+struct add_const_under_ref {
+    static_assert( !std:: is_reference<T>{} ,"");
+    // don't define 'type' here, as this refuses
+    // to add const to a non-ref type
+};
+template<typename T>
+struct add_const_under_ref<T&> {
+    static_assert( !std:: is_reference<T>{} ,"");
+    using type = std:: add_const_t<T> &;
+};
+template<typename T>
+struct add_const_under_ref<T&&> {
+    static_assert( !std:: is_reference<T>{} ,"");
+    using type = std:: add_const_t<T> &&;
+};
 
 } // namespace utils
