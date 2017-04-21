@@ -123,6 +123,28 @@ namespace range {
         decltype(auto) get_fwd() {
             return std::forward<V>(m_v);
         }
+        decltype(auto) get_fwd() const {
+            // We need to add const to V before forwarding
+            // I wish std::forward didn't make things which
+            // were 'less const'.
+            using V_cur = utils:: add_const_under_ref_t<V>;
+            using fwd_t_const = decltype(std::forward< V_cur >(m_v));
+            static_assert( std:: is_same<V_cur, fwd_t_const> {} ,"");
+            static_assert( std:: is_lvalue_reference<V>{} ,""); // TODO: won't always be true
+
+            // Check V and V_cur have the same 'referencedness'
+            static_assert( std:: is_lvalue_reference<V_cur>{} == std:: is_lvalue_reference<V> {} ,"");
+            static_assert( std:: is_rvalue_reference<V_cur>{} == std:: is_rvalue_reference<V> {} ,"");
+
+            // ... but different 'constness'
+            static_assert(!std:: is_const<std::remove_reference_t<V>> {} ,"");
+            static_assert( std:: is_const<std::remove_reference_t<V_cur>> {} ,"");
+            static_assert(!std:: is_same<V_cur, V> {} ,"");
+            static_assert( std:: is_same<   std::decay_t<V_cur>
+                                        ,   std::decay_t<V>
+                                        > {} ,"");
+            return std::forward<V_cur>(m_v);
+        }
 
         template<typename T>
         auto push_back(T &&t) -> AMD_RANGE_DECLTYPE_AND_RETURN( get_fwd().push_back( AMD_FORWARD(t) ) );
