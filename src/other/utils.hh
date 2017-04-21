@@ -248,6 +248,24 @@ template<typename T>
 using add_const_under_ref_t = typename add_const_under_ref<T>::type;
 
 template<typename T>
+struct add_const_even_if_ref {
+    static_assert( !std:: is_reference<T>{} ,"");
+    using type = std:: add_const_t<T>;
+};
+template<typename T>
+struct add_const_even_if_ref<T&> {
+    static_assert( !std:: is_reference<T>{} ,"");
+    using type = std:: add_const_t<T> &;
+};
+template<typename T>
+struct add_const_even_if_ref<T&&> {
+    static_assert( !std:: is_reference<T>{} ,"");
+    using type = std:: add_const_t<T> &&;
+};
+template<typename T>
+using add_const_even_if_ref_t = typename add_const_even_if_ref<T>::type;
+
+template<typename T>
 T   un_lref(T &t) { return t; }
 template<typename T>
 T   un_lref(T &&) = delete;
