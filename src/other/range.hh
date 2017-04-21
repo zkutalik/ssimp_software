@@ -128,23 +128,26 @@ namespace range {
             // We need to add const to V before forwarding
             // I wish std::forward didn't make things which
             // were 'less const'.
-            using V_cur = utils:: add_const_under_ref_t<V>;
-            using fwd_t_const = decltype(std::forward< V_cur >(m_v));
-            static_assert( std:: is_same<V_cur, fwd_t_const> {} ,"");
-            static_assert( std:: is_lvalue_reference<V>{} ,""); // TODO: won't always be true
 
-            // Check V and V_cur have the same 'referencedness'
-            static_assert( std:: is_lvalue_reference<V_cur>{} == std:: is_lvalue_reference<V> {} ,"");
-            static_assert( std:: is_rvalue_reference<V_cur>{} == std:: is_rvalue_reference<V> {} ,"");
+            // Anyway, V is either non-ref or l-ref, but not r-ref
+            static_assert(!std:: is_rvalue_reference<V>{} ,"");
+
+            using V_const = utils:: add_const_even_if_ref_t<V>;
+            using fwd_t_const = decltype(std::forward< V_const >(m_v));
+            static_assert( std:: is_same<V_const &&, fwd_t_const> {} ,"");
+
+            // Check V and V_const have the same 'referencedness'
+            static_assert( std:: is_lvalue_reference<V_const>{} == std:: is_lvalue_reference<V> {} ,"");
+            static_assert( std:: is_rvalue_reference<V_const>{} == std:: is_rvalue_reference<V> {} ,"");
 
             // ... but different 'constness'
             static_assert(!std:: is_const<std::remove_reference_t<V>> {} ,"");
-            static_assert( std:: is_const<std::remove_reference_t<V_cur>> {} ,"");
-            static_assert(!std:: is_same<V_cur, V> {} ,"");
-            static_assert( std:: is_same<   std::decay_t<V_cur>
+            static_assert( std:: is_const<std::remove_reference_t<V_const>> {} ,"");
+            static_assert(!std:: is_same<V_const, V> {} ,"");
+            static_assert( std:: is_same<   std::decay_t<V_const>
                                         ,   std::decay_t<V>
                                         > {} ,"");
-            return std::forward<V_cur>(m_v);
+            return std::forward<V_const>(m_v);
         }
 
         template<typename T>
