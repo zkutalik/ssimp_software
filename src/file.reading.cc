@@ -399,31 +399,17 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
 static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int line_number) {
-    auto range_of_parses = zip_val( range:: ints(calls_as_strings.size())
-           , range:: range_from_begin_end(calls_as_strings) )
-    |view:: unzip_map|
-    [&](int person, string const & call_for_this_person) {
-        return parse_call_pair(call_for_this_person, person, line_number);
-    };
-    (void) range_of_parses;
-    /*
-    while(!range:: empty(range_of_parses)) {
-        auto n = range:: front_val( range_of_parses );
-        using utils:: operator<<;
-        range:: advance(range_of_parses);
-    }
-    */
 
-    auto z = zip_val(  range:: from_vector( vector<uint8_t>{} )
+    auto z_out = zip_val(  range:: from_vector( vector<uint8_t>{} )
                     ,  range:: from_vector( vector<uint8_t>{} ) );
 
     zip_val( range:: ints(calls_as_strings.size())
            , range:: range_from_begin_end(calls_as_strings) )
     |view:: unzip_foreach|
     [&](int person, string const & call_for_this_person) {
-        z.push_back( parse_call_pair(call_for_this_person, person, line_number) );
+        z_out.push_back( parse_call_pair(call_for_this_person, person, line_number) );
     };
-    auto l3 = move(z) | view:: unzip_collect_transpose;
+    auto l3 = move(z_out) | view:: unzip_collect_transpose;
 
     return make_pair(std::get<0>(l3)
                     ,std::get<1>(l3) );
