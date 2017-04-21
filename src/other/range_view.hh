@@ -10,6 +10,7 @@ namespace view {
     }
 
     struct {} ref_wraps;
+    struct {} map;
     struct {} foreach;
     struct {} unzip_foreach;
     struct {} collect;
@@ -47,6 +48,10 @@ namespace view {
     template<typename R>
     auto operator| (R r, decltype(unzip_map) ) {
         return temporary_tagged_holder<R, decltype(unzip_map)> { std::move(r) };
+    }
+    template<typename R>
+    auto operator| (R r, decltype(map) ) {
+        return temporary_tagged_holder<R, decltype(map)> { std::move(r) };
     }
     template<typename R>
     auto operator| (R r, decltype(foreach) ) {
@@ -105,6 +110,24 @@ namespace view {
     auto operator| (temporary_tagged_holder<R, decltype(unzip_map)> r_holder, F f)
     {
         return unzip_map_t<R,F>{ move(r_holder.m_r), std:: move(f) };
+    }
+
+    template<typename R, typename F>
+    struct map_t {
+        R m_r;
+        F f;
+        bool empty() const {
+            return m_r.empty();
+        }
+        auto front_val() {
+            return f( range:: front_val(m_r) );
+        }
+        void advance() { m_r.advance(); }
+    };
+    template<typename R, typename F>
+    auto operator| (temporary_tagged_holder<R, decltype(map)> r_holder, F f)
+    {
+        return map_t<R,F>{ move(r_holder.m_r), std:: move(f) };
     }
     template<typename R, typename F>
     void operator| (temporary_tagged_holder<R, decltype(foreach)> r_holder, F && f)
