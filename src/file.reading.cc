@@ -362,21 +362,8 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
 static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int i) {
-    auto l = range:: from_vector( vector<uint8_t>{} );
-    auto r = range:: from_vector( vector<uint8_t>{} );
-    auto z_ = zip_val(  range:: from_vector( vector<uint8_t>{} )
-                     ,  range:: from_vector( vector<uint8_t>{} ) );
-    auto z3 = zip_val(  range:: from_vector( vector<uint8_t>{} )
-                     ,  range:: from_vector( vector<uint8_t>{} ) );
-
-
-
-
-    vector<uint8_t> lefts ;
-    vector<uint8_t> rights;
-    auto z   = zip_val( range:: from_vector(lefts)
-                      , range:: from_vector(rights)
-                      );
+    auto z = zip_val(  range:: from_vector( vector<uint8_t>{} )
+                    ,  range:: from_vector( vector<uint8_t>{} ) );
 
     zip_val( range:: ints(calls_as_strings.size())
            , range:: range_from_begin_end(calls_as_strings) )
@@ -384,18 +371,12 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
     [&](int person, string const & call_for_this_person) {
         auto call_pair = parse_call_pair(call_for_this_person, person, i);
 
-        z .push_back( call_pair );
-        z_.push_back( call_pair );
-        z3.push_back( call_pair );
+        z.push_back( call_pair );
     };
-    auto lefts_  = std:: get<0>( move(z_).m_ranges) | view:: collect ;
-    auto rights_ = std:: get<1>( move(z_).m_ranges) | view:: collect ;
-    assert(lefts == lefts_);
-    assert(rights == rights_);
-    auto l3 = move(z3) | view:: unzip_collect_transpose;
-    assert(lefts == std::get<0>(l3));
-    assert(rights == std::get<1>(l3));
-    return make_pair(lefts_, rights_);
+    auto l3 = move(z) | view:: unzip_collect_transpose;
+
+    return make_pair(std::get<0>(l3)
+                    ,std::get<1>(l3) );
 };
 static
 std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int line_number) {
