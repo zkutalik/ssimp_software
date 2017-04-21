@@ -362,6 +362,13 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
 static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int i) {
+    auto l = range:: from_vector( vector<uint8_t>{} );
+    auto r = range:: from_vector( vector<uint8_t>{} );
+    auto z_ = zip_val(move(l),move(r)); // Surprised that std:: isn't needed here
+
+
+
+
     vector<uint8_t> lefts ;
     vector<uint8_t> rights;
     auto z   = zip_val( range:: from_vector(lefts)
@@ -375,8 +382,13 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
         auto call_pair = parse_call_pair(call_for_this_person, person, i);
 
         z .push_back( call_pair );
+        z_.push_back( call_pair );
     };
-    return make_pair(lefts, rights);
+    auto lefts_  = std:: get<0>( move( z_.m_ranges)) | view:: collect ;
+    auto rights_ = std:: get<1>( move( z_.m_ranges)) | view:: collect ;
+    assert(lefts == lefts_);
+    assert(rights == rights_);
+    return make_pair(lefts_, rights_);
 };
 static
 std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int line_number) {
