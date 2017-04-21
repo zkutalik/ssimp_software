@@ -364,7 +364,10 @@ static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int i) {
     auto l = range:: from_vector( vector<uint8_t>{} );
     auto r = range:: from_vector( vector<uint8_t>{} );
-    auto z_ = zip_val(move(l),move(r)); // Surprised that std:: isn't needed here
+    auto z_ = zip_val(  range:: from_vector( vector<uint8_t>{} )
+                     ,  range:: from_vector( vector<uint8_t>{} ) );
+    auto z3 = zip_val(  range:: from_vector( vector<uint8_t>{} )
+                     ,  range:: from_vector( vector<uint8_t>{} ) );
 
 
 
@@ -383,11 +386,15 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
 
         z .push_back( call_pair );
         z_.push_back( call_pair );
+        z3.push_back( call_pair );
     };
-    auto lefts_  = std:: get<0>( move( z_.m_ranges)) | view:: collect ;
-    auto rights_ = std:: get<1>( move( z_.m_ranges)) | view:: collect ;
+    auto lefts_  = std:: get<0>( move(z_).m_ranges) | view:: collect ;
+    auto rights_ = std:: get<1>( move(z_).m_ranges) | view:: collect ;
     assert(lefts == lefts_);
     assert(rights == rights_);
+    auto l3 = move(z3) | view:: unzip_collect_transpose;
+    assert(lefts == std::get<0>(l3));
+    assert(rights == std::get<1>(l3));
     return make_pair(lefts_, rights_);
 };
 static
