@@ -6,6 +6,7 @@ namespace view {
     struct {} foreach;
     struct {} unzip_foreach;
     struct {} collect;
+    struct {} unzip_collect_transpose;
 
     template<typename R, typename tag>
     struct temporary_tagged_holder {
@@ -48,6 +49,19 @@ namespace view {
             v.push_back( range:: pull(r) );
         }
         return v;
+    }
+    template<size_t ...Is, typename R>
+    auto operator_pipe_impl (R r, decltype(unzip_collect_transpose), std:: index_sequence<Is...> )
+    //-> std:: vector<int>
+    {
+        return std::make_tuple( std:: get<Is>( move( r.m_ranges)) | view:: collect ... );
+    }
+    template<typename R>
+    auto operator| (R r, decltype(unzip_collect_transpose) )
+    {
+        return operator_pipe_impl( move(r), unzip_collect_transpose
+                , std:: make_index_sequence< r.width_v >{}
+                );
     }
 
     template<typename R, typename F>
