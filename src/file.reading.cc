@@ -133,6 +133,7 @@ char   decide_delimiter( string      const & header_line );
 static
 vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it);
 
+using call_type = std::pair<uint8_t,uint8_t>;
 struct OneLineSummary {
     ifstream:: pos_type      m_tellg_of_line_start;
     int                      m_simple_line_number;
@@ -141,7 +142,9 @@ struct OneLineSummary {
     int                      m_position;
     string                   m_allele_alt;
     string                   m_allele_ref;
+
     vector<bool>             m_calls_compressed;
+    vector<call_type>        m_calls_compressed_codes;
 };
 struct GwasLineSummary {
     string                   m_SNPname;
@@ -314,7 +317,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                 auto lefts_and_rights = parse_many_calls(calls_as_strings, -1);
 
                 // Count each distinct observed call type
-                using call_type = std::pair<uint8_t,uint8_t>;
                 map<call_type, int> count_the_call_types;
 
                 zip_val( range:: range_from_begin_end(lefts_and_rights.first)
@@ -372,6 +374,16 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                     bits_for_this_SNP.push_back(true);
                 };
                 ols.m_calls_compressed = bits_for_this_SNP;
+
+                auto just_calls_ordered_by_popularity =
+                range:: from_vector( most_popular_first )
+                |view:: map|
+                [&](count_and_call_t cac) {
+                    return call_type{ cac.left
+                                    , cac.right };
+                }
+                | view:: collect;
+                ols.m_calls_compressed_codes = just_calls_ordered_by_popularity;
             }
 
             p->m_each_SNP_and_its_offset.push_back(ols);
