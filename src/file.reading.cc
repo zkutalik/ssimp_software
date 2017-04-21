@@ -199,11 +199,13 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
                 ++ current_run_of_zeros;
             }
         }
-        auto all_calls_decoded =
-        move(z_out) | view:: unzip_collect_transpose
-            ;
-        auto all_calls_decoded_pair = std:: make_pair( std:: get<0>(all_calls_decoded)
-                                                     , std:: get<1>(all_calls_decoded) );
+        auto all_calls_decoded_pair =
+            utils:: apply
+            (   [](auto && ...xs) {
+                    return std:: make_pair( std::forward<decltype(xs)>(xs)...);
+                }
+            ,   move(z_out) | view:: unzip_collect_transpose
+            );
 
 
         std:: ifstream f(m_underlying_file_name); // reopen the file
@@ -227,9 +229,10 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
         };
 
         auto all_calls_reparsed = parse_many_calls(calls_as_strings, i);
+
         assert(all_calls_decoded_pair == all_calls_reparsed);
 
-        return parse_many_calls(calls_as_strings, i);
+        return all_calls_decoded_pair; // use the decompressed version
     }
 
     OneLineSummary  get_ols         (int i)     const {
