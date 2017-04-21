@@ -310,6 +310,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                 // Count each distinct observed call type
                 using call_type = std::pair<uint8_t,uint8_t>;
                 map<call_type, int> count_the_call_types;
+
                 zip_val( range:: range_from_begin_end(lefts_and_rights.first)
                        , range:: range_from_begin_end(lefts_and_rights.second))
                 |view:: foreach|
@@ -318,21 +319,56 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                                                             ,std::get<1>(x)
                                                             ) ];
                 };
+
+                int const number_of_distinct_call_types = count_the_call_types.size();
+
                 struct count_and_call_t {
                     int count;
                     int left;
                     int right;
+                    call_type as_pair() const { return {left,right}; }
                 };
-                vector<count_and_call_t> count_and_call;
+
+                vector<count_and_call_t> most_popular_first;
                 for(auto & abc : count_the_call_types) {
-                    count_and_call.push_back( count_and_call_t{ abc.second
+                    most_popular_first.push_back( count_and_call_t{ abc.second
                     ,abc.first.first
                     ,abc.first.second}
                     );
                 }
-                range:: sort(range:: range_from_begin_end(count_and_call), [](auto &l, auto &r) {
+                range:: sort(range:: range_from_begin_end(most_popular_first), [](auto &l, auto &r) {
                         return l.count > r.count;
                 });
+
+                map<call_type, int> map_call_to_contiguous_ids;
+                view:: enumerate_vector(most_popular_first)
+                |view::unzip_foreach|
+                [&](int i, count_and_call_t cac){
+                    map_call_to_contiguous_ids[ cac.as_pair() ] = i;
+                };
+                assert(utils::ssize(map_call_to_contiguous_ids) == number_of_distinct_call_types);
+                assert(utils::ssize(most_popular_first)         == number_of_distinct_call_types);
+                assert(utils::ssize(count_the_call_types)       == number_of_distinct_call_types);
+
+                vector<bool> bits_for_this_SNP;
+
+                zip_val( range:: range_from_begin_end(lefts_and_rights.first)
+                       , range:: range_from_begin_end(lefts_and_rights.second))
+                |view:: unzip_foreach|
+                [&](int left, int right) {
+                    int code = map_call_to_contiguous_ids.at( std:: make_pair(left,right) );
+                    assert(code >= 0);
+                    assert(code < number_of_distinct_call_types);
+                    for(int rep : range::ints(code)) {
+                        (void)rep;
+                        bits_for_this_SNP.push_back(false);
+                    }
+                    bits_for_this_SNP.push_back(true);
+                };
+                using utils:: operator<<;
+                //PP(bits_for_this_SNP);
+
+
                 /*
                  * I'll pause this now
                 */
