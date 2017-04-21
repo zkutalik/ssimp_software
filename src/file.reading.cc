@@ -139,6 +139,7 @@ struct OneLineSummary {
     int                      m_position;
     string                   m_allele_alt;
     string                   m_allele_ref;
+    vector<bool>             m_calls_compressed;
 };
 struct GwasLineSummary {
     string                   m_SNPname;
@@ -292,8 +293,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             ols.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
             ols.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
 
-            p->m_each_SNP_and_its_offset.push_back(ols);
-
             { // Now, store a 'compressed' version of the 'unaccounted' fields
 
                 int const N_ref = hd.unaccounted.size();
@@ -365,14 +364,10 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                     }
                     bits_for_this_SNP.push_back(true);
                 };
-                using utils:: operator<<;
-                //PP(bits_for_this_SNP);
-
-
-                /*
-                 * I'll pause this now
-                */
+                ols.m_calls_compressed = bits_for_this_SNP;
             }
+
+            p->m_each_SNP_and_its_offset.push_back(ols);
         } catch (std:: invalid_argument &e) {
             WARNING( "Ignoring this line, problem with the chromosome and/or position. ["
                     << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
