@@ -184,6 +184,28 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
             ,std::vector<uint8_t>
         > get_calls          (int i)                   const {
         OneLineSummary const & ols = get_ols(i);
+
+        auto z_out = zip_val(  range:: from_vector( vector<uint8_t>{} )
+                            ,  range:: from_vector( vector<uint8_t>{} ) );
+
+
+        int current_run_of_zeros = 0;
+        for(bool bit : ols.m_calls_compressed) {
+            if(bit) {
+                call_type call = ols.m_calls_compressed_codes.at(current_run_of_zeros);
+                current_run_of_zeros = 0;
+                z_out.push_back( call );
+            } else {
+                ++ current_run_of_zeros;
+            }
+        }
+        auto all_calls_decoded =
+        move(z_out) | view:: unzip_collect_transpose
+            ;
+        auto all_calls_decoded_pair = std:: make_pair( std:: get<0>(all_calls_decoded)
+                                                     , std:: get<1>(all_calls_decoded) );
+
+
         std:: ifstream f(m_underlying_file_name); // reopen the file
         f.seekg(ols.m_tellg_of_line_start);
         string line;
@@ -203,6 +225,9 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
             string & call_for_this_person = all_split_up.at(column_number);
             calls_as_strings.push_back(call_for_this_person);
         };
+
+        auto all_calls_reparsed = parse_many_calls(calls_as_strings, i);
+        assert(all_calls_decoded_pair == all_calls_reparsed);
 
         return parse_many_calls(calls_as_strings, i);
     }
