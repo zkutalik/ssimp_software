@@ -134,6 +134,7 @@ vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeF
 
 struct OneLineSummary {
     ifstream:: pos_type      m_tellg_of_line_start;
+    int                      m_simple_line_number;
     string                   m_SNPname;
     int                      m_chromosome;
     int                      m_position;
@@ -258,9 +259,12 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     f || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
+    int simple_line_number = 0;
+
 
     // Skip past the '##' lines
     while(getline(f, current_line)) {
+        ++ simple_line_number;
         if(current_line.at(0) == '#' && current_line.at(1) == '#')
             continue; // skip these ## lines
         break;
@@ -279,6 +283,8 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
         OneLineSummary ols;
         ols.m_tellg_of_line_start = f.tellg();
         getline(f, current_line);
+        ++ simple_line_number;
+        ols.m_simple_line_number = simple_line_number;
         // TODO: Should store a real 'line number' field directly in the 'ols' object
 
         if(!f) {
