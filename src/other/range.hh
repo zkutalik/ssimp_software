@@ -115,9 +115,10 @@ namespace range {
         template<typename V2>
         from_vector_t(V2 &&v, size_t i) : m_v(AMD_FORWARD(v)), m_i(i) {}
 
-        auto front_val() {
-            return m_v.at(m_i);
-        }
+        bool    empty()         const   { return get_fwd().empty(); }
+        auto    front_val()     const   { return get_fwd().at(m_i); }
+        auto    front_val()             { return get_fwd().at(m_i); }
+        void    advance  ()             { ++m_i; }
 
 
         decltype(auto) get_fwd() {
