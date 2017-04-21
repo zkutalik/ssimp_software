@@ -172,8 +172,11 @@ namespace range {
     }
 
     template<typename R >
-    auto front_val_impl(R&& r, utils:: priority_tag<2>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+    auto front_val_impl(R&& r, utils:: priority_tag<5>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
             std::forward<R>(r).front_val() )
+    template<typename R >
+    auto front_val_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+            utils:: un_lref( std::forward<R>(r).front_ref() ) )
     template<typename R >
     auto front_val_impl(R&& r, utils:: priority_tag<1>)
     -> std:: decay_t<decltype( *std::forward<R>(r).begin() )>
