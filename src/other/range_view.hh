@@ -2,6 +2,13 @@
 #include<functional>
 
 namespace view {
+    template<typename V>
+    auto enumerate_vector(V & v) {
+        return zip_val  (range:: ints(v.size())
+                        ,range:: from_vector(v)
+                );
+    }
+
     struct {} ref_wraps;
     struct {} foreach;
     struct {} unzip_foreach;
