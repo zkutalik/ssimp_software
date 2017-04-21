@@ -104,6 +104,10 @@ template<typename T>
 void print_type(T&&) {
     std:: cout << __PRETTY_FUNCTION__ << std:: endl;
 }
+template<typename T>
+void print_type() {
+    std:: cout << __PRETTY_FUNCTION__ << std:: endl;
+}
 
 template<typename T>
 void pop_back_expected(std:: vector<T> &v, T const & expected) {
