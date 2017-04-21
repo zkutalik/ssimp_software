@@ -205,6 +205,9 @@ namespace range {
         std:: tuple<Rs...> m_ranges;
 
         using value_type = std:: tuple< decltype( front_val(std::get<Is>(m_ranges)) ) ... >;
+        constexpr
+        static
+        size_t width_v = std:: tuple_size< decltype(m_ranges) > :: value;
 
         static_assert( utils:: and_all( std:: is_same<Rs, std::decay_t<Rs> >{}... ), "");
 
