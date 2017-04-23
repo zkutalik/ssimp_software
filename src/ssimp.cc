@@ -450,9 +450,14 @@ mvn:: Matrix make_c_unkn_tags_matrix
                 , range:: range_from_begin_end(genotypes_for_the_unks) | view:: ref_wraps
                 )
         |view:: unzip_foreach|
-        [&](auto u, auto unk_its_u, auto calls_at_u_rw) -> void {
-                auto &  calls_at_u  = calls_at_u_rw .get();
-
+        [&] (   int
+                    u
+            ,   SNPiterator<GenotypeFileHandle>
+                    unk_its_u
+            ,   std:: reference_wrapper< vector<int> const >
+                    calls_at_u_rw
+            ) -> void {
+                vector<int> const &  calls_at_u  = calls_at_u_rw .get();
                 assert(&calls_at_u == &genotypes_for_the_unks.at(u));
 
                 assert(N_ref        == utils:: ssize(calls_at_k));
