@@ -136,13 +136,18 @@ bool matrix_is_close_to_zero(const SquareMatrix &x);
 double norm_2(const SquareMatrix &x);
 double norm_2(const VecCol       &x);
 
-inline
-bool    operator==(SquareMatrix const& lhs, SquareMatrix const &rhs) {
+// These two operator== overloads are strange becuase gsl_matrix_equal isn't
+// available on hpc1.
+// I should check they still work elsewhere
+template<typename  SquareMatrix= SquareMatrix>
+auto    operator==(SquareMatrix const& lhs, SquareMatrix const &rhs)
+->decltype(gsl_matrix_equal(lhs.get(), rhs.get()))
+{
     assert(lhs.size() == rhs.size());
     return gsl_matrix_equal(lhs.get(), rhs.get());
 }
-inline
-bool    operator==(VecCol const& lhs, VecCol const &rhs) {
+template<typename  VecCol= VecCol>
+auto    operator==(VecCol const& lhs, VecCol const &rhs) {
     assert(lhs.size() == rhs.size());
     return gsl_vector_equal(lhs.get(), rhs.get());
 }
