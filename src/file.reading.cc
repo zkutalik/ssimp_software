@@ -437,15 +437,37 @@ static
 std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int line_number) {
     int d1, d2;
     int n;
-    int ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
+    int ret;
+
+    ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
     if(   ret == 2 // two digits
        && n == ssize(call_for_this_person) // all characters of input were consumed
        && d1 >= 0
        && d2 >= 0)
-    {} else
-        DIE("Couldn't parse \"" << call_for_this_person << "\" in the " << 1+column_number << "th column in the " << 1+line_number << "th SNP in the ref panel");
+    {
+        return {d1,d2};
+    }
 
-    return {d1,d2};
+    ret = sscanf(call_for_this_person.c_str(), "%d|%d:%n", &d1,&d2, &n); // note the space to allow trailing whitespace
+    if(   ret == 2 // two digits
+       // In this case, we don't care what n is
+       && d1 >= 0
+       && d2 >= 0)
+    {
+        return {d1,d2};
+    }
+
+    ret = sscanf(call_for_this_person.c_str(), "%d/%d:%n", &d1,&d2, &n); // note the space to allow trailing whitespace
+    if(   ret == 2 // two digits
+       // In this case, we don't care what n is
+       && d1 >= 0
+       && d2 >= 0)
+    {
+        return {d1,d2};
+    }
+
+    DIE("Couldn't parse \"" << call_for_this_person << "\" in the " << 1+column_number << "th column in the " << 1+line_number << "th SNP in the ref panel");
+    return {-1,-1}; // won't reach here - this doesn't matter
 };
 
 static
