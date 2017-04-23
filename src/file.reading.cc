@@ -499,7 +499,10 @@ header_details   parse_header( string      const & header_line ) {
         else if(is_in_this_list(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"z.from.peff"})) {
+        else if(is_in_this_list(one_field_name, {"z.from.peff"
+                                                ,"binary.mean.beta"
+                                                ,"beta"
+                                                })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else {
