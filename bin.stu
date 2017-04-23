@@ -7,6 +7,7 @@
     bin/o/file.reading.o
     bin/o/other/mvn.o
     bin/o/other/utils.o
+    bin/o/gz/gzstream/gzstream.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
     echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
@@ -16,6 +17,7 @@
         bin/o/file.reading.o \
         bin/o/other/mvn.o \
         bin/o/other/utils.o       \
+        bin/o/gz/gzstream/gzstream.o \
         ${LD_FLAGS}               \
     -o bin/ssimp
 }
@@ -34,6 +36,16 @@
 {
     mkdir -p "$(dirname "bin/o/${name}.o")"
     ${CXX_WITH_FLAGS} -c "src/${name}.cc" -o "bin/o/${name}.o"
+}
+
+# special rule for gzstream.o # http://www.cs.unc.edu/Research/compgeom/gzstream/#src
+    bin/o/gz/gzstream/gzstream.o
+:   src/gz/gzstream/gzstream.C
+    $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+    [bin/LIST_OF_HH_FILES]
+{
+    mkdir -p bin/o/gz/gzstream
+    ${CXX_WITH_FLAGS} -c "src/gz/gzstream/gzstream.C" -o "bin/o/gz/gzstream/gzstream.o"
 }
 
 >       bin/o/GCC_OR_CLANG
@@ -64,14 +76,19 @@
 }
 >       bin/o/LD_FLAGS
 :       bin/local/gsl_libs
+        bin.stu
 {
     cat bin/local/gsl_libs
+    echo " -lz "
 }
 >       bin/o/CXX_WITH_FLAGS
 :       bin/o/GCC_OR_CLANG
         bin/local/gsl_cflags
 {
-    cat bin/o/GCC_OR_CLANG bin/local/gsl_cflags
+    cat bin/o/GCC_OR_CLANG;
+    echo " -isystem src/gz/gzstream "
+    echo " -DGZSTREAM_NAMESPACE=gz "
+    cat bin/local/gsl_cflags
 }
 
 >       bin/local/gsl_cflags
