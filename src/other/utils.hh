@@ -296,4 +296,9 @@ T   un_lref(T &t) { return t; }
 template<typename T>
 T   un_lref(T &&) = delete;
 
+inline double ELAPSED(void) {
+       return double(clock()) / CLOCKS_PER_SEC;
+}
+
+
 } // namespace utils
