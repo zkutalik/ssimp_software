@@ -7,6 +7,8 @@
 #include <map>
 #include <cassert>
 
+#include <gzstream.h>
+
 #include "other/DIE.hh"
 #include "other/PP.hh"
 #include "other/utils.hh"
@@ -261,8 +263,11 @@ GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name) {
 static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     PP(file_name);
-    ifstream f(file_name);
-    f || DIE("Can't find file [" << file_name << ']');
+
+    // using gzstream to read gzipped input data. Thanks for http://www.cs.unc.edu/Research/compgeom/gzstream/#doc
+    // It's LGPL license, we should remember to document this
+    gz:: igzstream f(file_name.c_str());
+    (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
     int simple_line_number = 0;
