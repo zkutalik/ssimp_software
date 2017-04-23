@@ -516,7 +516,8 @@ header_details   parse_header( string      const & header_line ) {
             hd.filter = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"INFO"})) {
-            hd.info = header_details:: offset_and_name(field_counter, one_field_name);
+            // actually, ignore this big field
+            //hd.info = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
