@@ -107,11 +107,13 @@
         bin.stu
 ;
 
-@mkdir..${path}
-{
-    test -e "${path}" ||
-        mkdir -p "${path}"
+
+                         deps.empty/mkdir..${path} {
+    mkdir -p "$(dirname "deps.empty/mkdir..${path}")"
+    mkdir -p "${path}"
+    touch               "deps.empty/mkdir..${path}"
 }
+@mkdir..${path} : [deps.empty/mkdir..${path}] ;
 
 @unconditional {}
 
