@@ -596,8 +596,10 @@ struct SimpleGwasFile : public file_reading:: Effects_I
 static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) {
     PP(file_name);
-    ifstream f(file_name);
-    f || DIE("Can't find file [" << file_name << ']');
+
+    gz:: igzstream f(file_name.c_str());
+    (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << file_name << ']');
+
     string current_line;
 
     header_details hd;
