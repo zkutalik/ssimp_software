@@ -135,7 +135,6 @@ vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeF
 
 using call_type = std::pair<uint8_t,uint8_t>;
 struct OneLineSummary {
-    ifstream:: pos_type      m_tellg_of_line_start;
     int                      m_simple_line_number;
     string                   m_SNPname;
     int                      m_chromosome;
@@ -206,31 +205,6 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
                 }
             ,   move(z_out) | view:: unzip_collect_transpose
             );
-
-
-        std:: ifstream f(m_underlying_file_name); // reopen the file
-        f.seekg(ols.m_tellg_of_line_start);
-        string line;
-        getline(f, line);
-
-        auto all_split_up = tokenize(line, m_header_details.m_delimiter);
-
-        using utils:: operator<<;
-
-
-        // From here one, just assume VCF, with 'unaccounted-for' fields starting at offset 9 (i.e. 10th column)
-        int N_ref = m_header_details.unaccounted.size();
-        vector<string> calls_as_strings;
-        range:: ints(N_ref) |view:: foreach| [&](int person) {
-            auto column_number = m_header_details.unaccounted.at(person).m_offset;
-            assert(column_number-9 == person);
-            string & call_for_this_person = all_split_up.at(column_number);
-            calls_as_strings.push_back(call_for_this_person);
-        };
-
-        auto all_calls_reparsed = parse_many_calls(calls_as_strings, i);
-
-        assert(all_calls_decoded_pair == all_calls_reparsed);
 
         return all_calls_decoded_pair; // use the decompressed version
     }
@@ -313,7 +287,6 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
     while(1) {
         OneLineSummary ols;
-        ols.m_tellg_of_line_start = f.tellg();
         getline(f, current_line);
         ++ simple_line_number;
         ols.m_simple_line_number = simple_line_number;
@@ -431,7 +404,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
             if(l.m_chromosome > r.m_chromosome) return false;
             if(l.m_position   < r.m_position  ) return true;
             if(l.m_position   > r.m_position  ) return false;
-            return l.m_tellg_of_line_start <  r.m_tellg_of_line_start;
+            return l.m_simple_line_number <  r.m_simple_line_number;
         }
         );
 
