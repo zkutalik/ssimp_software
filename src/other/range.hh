@@ -152,9 +152,6 @@ namespace range {
 
         template<typename T>
         auto push_back(T &&t) -> AMD_RANGE_DECLTYPE_AND_RETURN( this->get_fwd().push_back( AMD_FORWARD(t) ) );
-
-        template<typename T>
-        auto push_back(T &&t) const -> AMD_RANGE_DECLTYPE_AND_RETURN( this->get_fwd().push_back( AMD_FORWARD(t) ) );
     };
 
     template<typename V>
