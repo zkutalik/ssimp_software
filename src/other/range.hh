@@ -68,6 +68,24 @@ namespace range {
     template<typename C>
     auto range_from_begin_end(C &c) -> AMD_RANGE_DECLTYPE_AND_RETURN( range_from_begin_end(c.begin(), c.end()) )
 
+    namespace detail {
+    template<typename T>
+    constexpr
+    auto    is_definitely_infinite_impl(T&& t, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+            AMD_FORWARD(t).is_definitely_infinite()
+    )
+    template<typename T>
+    constexpr
+    bool    is_definitely_infinite_impl(T&&, utils:: priority_tag<0>) {
+        return false;
+    }
+    }
+    template<typename T>
+    constexpr
+    auto    is_definitely_infinite(T&& t) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+            detail:: is_definitely_infinite_impl(AMD_FORWARD(t), utils:: priority_tag<9>{})
+    )
+
     template<typename I, bool is_infinite>
     struct range_ints_t : public range_tag {
         struct iter_is_own_value {
