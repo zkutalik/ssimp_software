@@ -23,7 +23,9 @@ namespace range {
         gz:: igzstream      &   m_f;
         string                  current_line;
 
-        read_file_as_a_range_t(gz:: igzstream & f) : m_f(f) {}
+        read_file_as_a_range_t(gz:: igzstream & f) : m_f(f) {
+            advance();
+        }
 
         bool            empty()     const   { return !m_f; }
         void            advance()           { getline(m_f, current_line); }
