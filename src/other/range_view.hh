@@ -1,6 +1,10 @@
+#ifndef AMD_RANGE_VIEW_HH
+#define AMD_RANGE_VIEW_HH
+
 #include"range.hh"
 #include<functional>
 
+namespace range {
 namespace view {
     template<typename V>
     auto enumerate_vector(V & v) {
@@ -13,8 +17,6 @@ namespace view {
     struct {} map;
     struct {} foreach;
     struct {} unzip_foreach;
-    struct {} collect;
-    struct {} unzip_collect_transpose;
     struct {} unzip_map;
 
     template<typename R, typename tag>
@@ -56,30 +58,6 @@ namespace view {
     template<typename R>
     auto operator| (R r, decltype(foreach) ) {
         return temporary_tagged_holder<R, decltype(foreach)> { std::move(r) };
-    }
-    template<typename R>
-    auto operator| (R r, decltype(collect) )
-    //-> std:: vector<int>
-    {
-        using value_type = std:: decay_t< decltype( range:: pull(r) ) >;
-        std:: vector<value_type> v;
-        while(!r.empty()) {
-            v.push_back( range:: pull(r) );
-        }
-        return v;
-    }
-    template<size_t ...Is, typename R>
-    auto operator_pipe_impl (R r, decltype(unzip_collect_transpose), std:: index_sequence<Is...> )
-    //-> std:: vector<int>
-    {
-        return std::make_tuple( std:: get<Is>( move( r.m_ranges)) | view:: collect ... );
-    }
-    template<typename R>
-    auto operator| (R r, decltype(unzip_collect_transpose) )
-    {
-        return operator_pipe_impl( move(r), unzip_collect_transpose
-                , std:: make_index_sequence< r.width_v >{}
-                );
     }
 
     template<typename R, typename F>
@@ -140,3 +118,5 @@ namespace view {
     }
 
 } // namespace view
+} // namespace range
+#endif

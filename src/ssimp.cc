@@ -20,6 +20,8 @@
 #include "other/range.hh"
 #include "other/range_view.hh"
 
+namespace view = range:: view;
+
 using std:: cout;
 using std:: endl;
 using std:: string;

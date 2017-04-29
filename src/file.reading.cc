@@ -13,6 +13,10 @@
 #include "other/PP.hh"
 #include "other/utils.hh"
 #include "other/range_view.hh"
+#include "other/range_action.hh"
+
+namespace action = range:: action;
+namespace view   = range:: view  ;
 
 using std:: ifstream;
 using std:: string;
@@ -205,7 +209,7 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
             (   [](auto && ...xs) {
                     return std:: make_pair( std::forward<decltype(xs)>(xs)...);
                 }
-            ,   move(z_out) | view:: unzip_collect_transpose
+            ,   move(z_out) | action:: unzip_collect_transpose
             );
 
         return all_calls_decoded_pair; // use the decompressed version
@@ -388,7 +392,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                     return call_type{ cac.left
                                     , cac.right };
                 }
-                | view:: collect;
+                | action:: collect;
                 ols.m_calls_compressed_codes = just_calls_ordered_by_popularity;
             }
 
@@ -428,7 +432,7 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
     [&](int person, string const & call_for_this_person) {
         z_out.push_back( parse_call_pair(call_for_this_person, person, line_number) );
     };
-    auto l3 = move(z_out) | view:: unzip_collect_transpose;
+    auto l3 = move(z_out) | action:: unzip_collect_transpose;
 
     return make_pair(std::get<0>(l3)
                     ,std::get<1>(l3) );
