@@ -5,6 +5,7 @@
     bin/o/ssimp.o
     bin/o/options.o
     bin/o/file.reading.o
+    bin/o/compression.o
     bin/o/other/mvn.o
     bin/o/other/utils.o
     bin/o/gz/gzstream/gzstream.o
@@ -15,6 +16,7 @@
         bin/o/options.o \
         bin/o/ssimp.o \
         bin/o/file.reading.o \
+        bin/o/compression.o  \
         bin/o/other/mvn.o \
         bin/o/other/utils.o       \
         bin/o/gz/gzstream/gzstream.o \

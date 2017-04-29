@@ -17,6 +17,7 @@ namespace options {
         int                     opt_window_width = 1'000'000;
         int                     opt_flanking_width = 250'000;
         double                  opt_lambda  = 0.0;
+        std:: string            opt_compressed_out;
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
@@ -29,6 +30,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"gwas"               ,  required_argument, 0,  5 },
             {"lambda"             ,  required_argument, 0,  6 },
             {"out"                ,  required_argument, 0,  7 },
+            {"compressed.out"     ,  required_argument, 0,  8 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -60,6 +62,10 @@ void read_in_all_command_line_options(int argc, char **argv) {
         if (c == 7) {
             assert(string("out") == long_options[long_option_index].name);
             options::  opt_out = optarg;
+        }
+        if (c == 8) {
+            assert(string("compressed.out") == long_options[long_option_index].name);
+            options::  opt_compressed_out = optarg;
         }
     }
 }
