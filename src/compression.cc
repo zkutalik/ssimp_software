@@ -17,6 +17,8 @@ using std:: ofstream;
 using std:: ios_base;
 using std:: string;
 
+using utils:: operator<<;
+
 namespace range {
     // put this into the 'range' namespace, to help begin() find it via ADL
     struct read_file_as_a_range_t {
@@ -54,7 +56,26 @@ namespace compression {
         [&](auto i, std:: string const & s) {
             if(s.substr(0,2) == "##")
                 return;
-            PP( i, s.substr(0,20) );
+            auto fields = utils:: tokenize(s, '\t');
+            //PP(fields);
+            if(fields.at(0) == "#CHROM") {
+                // #CHROM,POS,ID,REF,ALT,QUAL,FILTER,INFO,FORMAT
+                assert((
+                std::vector<string> {   fields.at(0)
+                                    ,   fields.at(1)
+                                    ,   fields.at(2)
+                                    ,   fields.at(3)
+                                    ,   fields.at(4)
+                                    ,   fields.at(5)
+                                    ,   fields.at(6)
+                                    ,   fields.at(7)
+                                    ,   fields.at(8)
+                                    } ==
+                std::vector<string> { "#CHROM" , "POS" , "ID" , "REF", "ALT", "QUAL", "FILTER" , "INFO", "FORMAT"
+                                    }));
+                return;
+            }
+            PP( i, s.substr(0,50) );
         };
 
     }
