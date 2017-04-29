@@ -48,7 +48,7 @@ namespace compression {
         (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << vcf_filename << ']');
 
         range:: read_file_as_a_range_t vcf_input_range{f};
-        auto z = zip( range::ints<int64_t>(), vcf_input_range | view:: ref_wraps );
+        auto z = zip( range::ints<int64_t>(), vcf_input_range );
 
         for(auto const & x : z) {
             PP( std:: get<0>(x)
