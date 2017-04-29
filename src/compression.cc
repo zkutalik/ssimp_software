@@ -37,13 +37,24 @@ namespace range {
 }
 namespace compression {
 
+    struct GTcompressed_output_t {
+        ofstream m_f;
+
+        template<typename ...Ts>
+        GTcompressed_output_t(Ts&& ...ts) : m_f( std::forward<Ts>(ts) ... ) {}
+
+        operator bool() const {
+            return !!m_f;
+        }
+    };
+
     void make_compressed_vcf_file   (std:: string compressed_out_file_name, std:: string vcf_filename) {
-        ofstream binary_output  (compressed_out_file_name
-                                ,   ios_base::out
-                                 |  ios_base::binary
-                                 |  ios_base::trunc
-                                );
-        (!!binary_output) || DIE("Couldn't open [" << compressed_out_file_name.c_str()
+        GTcompressed_output_t binary_output (compressed_out_file_name
+                                            ,   ios_base::out
+                                               |ios_base::binary
+                                               |ios_base::trunc
+                                            );
+        (  binary_output) || DIE("Couldn't open [" << compressed_out_file_name.c_str()
                 << "] for writing.");
 
         gz:: igzstream f(vcf_filename.c_str());
@@ -51,6 +62,8 @@ namespace compression {
 
         range:: read_file_as_a_range_t vcf_input_range{f};
         auto z = zip( range::ints<int64_t>(), vcf_input_range );
+
+        constexpr int INFO_field_to_skip = 7;
 
         std::move(z) |action:: unzip_foreach|
         [&](auto i, std:: string const & s) {
@@ -60,6 +73,7 @@ namespace compression {
             //PP(fields);
             if(fields.at(0) == "#CHROM") {
                 // #CHROM,POS,ID,REF,ALT,QUAL,FILTER,INFO,FORMAT
+                assert( fields.at(INFO_field_to_skip) == "INFO" );
                 assert((
                 std::vector<string> {   fields.at(0)
                                     ,   fields.at(1)
@@ -75,7 +89,7 @@ namespace compression {
                                     }));
                 return;
             }
-            PP( i, s.substr(0,50) );
+            PP( i, s.substr(0,90) );
         };
 
     }
