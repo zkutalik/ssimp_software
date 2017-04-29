@@ -19,8 +19,10 @@
 #include "other/PP.hh"
 #include "other/range.hh"
 #include "other/range_view.hh"
+#include "other/range_action.hh"
 
 namespace view = range:: view;
+namespace action = range:: action;
 
 using std:: cout;
 using std:: endl;
@@ -451,7 +453,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
                 , range:: range_from_begin_end(unk_its)
                 , range:: range_from_begin_end(genotypes_for_the_unks) | view:: ref_wraps
                 )
-        |view:: unzip_foreach|
+        |action:: unzip_foreach|
         [&] (   int
                     u
             ,   SNPiterator<GenotypeFileHandle>

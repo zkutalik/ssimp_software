@@ -367,4 +367,13 @@ namespace range {
     auto next_permutation(range_from_begin_end_t<Rb,Re> r) -> AMD_RANGE_DECLTYPE_AND_RETURN(
            std::next_permutation( r.m_b , r.m_e))
 
+    namespace detail {
+        template<typename R, typename tag>
+        struct temporary_tagged_holder {
+            static_assert(!std:: is_reference<R>{}, "");
+            R m_r;
+            temporary_tagged_holder(R r) : m_r(std::move(r)) {}
+        };
+    }
+
 } // namespace range

@@ -317,7 +317,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 int const N_ref = hd.unaccounted.size();
                 vector<string> calls_as_strings;
-                range:: ints(N_ref) |view:: foreach| [&](int person) {
+                range:: ints(N_ref) |action:: foreach| [&](int person) {
                     auto column_number = hd.unaccounted.at(person).m_offset;
                     assert(column_number-9 == person);
                     string & call_for_this_person = all_split_up.at(column_number);
@@ -331,7 +331,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 zip_val( range:: range_from_begin_end(lefts_and_rights.first)
                        , range:: range_from_begin_end(lefts_and_rights.second))
-                |view:: foreach|
+                |action:: foreach|
                 [&](auto x) {
                     ++ count_the_call_types[ std:: make_pair(std::get<0>(x)
                                                             ,std::get<1>(x)
@@ -360,7 +360,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 map<call_type, int> map_call_to_contiguous_ids;
                 view:: enumerate_vector(most_popular_first)
-                |view::unzip_foreach|
+                |action:: unzip_foreach|
                 [&](int i, count_and_call_t cac){
                     map_call_to_contiguous_ids[ cac.as_pair() ] = i;
                 };
@@ -372,7 +372,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 zip_val( range:: range_from_begin_end(lefts_and_rights.first)
                        , range:: range_from_begin_end(lefts_and_rights.second))
-                |view:: unzip_foreach|
+                |action:: unzip_foreach|
                 [&](int left, int right) {
                     int code = map_call_to_contiguous_ids.at( std:: make_pair(left,right) );
                     assert(code >= 0);
@@ -428,7 +428,7 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
 
     zip_val( range:: ints(calls_as_strings.size())
            , range:: range_from_begin_end(calls_as_strings) )
-    |view:: unzip_foreach|
+    |action:: unzip_foreach|
     [&](int person, string const & call_for_this_person) {
         z_out.push_back( parse_call_pair(call_for_this_person, person, line_number) );
     };

@@ -11,6 +11,8 @@ namespace action {
 
     struct {} collect;
     struct {} unzip_collect_transpose;
+    struct {} foreach;
+    struct {} unzip_foreach;
 
     template<typename R>
     auto operator| (R r, decltype(collect) )
@@ -35,7 +37,35 @@ namespace action {
                 , std:: make_index_sequence< r.width_v >{}
                 );
     }
-}
-}
+
+    template<typename R>
+    auto operator| (R r, decltype(unzip_foreach) ) {
+        return detail:: temporary_tagged_holder<R, decltype(unzip_foreach)> { std::move(r) };
+    }
+    template<typename R>
+    auto operator| (R r, decltype(foreach) ) {
+        return detail:: temporary_tagged_holder<R, decltype(foreach)> { std::move(r) };
+    }
+
+    template<typename R, typename F>
+    void operator| (detail:: temporary_tagged_holder<R, decltype(unzip_foreach)> r_holder, F && f)
+    {
+        while(!r_holder.m_r.empty()) {
+            utils:: apply   ( std::forward<F>(f)
+                            , range:: pull(r_holder.m_r)
+            );
+        }
+    }
+    template<typename R, typename F>
+    void operator| (detail:: temporary_tagged_holder<R, decltype(foreach)> r_holder, F && f)
+    {
+        while(!r_holder.m_r.empty()) {
+            std::forward<F>(f)(
+                range:: pull(r_holder.m_r)
+            );
+        }
+    }
+} // namespace action
+} // namespace range
 
 #endif
