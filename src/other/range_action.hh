@@ -44,7 +44,7 @@ namespace action {
     }
     template<typename R>
     auto operator| (R &&r, decltype(foreach) ) {
-        return detail:: temporary_tagged_holder_Uref<R, decltype(foreach)> { AMD_FORWARD(r) };
+        return detail:: temporary_tagged_holder<R, decltype(foreach)> { AMD_FORWARD(r) };
     }
 
     template<typename R, typename F>
@@ -57,7 +57,7 @@ namespace action {
         }
     }
     template<typename R, typename F>
-    void operator| (detail:: temporary_tagged_holder_Uref<R, decltype(foreach)> r_holder, F && f)
+    void operator| (detail:: temporary_tagged_holder<R, decltype(foreach)> r_holder, F && f)
     {
         while(!r_holder.m_r.empty()) {
             std::forward<F>(f)(
