@@ -50,11 +50,12 @@ namespace compression {
         range:: read_file_as_a_range_t vcf_input_range{f};
         auto z = zip( range::ints<int64_t>(), vcf_input_range );
 
-        for(auto const & x : z) {
-            PP( std:: get<0>(x)
-              , std:: get<1>(x).get().substr(0,20) );
-            utils:: print_type( std:: get<0>(x) );
-        }
+        std::move(z) |action:: unzip_foreach|
+        [&](auto i, std:: string const & s) {
+            if(s.substr(0,2) == "##")
+                return;
+            PP( i, s.substr(0,20) );
+        };
 
     }
 }
