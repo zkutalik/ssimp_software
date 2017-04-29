@@ -350,6 +350,8 @@ std:: unordered_map<string, chrpos>
     auto const e =   end_from_file(raw_ref_file);
     std:: unordered_map<string, chrpos> m;
     for(;b<e; ++b) {
+        if(b.get_SNPname() == ".") // skip these
+            continue;
         auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
         rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
     }
