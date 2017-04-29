@@ -63,6 +63,19 @@ namespace compression {
             return !!m_f;
         }
 
+        void output_uint32(uint32_t x) {
+            constexpr size_t w = sizeof(x);
+            static_assert( w == 4 ,"");
+            vector<uint8_t> bytes(w);
+            for(int i=w-1; i>=0; --i) {
+                bytes.at(i) = x % 256;
+                x = x / 256;
+            }
+            assert(x==0);
+            for(int i=0; i<(int)w; ++i) {
+                m_f << bytes.at(i);
+            }
+        }
         void output_uint64(uint64_t x) {
             static_assert( 8 == sizeof(uint64_t) ,"");
             vector<uint8_t> bytes(8);
@@ -83,7 +96,7 @@ namespace compression {
                 static_assert( sizeof(int) == sizeof(int32_t) ,"");
                 int as_int = utils:: lexical_cast<int>(s);
                 output_code(TypesOfCodedOutput:: code_int);
-                output_uint64(as_int);
+                output_uint32(as_int);
                 return;
             } catch (std:: invalid_argument & e) { }
             try {
@@ -92,7 +105,7 @@ namespace compression {
                     static_assert( sizeof(int) == sizeof(int32_t) ,"");
                     int as_int = utils:: lexical_cast<int>(s_skip_first_two);
                     output_code(TypesOfCodedOutput:: code_rs_int);
-                    output_uint64(as_int);
+                    output_uint32(as_int);
                     return;
                 }
             } catch (std:: invalid_argument & e) { }
