@@ -423,6 +423,14 @@ namespace range {
             R m_r;
             temporary_tagged_holder(R r) : m_r(std::move(r)) {}
         };
+        template<typename R, typename tag>
+        struct temporary_tagged_holder_Uref {
+            // NOTE, R might be an lvalue-reference type
+            // .. but not an rvalue-ref type
+            static_assert(!std:: is_rvalue_reference<R>{}, "");
+            R m_r;
+            temporary_tagged_holder_Uref(R r) : m_r(AMD_FORWARD(r)) {}
+        };
     }
 
 } // namespace range
