@@ -111,7 +111,11 @@ namespace range {
         void        advance()           {       ++m_b; }
         I           front_val  () const { return  m_b; }
         constexpr
-        bool        is_definitely_infinite() const { return is_infinite; }
+        bool        is_definitely_infinite() const {
+            if(is_infinite)
+                assert(m_e == std:: numeric_limits<I> :: max());
+            return is_infinite;
+        }
     };
     template<typename I = int>
     range_ints_t<I, false> ints(std:: remove_reference_t <I> e) {
