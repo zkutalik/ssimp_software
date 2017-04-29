@@ -68,7 +68,7 @@ namespace range {
     template<typename C>
     auto range_from_begin_end(C &c) -> AMD_RANGE_DECLTYPE_AND_RETURN( range_from_begin_end(c.begin(), c.end()) )
 
-    template<typename I>
+    template<typename I, bool is_infinite>
     struct range_ints_t : public range_tag {
         struct iter_is_own_value {
             I m_i;
@@ -92,10 +92,16 @@ namespace range {
         bool        empty()     const   { return  m_b == m_e; }
         void        advance()           {       ++m_b; }
         I           front_val  () const { return  m_b; }
+        constexpr
+        bool        is_definitely_infinite() const { return is_infinite; }
     };
     template<typename I = int>
-    range_ints_t<I> ints(std:: remove_reference_t <I> e) {
+    range_ints_t<I, false> ints(std:: remove_reference_t <I> e) {
         return {e};
+    }
+    template<typename I = int>
+    range_ints_t<I, true> ints() {
+        return { std:: numeric_limits<I> :: max()};
     }
 
     struct pull_from_empty_range_error : public std:: runtime_error {

@@ -46,13 +46,12 @@ namespace compression {
         (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << vcf_filename << ']');
 
         range:: read_file_as_a_range_t vcf_input_range{f};
-        auto z = zip( range::ints(10000000), vcf_input_range | view:: ref_wraps );
+        auto z = zip( range::ints<int64_t>(), vcf_input_range | view:: ref_wraps );
 
-        //for(string const & s : vcf_input_range) { PP(s.substr(0,20)); }
-        //z |action:: foreach| [&](auto) { };
         for(auto const & x : z) {
             PP( std:: get<0>(x)
               , std:: get<1>(x).get().substr(0,20) );
+            utils:: print_type( std:: get<0>(x) );
         }
 
     }
