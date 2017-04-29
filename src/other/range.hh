@@ -93,8 +93,8 @@ namespace range {
         void        advance()           {       ++m_b; }
         I           front_val  () const { return  m_b; }
     };
-    inline
-    range_ints_t<int> ints(int e) {
+    template<typename I = int>
+    range_ints_t<I> ints(std:: remove_reference_t <I> e) {
         return {e};
     }
 
