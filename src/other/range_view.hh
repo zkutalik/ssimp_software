@@ -31,7 +31,7 @@ namespace view {
 
     template<typename R>
     auto operator| (R r, decltype(ref_wraps) ) {
-        return ref_wraps_impl<R> {move(r)};
+        return ref_wraps_impl<R> {std:: move(r)};
     }
 
     template<typename R>

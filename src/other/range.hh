@@ -249,6 +249,13 @@ namespace range {
         return { std::forward<decltype(ranges)>(ranges)... };
     }
 
+    // Should just call it 'zip', not 'zip_val'. I'll delete 'zip_val{,_t}' later
+    template<typename ...Rs>
+    auto
+    zip(Rs && ...ranges) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+        zip_val( std::forward<decltype(ranges)>(ranges)... )
+    )
+
     namespace impl {
     template<typename R>
     auto pull_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN (
