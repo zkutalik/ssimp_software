@@ -240,10 +240,24 @@ namespace range {
         value_type          front_val()     const;
 
         bool                empty()         const {
-            bool e0 = range:: empty(std::get<0>(m_ranges));
-            bool all_the_same = utils:: and_all( e0 == range:: empty(std::get<Is>(m_ranges)) ...);
-            assert(all_the_same);
-            return e0;
+            /*
+             * Either:
+             *  1.  They're all non-empty, in which case
+             *      we return false
+             *  2.  Otherwise they must all be infinite or empty,
+             *      in which case we return true
+             *  ... otherwise, assertion failure
+             */
+            if (utils:: and_all( !range:: empty(std::get<Is>(m_ranges)) ...) ) {
+                return false;
+            }
+
+            bool all_empty_or_infinite = utils:: and_all(
+                        range:: is_definitely_infinite( std::get<Is>(m_ranges) )
+                     || range:: empty                 ( std::get<Is>(m_ranges) )
+                    ...);
+            assert(all_empty_or_infinite);
+            return true;
         }
         void                advance() {
             auto ignore_me = {((void)std::get<Is>(m_ranges).advance(),false)...};
