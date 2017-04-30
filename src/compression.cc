@@ -53,9 +53,16 @@ namespace compression {
     };
     struct GTcompressed_output_t {
         ofstream m_f;
+        ofstream:: pos_type m_remember_the_begining_position;
 
         template<typename ...Ts>
-        GTcompressed_output_t(Ts&& ...ts) : m_f( std::forward<Ts>(ts) ... ) {}
+        GTcompressed_output_t(Ts&& ...ts)   : m_f( std::forward<Ts>(ts) ... )
+                                            , m_remember_the_begining_position( m_f.tellp() )
+        {
+            // Next two lines to ensure we really are at the start.
+            m_f.seekp(0, ios_base::beg);
+            assert( m_remember_the_begining_position == m_f.tellp() );
+        }
 
         ~GTcompressed_output_t() { m_f.close(); }
 
