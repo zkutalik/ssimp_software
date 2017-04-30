@@ -46,6 +46,7 @@ namespace compression {
         ,   code_rs_int             = 2
         ,   code_period             = 3 // "." occurs a lot
         ,   code_PASS               = 4 // "PASS" occurs a lot
+        ,   code_null_term_string   = 5 // null-terminated string - when everything else fails
         ,   code_A                  = 12
         ,   code_T                  = 13
         ,   code_G                  = 14
@@ -96,9 +97,18 @@ namespace compression {
             }
         }
         void output_string(string const & s) {
+            for(auto c : s) {
+                static_assert( std:: is_same<decltype(c), char>{} ,"");
+                assert(c != '\0');
+            }
             m_f << s;
+            m_f << '\0';
         }
         void output_smart_string(string const & s) {
+            for(auto c : s) {
+                static_assert( std:: is_same<decltype(c), char>{} ,"");
+                assert(c != '\0');
+            }
             try {
                 static_assert( sizeof(int) == sizeof(int32_t) ,"");
                 int as_int = utils:: lexical_cast<int>(s);
@@ -122,7 +132,9 @@ namespace compression {
             if(s == "T"      ) { output_code(TypesOfCodedOutput:: code_T     ); return; }
             if(s == "G"      ) { output_code(TypesOfCodedOutput:: code_G     ); return; }
             if(s == "C"      ) { output_code(TypesOfCodedOutput:: code_C     ); return; }
-            cout << '?' << s << '?' << endl;
+            // Otherwise, we just need to output a plain null-terminated string
+            output_code(TypesOfCodedOutput:: code_null_term_string);
+            output_string(s);
         }
         void output_code(TypesOfCodedOutput code) {
                 m_f << (uint8_t)code;
