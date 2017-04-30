@@ -111,7 +111,7 @@ namespace view {
         bool empty() const {
             return m_r.empty();
         }
-        auto front_val() {
+        auto front_val() const {
             return f( range:: front_val(m_r) );
         }
         void advance() { m_r.advance(); }
