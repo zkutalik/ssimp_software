@@ -112,6 +112,7 @@ namespace compression {
             try {
                 static_assert( sizeof(int) == sizeof(int32_t) ,"");
                 int as_int = utils:: lexical_cast<int>(s);
+                assert(as_int >= 0); // TODO: Could fail sometime
                 output_code(TypesOfCodedOutput:: code_int);
                 output_uint32(as_int);
                 return;
@@ -121,6 +122,7 @@ namespace compression {
                     string s_skip_first_two = s.substr(2, string:: npos);
                     static_assert( sizeof(int) == sizeof(int32_t) ,"");
                     int as_int = utils:: lexical_cast<int>(s_skip_first_two);
+                    assert(as_int >= 0); // TODO: Could fail sometime
                     output_code(TypesOfCodedOutput:: code_rs_int);
                     output_uint32(as_int);
                     return;
