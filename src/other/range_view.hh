@@ -7,9 +7,9 @@
 namespace range {
 namespace view {
     template<typename V>
-    auto enumerate_vector(V & v) {
-        return zip_val  (range:: ints(v.size())
-                        ,range:: from_vector(v)
+    auto enumerate_vector(V && v) {
+        return zip_val  (range:: ints       ( AMD_FORWARD(v).size())
+                        ,range:: from_vector( AMD_FORWARD(v) )
                 );
     }
 
