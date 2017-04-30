@@ -21,6 +21,8 @@ using std:: cout;
 using std:: endl;
 
 using utils:: operator<<;
+using utils:: stdget0;
+using utils:: stdget1;
 
 namespace range {
     // put this into the 'range' namespace, to help begin() find it via ADL
@@ -39,6 +41,11 @@ namespace range {
     };
 }
 namespace compression {
+
+    static
+    auto build_an_efficient_dictionary_from_a_vector_of_strings(vector<string> const & v) {
+        (void) v;
+    }
 
     enum class TypesOfCodedOutput : uint8_t {
             code_end_of_file        = 0
@@ -163,6 +170,7 @@ namespace compression {
 
         constexpr int INFO_field_to_skip = 7;
         constexpr int FORMAT_field_to_skip = 8;
+        constexpr int first_GT_field = 9;
 
         std::move(z) |action:: unzip_foreach|
         [&](auto i, std:: string const & s) {
@@ -198,6 +206,33 @@ namespace compression {
                     continue;
                 binary_output.output_smart_string( fields.at(j) );
             }
+
+            /* Next, even though the FORMAT field isn't explicitly encoded, we
+             * do need to find 'GT' in it
+             */
+            auto FORMAT = fields.at(FORMAT_field_to_skip);
+            auto where_is_GT =
+                view:: enumerate_vector(utils:: tokenize(FORMAT,':'))
+                |view:: unzip_filter|
+                [](auto /*index*/, auto fmt) {
+                        return "GT" == fmt;
+                }
+                | action:: collect;
+            where_is_GT.size() == 1 || DIE("The FORMAT field should have 'GT' exactly once [" << FORMAT << "]");
+
+            int const offset_of_GT_within_FORMAT_field = where_is_GT.at(0) |stdget0;
+            assert("GT" ==                              (where_is_GT.at(0) |stdget1));
+
+            auto many_call_pairs_as_strings =
+                range:: ints( first_GT_field, fields.size() )
+                |view:: map|
+                [&](auto index) {
+                    return utils::tokenize(fields.at(index),':').at(offset_of_GT_within_FORMAT_field);
+                }
+                |action:: collect
+                ;
+            build_an_efficient_dictionary_from_a_vector_of_strings(many_call_pairs_as_strings);
+
         };
 
     }
