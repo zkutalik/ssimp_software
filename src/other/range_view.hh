@@ -119,7 +119,7 @@ namespace view {
     template<typename R, typename F>
     auto operator| (detail:: temporary_tagged_holder<R, decltype(map)> r_holder, F f)
     {
-        return map_t<R,F>{ move(r_holder.m_r), std:: move(f) };
+        return map_t<R,F>{ std:: move(r_holder.m_r), std:: move(f) };
     }
 
 } // namespace view
