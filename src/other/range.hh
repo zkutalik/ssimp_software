@@ -125,6 +125,10 @@ namespace range {
     range_ints_t<I, true> ints() {
         return { std:: numeric_limits<I> :: max()};
     }
+    template<typename I = int>
+    range_ints_t<I, false> ints(std:: remove_reference_t <I> b, std:: remove_reference_t <I> e) {
+        return {b, e};
+    }
 
     struct pull_from_empty_range_error : public std:: runtime_error {
         pull_from_empty_range_error() : std:: runtime_error("attempted pull() from an empty range") {}
