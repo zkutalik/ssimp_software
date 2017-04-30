@@ -300,5 +300,16 @@ inline double ELAPSED(void) {
        return double(clock()) / CLOCKS_PER_SEC;
 }
 
+struct {} stdget0;
+struct {} stdget1;
+template<typename T>
+decltype(auto) operator| (T&& t, decltype(stdget0)) {
+    return std:: get<0>( std::forward<T>(t) );
+}
+template<typename T>
+decltype(auto) operator| (T&& t, decltype(stdget1)) {
+    return std:: get<1>( std::forward<T>(t) );
+}
+
 
 } // namespace utils
