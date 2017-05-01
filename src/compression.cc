@@ -376,8 +376,11 @@ namespace compression {
 
             vector<string> decoded;
 
+            vector<int> int_codes; // just for checking later
+
             while(1) {
                 int code = read_uint32();
+                int_codes.push_back(code);
                 assert(code >= 0);
                 if(code == ssize(dict)) {
                     break;
@@ -388,6 +391,39 @@ namespace compression {
                 for(int i = 0 ; i<d.repetition; ++i) {
                     decoded.push_back( d.s );
                 }
+            }
+
+            // now to read a sequence of bits. Needs care
+            struct bit_reader_t {
+                int  offset = 7;
+                uint8_t current_byte;
+                binary_reader_t * m_outer_this;
+
+                bit_reader_t(binary_reader_t * outer_this) : m_outer_this(outer_this) {
+                    advance();
+                }
+
+                void    advance() {
+                    ++offset;
+                    if(offset == 8) {
+                        offset = 0;
+                        current_byte = m_outer_this->read_uint8();
+                    }
+                }
+                bool    get_bit() const {
+                    return (current_byte & (1 << offset)) > 0;
+                }
+            } bit_reader{this};
+
+            for(int code : int_codes) {
+                int code_from_bits = 0;
+                while(bit_reader.get_bit() == false) {
+                    ++code_from_bits;
+                    bit_reader.advance();
+                }
+                assert(bit_reader.get_bit() == true);
+                bit_reader.advance();
+                assert(code == code_from_bits);
             }
 
             return decoded;
