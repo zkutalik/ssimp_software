@@ -38,6 +38,9 @@ template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G> &pr);
 template<typename F, typename G, typename H>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr);
+template<typename T>
+auto operator<< (std:: ostream &o, T &t)
+-> decltype(  o << t.to_string() );
 
 template<typename T>
 auto nice_operator_shift_left(T &&t)
@@ -122,6 +125,13 @@ std::ostream & operator<< <bool> (std:: ostream &o, const std:: vector<bool> &v)
 
     return o;
 }
+template<typename T>
+auto operator<< (std:: ostream &o, T &t)
+-> decltype(  o << t.to_string() )
+{
+    return o << t.to_string();
+}
+
 template<typename T, typename ...Ts>
 auto mk_vector(T t, Ts ...ts) -> std:: vector<T> {
     return std:: vector<T>{t, ts...};
