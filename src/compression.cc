@@ -513,8 +513,9 @@ namespace compression {
         constexpr int INFO_field_to_skip = 7;
         constexpr int FORMAT_field_to_skip = 8;
         constexpr int first_GT_field = 9;
+        int             number_of_snps = 0;
 
-        std::move(z) |action:: unzip_foreach|
+        z |action:: unzip_foreach|
         [&](auto i, std:: string const & s) {
             if(s.substr(0,2) == "##")
                 return;
@@ -539,6 +540,7 @@ namespace compression {
                                     }));
                 return;
             }
+            ++ number_of_snps;
             (void)i;
             auto remember_offset_at_start_of_this_line = binary_output.m_f.tellp() - binary_output.m_remember_the_begining_position;
             //PP( i, s.substr(0,90) );
@@ -649,6 +651,7 @@ some_more:
                 assert(stuff.fully_decoded_strings == many_call_pairs_as_strings);
             }
         };
+        PP( number_of_snps,  z.front_val() | stdget0);
 
     }
 }
