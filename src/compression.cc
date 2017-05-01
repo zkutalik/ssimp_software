@@ -46,32 +46,32 @@ namespace range {
     };
 }
 namespace compression {
+    struct dict_entry {
+        string  s;
+        int     repetition;
+        double  pseudo_count;
+        int     code; // to be filled in much later
+
+        string  to_string() const {
+            std:: ostringstream oss;
+            oss << '(';
+            oss << utils::consider_quoting(s);
+            oss << ' ' << repetition;
+            oss << ',' << pseudo_count;
+            oss << ',' << code;
+            oss << ')';
+            return oss.str();
+        }
+    };
 
     static
     auto build_an_efficient_dictionary_from_a_vector_of_strings(vector<string> const & v) {
         int const N = v.size();
         unordered_map<string, int> frequencies;
         for(string const &s : v) {
-            ++frequencies["\t" + s];
+            ++frequencies[s];
         }
 
-        struct dict_entry {
-            string  s;
-            int     repetition;
-            double  pseudo_count;
-            int     code; // to be filled in much later
-
-            string  to_string() const {
-                std:: ostringstream oss;
-                oss << '(';
-                oss << utils::consider_quoting(s);
-                oss << ' ' << repetition;
-                oss << ',' << pseudo_count;
-                oss << ',' << code;
-                oss << ')';
-                return oss.str();
-            }
-        };
         vector<dict_entry> dict;
 
         //PP(N);
@@ -317,7 +317,36 @@ namespace compression {
             auto dict = build_an_efficient_dictionary_from_a_vector_of_strings(many_call_pairs_as_strings);
             (void)dict;
 
+            cout << endl;
+            PP(fields.at(1), fields.at(2));
 
+            // Now to find long runs of identical things within 'many_call_pairs_as_strings'
+            auto r = from_vector(many_call_pairs_as_strings);
+            vector<int> encoded_as_ints;
+            while(!r.empty()) {
+                auto s = front_val(r);
+                int  length_of_run = 1;
+                r.advance();
+                while(!r.empty() && s == front_val(r)) {
+                    ++ length_of_run;
+                    r.advance();
+                }
+                //PP(s, length_of_run);
+                // To find a suitable set of codings for this
+some_more:
+                for(dict_entry & d : dict) {
+                    if(s == d.s && length_of_run >= d.repetition) {
+                        PP(d);
+                        // just use this first one
+                        encoded_as_ints.push_back(d.code);
+                        length_of_run -= d.repetition;
+                        assert(length_of_run >= 0);
+                        goto some_more;
+                    }
+                }
+                assert(length_of_run==0);
+            }
+            PP(encoded_as_ints);
 
         };
 
