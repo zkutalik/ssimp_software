@@ -154,6 +154,8 @@ namespace compression {
         ,   code_period             = 3 // "." occurs a lot
         ,   code_PASS               = 4 // "PASS" occurs a lot
         ,   code_null_term_string   = 5 // null-terminated string - when everything else fails
+        ,   code_0pipe0             = 6
+        ,   code_0slash0            = 7
         ,   code_dict_start         = 11
         ,   code_A                  = 12
         ,   code_T                  = 13
@@ -238,6 +240,8 @@ namespace compression {
             } catch (std:: invalid_argument & e) { }
             if(s == "."      ) { output_code(TypesOfCodedOutput:: code_period); return; }
             if(s == "PASS"   ) { output_code(TypesOfCodedOutput:: code_PASS  ); return; }
+            if(s == "0|0"   ) { output_code(TypesOfCodedOutput:: code_0pipe0  ); return; }
+            if(s == "0/0"   ) { output_code(TypesOfCodedOutput:: code_0slash0  ); return; }
             if(s == "A"      ) { output_code(TypesOfCodedOutput:: code_A     ); return; }
             if(s == "T"      ) { output_code(TypesOfCodedOutput:: code_T     ); return; }
             if(s == "G"      ) { output_code(TypesOfCodedOutput:: code_G     ); return; }
@@ -299,6 +303,8 @@ namespace compression {
                 break; case TypesOfCodedOutput:: code_G     : { return "G"; }
                 break; case TypesOfCodedOutput:: code_C     : { return "C"; }
                 break; case TypesOfCodedOutput:: code_PASS  : { return "PASS"; }
+                break; case TypesOfCodedOutput:: code_0pipe0: { return "0|0"; }
+                break; case TypesOfCodedOutput:: code_0slash0: { return "0/0"; }
                 break; case TypesOfCodedOutput:: code_period: { return "."; }
                 break; case TypesOfCodedOutput:: code_null_term_string: {
                     string s;
