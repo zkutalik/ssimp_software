@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <unordered_map>
 
 #include <gzstream.h>
@@ -15,6 +16,8 @@ namespace action = range:: action;
 namespace view   = range:: view  ;
 
 using std:: ofstream;
+using std:: ifstream;
+using std:: ostringstream;
 using std:: ios_base;
 using std:: string;
 using std:: vector;
@@ -262,6 +265,104 @@ namespace compression {
         }
     };
 
+    struct binary_reader_t {
+        ifstream m_f;
+
+        binary_reader_t(string compressed_out_file_name)
+        {
+            m_f.open(   compressed_out_file_name
+                    //,   ios_base::in
+                       //|ios_base::binary
+                    );
+            m_f || DIE("can't reopen");
+        }
+
+        string              read_smart_string() {
+            auto code = read_code();
+            ostringstream oss;
+            switch(code) {
+                break; case TypesOfCodedOutput:: code_int: {
+                    auto u = read_uint32();
+                    //cout << std:: hex << u << endl;
+                    oss << u;
+                    return oss.str();
+                }
+                break; case TypesOfCodedOutput:: code_rs_int: {
+                    auto u = read_uint32();
+                    //cout << std:: hex << u << endl;
+                    oss << "rs" << u;
+                    return oss.str();
+                }
+                break; case TypesOfCodedOutput:: code_A     : { return "A"; }
+                break; case TypesOfCodedOutput:: code_T     : { return "T"; }
+                break; case TypesOfCodedOutput:: code_G     : { return "G"; }
+                break; case TypesOfCodedOutput:: code_C     : { return "C"; }
+                break; case TypesOfCodedOutput:: code_PASS  : { return "PASS"; }
+                break; case TypesOfCodedOutput:: code_period: { return "."; }
+                break; case TypesOfCodedOutput:: code_null_term_string: {
+                    string s;
+                    getline(m_f, s, '\0');
+                    return s;
+                }
+                break; default: {
+                    DIE("unhandled TypesOfCodedOutput [" << (int) code << "]");
+                }
+            }
+            return "?";
+        }
+        uint32_t read_uint32() {
+            uint32_t x = 0;
+            assert(m_f);
+
+            for(int i = 0; i<4; ++i) {
+                uint8_t c = (char) m_f.get(); // int -> char -> uint8_t . I think this is the only correct way
+                assert(m_f);
+                x = 256 * x;
+                x += c;
+            }
+            return x;
+        }
+
+        TypesOfCodedOutput  read_code() {
+            assert(m_f);
+            int i = m_f.get();
+            assert(m_f);
+            uint8_t x= (char) i;
+            assert(m_f);
+            return static_cast<TypesOfCodedOutput>(x);
+        }
+    };
+
+    static
+    auto        read_in_one_full_compressed_line( int64_t remember_offset_at_start_of_this_line
+            , string compressed_out_file_name
+            ) {
+        binary_reader_t reopen( compressed_out_file_name );
+        reopen.m_f.seekg( remember_offset_at_start_of_this_line
+                        , ios_base::beg
+                        );
+        reopen.m_f || DIE("can't seek the reopen");
+
+        //auto c0 = reopen.read_code();
+        //PP( (int)c0 );
+        struct stuff_t {
+            string field0;
+            string field1;
+            string field2;
+            string field3;
+            string field4;
+            string field5;
+            string field6;
+        };
+        return stuff_t  { reopen.read_smart_string()
+                        , reopen.read_smart_string()
+                        , reopen.read_smart_string()
+                        , reopen.read_smart_string()
+                        , reopen.read_smart_string()
+                        , reopen.read_smart_string()
+                        , reopen.read_smart_string() };
+    }
+
     void make_compressed_vcf_file   (std:: string compressed_out_file_name, std:: string vcf_filename) {
         GTcompressed_output_t binary_output (compressed_out_file_name
                                             ,   ios_base::out
@@ -310,6 +411,7 @@ namespace compression {
                 return;
             }
             (void)i;
+            auto remember_offset_at_start_of_this_line = binary_output.m_f.tellp() - binary_output.m_remember_the_begining_position;
             //PP( i, s.substr(0,90) );
             for(int j=0; j<9; ++j) {
                 if(j==INFO_field_to_skip)
@@ -347,7 +449,12 @@ namespace compression {
             (void)dict;
 
             cout << endl;
-            PP(fields.at(1), fields.at(2));
+            PP(       fields.at(0)
+                    , fields.at(1)
+                    , fields.at(2)
+                    , fields.at(3)
+                    , fields.at(4)
+                    );
 
             // Now to find long runs of identical things within 'many_call_pairs_as_strings'
             auto r = from_vector(many_call_pairs_as_strings);
@@ -365,7 +472,7 @@ namespace compression {
 some_more:
                 for(dict_entry & d : dict) {
                     if(s == d.s && length_of_run >= d.repetition) {
-                        PP(d);
+                        //PP(d);
                         // just use this first one
                         encoded_as_ints.push_back(d.code);
                         length_of_run -= d.repetition;
@@ -383,6 +490,19 @@ some_more:
             binary_output.output_dict(dict);
             binary_output.output_encoded_as_ints(encoded_as_ints);
 
+            binary_output.m_f.flush();
+
+            { // Let's reread everything to check it's OK
+                auto stuff = read_in_one_full_compressed_line(   remember_offset_at_start_of_this_line
+                                                             ,   compressed_out_file_name);
+                assert(stuff.field0 == fields.at(0));
+                assert(stuff.field1 == fields.at(1));
+                assert(stuff.field2 == fields.at(2));
+                assert(stuff.field3 == fields.at(3));
+                assert(stuff.field4 == fields.at(4));
+                assert(stuff.field5 == fields.at(5));
+                assert(stuff.field6 == fields.at(6));
+            }
         };
 
     }
