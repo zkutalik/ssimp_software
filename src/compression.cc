@@ -374,18 +374,6 @@ namespace compression {
                 }
             } while(1);
 
-            vector<int> int_codes; // just for checking later
-
-            while(1) {
-                int code = read_uint32();
-                assert(code >= 0);
-                if(code == ssize(dict)) {
-                    break;
-                }
-                assert(code < ssize(dict));
-                int_codes.push_back(code);
-            }
-
             // now to read a sequence of bits. Needs care
             struct bit_reader_t {
                 int  offset = 7;
@@ -427,9 +415,6 @@ namespace compression {
                 ints_from_bits.push_back(code_from_bits);
                 assert(code_from_bits <  ssize(dict));
             }while(1);
-
-            assert(int_codes == ints_from_bits);
-
 
             vector<string> decoded;
             for(int code : ints_from_bits) {
@@ -612,7 +597,6 @@ some_more:
 
             binary_output.output_dict(dict);
             encoded_as_ints.push_back( dict.size() );
-            binary_output.output_encoded_as_ints(encoded_as_ints);
 
             vector<bool> encoded_as_bits;
             for(int code : encoded_as_ints) {
