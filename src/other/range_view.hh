@@ -12,6 +12,12 @@ namespace view {
                         ,range:: from_vector( AMD_FORWARD(v) )
                 );
     }
+    template<typename R>
+    auto enumerate(R && r) {
+        return zip_val  (range:: ints       (                )
+                        ,AMD_FORWARD(r)
+                );
+    }
 
     struct {} ref_wraps;
     struct {} map;
