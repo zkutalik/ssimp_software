@@ -25,6 +25,9 @@ using std:: unordered_map;
 using utils:: operator<<;
 using utils:: stdget0;
 using utils:: stdget1;
+using utils:: print_type;
+
+using range:: from_vector;
 
 namespace range {
     // put this into the 'range' namespace, to help begin() find it via ADL
@@ -311,7 +314,10 @@ namespace compression {
                 }
                 |action:: collect
                 ;
-            build_an_efficient_dictionary_from_a_vector_of_strings(many_call_pairs_as_strings);
+            auto dict = build_an_efficient_dictionary_from_a_vector_of_strings(many_call_pairs_as_strings);
+            (void)dict;
+
+
 
         };
 
