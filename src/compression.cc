@@ -413,18 +413,28 @@ namespace compression {
                 bool    get_bit() const {
                     return (current_byte & (1 << offset)) > 0;
                 }
+                int     get_count_up_to_next_true() {
+                    int code_from_bits = 0;
+                    while(get_bit() == false) {
+                        ++code_from_bits;
+                        advance();
+                    }
+                    assert(get_bit() == true);
+                    advance();
+                    return code_from_bits;
+                }
             } bit_reader{this};
 
             for(int code : int_codes) {
-                int code_from_bits = 0;
-                while(bit_reader.get_bit() == false) {
-                    ++code_from_bits;
-                    bit_reader.advance();
-                }
-                assert(bit_reader.get_bit() == true);
-                bit_reader.advance();
+                int code_from_bits = bit_reader.get_count_up_to_next_true();
                 assert(code == code_from_bits);
+                assert(code <= ssize(dict));
             }
+            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
+            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
+            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
+            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
+            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
 
             return decoded;
         }
@@ -608,6 +618,19 @@ some_more:
                 }
                 encoded_as_bits.push_back(true);
             }
+            encoded_as_bits.push_back(true);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(true);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(true);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(true);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(false);
+            encoded_as_bits.push_back(true);
             binary_output.output_encoded_as_bits(std::move(encoded_as_bits));
 
             binary_output.m_f.flush();
