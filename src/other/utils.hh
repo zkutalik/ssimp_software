@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <cassert>
 #include <cmath>
@@ -29,6 +30,27 @@ namespace impl {
 
 template<template<class...> class Template, typename ...Args>
 using can_apply = impl:: can_apply_impl<void, Template, Args...>;
+
+template<typename T>
+decltype(auto) consider_quoting(T &&t) {
+    return std::forward<T>(t);
+}
+//template<>
+inline
+std:: string consider_quoting(std::string const &t) {
+    std:: ostringstream oss;
+    oss << '"';
+    for(char c : t) {
+        switch(c) {
+            break; case '\t': oss << "\\t";
+            break; case '"' : oss << "\\\"";
+            break; case '\\' : oss << "\\\\";
+            break; default  : oss << c;
+        }
+    }
+    oss << '"';
+    return oss.str();
+}
 
 template<typename T>
 std::ostream & operator<< (std:: ostream &o, const std:: vector<T> &v);
