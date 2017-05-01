@@ -265,6 +265,27 @@ namespace compression {
                 output_uint32(i);
             }
         }
+        void output_encoded_as_bits(vector<bool> encoded_as_bits
+                ) {
+            while(encoded_as_bits.size() % 8 != 0)
+                encoded_as_bits.push_back(true);
+            assert(encoded_as_bits.size() % 8 == 0);
+            int num_bytes = encoded_as_bits.size() / 8;
+            for(int byte_counter = 0; byte_counter < num_bytes; ++byte_counter) {
+                int this_byte_as_an_int = 0;
+                for(int bit_counter = 0; bit_counter < 8; ++bit_counter) {
+                    if( encoded_as_bits.at(8*byte_counter + bit_counter) ) {
+                        //PP( bit_counter, 1 << bit_counter );
+                        this_byte_as_an_int += 1 << bit_counter;
+                    }
+                }
+                //PP(this_byte_as_an_int);
+                output_uint8(this_byte_as_an_int);
+            }
+        }
+        void output_uint8(uint8_t u) {
+                m_f << (uint8_t)u;
+        }
         void output_code(TypesOfCodedOutput code) {
                 m_f << (uint8_t)code;
         }
@@ -539,6 +560,15 @@ some_more:
             binary_output.output_dict(dict);
             encoded_as_ints.push_back( dict.size() );
             binary_output.output_encoded_as_ints(encoded_as_ints);
+
+            vector<bool> encoded_as_bits;
+            for(int code : encoded_as_ints) {
+                for(int i=0; i<code; ++i) {
+                    encoded_as_bits.push_back(false);
+                }
+                encoded_as_bits.push_back(true);
+            }
+            binary_output.output_encoded_as_bits(std::move(encoded_as_bits));
 
             binary_output.m_f.flush();
 
