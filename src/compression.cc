@@ -425,16 +425,16 @@ namespace compression {
                 }
             } bit_reader{this};
 
-            for(int code : int_codes) {
+            vector<int> ints_from_bits;
+            do {
                 int code_from_bits = bit_reader.get_count_up_to_next_true();
-                assert(code == code_from_bits);
-                assert(code <= ssize(dict));
-            }
-            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
-            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
-            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
-            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
-            PP(bit_reader.get_count_up_to_next_true(), ssize(dict));
+                assert(code_from_bits <= ssize(dict));
+                ints_from_bits.push_back(code_from_bits);
+                if(code_from_bits ==  ssize(dict))
+                    break;
+                assert(code_from_bits <  ssize(dict));
+            }while(1);
+            assert(int_codes == ints_from_bits);
 
             return decoded;
         }
@@ -618,19 +618,11 @@ some_more:
                 }
                 encoded_as_bits.push_back(true);
             }
+
+            // This next line is quite important, to ensure that (when reading)
+            // that we don't 'advance' into one byte too far
             encoded_as_bits.push_back(true);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(true);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(true);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(true);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(false);
-            encoded_as_bits.push_back(true);
+
             binary_output.output_encoded_as_bits(std::move(encoded_as_bits));
 
             binary_output.m_f.flush();
