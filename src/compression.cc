@@ -155,7 +155,14 @@ namespace compression {
         ,   code_PASS               = 4 // "PASS" occurs a lot
         ,   code_null_term_string   = 5 // null-terminated string - when everything else fails
         ,   code_0pipe0             = 6
-        ,   code_0slash0            = 7
+        ,   code_0slsh0             = 7
+        ,   code_0pipe1             = 16
+        ,   code_0slsh1             = 17
+        ,   code_1pipe0             = 18
+        ,   code_1slsh0             = 19
+        ,   code_1pipe1             = 20
+        ,   code_1slsh1             = 21
+
         ,   code_dict_start         = 11
         ,   code_A                  = 12
         ,   code_T                  = 13
@@ -241,7 +248,13 @@ namespace compression {
             if(s == "."      ) { output_code(TypesOfCodedOutput:: code_period); return; }
             if(s == "PASS"   ) { output_code(TypesOfCodedOutput:: code_PASS  ); return; }
             if(s == "0|0"   ) { output_code(TypesOfCodedOutput:: code_0pipe0  ); return; }
-            if(s == "0/0"   ) { output_code(TypesOfCodedOutput:: code_0slash0  ); return; }
+            if(s == "0/0"   ) { output_code(TypesOfCodedOutput:: code_0slsh0  ); return; }
+            if(s == "0|1"   ) { output_code(TypesOfCodedOutput:: code_0pipe1  ); return; }
+            if(s == "0/1"   ) { output_code(TypesOfCodedOutput:: code_0slsh1  ); return; }
+            if(s == "1|0"   ) { output_code(TypesOfCodedOutput:: code_1pipe0  ); return; }
+            if(s == "1/0"   ) { output_code(TypesOfCodedOutput:: code_1slsh0  ); return; }
+            if(s == "1|1"   ) { output_code(TypesOfCodedOutput:: code_1pipe1  ); return; }
+            if(s == "1/1"   ) { output_code(TypesOfCodedOutput:: code_1slsh1  ); return; }
             if(s == "A"      ) { output_code(TypesOfCodedOutput:: code_A     ); return; }
             if(s == "T"      ) { output_code(TypesOfCodedOutput:: code_T     ); return; }
             if(s == "G"      ) { output_code(TypesOfCodedOutput:: code_G     ); return; }
@@ -325,7 +338,13 @@ namespace compression {
                 break; case TypesOfCodedOutput:: code_C     : { return "C"; }
                 break; case TypesOfCodedOutput:: code_PASS  : { return "PASS"; }
                 break; case TypesOfCodedOutput:: code_0pipe0: { return "0|0"; }
-                break; case TypesOfCodedOutput:: code_0slash0: { return "0/0"; }
+                break; case TypesOfCodedOutput:: code_0slsh0: { return "0/0"; }
+                break; case TypesOfCodedOutput:: code_1pipe0: { return "1|0"; }
+                break; case TypesOfCodedOutput:: code_1slsh0: { return "1/0"; }
+                break; case TypesOfCodedOutput:: code_0pipe1: { return "0|1"; }
+                break; case TypesOfCodedOutput:: code_0slsh1: { return "0/1"; }
+                break; case TypesOfCodedOutput:: code_1pipe1: { return "1|1"; }
+                break; case TypesOfCodedOutput:: code_1slsh1: { return "1/1"; }
                 break; case TypesOfCodedOutput:: code_period: { return "."; }
                 break; case TypesOfCodedOutput:: code_null_term_string: {
                     string s;
