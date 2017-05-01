@@ -54,12 +54,15 @@ namespace range {
 
         auto begin() const { return m_b; }
         auto end  () const { return m_e; }
+        auto begin()       { return m_b; }
+        auto end  ()       { return m_e; }
         bool empty() const { return m_b == m_e; }
         void advance()     { ++m_b; }
         auto current_it() const { return m_b; }
         // should consider a more flexible front_ref that tries to
         // return the least cv-qualified version that it can
-        value_type      const &  front_ref() const   { return *m_b; }
+        decltype(auto)           front_ref() const   { return *m_b; }
+        decltype(auto)           front_ref()         { return *m_b; }
     };
     template<typename b_t, typename e_t>
     range_from_begin_end_t<b_t,e_t> range_from_begin_end(b_t b, e_t e) {
