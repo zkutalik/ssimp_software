@@ -374,23 +374,16 @@ namespace compression {
                 }
             } while(1);
 
-            vector<string> decoded;
-
             vector<int> int_codes; // just for checking later
 
             while(1) {
                 int code = read_uint32();
-                int_codes.push_back(code);
                 assert(code >= 0);
                 if(code == ssize(dict)) {
                     break;
                 }
                 assert(code < ssize(dict));
-
-                dict_entry & d = dict.at(code);
-                for(int i = 0 ; i<d.repetition; ++i) {
-                    decoded.push_back( d.s );
-                }
+                int_codes.push_back(code);
             }
 
             // now to read a sequence of bits. Needs care
@@ -429,13 +422,23 @@ namespace compression {
             do {
                 int code_from_bits = bit_reader.get_count_up_to_next_true();
                 assert(code_from_bits <= ssize(dict));
-                ints_from_bits.push_back(code_from_bits);
                 if(code_from_bits ==  ssize(dict))
                     break;
+                ints_from_bits.push_back(code_from_bits);
                 assert(code_from_bits <  ssize(dict));
             }while(1);
+
             assert(int_codes == ints_from_bits);
 
+
+            vector<string> decoded;
+            for(int code : ints_from_bits) {
+                assert(code < ssize(dict));
+                dict_entry & d = dict.at(code);
+                for(int i = 0 ; i<d.repetition; ++i) {
+                    decoded.push_back( d.s );
+                }
+            }
             return decoded;
         }
 
