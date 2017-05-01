@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <unordered_map>
 
 #include <gzstream.h>
 
@@ -19,6 +20,7 @@ using std:: string;
 using std:: vector;
 using std:: cout;
 using std:: endl;
+using std:: unordered_map;
 
 using utils:: operator<<;
 using utils:: stdget0;
@@ -44,7 +46,85 @@ namespace compression {
 
     static
     auto build_an_efficient_dictionary_from_a_vector_of_strings(vector<string> const & v) {
-        (void) v;
+        int const N = v.size();
+        unordered_map<string, int> frequencies;
+        for(string const &s : v) {
+            ++frequencies["\t" + s];
+        }
+
+        struct dict_entry {
+            string  s;
+            int     repetition;
+            double  pseudo_count;
+            int     code; // to be filled in much later
+
+            string  to_string() const {
+                std:: ostringstream oss;
+                oss << '(';
+                oss << utils::consider_quoting(s);
+                oss << ' ' << repetition;
+                oss << ',' << pseudo_count;
+                oss << ',' << code;
+                oss << ')';
+                return oss.str();
+            }
+        };
+        vector<dict_entry> dict;
+
+        //PP(N);
+        if(frequencies.size() == 1) {
+            dict.emplace_back( dict_entry{frequencies.begin()->first, N, double(N), 0} );
+            //PP(dict);
+            return dict;
+        }
+        assert(frequencies.size() >= 2);
+
+        range:: range_from_begin_end(frequencies)
+        |action::unzip_foreach|
+        [&](auto k, auto v) {
+            auto rate = double(v)/N;
+            auto pseudo_rate = rate;
+            //PP(k,v, rate, -std::log2(rate));
+            // Entries with very high frequency deserve even more efficient coding
+            int repetition = 1;
+            while( -std::log2(rate) < 0.5 ) {
+                rate = rate * rate;
+                pseudo_rate = std:: sqrt(pseudo_rate); // just to ensure it's given high priority in the dictionary
+                repetition *= 2;
+                //PP(rate, - std::log2(rate) , k, repetition, pseudo_rate*N);
+                dict.emplace_back( dict_entry{k, repetition, pseudo_rate*N, -1} );
+                assert(repetition <= N);
+            }
+        };
+        //PP(frequencies.size());
+
+        range:: range_from_begin_end(frequencies)
+        |action::unzip_foreach|
+        [&](auto && k, auto && v) {
+            //PP(k,v);
+            auto rate = double(v)/N;
+            dict.emplace_back( dict_entry{k, 1, rate*N, -1} );
+        };
+
+        range:: sort( range:: range_from_begin_end(dict), [&](auto && l, auto && r) {
+            if    (l.pseudo_count == r. pseudo_count) {
+                if    (l.s == r.s)
+                    return l.repetition > r.repetition;
+                return l.s > r.s;
+            }
+            return l.pseudo_count >  r. pseudo_count;
+        });
+        //for(auto &&d : dict) { PP(d); }
+
+        enumerate(range:: range_from_begin_end(dict) | view:: ref_wraps)
+        |action:: unzip_foreach|
+        [&](auto &&i , auto && d
+                ) {
+            d.get().code = i;
+        };
+        //for(auto &&d : dict) { PP(d); }
+
+        return dict;
     }
 
     enum class TypesOfCodedOutput : uint8_t {
