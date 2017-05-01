@@ -242,6 +242,21 @@ namespace compression {
             output_code(TypesOfCodedOutput:: code_null_term_string);
             output_string(s);
         }
+        void output_dict(vector<dict_entry>     const   & dict) {
+            (void)dict;
+            for(dict_entry const & d : dict) {
+                assert(d.repetition > 0); // repetition==0 will mark the end
+                output_uint32(d.repetition);
+                output_smart_string(d.s);
+            }
+            output_uint32(0); // end of dictionary
+        }
+        void output_encoded_as_ints(vector<int> const   & encoded_as_ints) {
+            for(int i : encoded_as_ints) {
+                assert(i>=0);
+                output_uint32(i);
+            }
+        }
         void output_code(TypesOfCodedOutput code) {
                 m_f << (uint8_t)code;
         }
@@ -364,6 +379,9 @@ some_more:
             auto decoded_from_ints = decode_from_ints(encoded_as_ints, dict);
             assert(many_call_pairs_as_strings.size() == decoded_from_ints.size());
             assert(many_call_pairs_as_strings        == decoded_from_ints       );
+
+            binary_output.output_dict(dict);
+            binary_output.output_encoded_as_ints(encoded_as_ints);
 
         };
 
