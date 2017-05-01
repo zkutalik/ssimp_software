@@ -154,6 +154,7 @@ namespace compression {
         ,   code_period             = 3 // "." occurs a lot
         ,   code_PASS               = 4 // "PASS" occurs a lot
         ,   code_null_term_string   = 5 // null-terminated string - when everything else fails
+        ,   code_dict_start         = 11
         ,   code_A                  = 12
         ,   code_T                  = 13
         ,   code_G                  = 14
@@ -246,7 +247,7 @@ namespace compression {
             output_string(s);
         }
         void output_dict(vector<dict_entry>     const   & dict) {
-            (void)dict;
+            output_code(TypesOfCodedOutput:: code_dict_start);
             for(dict_entry const & d : dict) {
                 assert(d.repetition > 0); // repetition==0 will mark the end
                 output_uint32(d.repetition);
@@ -323,6 +324,44 @@ namespace compression {
             return x;
         }
 
+        vector<string>  read_dict_and_fully_decode() {
+            auto starter = read_code();
+            assert(starter == TypesOfCodedOutput:: code_dict_start);
+
+            vector<dict_entry> dict;
+            do {
+                dict_entry d;
+                d.pseudo_count = std::nan("");
+                d.code = -1;
+                d.repetition = read_uint32();
+                if(d.repetition == 0)
+                    break;
+                else {
+                    assert(d.repetition>0);
+                    d.s = read_smart_string();
+                    dict.push_back(d);
+                }
+            } while(1);
+
+            vector<string> decoded;
+
+            while(1) {
+                int code = read_uint32();
+                assert(code >= 0);
+                if(code == ssize(dict)) {
+                    break;
+                }
+                assert(code < ssize(dict));
+
+                dict_entry & d = dict.at(code);
+                for(int i = 0 ; i<d.repetition; ++i) {
+                    decoded.push_back( d.s );
+                }
+            }
+
+            return decoded;
+        }
+
         TypesOfCodedOutput  read_code() {
             assert(m_f);
             int i = m_f.get();
@@ -353,6 +392,7 @@ namespace compression {
             string field4;
             string field5;
             string field6;
+            vector<string> fully_decoded_strings;
         };
         return stuff_t  { reopen.read_smart_string()
                         , reopen.read_smart_string()
@@ -360,7 +400,9 @@ namespace compression {
                         , reopen.read_smart_string()
                         , reopen.read_smart_string()
                         , reopen.read_smart_string()
-                        , reopen.read_smart_string() };
+                        , reopen.read_smart_string()
+                        , reopen.read_dict_and_fully_decode()
+        };
     }
 
     void make_compressed_vcf_file   (std:: string compressed_out_file_name, std:: string vcf_filename) {
@@ -475,6 +517,7 @@ some_more:
                         //PP(d);
                         // just use this first one
                         encoded_as_ints.push_back(d.code);
+                        assert( &d == &dict.at(d.code) );
                         length_of_run -= d.repetition;
                         assert(length_of_run >= 0);
                         goto some_more;
@@ -488,6 +531,7 @@ some_more:
             assert(many_call_pairs_as_strings        == decoded_from_ints       );
 
             binary_output.output_dict(dict);
+            encoded_as_ints.push_back( dict.size() );
             binary_output.output_encoded_as_ints(encoded_as_ints);
 
             binary_output.m_f.flush();
@@ -502,6 +546,7 @@ some_more:
                 assert(stuff.field4 == fields.at(4));
                 assert(stuff.field5 == fields.at(5));
                 assert(stuff.field6 == fields.at(6));
+                assert(stuff.fully_decoded_strings == many_call_pairs_as_strings);
             }
         };
 
