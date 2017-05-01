@@ -149,25 +149,28 @@ namespace compression {
 
     enum class TypesOfCodedOutput : uint8_t {
             code_end_of_file        = 0
-        ,   code_int                = 1
-        ,   code_rs_int             = 2
-        ,   code_period             = 3 // "." occurs a lot
-        ,   code_PASS               = 4 // "PASS" occurs a lot
-        ,   code_null_term_string   = 5 // null-terminated string - when everything else fails
-        ,   code_0pipe0             = 6
-        ,   code_0slsh0             = 7
-        ,   code_0pipe1             = 16
-        ,   code_0slsh1             = 17
-        ,   code_1pipe0             = 18
-        ,   code_1slsh0             = 19
-        ,   code_1pipe1             = 20
-        ,   code_1slsh1             = 21
+        ,   code_null_term_string   = 1 // null-terminated string - when everything else fails
 
-        ,   code_dict_start         = 11
-        ,   code_A                  = 12
-        ,   code_T                  = 13
-        ,   code_G                  = 14
-        ,   code_C                  = 15
+        ,   code_int                = 2
+        ,   code_rs_int             = 3
+        ,   code_period             = 4 // "." occurs a lot
+        ,   code_PASS               = 5 // "PASS" occurs a lot
+
+        ,   code_A                  = 6
+        ,   code_T                  = 7
+        ,   code_G                  = 8
+        ,   code_C                  = 9
+
+        ,   code_dict_start         = 15
+        ,   code_0pipe0             = 16
+        ,   code_0slsh0             = 17
+        ,   code_0pipe1             = 18
+        ,   code_0slsh1             = 19
+        ,   code_1pipe0             = 20
+        ,   code_1slsh0             = 21
+        ,   code_1pipe1             = 22
+        ,   code_1slsh1             = 23
+
     };
     struct GTcompressed_output_t {
         ofstream m_f;
