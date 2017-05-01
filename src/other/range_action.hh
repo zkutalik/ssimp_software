@@ -39,8 +39,8 @@ namespace action {
     }
 
     template<typename R>
-    auto operator| (R r, decltype(unzip_foreach) ) {
-        return detail:: temporary_tagged_holder<R, decltype(unzip_foreach)> { std::move(r) };
+    auto operator| (R &&r, decltype(unzip_foreach) ) {
+        return detail:: temporary_tagged_holder_Uref<R, decltype(unzip_foreach)> { AMD_FORWARD(r) };
     }
     template<typename R>
     auto operator| (R &&r, decltype(foreach) ) {
@@ -48,7 +48,7 @@ namespace action {
     }
 
     template<typename R, typename F>
-    void operator| (detail:: temporary_tagged_holder<R, decltype(unzip_foreach)> r_holder, F && f)
+    void operator| (detail:: temporary_tagged_holder_Uref<R, decltype(unzip_foreach)> r_holder, F && f)
     {
         while(!r_holder.m_r.empty()) {
             utils:: apply   ( std::forward<F>(f)
