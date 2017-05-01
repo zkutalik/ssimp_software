@@ -26,6 +26,7 @@ using utils:: operator<<;
 using utils:: stdget0;
 using utils:: stdget1;
 using utils:: print_type;
+using utils:: ssize;
 
 using range:: from_vector;
 
@@ -63,6 +64,19 @@ namespace compression {
             return oss.str();
         }
     };
+    static
+    auto    decode_from_ints(vector<int> & encoded_as_ints, vector<dict_entry> &dict) {
+        vector<string> fields;
+        for(int code : encoded_as_ints) {
+            assert(code < ssize(dict));
+            dict_entry const & d = dict.at(code);
+            for(int i : range:: ints(d.repetition)) {
+                (void)i;
+                fields.push_back(d.s);
+            }
+        }
+        return fields;
+    }
 
     static
     auto build_an_efficient_dictionary_from_a_vector_of_strings(vector<string> const & v) {
@@ -346,7 +360,10 @@ some_more:
                 }
                 assert(length_of_run==0);
             }
-            PP(encoded_as_ints);
+
+            auto decoded_from_ints = decode_from_ints(encoded_as_ints, dict);
+            assert(many_call_pairs_as_strings.size() == decoded_from_ints.size());
+            assert(many_call_pairs_as_strings        == decoded_from_ints       );
 
         };
 
