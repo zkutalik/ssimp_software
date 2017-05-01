@@ -338,6 +338,10 @@ namespace compression {
             }
             return "?";
         }
+        uint32_t read_uint8() {
+            uint8_t c = (char) m_f.get();
+            return c;
+        }
         uint32_t read_uint32() {
             uint32_t x = 0;
             assert(m_f);
