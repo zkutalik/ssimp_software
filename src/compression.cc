@@ -577,15 +577,6 @@ namespace compression {
                 |action:: collect
                 ;
             auto dict = build_an_efficient_dictionary_from_a_vector_of_strings(many_call_pairs_as_strings);
-            (void)dict;
-
-            cout << endl;
-            PP(       fields.at(0)
-                    , fields.at(1)
-                    , fields.at(2)
-                    , fields.at(3)
-                    , fields.at(4)
-                    );
 
             // Now to find long runs of identical things within 'many_call_pairs_as_strings'
             auto r = from_vector(many_call_pairs_as_strings);
