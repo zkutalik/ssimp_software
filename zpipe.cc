@@ -12,8 +12,7 @@
                      Avoid some compiler warnings for input and output buffers
  */
 
-#include <stdio.h>
-#include <string.h>
+#include <string>
 #include <assert.h>
 #include "zlib.h"
 
@@ -190,7 +189,7 @@ int main(int argc, char **argv)
     }
 
     /* do decompression if -d specified */
-    else if (argc == 2 && strcmp(argv[1], "-d") == 0) {
+    else if (argc == 2 && std::string(argv[1]) == "-d") {
         auto input_data = read_FILE_into_vector(stdin);
         auto result = inf(std::move(input_data));
         std:: cout.write    (   reinterpret_cast<char*>(result.data())
