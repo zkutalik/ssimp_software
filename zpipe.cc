@@ -118,8 +118,10 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
    invalid or incomplete, Z_VERSION_ERROR if the version of zlib.h and
    the version of the library linked do not match, or Z_ERRNO if there
    is an error reading or writing the files. */
-void inf(FILE *source, FILE *dest)
+vector<unsigned char> inf(FILE *source)
 {
+    vector<unsigned char> result;
+
     constexpr int CHUNKii = 16384;
     constexpr int CHUNKio = 163;
 
@@ -165,10 +167,7 @@ void inf(FILE *source, FILE *dest)
                 throw exc:: error_from_inflateInit_t{ret};
             }
             have = CHUNKio - strm.avail_out;
-            if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
-                (void)inflateEnd(&strm);
-                throw exc:: error_from_inflateInit_t{Z_ERRNO};
-            }
+            result.insert(result.end(), out, out+have);
         } while (strm.avail_out == 0);
 
         /* done when inflate() says it's done */
@@ -179,6 +178,7 @@ void inf(FILE *source, FILE *dest)
     if(ret != Z_STREAM_END) {
         throw exc:: error_from_inflateInit_t{Z_DATA_ERROR};
     }
+    return result;
 }
 
 /* report a zlib or i/o error */
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
     /* do compression if no arguments */
     if (argc == 1) {
         auto input_data = read_FILE_into_vector(stdin);
-        vector<unsigned char> result = def(std::move(input_data), Z_DEFAULT_COMPRESSION);
+        auto result = def(std::move(input_data), Z_DEFAULT_COMPRESSION);
         std:: cout.write    (   reinterpret_cast<char*>(result.data())
                             ,   result.size()
                             );
@@ -225,7 +225,10 @@ int main(int argc, char **argv)
 
     /* do decompression if -d specified */
     else if (argc == 2 && strcmp(argv[1], "-d") == 0) {
-        inf(stdin, stdout);
+        auto result = inf(stdin);
+        std:: cout.write    (   reinterpret_cast<char*>(result.data())
+                            ,   result.size()
+                            );
         return 0;
     }
 
