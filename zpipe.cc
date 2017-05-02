@@ -36,6 +36,9 @@ namespace exc {
     // Too lazy to make proper std::exception objects to throw. So
     // I'll just throw these instead:
     struct error_from_deflateInit_t {};
+    struct error_from_inflateInit_t {
+        decltype(Z_DATA_ERROR) m_error_code;
+    };
 }
 
 /* Compress from file source to file dest until EOF on source.
@@ -115,7 +118,7 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
    invalid or incomplete, Z_VERSION_ERROR if the version of zlib.h and
    the version of the library linked do not match, or Z_ERRNO if there
    is an error reading or writing the files. */
-int inf(FILE *source, FILE *dest)
+void inf(FILE *source, FILE *dest)
 {
     constexpr int CHUNKii = 16384;
     constexpr int CHUNKio = 163;
@@ -134,14 +137,14 @@ int inf(FILE *source, FILE *dest)
     strm.next_in = Z_NULL;
     ret = inflateInit(&strm);
     if (ret != Z_OK)
-        return ret;
+        throw exc:: error_from_inflateInit_t{ret};
 
     /* decompress until deflate stream ends or end of file */
     do {
         strm.avail_in = fread(in, 1, CHUNKii, source);
         if (ferror(source)) {
             (void)inflateEnd(&strm);
-            return Z_ERRNO;
+            throw exc:: error_from_inflateInit_t{Z_ERRNO};
         }
         if (strm.avail_in == 0)
             break;
@@ -159,12 +162,12 @@ int inf(FILE *source, FILE *dest)
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 (void)inflateEnd(&strm);
-                return ret;
+                throw exc:: error_from_inflateInit_t{ret};
             }
             have = CHUNKio - strm.avail_out;
             if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
                 (void)inflateEnd(&strm);
-                return Z_ERRNO;
+                throw exc:: error_from_inflateInit_t{Z_ERRNO};
             }
         } while (strm.avail_out == 0);
 
@@ -173,7 +176,9 @@ int inf(FILE *source, FILE *dest)
 
     /* clean up and return */
     (void)inflateEnd(&strm);
-    return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
+    if(ret != Z_STREAM_END) {
+        throw exc:: error_from_inflateInit_t{Z_DATA_ERROR};
+    }
 }
 
 /* report a zlib or i/o error */
@@ -204,8 +209,6 @@ void zerr(int ret)
 /* compress or decompress from stdin to stdout */
 int main(int argc, char **argv)
 {
-    int ret;
-
     /* avoid end-of-line conversions */
     SET_BINARY_MODE(stdin);
     SET_BINARY_MODE(stdout);
@@ -222,10 +225,8 @@ int main(int argc, char **argv)
 
     /* do decompression if -d specified */
     else if (argc == 2 && strcmp(argv[1], "-d") == 0) {
-        ret = inf(stdin, stdout);
-        if (ret != Z_OK)
-            zerr(ret);
-        return ret;
+        inf(stdin, stdout);
+        return 0;
     }
 
     /* otherwise, report usage */
