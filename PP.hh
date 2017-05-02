@@ -1,5 +1,7 @@
-#ifndef MACROS_HPP__
-#define MACROS_HPP__
+#ifndef PP_HH__
+#define PP_HH__
+
+#include<iostream>
 
 #define PP1(x)                 std :: cout << #x << ":" << (x) << std :: endl
 #define PP2(x,y)               std :: cout << #x << ',' << #y                                           << ":\t" << (x) << " , " << (y) << std :: endl
