@@ -7,7 +7,6 @@
     bin/o/file.reading.o
     bin/o/compression.o
     bin/o/other/mvn.o
-    bin/o/other/utils.o
     bin/o/gz/gzstream/gzstream.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
@@ -18,7 +17,6 @@
         bin/o/file.reading.o \
         bin/o/compression.o  \
         bin/o/other/mvn.o \
-        bin/o/other/utils.o       \
         bin/o/gz/gzstream/gzstream.o \
         ${LD_FLAGS}               \
     -o bin/ssimp
