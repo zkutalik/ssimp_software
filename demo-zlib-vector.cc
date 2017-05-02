@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     /* do compression if no arguments */
     if (argc == 1) {
         auto input_data = read_FILE_into_vector(stdin);
-        auto result = zlib_deflate_vector(std::move(input_data));
+        auto result = zlib_vector:: deflate(std::move(input_data));
         std:: cout.write    (   reinterpret_cast<char*>(result.data())
                             ,   result.size()
                             );
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     /* do decompression if -d specified */
     else if (argc == 2 && std::string(argv[1]) == "-d") {
         auto input_data = read_FILE_into_vector(stdin);
-        auto result = zlib_inflate_vector(std::move(input_data));
+        auto result = zlib_vector:: inflate(std::move(input_data));
         std:: cout.write    (   reinterpret_cast<char*>(result.data())
                             ,   result.size()
                             );

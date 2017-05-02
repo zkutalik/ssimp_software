@@ -19,7 +19,7 @@ namespace exc {
     };
 }
 
-std:: vector<unsigned char> zlib_deflate_vector(std:: vector<unsigned char> src)
+std:: vector<unsigned char> zlib_vector:: deflate(std:: vector<unsigned char> src)
 {
     int level = 9; // for best compression
     std:: vector<unsigned char> result;
@@ -63,7 +63,7 @@ std:: vector<unsigned char> zlib_deflate_vector(std:: vector<unsigned char> src)
 
     return result;
 }
-std:: vector<unsigned char> zlib_inflate_vector(std:: vector<unsigned char> src)
+std:: vector<unsigned char> zlib_vector:: inflate(std:: vector<unsigned char> src)
 {
     std:: vector<unsigned char> result;
     constexpr int CHUNK = 16384;
