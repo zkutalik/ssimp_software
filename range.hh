@@ -11,7 +11,7 @@
 #include<memory>
 #include<iostream> // just so I can implement operator <<
 
-#include"utils.hh"
+#include"../module-bits.and.pieces/utils.hh"
 
 #define AMD_RANGE_DECLTYPE_AND_RETURN( expr )    decltype( expr ) { return expr ; }
 #define AMD_FORWARD(                   expr )    std::forward<decltype(expr)>(expr)
