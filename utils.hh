@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AMD_UTILS_HH__
+#define AMD_UTILS_HH__
 
 #include <iostream>
 #include <sstream>
@@ -6,6 +7,8 @@
 #include <cassert>
 #include <cmath>
 #include <utility> // for tuple::get
+#include <vector>
+#include <string>
 
 namespace utils {
 namespace impl {
@@ -222,9 +225,22 @@ double lexical_cast<double>(std:: string const & s) {
     else
         throw std:: invalid_argument{std::string("Can't parse this double [") + s + ']'};
 }
+
+inline
 std:: vector<std:: string>   tokenize       ( std:: string      const & line
-                                            , char                delimiter
-        );
+                                            , char                      delimiter
+        ) {
+    int pos = 0;
+    std:: vector<std:: string> fields;
+    while(1) {
+        auto next_delim = line.find(delimiter, pos);
+        fields.push_back( line.substr(pos, next_delim-pos) );
+        if(next_delim== std:: string:: npos)
+            break;
+        pos=next_delim+1;
+    }
+    return fields;
+}
 
 template<int i>
 struct priority_tag;
@@ -345,3 +361,5 @@ decltype(auto) operator| (T&& t, decltype(stdget1)) {
 
 
 } // namespace utils
+
+#endif
