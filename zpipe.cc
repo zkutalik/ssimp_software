@@ -40,6 +40,8 @@ namespace exc {
         decltype(Z_DATA_ERROR) m_error_code;
     };
 }
+constexpr int CHUNKio = 16384;
+constexpr int CHUNKdo = 16384;
 
 /* Compress from file source to file dest until EOF on source.
    def() returns Z_OK on success, Z_MEM_ERROR if memory could not be
@@ -69,7 +71,6 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
 }
 vector<unsigned char> def(vector<unsigned char> src, int level)
 {
-    constexpr int CHUNKdo = 16384;
 
     int ret, flush;
     unsigned have;
@@ -94,11 +95,11 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
     /* run deflate() on input until output buffer not full, finish
        compression if all of source has been read in */
     do {
-        strm.avail_out = CHUNKdo;
+        strm.avail_out = sizeof(out);
         strm.next_out = out;
         ret = deflate(&strm, flush);    /* no bad return value */
         assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-        have = CHUNKdo - strm.avail_out;
+        have = sizeof(out) - strm.avail_out;
         result.insert(result.end(), out, out+have);
     } while (strm.avail_out == 0);
     assert(strm.avail_in == 0);     /* all input will be used */
@@ -118,17 +119,13 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
    invalid or incomplete, Z_VERSION_ERROR if the version of zlib.h and
    the version of the library linked do not match, or Z_ERRNO if there
    is an error reading or writing the files. */
-vector<unsigned char> inf(FILE *source)
+vector<unsigned char> inf(vector<unsigned char> src)
 {
     vector<unsigned char> result;
-
-    constexpr int CHUNKii = 16384;
-    constexpr int CHUNKio = 163;
 
     int ret;
     unsigned have;
     z_stream strm;
-    unsigned char in[CHUNKii];
     unsigned char out[CHUNKio];
 
     /* allocate inflate state */
@@ -143,18 +140,14 @@ vector<unsigned char> inf(FILE *source)
 
     /* decompress until deflate stream ends or end of file */
     do {
-        strm.avail_in = fread(in, 1, CHUNKii, source);
-        if (ferror(source)) {
-            (void)inflateEnd(&strm);
-            throw exc:: error_from_inflateInit_t{Z_ERRNO};
-        }
+        strm.avail_in = src.size();
         if (strm.avail_in == 0)
             break;
-        strm.next_in = in;
+        strm.next_in = src.data();
 
         /* run inflate() on input until output buffer not full */
         do {
-            strm.avail_out = CHUNKio;
+            strm.avail_out = sizeof(out);
             strm.next_out = out;
             ret = inflate(&strm, Z_NO_FLUSH);
             assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
@@ -166,9 +159,11 @@ vector<unsigned char> inf(FILE *source)
                 (void)inflateEnd(&strm);
                 throw exc:: error_from_inflateInit_t{ret};
             }
-            have = CHUNKio - strm.avail_out;
+            have = sizeof(out) - strm.avail_out;
             result.insert(result.end(), out, out+have);
         } while (strm.avail_out == 0);
+
+        assert(ret == Z_STREAM_END);
 
         /* done when inflate() says it's done */
     } while (ret != Z_STREAM_END);
@@ -225,7 +220,8 @@ int main(int argc, char **argv)
 
     /* do decompression if -d specified */
     else if (argc == 2 && strcmp(argv[1], "-d") == 0) {
-        auto result = inf(stdin);
+        auto input_data = read_FILE_into_vector(stdin);
+        auto result = inf(std::move(input_data));
         std:: cout.write    (   reinterpret_cast<char*>(result.data())
                             ,   result.size()
                             );
