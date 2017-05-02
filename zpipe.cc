@@ -32,6 +32,12 @@
 using std:: vector;
 using std:: cerr;
 
+namespace exc {
+    // Too lazy to make proper std::exception objects to throw. So
+    // I'll just throw these instead:
+    struct error_from_deflateInit_t {};
+}
+
 /* Compress from file source to file dest until EOF on source.
    def() returns Z_OK on success, Z_MEM_ERROR if memory could not be
    allocated for processing, Z_STREAM_ERROR if an invalid compression
@@ -58,7 +64,7 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
     c.pop_back();
     return c;
 }
-int def(vector<unsigned char> src, vector<unsigned char> & result, int level)
+void def(vector<unsigned char> src, vector<unsigned char> & result, int level)
 {
     constexpr int CHUNKdo = 16384;
 
@@ -73,7 +79,7 @@ int def(vector<unsigned char> src, vector<unsigned char> & result, int level)
     strm.opaque = Z_NULL;
     ret = deflateInit(&strm, level);
     if (ret != Z_OK)
-        return ret;
+        throw exc :: error_from_deflateInit_t{};
 
     /* input data specified in one big chunk */
     strm.avail_in = src.size();
@@ -100,7 +106,6 @@ int def(vector<unsigned char> src, vector<unsigned char> & result, int level)
     std:: cout.write    (   reinterpret_cast<char*>(result.data())
                         ,   result.size()
                         );
-    return Z_OK;
 }
 
 /* Decompress from file source to file dest until stream ends or EOF.
@@ -208,10 +213,8 @@ int main(int argc, char **argv)
     if (argc == 1) {
         auto input_data = read_FILE_into_vector(stdin);
         vector<unsigned char> result;
-        ret = def(std::move(input_data), result, Z_DEFAULT_COMPRESSION);
-        if (ret != Z_OK)
-            zerr(ret);
-        return ret;
+        def(std::move(input_data), result, Z_DEFAULT_COMPRESSION);
+        return 0;
     }
 
     /* do decompression if -d specified */
