@@ -10,7 +10,7 @@
 #include<gsl/gsl_blas.h>
 #include<gsl/gsl_linalg.h>
 
-#include "PP.hh"
+#include "../module-bits.and.pieces/PP.hh"
 
 using namespace std;
 namespace mvn {
