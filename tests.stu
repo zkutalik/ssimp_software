@@ -2,12 +2,13 @@
 :       bin/ssimp
     tests/${testname}/command
 {
-    export SSIMP="$(pwd | tr -d '\n'; echo /bin/ssimp)"
-    export   REF="$(pwd | tr -d '\n'; echo /ref)"
-    export  GWAS="$(pwd | tr -d '\n'; echo /gwas)"
-    cd    "tests/${testname}"
-    export OUTPUT=output.actual.tmp
-    export OUT_IMPUTATIONS=imputations.txt
-    bash command
-    mv output.actual.tmp output.actual
+    export SSIMP=bin/ssimp
+    export   REF=ref
+    export  GWAS=gwas
+    export OUTPUT="tests/${testname}"/output.actual.tmp
+    export OUT_IMPUTATIONS="tests/${testname}"/imputations.txt
+
+    bash "tests/${testname}"/command
+
+    mv "tests/${testname}"/output.actual.tmp "tests/${testname}"/output.actual
 }

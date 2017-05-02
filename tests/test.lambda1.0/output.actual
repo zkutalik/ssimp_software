@@ -1,6 +1,6 @@
-options:: opt_raw_ref,options:: opt_gwas_filename,options:: opt_window_width:	/home/aaron/Research/Code/Imputation/ssimp_software/ref/small.vcf.sample.vcf , /home/aaron/Research/Code/Imputation/ssimp_software/gwas/fixup.UKBB.both.smry..fdr , 300'000
-file_name:/home/aaron/Research/Code/Imputation/ssimp_software/ref/small.vcf.sample.vcf
-file_name:/home/aaron/Research/Code/Imputation/ssimp_software/gwas/fixup.UKBB.both.smry..fdr
+options:: opt_raw_ref,options:: opt_gwas_filename,options:: opt_window_width:	ref/small.vcf.sample.vcf , gwas/fixup.UKBB.both.smry..fdr , 300'000
+file_name:ref/small.vcf.sample.vcf
+file_name:gwas/fixup.UKBB.both.smry..fdr
 
 raw_ref_file->number_of_snps():9'747
 gwas->number_of_snps():718'712
