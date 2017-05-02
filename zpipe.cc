@@ -58,7 +58,6 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
     c.push_back('\0');
     //cout << c.data() << '\n';
     c.pop_back();
-    PP(c.size());
     return c;
 }
 int def(FILE *source, FILE *dest, int level)
