@@ -1,3 +1,5 @@
+#include<iostream>
+
 #ifdef __EMSCRIPTEN__
 #define error_print_and_exit(...) ([&]()->bool{ std::cout << '\n' << "Exiting: "  __FILE__  ":" << __LINE__ << "\tError: " << __VA_ARGS__; std::cout << '\n'; exit(1);}())
 #else
