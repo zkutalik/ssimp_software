@@ -40,8 +40,7 @@ namespace exc {
         decltype(Z_DATA_ERROR) m_error_code;
     };
 }
-constexpr int CHUNKio = 16384;
-constexpr int CHUNKdo = 16384;
+constexpr int CHUNK = 16384;
 
 /* Compress from file source to file dest until EOF on source.
    def() returns Z_OK on success, Z_MEM_ERROR if memory could not be
@@ -52,7 +51,6 @@ constexpr int CHUNKdo = 16384;
 static
 vector<unsigned char> read_FILE_into_vector(FILE *source) {
     vector<unsigned char> c;
-    constexpr int CHUNK = 16384;
     unsigned char tmp[CHUNK];
 
     do {
@@ -64,9 +62,7 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
             break;
         c.insert( c.end(), tmp, tmp+n );
     } while(1);
-    c.push_back('\0');
     cerr << "c.size()=" << c.size() << '\n';
-    c.pop_back();
     return c;
 }
 vector<unsigned char> def(vector<unsigned char> src, int level)
@@ -75,7 +71,7 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
     int ret, flush;
     unsigned have;
     z_stream strm;
-    unsigned char out[CHUNKdo];
+    unsigned char out[CHUNK];
 
     vector<unsigned char> result;
 
@@ -95,11 +91,11 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
     /* run deflate() on input until output buffer not full, finish
        compression if all of source has been read in */
     do {
-        strm.avail_out = sizeof(out);
+        strm.avail_out = CHUNK;
         strm.next_out = out;
         ret = deflate(&strm, flush);    /* no bad return value */
         assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-        have = sizeof(out) - strm.avail_out;
+        have = CHUNK - strm.avail_out;
         result.insert(result.end(), out, out+have);
     } while (strm.avail_out == 0);
     assert(strm.avail_in == 0);     /* all input will be used */
@@ -126,7 +122,7 @@ vector<unsigned char> inf(vector<unsigned char> src)
     int ret;
     unsigned have;
     z_stream strm;
-    unsigned char out[CHUNKio];
+    unsigned char out[CHUNK];
 
     /* allocate inflate state */
     strm.zalloc = Z_NULL;
@@ -147,7 +143,7 @@ vector<unsigned char> inf(vector<unsigned char> src)
 
         /* run inflate() on input until output buffer not full */
         do {
-            strm.avail_out = sizeof(out);
+            strm.avail_out = CHUNK;
             strm.next_out = out;
             ret = inflate(&strm, Z_NO_FLUSH);
             assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
@@ -159,7 +155,7 @@ vector<unsigned char> inf(vector<unsigned char> src)
                 (void)inflateEnd(&strm);
                 throw exc:: error_from_inflateInit_t{ret};
             }
-            have = sizeof(out) - strm.avail_out;
+            have = CHUNK - strm.avail_out;
             result.insert(result.end(), out, out+have);
         } while (strm.avail_out == 0);
 
