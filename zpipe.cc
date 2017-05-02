@@ -29,7 +29,7 @@
 #include"../module-bits.and.pieces/PP.hh"
 
 using std:: vector;
-using std:: cout;
+using std:: cerr;
 
 /* Compress from file source to file dest until EOF on source.
    def() returns Z_OK on success, Z_MEM_ERROR if memory could not be
@@ -56,19 +56,17 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
         c.insert( c.end(), tmp, tmp+n );
     } while(1);
     c.push_back('\0');
-    //cout << c.data() << '\n';
+    cerr << "c.size()=" << c.size() << '\n';
     c.pop_back();
     return c;
 }
-int def(FILE *source, FILE *dest, int level)
+int def(vector<unsigned char> src, FILE *dest, int level)
 {
-    constexpr int CHUNKdi = 16;
     constexpr int CHUNKdo = 1638;
 
     int ret, flush;
     unsigned have;
     z_stream strm;
-    unsigned char in[CHUNKdi];
     unsigned char out[CHUNKdo];
 
     /* allocate deflate state */
@@ -81,13 +79,9 @@ int def(FILE *source, FILE *dest, int level)
 
     /* compress until end of file */
     do {
-        strm.avail_in = fread(in, 1, CHUNKdi, source);
-        if (ferror(source)) {
-            (void)deflateEnd(&strm);
-            return Z_ERRNO;
-        }
-        flush = feof(source) ? Z_FINISH : Z_NO_FLUSH;
-        strm.next_in = in;
+        strm.avail_in = src.size();
+        flush = 1 ? Z_FINISH : Z_NO_FLUSH;
+        strm.next_in = src.data();
 
         /* run deflate() on input until output buffer not full, finish
            compression if all of source has been read in */
@@ -216,8 +210,8 @@ int main(int argc, char **argv)
 
     /* do compression if no arguments */
     if (argc == 1) {
-        //auto input_data = read_FILE_into_vector(stdin);
-        ret = def(stdin, stdout, Z_DEFAULT_COMPRESSION);
+        auto input_data = read_FILE_into_vector(stdin);
+        ret = def(std::move(input_data), stdout, Z_DEFAULT_COMPRESSION);
         if (ret != Z_OK)
             zerr(ret);
         return ret;
