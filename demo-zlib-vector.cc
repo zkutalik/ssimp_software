@@ -14,6 +14,7 @@
 #include"../module-bits.and.pieces/DIE.hh"
 
 using std:: vector;
+using zlib_vector:: vec_t;
 
 
 /* Compress from file source to file dest until EOF on source.
@@ -23,8 +24,8 @@ using std:: vector;
    version of the library linked do not match, or Z_ERRNO if there is
    an error reading or writing the files. */
 static
-vector<unsigned char> read_FILE_into_vector(FILE *source) {
-    vector<unsigned char> c;
+vec_t read_FILE_into_vector(FILE *source) {
+    vec_t c;
 
     constexpr int CHUNK = 16384;
     unsigned char tmp[CHUNK];

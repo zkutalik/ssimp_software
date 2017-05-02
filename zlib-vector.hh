@@ -1,8 +1,9 @@
 #include<vector>
 namespace zlib_vector {
+    using vec_t = std:: vector<unsigned char>;
 
-std:: vector<unsigned char> deflate(std:: vector<unsigned char> src);
-std:: vector<unsigned char> inflate(std:: vector<unsigned char> src);
+    vec_t deflate(vec_t src);
+    vec_t inflate(vec_t src);
 
 }
 

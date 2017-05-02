@@ -7,6 +7,8 @@
 
 #include"zlib-vector.hh"
 
+using zlib_vector:: vec_t;
+
 #include<zlib.h>
 #include<cassert>
 
@@ -19,10 +21,10 @@ namespace exc {
     };
 }
 
-std:: vector<unsigned char> zlib_vector:: deflate(std:: vector<unsigned char> src)
+vec_t zlib_vector:: deflate(vec_t src)
 {
     int level = 9; // for best compression
-    std:: vector<unsigned char> result;
+    vec_t result;
 
     constexpr int CHUNK = 16384;
 
@@ -63,9 +65,9 @@ std:: vector<unsigned char> zlib_vector:: deflate(std:: vector<unsigned char> sr
 
     return result;
 }
-std:: vector<unsigned char> zlib_vector:: inflate(std:: vector<unsigned char> src)
+vec_t zlib_vector:: inflate(vec_t src)
 {
-    std:: vector<unsigned char> result;
+    vec_t result;
     constexpr int CHUNK = 16384;
 
     int ret;
