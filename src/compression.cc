@@ -7,10 +7,10 @@
 
 #include <gzstream.h>
 
-#include "other/DIE.hh"
+#include "bits.and.pieces/DIE.hh"
 #include "range/range_action.hh"
 #include "range/range_view.hh"
-#include "other/PP.hh"
+#include "bits.and.pieces/PP.hh"
 
 namespace action = range:: action;
 namespace view   = range:: view  ;

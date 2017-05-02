@@ -6,7 +6,7 @@
     bin/o/options.o
     bin/o/file.reading.o
     bin/o/compression.o
-    bin/o/other/mvn.o
+    bin/o/mvn/mvn.o
     bin/o/gz/gzstream/gzstream.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
@@ -16,7 +16,7 @@
         bin/o/ssimp.o \
         bin/o/file.reading.o \
         bin/o/compression.o  \
-        bin/o/other/mvn.o \
+        bin/o/mvn/mvn.o \
         bin/o/gz/gzstream/gzstream.o \
         ${LD_FLAGS}               \
     -o bin/ssimp
@@ -121,6 +121,6 @@
 {
     rm bin/ssimp                 || :
     rm bin/o/CXX_WITH_FLAGS      || :
-    rm bin/LIST_OF_HH_FILES
+    rm bin/LIST_OF_HH_FILES      || :
     find bin/o -name '*.o' -exec rm {} \;
 }

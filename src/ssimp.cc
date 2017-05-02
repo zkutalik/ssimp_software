@@ -15,9 +15,9 @@
 #include "compression.hh"
 
 #include "bits.and.pieces/utils.hh"
-#include "other/mvn.hh"
-#include "other/DIE.hh"
-#include "other/PP.hh"
+#include "mvn/mvn.hh"
+#include "bits.and.pieces/DIE.hh"
+#include "bits.and.pieces/PP.hh"
 #include "range/range_view.hh"
 #include "range/range_action.hh"
 

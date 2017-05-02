@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "other/DIE.hh"
+#include "bits.and.pieces/DIE.hh"
 #include "bits.and.pieces/utils.hh"
 
 using std:: string;
