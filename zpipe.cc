@@ -25,8 +25,6 @@
 #  define SET_BINARY_MODE(file)
 #endif
 
-#define CHUNK 16384
-
 /* Compress from file source to file dest until EOF on source.
    def() returns Z_OK on success, Z_MEM_ERROR if memory could not be
    allocated for processing, Z_STREAM_ERROR if an invalid compression
@@ -35,11 +33,14 @@
    an error reading or writing the files. */
 int def(FILE *source, FILE *dest, int level)
 {
+    constexpr int CHUNKdi = 16;
+    constexpr int CHUNKdo = 1638;
+
     int ret, flush;
     unsigned have;
     z_stream strm;
-    unsigned char in[CHUNK];
-    unsigned char out[CHUNK];
+    unsigned char in[CHUNKdi];
+    unsigned char out[CHUNKdo];
 
     /* allocate deflate state */
     strm.zalloc = Z_NULL;
@@ -51,7 +52,7 @@ int def(FILE *source, FILE *dest, int level)
 
     /* compress until end of file */
     do {
-        strm.avail_in = fread(in, 1, CHUNK, source);
+        strm.avail_in = fread(in, 1, CHUNKdi, source);
         if (ferror(source)) {
             (void)deflateEnd(&strm);
             return Z_ERRNO;
@@ -62,11 +63,11 @@ int def(FILE *source, FILE *dest, int level)
         /* run deflate() on input until output buffer not full, finish
            compression if all of source has been read in */
         do {
-            strm.avail_out = CHUNK;
+            strm.avail_out = CHUNKdo;
             strm.next_out = out;
             ret = deflate(&strm, flush);    /* no bad return value */
             assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-            have = CHUNK - strm.avail_out;
+            have = CHUNKdo - strm.avail_out;
             if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
                 (void)deflateEnd(&strm);
                 return Z_ERRNO;
@@ -91,11 +92,14 @@ int def(FILE *source, FILE *dest, int level)
    is an error reading or writing the files. */
 int inf(FILE *source, FILE *dest)
 {
+    constexpr int CHUNKii = 16384;
+    constexpr int CHUNKio = 163;
+
     int ret;
     unsigned have;
     z_stream strm;
-    unsigned char in[CHUNK];
-    unsigned char out[CHUNK];
+    unsigned char in[CHUNKii];
+    unsigned char out[CHUNKio];
 
     /* allocate inflate state */
     strm.zalloc = Z_NULL;
@@ -109,7 +113,7 @@ int inf(FILE *source, FILE *dest)
 
     /* decompress until deflate stream ends or end of file */
     do {
-        strm.avail_in = fread(in, 1, CHUNK, source);
+        strm.avail_in = fread(in, 1, CHUNKii, source);
         if (ferror(source)) {
             (void)inflateEnd(&strm);
             return Z_ERRNO;
@@ -120,7 +124,7 @@ int inf(FILE *source, FILE *dest)
 
         /* run inflate() on input until output buffer not full */
         do {
-            strm.avail_out = CHUNK;
+            strm.avail_out = CHUNKio;
             strm.next_out = out;
             ret = inflate(&strm, Z_NO_FLUSH);
             assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
@@ -132,7 +136,7 @@ int inf(FILE *source, FILE *dest)
                 (void)inflateEnd(&strm);
                 return ret;
             }
-            have = CHUNK - strm.avail_out;
+            have = CHUNKio - strm.avail_out;
             if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
                 (void)inflateEnd(&strm);
                 return Z_ERRNO;
