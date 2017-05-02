@@ -30,6 +30,7 @@ using utils:: stdget0;
 using utils:: stdget1;
 using utils:: print_type;
 using utils:: ssize;
+using utils:: ELAPSED;
 
 using range:: from_vector;
 
@@ -540,7 +541,15 @@ namespace compression {
                                     }));
                 return;
             }
+
             ++ number_of_snps;
+            if(number_of_snps % 10000 == 0) {
+                PP(number_of_snps, ELAPSED()
+                        , fields.at(0)
+                        , fields.at(1)
+                        );
+            }
+
             (void)i;
             auto remember_offset_at_start_of_this_line = binary_output.m_f.tellp() - binary_output.m_remember_the_begining_position;
             //PP( i, s.substr(0,90) );
@@ -577,6 +586,7 @@ namespace compression {
                 |action:: collect
                 ;
             auto dict = build_an_efficient_dictionary_from_a_vector_of_strings(many_call_pairs_as_strings);
+            //PP(dict.size());
 
             // Now to find long runs of identical things within 'many_call_pairs_as_strings'
             auto r = from_vector(many_call_pairs_as_strings);
