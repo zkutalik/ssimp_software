@@ -15,12 +15,12 @@ namespace action {
     struct {} unzip_foreach;
 
     template<typename R>
-    auto operator| (R r, decltype(collect) )
+    auto operator| (R && r, decltype(collect) )
     {
-        using value_type = std:: decay_t< decltype( range:: pull(r) ) >;
+        using value_type = std:: decay_t< decltype( range:: pull(AMD_FORWARD(r)) ) >;
         std:: vector<value_type> v;
-        while(!r.empty()) {
-            v.push_back( range:: pull(r) );
+        while(!AMD_FORWARD(r).empty()) {
+            v.push_back( range:: pull(AMD_FORWARD(r)) );
         }
         return v;
     }
