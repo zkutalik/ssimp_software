@@ -3,7 +3,7 @@
    Version 1.4  11 December 2005  Mark Adler */
 
 #include <string>
-#include <assert.h>
+#include <cassert>
 #include "zlib.h"
 
 #if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(__CYGWIN__)
@@ -15,7 +15,6 @@
 #endif
 
 #include<vector>
-#include"../module-bits.and.pieces/PP.hh"
 #include"../module-bits.and.pieces/DIE.hh"
 
 using std:: vector;
@@ -53,9 +52,9 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
     } while(1);
     return c;
 }
-vector<unsigned char> zlib_deflate_vector(vector<unsigned char> src, int level)
+std:: vector<unsigned char> zlib_deflate_vector(std:: vector<unsigned char> src, int level)
 {
-    vector<unsigned char> result;
+    std:: vector<unsigned char> result;
 
     constexpr int CHUNK = 16384;
 
@@ -103,9 +102,9 @@ vector<unsigned char> zlib_deflate_vector(vector<unsigned char> src, int level)
    invalid or incomplete, Z_VERSION_ERROR if the version of zlib.h and
    the version of the library linked do not match, or Z_ERRNO if there
    is an error reading or writing the files. */
-vector<unsigned char> zlib_inflate_vector(vector<unsigned char> src)
+std:: vector<unsigned char> zlib_inflate_vector(std:: vector<unsigned char> src)
 {
-    vector<unsigned char> result;
+    std:: vector<unsigned char> result;
     constexpr int CHUNK = 16384;
 
     int ret;
