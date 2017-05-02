@@ -2,16 +2,6 @@
    Not copyrighted -- provided to the public domain
    Version 1.4  11 December 2005  Mark Adler */
 
-/* Version history:
-   1.0  30 Oct 2004  First version
-   1.1   8 Nov 2004  Add void casting for unused return values
-                     Use switch statement for inflate() return values
-   1.2   9 Nov 2004  Add assertions to document zlib guarantees
-   1.3   6 Apr 2005  Remove incorrect assertion in inf()
-   1.4  11 Dec 2005  Add hack to avoid MSDOS end-of-line conversions
-                     Avoid some compiler warnings for input and output buffers
- */
-
 #include <string>
 #include <assert.h>
 #include "zlib.h"
@@ -29,7 +19,6 @@
 #include"../module-bits.and.pieces/DIE.hh"
 
 using std:: vector;
-using std:: cerr;
 
 namespace exc {
     // Too lazy to make proper std::exception objects to throw. So
@@ -39,7 +28,6 @@ namespace exc {
         decltype(Z_DATA_ERROR) m_error_code;
     };
 }
-constexpr int CHUNK = 16384;
 
 /* Compress from file source to file dest until EOF on source.
    def() returns Z_OK on success, Z_MEM_ERROR if memory could not be
@@ -50,6 +38,8 @@ constexpr int CHUNK = 16384;
 static
 vector<unsigned char> read_FILE_into_vector(FILE *source) {
     vector<unsigned char> c;
+
+    constexpr int CHUNK = 16384;
     unsigned char tmp[CHUNK];
 
     do {
@@ -61,18 +51,18 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
             break;
         c.insert( c.end(), tmp, tmp+n );
     } while(1);
-    cerr << "c.size()=" << c.size() << '\n';
     return c;
 }
-vector<unsigned char> def(vector<unsigned char> src, int level)
+vector<unsigned char> zlib_deflate_vector(vector<unsigned char> src, int level)
 {
+    vector<unsigned char> result;
+
+    constexpr int CHUNK = 16384;
 
     int ret, flush;
     unsigned have;
     z_stream strm;
     unsigned char out[CHUNK];
-
-    vector<unsigned char> result;
 
     /* allocate deflate state */
     strm.zalloc = Z_NULL;
@@ -103,7 +93,6 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
 
     /* clean up and return */
     (void)deflateEnd(&strm);
-    cerr << "result.size() = " << result.size() << '\n';
 
     return result;
 }
@@ -114,9 +103,10 @@ vector<unsigned char> def(vector<unsigned char> src, int level)
    invalid or incomplete, Z_VERSION_ERROR if the version of zlib.h and
    the version of the library linked do not match, or Z_ERRNO if there
    is an error reading or writing the files. */
-vector<unsigned char> inf(vector<unsigned char> src)
+vector<unsigned char> zlib_inflate_vector(vector<unsigned char> src)
 {
     vector<unsigned char> result;
+    constexpr int CHUNK = 16384;
 
     int ret;
     unsigned have;
@@ -173,7 +163,7 @@ int main(int argc, char **argv)
     /* do compression if no arguments */
     if (argc == 1) {
         auto input_data = read_FILE_into_vector(stdin);
-        auto result = def(std::move(input_data), Z_DEFAULT_COMPRESSION);
+        auto result = zlib_deflate_vector(std::move(input_data), Z_DEFAULT_COMPRESSION);
         std:: cout.write    (   reinterpret_cast<char*>(result.data())
                             ,   result.size()
                             );
@@ -183,7 +173,7 @@ int main(int argc, char **argv)
     /* do decompression if -d specified */
     else if (argc == 2 && std::string(argv[1]) == "-d") {
         auto input_data = read_FILE_into_vector(stdin);
-        auto result = inf(std::move(input_data));
+        auto result = zlib_inflate_vector(std::move(input_data));
         std:: cout.write    (   reinterpret_cast<char*>(result.data())
                             ,   result.size()
                             );
