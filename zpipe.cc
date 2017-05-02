@@ -58,7 +58,7 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
     c.pop_back();
     return c;
 }
-int def(vector<unsigned char> src, FILE *dest, int level)
+int def(vector<unsigned char> src, vector<unsigned char> & result, int level)
 {
     constexpr int CHUNKdo = 16384;
 
@@ -88,10 +88,7 @@ int def(vector<unsigned char> src, FILE *dest, int level)
         ret = deflate(&strm, flush);    /* no bad return value */
         assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
         have = CHUNKdo - strm.avail_out;
-        if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
-            (void)deflateEnd(&strm);
-            return Z_ERRNO;
-        }
+        result.insert(result.end(), out, out+have);
     } while (strm.avail_out == 0);
     assert(strm.avail_in == 0);     /* all input will be used */
 
@@ -99,6 +96,10 @@ int def(vector<unsigned char> src, FILE *dest, int level)
 
     /* clean up and return */
     (void)deflateEnd(&strm);
+    cerr << "result.size() = " << result.size() << '\n';
+    std:: cout.write    (   reinterpret_cast<char*>(result.data())
+                        ,   result.size()
+                        );
     return Z_OK;
 }
 
@@ -206,7 +207,8 @@ int main(int argc, char **argv)
     /* do compression if no arguments */
     if (argc == 1) {
         auto input_data = read_FILE_into_vector(stdin);
-        ret = def(std::move(input_data), stdout, Z_DEFAULT_COMPRESSION);
+        vector<unsigned char> result;
+        ret = def(std::move(input_data), result, Z_DEFAULT_COMPRESSION);
         if (ret != Z_OK)
             zerr(ret);
         return ret;
