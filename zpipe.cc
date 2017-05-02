@@ -25,12 +25,42 @@
 #  define SET_BINARY_MODE(file)
 #endif
 
+#include<vector>
+#include"../module-bits.and.pieces/PP.hh"
+
+using std:: vector;
+using std:: cout;
+
 /* Compress from file source to file dest until EOF on source.
    def() returns Z_OK on success, Z_MEM_ERROR if memory could not be
    allocated for processing, Z_STREAM_ERROR if an invalid compression
    level is supplied, Z_VERSION_ERROR if the version of zlib.h and the
    version of the library linked do not match, or Z_ERRNO if there is
    an error reading or writing the files. */
+static
+vector<unsigned char> read_FILE_into_vector(FILE *source) {
+    vector<unsigned char> c;
+    constexpr int CHUNK = 16384;
+    unsigned char tmp[CHUNK];
+
+    do {
+        size_t n = fread(tmp, 1, CHUNK, source);
+        /* TODO
+        if (ferror(source)) {
+            (void)deflateEnd(&strm);
+            throw Z_ERRNO;
+        }
+        */
+        if(n==0)
+            break;
+        c.insert( c.end(), tmp, tmp+n );
+    } while(1);
+    c.push_back('\0');
+    //cout << c.data() << '\n';
+    c.pop_back();
+    PP(c.size());
+    return c;
+}
 int def(FILE *source, FILE *dest, int level)
 {
     constexpr int CHUNKdi = 16;
@@ -187,6 +217,7 @@ int main(int argc, char **argv)
 
     /* do compression if no arguments */
     if (argc == 1) {
+        //auto input_data = read_FILE_into_vector(stdin);
         ret = def(stdin, stdout, Z_DEFAULT_COMPRESSION);
         if (ret != Z_OK)
             zerr(ret);
