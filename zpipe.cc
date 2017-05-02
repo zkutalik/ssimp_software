@@ -27,6 +27,7 @@
 
 #include<vector>
 #include"../module-bits.and.pieces/PP.hh"
+#include"../module-bits.and.pieces/DIE.hh"
 
 using std:: vector;
 using std:: cerr;
@@ -45,12 +46,9 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
 
     do {
         size_t n = fread(tmp, 1, CHUNK, source);
-        /* TODO
         if (ferror(source)) {
-            (void)deflateEnd(&strm);
-            throw Z_ERRNO;
+            DIE("some problem reading from stdin");
         }
-        */
         if(n==0)
             break;
         c.insert( c.end(), tmp, tmp+n );
@@ -62,7 +60,7 @@ vector<unsigned char> read_FILE_into_vector(FILE *source) {
 }
 int def(vector<unsigned char> src, FILE *dest, int level)
 {
-    constexpr int CHUNKdo = 1638;
+    constexpr int CHUNKdo = 16384;
 
     int ret, flush;
     unsigned have;
@@ -77,29 +75,26 @@ int def(vector<unsigned char> src, FILE *dest, int level)
     if (ret != Z_OK)
         return ret;
 
-    /* compress until end of file */
+    /* input data specified in one big chunk */
+    strm.avail_in = src.size();
+    flush = Z_FINISH; // instead of Z_NO_FLUSH, as this is the entire data
+    strm.next_in = src.data();
+
+    /* run deflate() on input until output buffer not full, finish
+       compression if all of source has been read in */
     do {
-        strm.avail_in = src.size();
-        flush = 1 ? Z_FINISH : Z_NO_FLUSH;
-        strm.next_in = src.data();
+        strm.avail_out = CHUNKdo;
+        strm.next_out = out;
+        ret = deflate(&strm, flush);    /* no bad return value */
+        assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
+        have = CHUNKdo - strm.avail_out;
+        if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
+            (void)deflateEnd(&strm);
+            return Z_ERRNO;
+        }
+    } while (strm.avail_out == 0);
+    assert(strm.avail_in == 0);     /* all input will be used */
 
-        /* run deflate() on input until output buffer not full, finish
-           compression if all of source has been read in */
-        do {
-            strm.avail_out = CHUNKdo;
-            strm.next_out = out;
-            ret = deflate(&strm, flush);    /* no bad return value */
-            assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-            have = CHUNKdo - strm.avail_out;
-            if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
-                (void)deflateEnd(&strm);
-                return Z_ERRNO;
-            }
-        } while (strm.avail_out == 0);
-        assert(strm.avail_in == 0);     /* all input will be used */
-
-        /* done when last data in file processed */
-    } while (flush != Z_FINISH);
     assert(ret == Z_STREAM_END);        /* stream will be complete */
 
     /* clean up and return */
