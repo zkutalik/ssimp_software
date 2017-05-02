@@ -8,8 +8,8 @@
 #include <gzstream.h>
 
 #include "other/DIE.hh"
-#include "other/range_action.hh"
-#include "other/range_view.hh"
+#include "range/range_action.hh"
+#include "range/range_view.hh"
 #include "other/PP.hh"
 
 namespace action = range:: action;

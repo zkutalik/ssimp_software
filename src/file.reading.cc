@@ -11,9 +11,9 @@
 
 #include "other/DIE.hh"
 #include "other/PP.hh"
-#include "other/utils.hh"
-#include "other/range_view.hh"
-#include "other/range_action.hh"
+#include "bits.and.pieces/utils.hh"
+#include "range/range_view.hh"
+#include "range/range_action.hh"
 
 namespace action = range:: action;
 namespace view   = range:: view  ;

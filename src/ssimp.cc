@@ -14,13 +14,12 @@
 #include "file.reading.hh"
 #include "compression.hh"
 
-#include "other/utils.hh"
+#include "bits.and.pieces/utils.hh"
 #include "other/mvn.hh"
 #include "other/DIE.hh"
 #include "other/PP.hh"
-#include "other/range.hh"
-#include "other/range_view.hh"
-#include "other/range_action.hh"
+#include "range/range_view.hh"
+#include "range/range_action.hh"
 
 namespace view = range:: view;
 namespace action = range:: action;
