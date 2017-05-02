@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AMD_UTILS_HH__
+#define AMD_UTILS_HH__
 
 #include <iostream>
 #include <sstream>
@@ -345,3 +346,5 @@ decltype(auto) operator| (T&& t, decltype(stdget1)) {
 
 
 } // namespace utils
+
+#endif
