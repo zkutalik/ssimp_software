@@ -11,12 +11,14 @@
 
 namespace from = range:: from;
 namespace action = range:: action;
+namespace view   = range:: view  ;
 
 using std:: vector;
 using std:: string;
 using utils:: tokenize;
 using utils:: stdget0;
 using utils:: stdget1;
+using utils:: print_type;
 using range:: range_from_begin_end;
 using range:: view:: take;
 
@@ -49,7 +51,6 @@ int main(int argc, char **argv) {
     using utils:: operator<<;
     for(auto && x : r ) {
         int line_no = x |stdget1;
-        (void)line_no;
         auto && s = x |stdget0;
 
         ++SNP_counter;
@@ -65,9 +66,28 @@ int main(int argc, char **argv) {
         }
 
         // Copy the two interesting fields before deleting them
+        // ** all lines, not just the header **
         auto INFO = fields.at(7);
         auto FORMAT = fields.at(8);
         fields.erase( fields.begin() + 7, fields.begin() + 9 );
+
+        if(SNP_counter >= 0) {
+            // Next, delete the non-'GT' fields from the individual data (and from the header, for completeness)
+            auto subfields_that_are_GT =
+                from :: vector(tokenize(FORMAT,':'))
+                |view::map| [](auto && s){ return s == "GT"; }
+                |view:: which
+                |action:: collect
+            ;
+            PP(FORMAT, subfields_that_are_GT);
+            subfields_that_are_GT.size() == 1 || DIE(
+                    "Was expecting 'GT' exactly once in the format field. ["
+                    << arg_input_filename << ':' << line_no
+                    << "] ["
+                    << FORMAT
+                    << "]"
+                    );
+        }
 
         { // This is pointless, just an assertion to help check my compression
             zlib_vector:: vec_t as_a_vector{ s.begin(), s.end() };
