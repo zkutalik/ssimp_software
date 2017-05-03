@@ -84,7 +84,21 @@ inline
 auto nice_operator_shift_left(std:: string t)
 -> std:: string
 {
-    return '"' + t + '"';
+    std:: vector<char> q;
+    q.reserve(2+2*t.size());
+    q.push_back('"');
+    for(char c : t) {
+        switch(c) {
+            break; case '"': q.push_back('\\'); q.push_back('"');
+            break; case '\n': q.push_back('\\'); q.push_back('n');
+            break; case '\t': q.push_back('\\'); q.push_back('t');
+            break; case '\\': q.push_back('\\'); q.push_back('\\');
+            break; default:
+                q.push_back(c);
+        }
+    }
+    q.push_back('"');
+    return std::string{ q.begin(), q.end() };
 }
 
 template<typename F, typename G>
