@@ -113,7 +113,7 @@ namespace range {
 
         using value_type = std::decay_t<decltype(*m_b)>;
 
-        range_from_begin_end_t(b_t b, e_t e) : m_b(move(b)), m_e(move(e)) {}
+        range_from_begin_end_t(b_t b, e_t e) : m_b(std::move(b)), m_e(std::move(e)) {}
 
         auto begin() const { return m_b; }
         auto end  () const { return m_e; }
@@ -129,7 +129,7 @@ namespace range {
     };
     template<typename b_t, typename e_t>
     range_from_begin_end_t<b_t,e_t> range_from_begin_end(b_t b, e_t e) {
-        return {move(b), move(e)};
+        return {std::move(b), std::move(e)};
     }
     template<typename C>
     auto range_from_begin_end(C &c) -> AMD_RANGE_DECLTYPE_AND_RETURN( range_from_begin_end(c.begin(), c.end()) )
