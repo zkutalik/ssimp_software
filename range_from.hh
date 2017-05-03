@@ -32,6 +32,11 @@ auto    ifstream(T_vl && f) {
     return from_ifstream_t<T_vl>( AMD_FORWARD(f) );
 }
 
+template<typename T_vl>
+auto    vector(T_vl && f) {
+    return range:: from_vector( AMD_FORWARD(f) );
+}
+
 } //namespace from
 } //namespace range
 
