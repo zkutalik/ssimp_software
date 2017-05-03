@@ -59,6 +59,8 @@ template<typename T>
 std::ostream & operator<< (std:: ostream &o, const std:: vector<T> &v);
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr);
+template<typename F>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F> &pr);
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G> &pr);
 template<typename F, typename G, typename H>
@@ -78,6 +80,12 @@ inline
 auto nice_operator_shift_left(bool t)
 -> char
 { return t?'T':'F'; }
+inline
+auto nice_operator_shift_left(std:: string t)
+-> std:: string
+{
+    return '"' + t + '"';
+}
 
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr) {
@@ -88,12 +96,19 @@ std::ostream & operator<< (std:: ostream &o, const std:: pair<F, G> &pr) {
         << ')';
     return o;
 }
+template<typename F>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F> &pr) {
+    o << '('
+        << nice_operator_shift_left(std::get<0>(pr))
+        << ')';
+    return o;
+}
 template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G> &pr) {
     o << '('
-        << std::get<0>(pr)
+        << nice_operator_shift_left(std::get<0>(pr))
         << ','
-        << std::get<1>(pr)
+        << nice_operator_shift_left(std::get<1>(pr))
         << ')';
     return o;
 }
