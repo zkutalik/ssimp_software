@@ -502,6 +502,7 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         auto QUAL   = reader.read_smart_string0();
         auto FILTER = reader.read_smart_string0();
         PP(p, CHROM, CHROM.size(), POS, ID, REF, ALTs , QUAL, FILTER);
+        reader.read_vector_of_char_with_leading_size();
     }
 
 

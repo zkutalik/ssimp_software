@@ -113,6 +113,7 @@ struct vcfGTz_writer {
         m_f << '\0';
     }
     void            save_vector_of_char_with_leading_size( zlib_vector:: vec_t const & compressed ) {
+        save_code(vcfGTz:: vcfGTz_codes:: code_vector_of_char_with_leading_size_plain_GT);
         uint32_t sz = compressed.size();
         save_uint32_t(sz);
 

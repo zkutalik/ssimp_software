@@ -10,6 +10,7 @@ namespace vcfGTz {
     enum class vcfGTz_codes : uint8_t {
                 code_end_of_file        = 0
             ,   code_null_term_string   = 1 // null-terminated string - when everything else fails
+            ,   code_vector_of_char_with_leading_size_plain_GT = 2 // for storing the zlib-compressed stuff
     };
 
     namespace bit_conversions {
@@ -62,6 +63,11 @@ struct vcfGTz_reader {
         std:: string s;
         getline(m_f, s, '\0');
         return s;
+    }
+    auto            read_vector_of_char_with_leading_size() {
+        auto cd = read_code();
+        std:: cout << "cd = " << (int) cd << '\n';
+        assert(cd == vcfGTz_codes:: code_vector_of_char_with_leading_size_plain_GT);
     }
     vcfGTz_codes    read_code() {
         assert(m_f);
