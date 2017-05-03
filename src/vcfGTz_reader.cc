@@ -13,9 +13,8 @@ using std:: cout;
 namespace vcfGTz {
     int64_t     vcfGTz_reader:: read_offset_at_start_of_block() {
         int64_t i = read_uint64_t();
-        PP(i);
         assert(i>=0);
-        assert(i> 0);
+        // i==0 is special, no block here
         return i;
     }
     uint64_t    vcfGTz_reader:: read_uint64_t() {

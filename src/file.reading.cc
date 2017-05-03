@@ -441,18 +441,31 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     PP(first_string, first_string.size());
     assert(first_string == magic_file_header);
 
-    auto position_just_before_main_block = reader.m_f.tellg();
-    auto offset_over_main_block = reader.read_offset_at_start_of_block();
-    auto first_block_description = reader.read_string0();
-    PP(nice_operator_shift_left(first_block_description), offset_over_main_block);
+    struct block_summary_t {
+        string                          m_description;
+        decltype(reader.m_f.tellg())    m_just_after_description;
 
-    reader.m_f.seekg( position_just_before_main_block + offset_over_main_block );
+        string to_string() const {
+            return m_description;
+        }
+    };
+    vector<block_summary_t> block_summarys;
 
-    {
-        auto offset_over_second_block = reader.read_offset_at_start_of_block();
-        auto second_block_description = reader.read_string0();
-        PP(nice_operator_shift_left(second_block_description), offset_over_second_block);
-    }
+    do {
+        auto start_of_block = reader.m_f.tellg();
+        auto offset_over_this_block = reader.read_offset_at_start_of_block();
+        if(offset_over_this_block == 0)
+            break;
+        auto block_description = reader.read_string0();
+
+        block_summarys.push_back( block_summary_t{ block_description, reader.m_f.tellg() });
+
+        PP(nice_operator_shift_left(block_description), offset_over_this_block);
+
+        reader.m_f.seekg(start_of_block + offset_over_this_block);
+    } while(1);
+    using utils:: operator<<;
+    PP(block_summarys);
 
     DIE("vcfGTz not fully implemented");
     return {};
