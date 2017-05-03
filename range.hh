@@ -411,7 +411,7 @@ namespace range {
         o << '[';
         for(;;) {
             using utils:: operator<<; // to help print pairs and tuples
-            o << front_val(r);
+            o << utils:: nice_operator_shift_left(front_val(r));
             r.advance();
             if(r.empty())
                 break;
