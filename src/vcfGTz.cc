@@ -16,6 +16,16 @@ using utils:: stdget0;
 using utils:: stdget1;
 
 int main(int argc, char **argv) {
+    // Compress the input vcf file. The following info is discarded from the vcf file:
+    //  - The 'preamble'. Everything before before the header ("#CHROM\tPOS"...) is ignored
+    //      * (We do keep the header though)
+    //  - The INFO field is ignored - too long and not very interesting
+    //  - only the 'GT' data is kept, i.e. the other four in 'GT:PL:DP:GP:PS' are ignored is present
+    // Everything else is faithfully compressed (via 'zlib') line-by-line and stored.
+    // An index is appended to allow very fast access to the input in three orders:
+    //  - original file order
+    //  - CHROM:POS order
+    //  - ID order
     argc == 3 || DIE(argv[0] << ": requires 2 args, input (.vcf/.vcfgz) and output");
 
     gz:: igzstream f(argv[1]);
