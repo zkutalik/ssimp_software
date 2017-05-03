@@ -446,7 +446,10 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         decltype(reader.m_f.tellg())    m_just_after_description;
 
         string to_string() const {
-            return m_description;
+            std::ostringstream oss;
+            oss << '(' << m_just_after_description << ')';
+            oss << m_description;
+            return oss.str();
         }
     };
     vector<block_summary_t> block_summarys;
