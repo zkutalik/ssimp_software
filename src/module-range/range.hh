@@ -20,9 +20,6 @@ using utils:: can_apply;
 using utils:: void_t;
 
 namespace range {
-    struct range_tag {}; // *all* ranges will inherit this, if nothing else
-    template<typename R>
-    using is_of_range_tag = std:: enable_if_t<std::is_base_of<range_tag, std::remove_reference_t<R>>{}>;
     // A range is either non-owning:
     //   - initialized with lvalue container (or an lvalue range)
     //   - the range itself is copyable
@@ -44,7 +41,7 @@ namespace range {
 
     // First, I'll give an example of a simple range-like object. What could be simpler than a pair of iterators?
     template<typename b_t, typename e_t>
-    struct range_from_begin_end_t : public range_tag {
+    struct range_from_begin_end_t {
         b_t m_b;
         e_t m_e;
 
@@ -90,7 +87,7 @@ namespace range {
     )
 
     template<typename I, bool is_infinite>
-    struct range_ints_t : public range_tag {
+    struct range_ints_t {
         struct iter_is_own_value {
             I m_i;
 
@@ -233,7 +230,7 @@ namespace range {
     template<typename idx, typename ... range_types>
     struct zip_val_t;
     template<size_t ...Is, typename ...Rs>
-    struct zip_val_t<std::index_sequence<Is...>, Rs...> : public range_tag {
+    struct zip_val_t<std::index_sequence<Is...>, Rs...> {
         std:: tuple<Rs...> m_ranges;
 
         using value_type = std:: tuple< decltype( front_val(std::get<Is>(m_ranges)) ) ... >;
@@ -389,7 +386,12 @@ namespace range {
     template<typename R>
     auto begin(R && r) -> decltype(r.begin());
 
-    template<typename R, class..., typename Rnonref = std::remove_reference_t<R>, typename = std:: enable_if_t<std::is_base_of<range_tag, Rnonref >{}> >
+    template<typename R
+        , class...
+        , typename = decltype(              std::declval<R>().empty()       )
+        , typename = decltype(              std::declval<R>().advance()     )
+        , typename = decltype( front_val(   std::declval<R>()           )   )
+        >
     decltype(auto) operator<< (std:: ostream &o, R r) {
         if(r.empty()) {
             o << "[]";
