@@ -24,7 +24,7 @@ namespace vcfGTz {
         static_assert(N == sizeof(this->read_uint64_t()) ,"");
         for(int i=0; i<ssize(arr); ++i) {
             assert(m_f);
-            m_f >> arr.at(i);
+            arr.at(i) = (char) m_f.get();
         }
         assert(m_f);
         return   bit_conversions:: convert_from_some_bytes(arr);
