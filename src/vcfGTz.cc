@@ -15,12 +15,82 @@ namespace view   = range:: view  ;
 
 using std:: vector;
 using std:: string;
+using std:: ofstream;
+using std:: ios_base;
 using utils:: tokenize;
 using utils:: stdget0;
 using utils:: stdget1;
 using utils:: print_type;
 using range:: range_from_begin_end;
 using range:: view:: take;
+
+enum class vcfGTz_codes : uint8_t {
+            code_end_of_file        = 0
+        ,   code_null_term_string   = 1 // null-terminated string - when everything else fails
+};
+
+struct vcfGTz_writer {
+    ofstream m_f;
+    decltype(m_f.tellp()) my_beginning_pos;
+
+    vcfGTz_writer(string output_filename) : m_f {   output_filename
+                                                ,   ios_base::out
+                                                  | ios_base::binary
+                                                  | ios_base::trunc
+    }{
+        my_beginning_pos = m_f.tellp();
+
+        constexpr char magic_file_header[] = "vcfGTz.0.0.1";
+        save_string0( magic_file_header );
+
+        assert( sizeof(magic_file_header) == get_current_file_offset() );
+    }
+
+    void            save_this_line(vector<string>   const & fields) {
+        ensure_there_are_no_nulls(fields);
+
+        constexpr int HOW_MANY_FIELDS_TO_SAVE_DIRECTLY = 7;
+        // store the first seven fields directly, so these
+        // can be used for lookups later with having to go via
+        // zlib
+
+        for(int f = 0; f < HOW_MANY_FIELDS_TO_SAVE_DIRECTLY; ++f) {
+            //PP(fields.at(f));
+            save_smart_string0(fields.at(f));
+        }
+    }
+
+    void save_smart_string0(    string const & s) {
+        save_code(vcfGTz_codes:: code_null_term_string);
+        save_string0(s.c_str());
+    }
+
+    void            save_string0(char const *s) {
+        m_f << s;
+        m_f << '\0';
+    }
+
+    void            save_code(vcfGTz_codes code) {
+        m_f << (char)(uint8_t)code;
+    }
+
+    int64_t         get_current_file_offset() {
+        // not every platform uses anything as big as int64_t,
+        // but I'm going to force it, as I want something
+        // standard that I can store in the file
+        assert(m_f);
+        auto off = m_f.tellp() - my_beginning_pos;
+        assert(off > 0);
+        return off;
+    }
+    void            ensure_there_are_no_nulls(vector<string>   const & fields) {
+        for(auto & f : fields) {
+            for(char const & c : f) {
+                assert( c!='\0' );
+            }
+        }
+    }
+};
 
 int main(int argc, char **argv) {
     // Compress the input vcf file. The following info is discarded from the vcf file:
@@ -47,6 +117,8 @@ int main(int argc, char **argv) {
         advance(r);
 
     int64_t SNP_counter = -2; // because -1 is the 'special' SNP for the header
+
+    vcfGTz_writer writer{arg_output_filename};
 
     using utils:: operator<<;
     for(auto && x : r ) {
@@ -116,5 +188,6 @@ int main(int argc, char **argv) {
          * Remember that this includes the header line
          */
         //PP(fields.size(), fields);
+        writer.save_this_line(fields);
     }
 }
