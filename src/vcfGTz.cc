@@ -110,9 +110,11 @@ int main(int argc, char **argv) {
                 r.advance();
             }
 
-            // Now we've finally got a version of the line worth saving
-            //PP(fields);
         }
 
+        /* Now we've finally got a version of the line worth saving
+         * Remember that this includes the header line
+         */
+        //PP(fields.size(), fields);
     }
 }
