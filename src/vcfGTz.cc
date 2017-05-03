@@ -10,6 +10,8 @@
 #include "bits.and.pieces/PP.hh"
 #include "zlib-vector-of-char/zlib-vector.hh"
 
+#include "vcfGTz_reader.hh"
+
 namespace from = range:: from;
 namespace action = range:: action;
 namespace view   = range:: view  ;
@@ -29,6 +31,7 @@ using utils:: nice_operator_shift_left;
 using utils:: save_ostream_briefly;
 using range:: range_from_begin_end;
 using range:: view:: take;
+namespace bit_conversions = vcfGTz:: bit_conversions;
 
 enum class vcfGTz_codes : uint8_t {
             code_end_of_file        = 0
@@ -124,36 +127,6 @@ struct vcfGTz_writer {
                     );
     }
 
-    struct bit_conversions {
-    template<size_t N, typename T>
-    static
-    array<uint8_t,N> convert_to_some_bytes(T u) {
-        static_assert(N==8 || N==4, "");
-        static_assert(      ( std:: is_same<T, uint32_t>{} && N==4 )
-                         || ( std:: is_same<T, uint64_t>{} && N==8 ), "");
-
-        array<uint8_t,N> arr;
-        static_assert(N==utils::ssize(arr) ,"");
-        for(int byte = 0; byte < utils::ssize(arr); ++byte) {
-            auto by = (u >> (byte*8)) & 255;
-            arr.at(N-1-byte) = by;
-        }
-        return arr;
-    }
-    template<size_t N>
-    static
-    auto convert_from_some_bytes(array<uint8_t,N> arr) {
-        static_assert(N == 4 || N==8 ,""); // to return a uint32_t
-        using return_type = std::conditional_t<N==4, uint32_t, uint64_t>;
-        static_assert(sizeof(return_type) == N ,"");
-        return_type u = 0;
-        for(int byte = arr.size(); byte > 0; --byte) {
-            u <<= 8;
-            u += arr.at(N-byte);
-        }
-        return u;
-    }
-    };
 
     template<typename T>
     void            save_uint32_t(T sz) {
