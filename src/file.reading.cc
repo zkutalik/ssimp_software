@@ -24,8 +24,11 @@ using std:: ifstream;
 using std:: string;
 using std:: vector;
 using std:: map;
+using std:: cout;
 using utils:: ssize;
 using utils:: tokenize;
+using utils:: nice_operator_shift_left;
+using utils:: save_ostream_briefly;
 
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
@@ -438,8 +441,19 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     PP(first_string, first_string.size());
     assert(first_string == magic_file_header);
 
-    auto offset_before_main_block = reader.read_offset_at_start_of_block();
-    PP(offset_before_main_block);
+    auto position_just_before_main_block = reader.m_f.tellg();
+    auto offset_over_main_block = reader.read_offset_at_start_of_block();
+    auto first_block_description = reader.read_string0();
+    PP(nice_operator_shift_left(first_block_description), offset_over_main_block);
+
+    reader.m_f.seekg( position_just_before_main_block + offset_over_main_block );
+
+    {
+        auto offset_over_second_block = reader.read_offset_at_start_of_block();
+        auto second_block_description = reader.read_string0();
+        PP(nice_operator_shift_left(second_block_description), offset_over_second_block);
+    }
+
     DIE("vcfGTz not fully implemented");
     return {};
 }
