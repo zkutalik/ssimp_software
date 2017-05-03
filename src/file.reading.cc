@@ -443,10 +443,12 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
 
     struct block_summary_t {
         string                          m_description;
+        decltype(reader.m_f.tellg())    m_start_of_block;
         decltype(reader.m_f.tellg())    m_just_after_description;
 
         string to_string() const {
             std::ostringstream oss;
+            oss << '(' << m_start_of_block << ')';
             oss << '(' << m_just_after_description << ')';
             oss << m_description;
             return oss.str();
@@ -461,7 +463,7 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
             break;
         auto block_description = reader.read_string0();
 
-        block_summarys.push_back( block_summary_t{ block_description, reader.m_f.tellg() });
+        block_summarys.push_back( block_summary_t{ block_description, start_of_block, reader.m_f.tellg() });
 
         PP(nice_operator_shift_left(block_description), offset_over_this_block);
 
@@ -469,6 +471,40 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     } while(1);
     using utils:: operator<<;
     PP(block_summarys);
+
+    block_summarys.size() == 2 || DIE("vcfGTz not fully implemented");
+    block_summarys.at(0).m_description == "manylines:GTonly:zlib" || DIE("vcfGTz not fully implemented. Unexpected blocks.");
+    block_summarys.at(1).m_description == "offsets.into.previous.block" || DIE("vcfGTz not fully implemented. Unexpected blocks.");
+
+    // Start extracting the SNP-specific positions
+    reader.m_f.seekg( block_summarys.at(1).m_just_after_description );
+    int num_SNPs = reader.read_uint64_t();
+    PP(num_SNPs);
+
+    auto start_of_block_0 = block_summarys.at(0).m_start_of_block;
+    vector< decltype( start_of_block_0 ) > vec_of_positions_for_each_SNP;
+
+    for(auto i : range:: ints(num_SNPs)) {
+        (void)i;
+        auto next_offset = reader.read_uint64_t();
+        auto position_of_this_SNPs_data = start_of_block_0 .operator+(next_offset);
+        vec_of_positions_for_each_SNP.push_back( position_of_this_SNPs_data );
+    }
+    assert(num_SNPs == ssize(vec_of_positions_for_each_SNP));
+
+    for( auto p : vec_of_positions_for_each_SNP ) {
+        reader.m_f.seekg( p );
+        auto CHROM  = reader.read_smart_string0();
+        auto POS    = reader.read_smart_string0();
+        auto ID     = reader.read_smart_string0();
+        auto REF    = reader.read_smart_string0();
+        auto ALTs   = reader.read_smart_string0();
+        auto QUAL   = reader.read_smart_string0();
+        auto FILTER = reader.read_smart_string0();
+        PP(p, CHROM, CHROM.size(), POS, ID, REF, ALTs , QUAL, FILTER);
+    }
+
+
 
     DIE("vcfGTz not fully implemented");
     return {};

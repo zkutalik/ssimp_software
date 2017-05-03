@@ -33,11 +33,6 @@ using range:: range_from_begin_end;
 using range:: view:: take;
 namespace bit_conversions = vcfGTz:: bit_conversions;
 
-enum class vcfGTz_codes : uint8_t {
-            code_end_of_file        = 0
-        ,   code_null_term_string   = 1 // null-terminated string - when everything else fails
-};
-
 struct vcfGTz_writer {
     ofstream m_f;
     decltype(m_f.tellp()) my_beginning_pos;

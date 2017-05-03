@@ -7,6 +7,11 @@ using std:: ios_base;
 using utils:: ssize;
 
 namespace vcfGTz {
+    enum class vcfGTz_codes : uint8_t {
+                code_end_of_file        = 0
+            ,   code_null_term_string   = 1 // null-terminated string - when everything else fails
+    };
+
     namespace bit_conversions {
     template<size_t N, typename T>
     static
@@ -48,10 +53,21 @@ struct vcfGTz_reader {
         m_my_beginning = m_f.tellg();
     }
 
+    std:: string read_smart_string0() {
+        auto cd = read_code();
+        assert( cd == vcfGTz:: vcfGTz_codes:: code_null_term_string );
+        return read_string0();
+    }
     std:: string read_string0() {
         std:: string s;
         getline(m_f, s, '\0');
         return s;
+    }
+    vcfGTz_codes    read_code() {
+        assert(m_f);
+        uint8_t u = (char) m_f.get();
+        assert(m_f);
+        return static_cast<vcfGTz_codes>(u);
     }
 
     int64_t     read_offset_at_start_of_block();
