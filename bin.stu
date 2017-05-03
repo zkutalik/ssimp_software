@@ -53,12 +53,14 @@
     $[LD_FLAGS=bin/o/LD_FLAGS]
     bin/o/vcfGTz.o
     bin/o/gz/gzstream/gzstream.o
+    bin/o/zlib-vector-of-char/zlib-vector.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
     echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
     ${LINKER} \
         bin/o/vcfGTz.o \
         bin/o/gz/gzstream/gzstream.o \
+        bin/o/zlib-vector-of-char/zlib-vector.o \
         ${LD_FLAGS}               \
     -o bin/vcfGTz
 }
