@@ -14,9 +14,11 @@ namespace from = range:: from;
 namespace action = range:: action;
 namespace view   = range:: view  ;
 
+using std:: array;
 using std:: vector;
 using std:: string;
 using std:: ofstream;
+using std:: cout;
 using std:: ios_base;
 using std:: ostringstream;
 using utils:: tokenize;
@@ -24,6 +26,7 @@ using utils:: stdget0;
 using utils:: stdget1;
 using utils:: print_type;
 using utils:: nice_operator_shift_left;
+using utils:: save_ostream_briefly;
 using range:: range_from_begin_end;
 using range:: view:: take;
 
@@ -56,21 +59,35 @@ struct vcfGTz_writer {
         // store the first seven fields directly, so these
         // can be used for lookups later with having to go via
         // zlib
+        // Then compress the remainder of the fields using zlib
 
         for(int f = 0; f < HOW_MANY_FIELDS_TO_SAVE_DIRECTLY; ++f) {
-            //PP(fields.at(f));
             save_smart_string0(fields.at(f));
         }
 
+        auto just_last_fields = range:: range_from_begin_end (
+                fields.begin() + HOW_MANY_FIELDS_TO_SAVE_DIRECTLY
+                ,fields.end()
+                );
+
         ostringstream detokenized_stream;
-        for(auto & any_field : fields) {
+        for(auto & any_field : just_last_fields) {
             if(&any_field != &fields.front()) {
                 detokenized_stream << '\t';
             }
             detokenized_stream << any_field;
         }
         string detokenized = detokenized_stream.str();
-        PP(nice_operator_shift_left(detokenized));
+
+        zlib_vector:: vec_t as_a_vector( detokenized.begin(), detokenized.end() );
+        zlib_vector:: vec_t compressed = zlib_vector:: deflate( as_a_vector );
+
+        save_vector_of_char_with_leading_size( compressed );
+
+        {
+            //assert(fields == tokenize(detokenized,'\t'));
+            assert(as_a_vector == zlib_vector:: inflate( compressed ));
+        }
     }
 
     void save_smart_string0(    string const & s) {
@@ -81,6 +98,52 @@ struct vcfGTz_writer {
     void            save_string0(char const *s) {
         m_f << s;
         m_f << '\0';
+    }
+    void            save_vector_of_char_with_leading_size( zlib_vector:: vec_t const & compressed ) {
+        uint32_t sz = compressed.size();
+        save_uint32_t(sz);
+
+        static_assert(std::is_same< unsigned char const * , decltype(compressed.data()) >{} ,"");
+        m_f.write   (   reinterpret_cast<char const *>(compressed.data())
+                    ,   compressed.size()
+                    );
+    }
+
+    struct bit_conversions {
+        template<typename T>
+    static
+    array<uint8_t,4> convert_to_four_bytes(T u) {
+        static_assert(std:: is_same<T, uint32_t>{}, "");
+
+        //cout << '\n'; PP(u);
+        {
+            save_ostream_briefly sob{cout};
+            cout << std::hex << u << '\n';
+        }
+        array<uint8_t,4> arr;
+        for(int byte = 0; byte < 4; ++byte) {
+            auto by = (u >> (byte*8)) & 255;
+            arr.at(byte) = by;
+        }
+        return arr;
+    }
+    static
+    uint32_t convert_from_four_bytes(array<uint8_t,4> arr) {
+        uint32_t u = 0;
+        for(int byte = 4; byte > 0; --byte) {
+            u <<= 8;
+            u += arr.at(byte-1);
+        }
+        return u;
+    }
+    };
+
+    void            save_uint32_t(uint32_t sz) {
+        auto arr4bytes = bit_conversions:: convert_to_four_bytes(sz);
+        assert(sz == bit_conversions:: convert_from_four_bytes(arr4bytes));
+        for(uint8_t u8: arr4bytes) {
+            m_f << (char) u8;
+        }
     }
 
     void            save_code(vcfGTz_codes code) {
