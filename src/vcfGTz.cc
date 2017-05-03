@@ -58,6 +58,19 @@ struct vcfGTz_writer {
         save_uint64_t(minus1);
         return current_pos;
     }
+    void            close_this_block( decltype(my_beginning_pos) pos_to_write_in_offset ) {
+        auto current_pos = m_f.tellp();
+        PP(current_pos , pos_to_write_in_offset);
+        PP(current_pos - pos_to_write_in_offset);
+        auto sz_of_this_block = current_pos - pos_to_write_in_offset;
+        PP(sz_of_this_block);
+        assert(sz_of_this_block > 0);
+        print_type(sz_of_this_block);
+        print_type((uint64_t)sz_of_this_block);
+        m_f.seekp( pos_to_write_in_offset ); save_uint64_t( 0xffffffffffffffffuL );
+        m_f.seekp( pos_to_write_in_offset ); save_uint64_t( (uint64_t)sz_of_this_block );
+        m_f.seekp(current_pos); // move back to here before returning
+    }
 
     void            save_this_line(vector<string>   const & fields) {
         ensure_there_are_no_nulls(fields);
@@ -217,7 +230,6 @@ int main(int argc, char **argv) {
     vcfGTz_writer writer{arg_output_filename};
 
     auto remember_start_of_this_block = writer.start_a_new_block();
-    (void)remember_start_of_this_block;
 
     using utils:: operator<<;
     for(auto && x : r ) {
@@ -289,4 +301,5 @@ int main(int argc, char **argv) {
         //PP(fields.size(), fields);
         writer.save_this_line(fields);
     }
+    writer.close_this_block(remember_start_of_this_block);
 }
