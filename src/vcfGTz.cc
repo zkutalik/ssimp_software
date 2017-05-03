@@ -67,9 +67,15 @@ int main(int argc, char **argv) {
 
         // Copy the two interesting fields before deleting them
         // ** all lines, not just the header **
-        auto INFO = fields.at(7);
-        auto FORMAT = fields.at(8);
-        fields.erase( fields.begin() + 7, fields.begin() + 9 );
+
+        constexpr size_t index_of_field_INFO = 7; // MUST be three consecutive values
+        constexpr size_t index_of_field_FORMAT = 8; // MUST be three consecutive values
+        constexpr size_t index_of_field_therest = 9; // MUST be three consecutive values
+        constexpr size_t index_of_field_therest_after_deletion = 7;
+
+        auto INFO = fields.at(index_of_field_INFO);
+        auto FORMAT = fields.at(index_of_field_FORMAT);
+        fields.erase( fields.begin() + index_of_field_INFO, fields.begin() + index_of_field_therest );
 
         if(SNP_counter >= 0) {
             // Next, delete the non-'GT' fields from the individual data (and from the header, for completeness)
@@ -79,7 +85,6 @@ int main(int argc, char **argv) {
                 |view:: which
                 |action:: collect
             ;
-            PP(FORMAT, subfields_that_are_GT);
             subfields_that_are_GT.size() == 1 || DIE(
                     "Was expecting 'GT' exactly once in the format field. ["
                     << arg_input_filename << ':' << line_no
@@ -87,6 +92,26 @@ int main(int argc, char **argv) {
                     << FORMAT
                     << "]"
                     );
+
+            auto subfield_index_for_GT = subfields_that_are_GT.at(0);
+            (void)subfield_index_for_GT;
+            auto r = range_from_begin_end(  fields.begin() + index_of_field_therest_after_deletion
+                                         ,  fields.end()
+                                        );
+            while(!r.empty()) {
+                auto & x = front_ref(r);
+                auto t = tokenize(x,':');
+                (subfield_index_for_GT < t.size()) || DIE("FORMAT problem at "
+                    << '[' << arg_input_filename << ':' << line_no << ']'
+                    << " [" << FORMAT << "] [" << x << "]");
+                x=
+                t.at(subfield_index_for_GT);
+
+                r.advance();
+            }
+
+            // Now we've finally got a version of the line worth saving
+            //PP(fields);
         }
 
         { // This is pointless, just an assertion to help check my compression
