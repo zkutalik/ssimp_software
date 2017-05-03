@@ -39,7 +39,73 @@ namespace range {
      *   void advance()    - skip the current value
      */
 
-    // First, I'll give an example of a simple range-like object. What could be simpler than a pair of iterators?
+    // I'll start with the core 'synthesized' free functions.
+
+    // Synthesize 'front_ref'
+    template<typename R>
+    auto front_ref(R&& r)
+    -> decltype( std::forward<R>(r).front_ref() )
+    {
+        return   std::forward<R>(r).front_ref();
+    }
+
+    // Synthesize 'front_val'
+    namespace impl {
+        template<typename R >
+        auto front_val_impl(R&& r, utils:: priority_tag<5>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+                std::forward<R>(r).front_val() )
+        template<typename R >
+        auto front_val_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
+                utils:: un_lref( std::forward<R>(r).front_ref() ) )
+        template<typename R >
+        auto front_val_impl(R&& r, utils:: priority_tag<1>)
+        -> std:: decay_t<decltype( *std::forward<R>(r).begin() )>
+        {
+            return *std::forward<R>(r).begin();
+        }
+    }
+    template<typename R >
+    auto front_val(R&& r)
+    -> AMD_RANGE_DECLTYPE_AND_RETURN( impl:: front_val_impl(std::forward<R>(r), utils:: priority_tag<9>()) )
+
+    // Synthesize 'empty'
+    template<typename R >
+    auto empty(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).empty() )
+
+    // Synthesize 'advance'
+    template<typename R >
+    auto advance(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).advance() )
+
+    // Synthesize 'push_back'
+    template<typename R, typename T>
+    auto push_back(R&& r, T &&t)
+    -> decltype( std::forward<R>(r).push_back(std::forward<T>(t)) )
+    {
+        return   std::forward<R>(r).push_back(std::forward<T>(t));
+    }
+
+    // Synthesize 'pull'
+    namespace impl {
+        template<typename R>
+        auto pull_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN (
+            std:: forward<R>(r).pull()
+        )
+        template<typename R>
+        auto pull_impl(R&& r, utils:: priority_tag<2>) -> decltype( range:: front_val( std:: forward<R>(r) ) )
+        {
+            auto x = range:: front_val( std:: forward<R>(r) );
+                     range:: advance  ( std:: forward<R>(r) );
+            return x;
+        }
+    }
+    template<typename R>
+    auto pull(R&& r) {
+        return impl:: pull_impl(std::forward<R>(r), utils:: priority_tag<9>{});
+    }
+
+    // End of the main synthesizing
+
+    // Now, I'll give an example of a simple range-like object. What could be simpler than a pair of iterators?
     template<typename b_t, typename e_t>
     struct range_from_begin_end_t {
         b_t m_b;
@@ -192,48 +258,13 @@ namespace range {
                 ( std::forward<V>(v), 0 );
     }
 
-    template<typename R>
-    auto front_ref(R&& r)
-    -> decltype( std::forward<R>(r).front_ref() )
-    {
-        return   std::forward<R>(r).front_ref();
-    }
-
-    template<typename R, typename T>
-    auto push_back(R&& r, T &&t)
-    -> decltype( std::forward<R>(r).push_back(std::forward<T>(t)) )
-    {
-        return   std::forward<R>(r).push_back(std::forward<T>(t));
-    }
-
-    template<typename R >
-    auto front_val_impl(R&& r, utils:: priority_tag<5>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
-            std::forward<R>(r).front_val() )
-    template<typename R >
-    auto front_val_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN(
-            utils:: un_lref( std::forward<R>(r).front_ref() ) )
-    template<typename R >
-    auto front_val_impl(R&& r, utils:: priority_tag<1>)
-    -> std:: decay_t<decltype( *std::forward<R>(r).begin() )>
-    {
-        return *std::forward<R>(r).begin();
-    }
-
-    // Next, synthesize range::empty, for those with an empty() method
-    template<typename R >
-    auto empty(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).empty() )
-
-    // Synthesize range:: advance
-    template<typename R >
-    auto advance(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( std::forward<R>(r).advance() )
-
     template<typename idx, typename ... range_types>
     struct zip_val_t;
     template<size_t ...Is, typename ...Rs>
     struct zip_val_t<std::index_sequence<Is...>, Rs...> {
         std:: tuple<Rs...> m_ranges;
 
-        using value_type = std:: tuple< decltype( front_val(std::get<Is>(m_ranges)) ) ... >;
+        using value_type = std:: tuple< decltype( range:: front_val(std::get<Is>(m_ranges)) ) ... >;
         constexpr
         static
         size_t width_v = std:: tuple_size< decltype(m_ranges) > :: value;
@@ -279,8 +310,6 @@ namespace range {
                    utils:: ignore( ((void)range:: push_back(std::get<Is>( id{}(m_ranges)), std::get<Is>(p)),0) ... )
         )
     };
-    template<typename R >
-    auto front_val(R&& r) -> AMD_RANGE_DECLTYPE_AND_RETURN( front_val_impl(std::forward<R>(r), utils:: priority_tag<9>()) );
     template<size_t ...Is, typename ...Rs>
     typename zip_val_t<std::index_sequence<Is...>, Rs...> ::
         value_type
@@ -302,24 +331,6 @@ namespace range {
         zip_val( std::forward<decltype(ranges)>(ranges)... )
     )
 
-    namespace impl {
-    template<typename R>
-    auto pull_impl(R&& r, utils:: priority_tag<3>) -> AMD_RANGE_DECLTYPE_AND_RETURN (
-        std:: forward<R>(r).pull()
-    )
-    template<typename R>
-    auto pull_impl(R&& r, utils:: priority_tag<2>) -> decltype( range:: front_val( std:: forward<R>(r) ) )
-    {
-        auto x = range:: front_val( std:: forward<R>(r) );
-                 range:: advance  ( std:: forward<R>(r) );
-        return x;
-    }
-    }
-
-    template<typename R>
-    auto pull(R&& r) {
-        return impl:: pull_impl(std::forward<R>(r), utils:: priority_tag<9>{});
-    }
 
     template<typename R>
     struct begin_end_for_range_for {
