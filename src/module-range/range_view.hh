@@ -21,6 +21,7 @@ namespace view {
 
     struct {} ref_wraps;
     struct {} map;
+    struct {} take;
     struct {} unzip_filter;
     struct {} unzip_map;
 
@@ -52,6 +53,10 @@ namespace view {
     template<typename R>
     auto operator| (R r, decltype(map) ) {
         return detail:: temporary_tagged_holder<R, decltype(map)> { std::move(r) };
+    }
+    template<typename R>
+    auto operator| (R r, decltype(take) ) {
+        return detail:: temporary_tagged_holder<R, decltype(take)> { std::move(r) };
     }
 
     template<typename R, typename F>
@@ -126,6 +131,24 @@ namespace view {
     auto operator| (detail:: temporary_tagged_holder<R, decltype(map)> r_holder, F f)
     {
         return map_t<R,F>{ std:: move(r_holder.m_r), std:: move(f) };
+    }
+
+    template<typename R>
+    struct take_t {
+        R m_r;
+        int64_t     m_how_many;
+        bool empty() const {
+            return m_how_many==0 || m_r.empty();
+        }
+        auto front_val() const {
+            return range:: front_val(m_r);
+        }
+        void advance() { --m_how_many; m_r.advance(); }
+    };
+    template<typename R>
+    auto operator| (detail:: temporary_tagged_holder<R, decltype(take)> r_holder, int64_t how_many)
+    {
+        return take_t<R>{ std:: move(r_holder.m_r), how_many };
     }
 
 } // namespace view
