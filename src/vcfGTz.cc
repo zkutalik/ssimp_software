@@ -60,14 +60,9 @@ struct vcfGTz_writer {
     }
     void            close_this_block( decltype(my_beginning_pos) pos_to_write_in_offset ) {
         auto current_pos = m_f.tellp();
-        PP(current_pos , pos_to_write_in_offset);
-        PP(current_pos - pos_to_write_in_offset);
         auto sz_of_this_block = current_pos - pos_to_write_in_offset;
-        PP(sz_of_this_block);
         assert(sz_of_this_block > 0);
-        print_type(sz_of_this_block);
-        print_type((uint64_t)sz_of_this_block);
-        m_f.seekp( pos_to_write_in_offset ); save_uint64_t( 0xffffffffffffffffuL );
+        //m_f.seekp( pos_to_write_in_offset ); assert(read_uint64_t() == 0xffffffffffffffffuL );
         m_f.seekp( pos_to_write_in_offset ); save_uint64_t( (uint64_t)sz_of_this_block );
         m_f.seekp(current_pos); // move back to here before returning
     }
@@ -302,4 +297,9 @@ int main(int argc, char **argv) {
         writer.save_this_line(fields);
     }
     writer.close_this_block(remember_start_of_this_block);
+
+    // Normally, a block begins with a (non-zero number) that records its size.
+    // Hence, I'll just store '0' to record that the blocks are finished
+    // (and therefore [presumably] EOF).
+    writer.save_uint64_t(0UL);
 }
