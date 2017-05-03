@@ -30,8 +30,6 @@ using utils:: tokenize;
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
 namespace file_reading {
-    using utils:: operator<<; // to print vectors
-
     template<typename G>
     SNPiterator<G> &       SNPiterator<G>:: operator++()        {
         assert(m_line_number < m_gfh->number_of_snps());
@@ -710,7 +708,6 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
     return p;
 }
-using utils:: operator<<;
 vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
 
     if(m_cache_of_z12.count(crps) == 1) {
