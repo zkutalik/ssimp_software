@@ -39,15 +39,17 @@ int main(int argc, char **argv) {
     using utils:: operator<<;
     for(auto && x : r ) {
         int line_no = x |stdget1;
+        (void)line_no;
         auto && s = x |stdget0;
 
-        PP(line_no, s);
+        //PP(line_no, s);
         zlib_vector:: vec_t as_a_vector{ s.begin(), s.end() };
         assert(s.size() == as_a_vector.size());
-        auto compressed = zlib_vector:: deflate( std::move(as_a_vector) );
-        {
+        auto compressed = zlib_vector:: deflate( as_a_vector );
+        { // This is pointless, just an assertion to help check my compression
             auto uncompressed = zlib_vector:: inflate( compressed );
-            PP(compressed.size(), uncompressed.size());
+            PP(as_a_vector.size(), compressed.size());
+            assert(uncompressed == as_a_vector);
         }
     }
 }
