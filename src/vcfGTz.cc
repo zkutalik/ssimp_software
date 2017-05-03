@@ -198,6 +198,7 @@ int main(int argc, char **argv) {
     vcfGTz_writer writer{arg_output_filename};
 
     auto remember_start_of_this_block = writer.start_a_new_block();
+    writer.save_string0("manylines:GTonly:zlib");
 
     using utils:: operator<<;
     for(auto && x : r ) {
