@@ -223,6 +223,7 @@ T    pop_back_and_return(std:: vector<T> &v) {
     return was_at_the_back;
 }
 template<typename T>
+constexpr
 std::ptrdiff_t ssize(const T& t) {
     return t.size();
 }
