@@ -200,6 +200,8 @@ int main(int argc, char **argv) {
     auto remember_start_of_this_block = writer.start_a_new_block();
     writer.save_string0("manylines:GTonly:zlib");
 
+    vector<int64_t> offsets_within_block_for_each_line;
+
     using utils:: operator<<;
     for(auto && x : r ) {
         int line_no = x |stdget1;
@@ -268,9 +270,14 @@ int main(int argc, char **argv) {
          * Remember that this includes the header line
          */
         //PP(fields.size(), fields);
+        offsets_within_block_for_each_line.push_back( writer.m_f.tellp() - remember_start_of_this_block );
         writer.save_this_line(fields);
     }
     writer.close_this_block(remember_start_of_this_block);
+
+    {
+        PP(offsets_within_block_for_each_line);
+    }
 
     // Normally, a block begins with a (non-zero number) that records its size.
     // Hence, I'll just store '0' to record that the blocks are finished
