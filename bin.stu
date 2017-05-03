@@ -48,6 +48,21 @@
     ${CXX_WITH_FLAGS} -c "src/gz/gzstream/gzstream.C" -o "bin/o/gz/gzstream/gzstream.o"
 }
 
+    bin/vcfGTz
+:   $[LINKER=bin/o/LINKER]
+    $[LD_FLAGS=bin/o/LD_FLAGS]
+    bin/o/vcfGTz.o
+    bin/o/gz/gzstream/gzstream.o
+{
+    echo LINKER:"${LINKER}" | tr '\n' ' '; echo
+    echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
+    ${LINKER} \
+        bin/o/vcfGTz.o \
+        bin/o/gz/gzstream/gzstream.o \
+        ${LD_FLAGS}               \
+    -o bin/vcfGTz
+}
+
 >       bin/o/GCC_OR_CLANG
 :      @mkdir..bin/o
        @all.stu.files
@@ -120,6 +135,7 @@
         @clean
 {
     rm bin/ssimp                 || :
+    rm bin/vcfGTz                || :
     rm bin/o/CXX_WITH_FLAGS      || :
     rm bin/LIST_OF_HH_FILES      || :
     find bin/o -name '*.o' -exec rm {} \;
