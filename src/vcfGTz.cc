@@ -13,6 +13,7 @@ namespace from = range:: from;
 namespace action = range:: action;
 
 using std:: vector;
+using std:: string;
 using utils:: tokenize;
 using utils:: stdget0;
 using utils:: stdget1;
@@ -32,8 +33,11 @@ int main(int argc, char **argv) {
     //  - ID order
     argc == 3 || DIE(argv[0] << ": requires 2 args, input (.vcf/.vcfgz) and output");
 
-    gz:: igzstream f(argv[1]);
-    f.fail() && DIE("Can't find file [" << argv[1] << ']');
+    string arg_input_filename = argv[1];
+    string arg_output_filename = argv[2];
+
+    gz:: igzstream f(arg_input_filename.c_str());
+    f.fail() && DIE("Can't find file [" << arg_input_filename << ']');
 
     auto r = zip(from::ifstream( f ), range:: ints()) ;
 
