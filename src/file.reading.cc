@@ -15,6 +15,8 @@
 #include "range/range_view.hh"
 #include "range/range_action.hh"
 
+#include "vcfGTz_reader.hh"
+
 namespace action = range:: action;
 namespace view   = range:: view  ;
 
@@ -118,6 +120,8 @@ struct header_details {
 // Some forward declarations
 static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name);
+static
+GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name);
 static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int);
 static
@@ -224,8 +228,10 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
-    // I really should detect the file-type.
-    // But for now, we'll just assume a plain (non-gzipped) vcf file.
+    // Try various file types until one succeeds
+    auto gt_fh = read_in_vcfGTz_file(file_name);
+    if(gt_fh)
+        return gt_fh;
     return read_in_a_raw_ref_file_as_VCF(file_name);
 }
 
@@ -418,6 +424,26 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
         );
 
     return p;
+}
+static
+GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name) {
+    // Return an empty pointer if this is the wrong file type
+
+    vcfGTz:: vcfGTz_reader   reader{file_name};
+
+    constexpr char magic_file_header[] = "vcfGTz.0.0.1";
+    auto first_string = reader.read_string0();
+    if(first_string != magic_file_header) {
+        return {};
+    }
+
+    PP(first_string, first_string.size());
+    assert(first_string == magic_file_header);
+
+    auto offset_before_main_block = reader.read_offset_at_start_of_block();
+    PP(offset_before_main_block);
+    DIE("vcfGTz not fully implemented");
+    return {};
 }
 
 static
