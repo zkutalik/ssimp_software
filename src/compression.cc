@@ -503,7 +503,7 @@ namespace compression {
                 << "] for writing.");
 
         gz:: igzstream f(vcf_filename.c_str());
-        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << vcf_filename << ']');
+        f.fail() && DIE("Can't find file [" << vcf_filename << ']');
 
         binary_output.output_string( "vcf.GT.compressed.0.0.1" ); // later, this will be the offset just past the end
         binary_output.output_uint64( 1234 ); // later, this will be the offset just past the end

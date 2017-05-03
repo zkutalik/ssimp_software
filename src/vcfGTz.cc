@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     argc == 3 || DIE(argv[0] << ": requires 2 args, input (.vcf/.vcfgz) and output");
 
     gz:: igzstream f(argv[1]);
-    (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << argv[1] << ']');
+    f.fail() && DIE("Can't find file [" << argv[1] << ']');
 
     auto r = zip(from::ifstream( f ), range:: ints()) ;
 

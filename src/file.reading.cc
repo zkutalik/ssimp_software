@@ -271,7 +271,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     // using gzstream to read gzipped input data. Thanks for http://www.cs.unc.edu/Research/compgeom/gzstream/#doc
     // It's LGPL license, we should remember to document this
     gz:: igzstream f(file_name.c_str());
-    (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << file_name << ']');
+    f.fail() && DIE("Can't find file [" << file_name << ']');
     string current_line;
 
     int simple_line_number = 0;
