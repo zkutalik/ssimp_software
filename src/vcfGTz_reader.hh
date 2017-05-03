@@ -40,10 +40,13 @@ namespace vcfGTz {
 
 struct vcfGTz_reader {
     std:: ifstream m_f;
+    decltype(m_f.tellg())   m_my_beginning;
     vcfGTz_reader(std:: string file_name) : m_f {   file_name
                                                 ,   ios_base::in
                                                   | ios_base::binary
-    }{}
+    }{
+        m_my_beginning = m_f.tellg();
+    }
 
     std:: string read_string0() {
         std:: string s;
