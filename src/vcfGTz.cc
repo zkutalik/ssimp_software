@@ -121,7 +121,8 @@ struct vcfGTz_writer {
             cout << std::hex << u << '\n';
         }
         array<uint8_t,4> arr;
-        for(int byte = 0; byte < 4; ++byte) {
+        static_assert(4==utils::ssize(arr) ,"");
+        for(int byte = 0; byte < utils::ssize(arr); ++byte) {
             auto by = (u >> (byte*8)) & 255;
             arr.at(byte) = by;
         }
@@ -129,8 +130,9 @@ struct vcfGTz_writer {
     }
     static
     uint32_t convert_from_four_bytes(array<uint8_t,4> arr) {
+        static_assert(arr.size() == 4 ,""); // to return a uint32_t
         uint32_t u = 0;
-        for(int byte = 4; byte > 0; --byte) {
+        for(int byte = arr.size(); byte > 0; --byte) {
             u <<= 8;
             u += arr.at(byte-1);
         }
