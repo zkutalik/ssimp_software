@@ -24,7 +24,7 @@ struct from_ifstream_t {
     void                    advance()               {
         std:: getline(m_f, m_current);
     }
-    bool                    empty()         const   { return false; }
+    bool                    empty()         const   { return m_f.fail(); }
 };
 
 template<typename T_vl>
