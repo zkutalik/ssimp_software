@@ -388,6 +388,18 @@ decltype(auto) operator| (T&& t, decltype(stdget1)) {
     return std:: get<1>( std::forward<T>(t) );
 }
 
+struct save_ostream_briefly {
+    std::ostream               & m_o;
+    std::ios::fmtflags      m_f;
+
+    save_ostream_briefly(std::ostream & o) : m_o(o) {
+        m_f = m_o.flags();
+    }
+    ~save_ostream_briefly() {
+        m_o.flags(m_f);
+    }
+};
+
 
 } // namespace utils
 
