@@ -141,7 +141,7 @@ struct vcfGTz_writer {
         static_assert(N==utils::ssize(arr) ,"");
         for(int byte = 0; byte < utils::ssize(arr); ++byte) {
             auto by = (u >> (byte*8)) & 255;
-            arr.at(byte) = by;
+            arr.at(N-1-byte) = by;
         }
         return arr;
     }
@@ -154,7 +154,7 @@ struct vcfGTz_writer {
         return_type u = 0;
         for(int byte = arr.size(); byte > 0; --byte) {
             u <<= 8;
-            u += arr.at(byte-1);
+            u += arr.at(N-byte);
         }
         return u;
     }
