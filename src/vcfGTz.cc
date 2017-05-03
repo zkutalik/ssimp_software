@@ -277,6 +277,14 @@ int main(int argc, char **argv) {
 
     {
         PP(offsets_within_block_for_each_line);
+        auto remember_start_of_second_block = writer.start_a_new_block();
+        writer.save_string0("offsets.into.previous.block");
+        writer.save_uint64_t( offsets_within_block_for_each_line.size() );
+        for(uint64_t off : offsets_within_block_for_each_line) {
+            writer.save_uint64_t( off );
+        }
+
+        writer.close_this_block(remember_start_of_second_block);
     }
 
     // Normally, a block begins with a (non-zero number) that records its size.
