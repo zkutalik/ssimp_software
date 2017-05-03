@@ -110,10 +110,10 @@ struct vcfGTz_writer {
     }
 
     struct bit_conversions {
-        template<typename T>
+    template<size_t N, typename T>
     static
-    array<uint8_t,4> convert_to_four_bytes(T u) {
-        static_assert(std:: is_same<T, uint32_t>{}, "");
+    array<uint8_t,N> convert_to_some_bytes(T u) {
+        static_assert(std:: is_same<T, uint32_t>{} && N==4, "");
 
         //cout << '\n'; PP(u);
         {
@@ -128,9 +128,10 @@ struct vcfGTz_writer {
         }
         return arr;
     }
+    template<size_t N>
     static
-    uint32_t convert_from_four_bytes(array<uint8_t,4> arr) {
-        static_assert(arr.size() == 4 ,""); // to return a uint32_t
+    uint32_t convert_from_some_bytes(array<uint8_t,N> arr) {
+        static_assert(N == 4 ,""); // to return a uint32_t
         uint32_t u = 0;
         for(int byte = arr.size(); byte > 0; --byte) {
             u <<= 8;
@@ -140,9 +141,11 @@ struct vcfGTz_writer {
     }
     };
 
-    void            save_uint32_t(uint32_t sz) {
-        auto arr4bytes = bit_conversions:: convert_to_four_bytes(sz);
-        assert(sz == bit_conversions:: convert_from_four_bytes(arr4bytes));
+    template<typename T>
+    void            save_uint32_t(T sz) {
+        static_assert(std:: is_same<T, uint32_t>{}, "");
+        auto arr4bytes = bit_conversions:: convert_to_some_bytes<4>(sz);
+        assert(sz == bit_conversions:: convert_from_some_bytes(arr4bytes));
         for(uint8_t u8: arr4bytes) {
             m_f << (char) u8;
         }
