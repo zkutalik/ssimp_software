@@ -20,6 +20,7 @@ namespace view {
     }
 
     struct {} ref_wraps;
+    struct {} which;        // given a range of bools, return the indices (int64_t) of those that are true
     struct {} map;
     struct {} take;
     struct {} unzip_filter;
@@ -27,6 +28,8 @@ namespace view {
 
     template<typename R>
     auto operator| (R r, decltype(ref_wraps) );
+    template<typename R>
+    auto operator| (R r, decltype(which) );
 
     template<typename R>
     struct ref_wraps_impl {
@@ -40,6 +43,65 @@ namespace view {
     template<typename R>
     auto operator| (R r, decltype(ref_wraps) ) {
         return ref_wraps_impl<R> {std:: move(r)};
+    }
+
+    namespace impl {
+        static
+        constexpr int64_t special_index_notevenstarted = -1;
+        static
+        constexpr int64_t special_index_empty = -1337;
+        template<typename R>
+        struct which_impl {
+            mutable
+            R m_r;
+            mutable
+            int64_t     m_index; /* -1 means we haven't done anything yet
+                                  * -1337 means we're at empty
+                                  *  anything else means  true==front_val(m_r)
+                                  */
+
+            bool            empty()         const   {
+                if(m_index == special_index_notevenstarted) {
+                    real_advance();
+                    return empty();
+                }
+                assert(m_index != special_index_notevenstarted);
+                return m_index == special_index_empty;
+            }
+            uint64_t        front_val()     const   {
+                if(m_index == special_index_notevenstarted) {
+                    real_advance();
+                    return this->front_val();
+                }
+                assert(m_index != special_index_notevenstarted);
+                assert(m_index != special_index_empty);
+                return m_index;
+            }
+            void            real_advance()     const {
+                assert(m_index != special_index_empty);
+
+
+                bool b;
+                do{
+                    if( range::empty(m_r) ) {
+                        m_index = special_index_empty;
+                        return;
+                    }
+
+                    b = range:: pull(m_r);
+                    ++m_index;
+                    // that pre-increment above only works because special_index_notevenstarted==-1
+                    static_assert(special_index_notevenstarted == -1 ,"");
+                } while(!b);
+            }
+            void    advance() {
+                real_advance();
+            }
+        };
+    }
+    template<typename R>
+    auto operator| (R r, decltype(which) ) {
+        return impl:: which_impl<R> {std:: move(r), impl::special_index_notevenstarted};
     }
 
     template<typename R>
