@@ -113,15 +113,12 @@ struct vcfGTz_writer {
     template<size_t N, typename T>
     static
     array<uint8_t,N> convert_to_some_bytes(T u) {
-        static_assert(std:: is_same<T, uint32_t>{} && N==4, "");
+        static_assert(N==8 || N==4, "");
+        static_assert(      ( std:: is_same<T, uint32_t>{} && N==4 )
+                         || ( std:: is_same<T, uint64_t>{} && N==8 ), "");
 
-        //cout << '\n'; PP(u);
-        {
-            save_ostream_briefly sob{cout};
-            cout << std::hex << u << '\n';
-        }
-        array<uint8_t,4> arr;
-        static_assert(4==utils::ssize(arr) ,"");
+        array<uint8_t,N> arr;
+        static_assert(N==utils::ssize(arr) ,"");
         for(int byte = 0; byte < utils::ssize(arr); ++byte) {
             auto by = (u >> (byte*8)) & 255;
             arr.at(byte) = by;
@@ -130,9 +127,11 @@ struct vcfGTz_writer {
     }
     template<size_t N>
     static
-    uint32_t convert_from_some_bytes(array<uint8_t,N> arr) {
-        static_assert(N == 4 ,""); // to return a uint32_t
-        uint32_t u = 0;
+    auto convert_from_some_bytes(array<uint8_t,N> arr) {
+        static_assert(N == 4 || N==8 ,""); // to return a uint32_t
+        using return_type = std::conditional_t<N==4, uint32_t, uint64_t>;
+        static_assert(sizeof(return_type) == N ,"");
+        return_type u = 0;
         for(int byte = arr.size(); byte > 0; --byte) {
             u <<= 8;
             u += arr.at(byte-1);
@@ -147,6 +146,15 @@ struct vcfGTz_writer {
         auto arr4bytes = bit_conversions:: convert_to_some_bytes<4>(sz);
         assert(sz == bit_conversions:: convert_from_some_bytes(arr4bytes));
         for(uint8_t u8: arr4bytes) {
+            m_f << (char) u8;
+        }
+    }
+    template<typename T>
+    void            save_uint64_t(T sz) {
+        static_assert(std:: is_same<T, uint64_t>{}, "");
+        auto arr8bytes = bit_conversions:: convert_to_some_bytes<8>(sz);
+        assert(sz == bit_conversions:: convert_from_some_bytes(arr8bytes));
+        for(uint8_t u8: arr8bytes) {
             m_f << (char) u8;
         }
     }
