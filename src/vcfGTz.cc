@@ -1,4 +1,5 @@
 #include<iostream>
+#include<sstream>
 
 #include "gzstream.h"
 
@@ -17,10 +18,12 @@ using std:: vector;
 using std:: string;
 using std:: ofstream;
 using std:: ios_base;
+using std:: ostringstream;
 using utils:: tokenize;
 using utils:: stdget0;
 using utils:: stdget1;
 using utils:: print_type;
+using utils:: nice_operator_shift_left;
 using range:: range_from_begin_end;
 using range:: view:: take;
 
@@ -58,6 +61,16 @@ struct vcfGTz_writer {
             //PP(fields.at(f));
             save_smart_string0(fields.at(f));
         }
+
+        ostringstream detokenized_stream;
+        for(auto & any_field : fields) {
+            if(&any_field != &fields.front()) {
+                detokenized_stream << '\t';
+            }
+            detokenized_stream << any_field;
+        }
+        string detokenized = detokenized_stream.str();
+        PP(nice_operator_shift_left(detokenized));
     }
 
     void save_smart_string0(    string const & s) {
