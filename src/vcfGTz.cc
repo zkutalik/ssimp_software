@@ -104,7 +104,7 @@ struct vcfGTz_writer {
     }
 
     void save_smart_string0(    string const & s) {
-        save_code(vcfGTz_codes:: code_null_term_string);
+        save_code(vcfGTz:: vcfGTz_codes:: code_null_term_string);
         save_string0(s.c_str());
     }
 
@@ -142,7 +142,7 @@ struct vcfGTz_writer {
         }
     }
 
-    void            save_code(vcfGTz_codes code) {
+    void            save_code(vcfGTz:: vcfGTz_codes code) {
         m_f << (char)(uint8_t)code;
     }
 
