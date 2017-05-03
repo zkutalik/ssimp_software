@@ -114,13 +114,5 @@ int main(int argc, char **argv) {
             //PP(fields);
         }
 
-        { // This is pointless, just an assertion to help check my compression
-            zlib_vector:: vec_t as_a_vector{ s.begin(), s.end() };
-            assert(s.size() == as_a_vector.size());
-            auto compressed = zlib_vector:: deflate( as_a_vector );
-            auto uncompressed = zlib_vector:: inflate( compressed );
-            PP(as_a_vector.size(), compressed.size());
-            assert(uncompressed == as_a_vector);
-        }
     }
 }
