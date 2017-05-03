@@ -52,6 +52,13 @@ struct vcfGTz_writer {
         assert( sizeof(magic_file_header) == get_current_file_offset() );
     }
 
+    auto            start_a_new_block() {
+        auto current_pos = m_f.tellp();
+        uint64_t minus1 = ~ 0;
+        save_uint64_t(minus1);
+        return current_pos;
+    }
+
     void            save_this_line(vector<string>   const & fields) {
         ensure_there_are_no_nulls(fields);
 
@@ -208,6 +215,9 @@ int main(int argc, char **argv) {
     int64_t SNP_counter = -2; // because -1 is the 'special' SNP for the header
 
     vcfGTz_writer writer{arg_output_filename};
+
+    auto remember_start_of_this_block = writer.start_a_new_block();
+    (void)remember_start_of_this_block;
 
     using utils:: operator<<;
     for(auto && x : r ) {
