@@ -44,6 +44,58 @@ namespace vcfGTz {
     }
     }; // namespace bit_conversions
 
+struct special_encoder_for_list_of_GT_fields {
+    /* for more efficiency, instead of simply concatenating
+     * the fields with tabs and then using zlib, I use
+     * this more customized method.
+     *
+     * Note, this is lossless, i.e, it works in the header line
+     * even though it doesn't have entries like '0|0'
+     *
+     * HOWEVER, this assumes (reasonably!) that the original
+     * strings don't have '\0' in them. This is what I
+     * call ensure_there_are_no_nulls() before processing
+     * any line.
+     */
+    using vuc_t = std:: vector<unsigned char>; // same as 'zlib_vector:: vec_t
+
+    template<typename T> // T will be a range-type
+    static
+    vuc_t   deflate(T just_last_fields) {
+        vuc_t special_encoding_of_list_of_GT_fields;
+        for(auto & one_GT_field : just_last_fields) {
+            if  (   one_GT_field.size() == 3
+                 && (one_GT_field.at(1) == '|' || one_GT_field.at(1) == '/' )
+                 && (one_GT_field.at(0) >= '0' || one_GT_field.at(0) <= '3' )
+                 && (one_GT_field.at(2) >= '0' || one_GT_field.at(2) <= '3' )
+                ) {
+                static_assert('@' == 64 ,"not ASCII?");
+                // encode this in one character
+                bool slash_not_pipe = one_GT_field.at(1) == '/';
+                int left  = one_GT_field.at(0) - '0';
+                int right = one_GT_field.at(2) - '0';
+                assert(left  >= 0 && left  <= 3); // i.e. just two bits
+                assert(right >= 0 && right <= 3); // i.e. just two bits
+                char together = '@'
+                                | slash_not_pipe
+                                | (left << 1)
+                                | (right << 3)
+                                ;
+                assert(together >= '@' && together <= '_');
+                special_encoding_of_list_of_GT_fields.push_back( together );
+            }
+            else {
+                special_encoding_of_list_of_GT_fields.push_back( '\t' );
+                special_encoding_of_list_of_GT_fields.insert(   special_encoding_of_list_of_GT_fields.end()
+                                                            ,   one_GT_field.begin()
+                                                            ,   one_GT_field.end()
+                                                            );
+            }
+        }
+        return special_encoding_of_list_of_GT_fields;
+    }
+};
+
 struct vcfGTz_reader {
     std:: ifstream m_f;
     decltype(m_f.tellg())   m_my_beginning;

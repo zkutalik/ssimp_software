@@ -99,36 +99,7 @@ struct vcfGTz_writer {
 
         // Alternative method, specially tuned to GT fields
         {
-            zlib_vector:: vec_t special_encoding_of_list_of_GT_fields;
-            for(auto & one_GT_field : just_last_fields) {
-                if  (   one_GT_field.size() == 3
-                     && (one_GT_field.at(1) == '|' || one_GT_field.at(1) == '/' )
-                     && (one_GT_field.at(0) >= '0' || one_GT_field.at(0) <= '3' )
-                     && (one_GT_field.at(2) >= '0' || one_GT_field.at(2) <= '3' )
-                    ) {
-                    static_assert('@' == 64 ,"not ASCII?");
-                    // encode this in one character
-                    bool slash_not_pipe = one_GT_field.at(1) == '/';
-                    int left  = one_GT_field.at(0) - '0';
-                    int right = one_GT_field.at(2) - '0';
-                    assert(left  >= 0 && left  <= 3); // i.e. just two bits
-                    assert(right >= 0 && right <= 3); // i.e. just two bits
-                    char together = '@'
-                                    | slash_not_pipe
-                                    | (left << 1)
-                                    | (right << 3)
-                                    ;
-                    assert(together >= '@' && together <= '_');
-                    special_encoding_of_list_of_GT_fields.push_back( together );
-                }
-                else {
-                    special_encoding_of_list_of_GT_fields.push_back( '\t' );
-                    special_encoding_of_list_of_GT_fields.insert(   special_encoding_of_list_of_GT_fields.end()
-                                                                ,   one_GT_field.begin()
-                                                                ,   one_GT_field.end()
-                                                                );
-                }
-            }
+            zlib_vector:: vec_t special_encoding_of_list_of_GT_fields = vcfGTz:: special_encoder_for_list_of_GT_fields:: deflate(just_last_fields);
             zlib_vector:: vec_t compressed_specialGT = zlib_vector:: deflate( special_encoding_of_list_of_GT_fields );
             //PP(as_a_vector.size(), compressed.size());
             //PP(special_encoding_of_list_of_GT_fields.size(), compressed_specialGT.size());
