@@ -258,10 +258,10 @@ namespace range {
                 ( std::forward<V>(v), 0 );
     }
 
-    template<typename idx, typename ... range_types>
+    template<constexpr bool enforce_same_length, typename idx, typename ... range_types>
     struct zip_val_t;
-    template<size_t ...Is, typename ...Rs>
-    struct zip_val_t<std::index_sequence<Is...>, Rs...> {
+    template<constexpr bool enforce_same_length, size_t ...Is, typename ...Rs>
+    struct zip_val_t<enforce_same_length, std::index_sequence<Is...>, Rs...> {
         std:: tuple<Rs...> m_ranges;
 
         using value_type = std:: tuple< decltype( range:: front_val(std::get<Is>(m_ranges)) ) ... >;
@@ -291,11 +291,13 @@ namespace range {
                 return false;
             }
 
-            bool all_empty_or_infinite = utils:: and_all(
-                        range:: is_definitely_infinite( std::get<Is>(m_ranges) )
-                     || range:: empty                 ( std::get<Is>(m_ranges) )
-                    ...);
-            assert(all_empty_or_infinite);
+            if( enforce_same_length ) {
+                bool all_empty_or_infinite = utils:: and_all(
+                            range:: is_definitely_infinite( std::get<Is>(m_ranges) )
+                         || range:: empty                 ( std::get<Is>(m_ranges) )
+                        ...);
+                assert(all_empty_or_infinite);
+            }
             return true;
         }
         void                advance() {
@@ -310,16 +312,16 @@ namespace range {
                    utils:: ignore( ((void)range:: push_back(std::get<Is>( id{}(m_ranges)), std::get<Is>(p)),0) ... )
         )
     };
-    template<size_t ...Is, typename ...Rs>
-    typename zip_val_t<std::index_sequence<Is...>, Rs...> ::
+    template<constexpr bool enforce_same_length, size_t ...Is, typename ...Rs>
+    typename zip_val_t<enforce_same_length, std::index_sequence<Is...>, Rs...> ::
         value_type
-    zip_val_t<std::index_sequence<Is...>, Rs...> ::
+    zip_val_t<enforce_same_length, std::index_sequence<Is...>, Rs...> ::
         front_val()     const {
             return  value_type  { range:: front_val(std::get<Is>(m_ranges)) ...  };
         }
 
     template<typename ...Rs>
-    zip_val_t< std:: index_sequence_for<Rs...> ,std::decay_t<Rs>... >
+    zip_val_t< true, std:: index_sequence_for<Rs...> ,std::decay_t<Rs>... >
     zip_val(Rs && ...ranges) {
         return { std::forward<decltype(ranges)>(ranges)... };
     }
@@ -330,6 +332,12 @@ namespace range {
     zip(Rs && ...ranges) -> AMD_RANGE_DECLTYPE_AND_RETURN(
         zip_val( std::forward<decltype(ranges)>(ranges)... )
     )
+    // zip_relax_length - just ignore trailing elements if they're not all the same length
+    template<typename ...Rs>
+    zip_val_t< false, std:: index_sequence_for<Rs...> ,std::decay_t<Rs>... >
+    zip_relax_length(Rs && ...ranges) {
+        return { std::forward<decltype(ranges)>(ranges)... };
+    }
 
 
     template<typename R>
