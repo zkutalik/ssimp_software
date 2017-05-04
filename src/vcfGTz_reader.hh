@@ -144,6 +144,10 @@ struct vcfGTz_reader {
         m_my_beginning = m_f.tellg();
     }
 
+    void            seek_relative(int64_t o) {
+        m_f.seekg(o, ios_base:: cur);
+    }
+
     std:: string read_smart_string0() {
         auto cd = read_code();
         assert( cd == vcfGTz:: vcfGTz_codes:: code_null_term_string );
@@ -169,10 +173,35 @@ struct vcfGTz_reader {
         return static_cast<vcfGTz_codes>(u);
     }
 
-    int64_t     read_offset_at_start_of_block();
+    int64_t     read_offset_at_start_of_block() {
+        int64_t i = read_uint64_t();
+        assert(i>=0);
+        // i==0 is special, no block here
+        return i;
+    }
 
-    uint32_t    read_uint32_t();
-    uint64_t    read_uint64_t();
+    uint32_t    read_uint32_t() {
+        constexpr int N = 4;
+        std:: array<uint8_t, N> arr;
+        static_assert(N == sizeof(this->read_uint32_t()) ,"");
+        for(int i=0; i<ssize(arr); ++i) {
+            assert(m_f);
+            arr.at(i) = (char) m_f.get();
+        }
+        assert(m_f);
+        return   bit_conversions:: convert_from_some_bytes(arr);
+    }
+    uint64_t    read_uint64_t() {
+        constexpr int N = 8;
+        std:: array<uint8_t, N> arr;
+        static_assert(N == sizeof(this->read_uint64_t()) ,"");
+        for(int i=0; i<ssize(arr); ++i) {
+            assert(m_f);
+            arr.at(i) = (char) m_f.get();
+        }
+        assert(m_f);
+        return   bit_conversions:: convert_from_some_bytes(arr);
+    }
 };
 
 } // namespace vcfGTz

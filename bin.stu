@@ -9,7 +9,6 @@
     bin/o/file.reading.o
     bin/o/mvn/mvn.o
     bin/o/gz/gzstream/gzstream.o
-    bin/o/vcfGTz_reader.o
     bin/o/zlib-vector-of-char/zlib-vector.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
@@ -20,7 +19,6 @@
         bin/o/file.reading.o \
         bin/o/mvn/mvn.o \
         bin/o/gz/gzstream/gzstream.o \
-        bin/o/vcfGTz_reader.o \
         bin/o/zlib-vector-of-char/zlib-vector.o \
         ${LD_FLAGS}               \
     -o bin/ssimp
