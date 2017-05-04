@@ -23,6 +23,7 @@ namespace view {
     struct {} which;        // given a range of bools, return the indices (int64_t) of those that are true
     struct {} map;
     struct {} take;
+    struct {} skip;
     struct {} unzip_filter;
     struct {} unzip_map;
 
@@ -120,6 +121,10 @@ namespace view {
     auto operator| (R r, decltype(take) ) {
         return detail:: temporary_tagged_holder<R, decltype(take)> { std::move(r) };
     }
+    template<typename R>
+    auto operator| (R r, decltype(skip) ) {
+        return detail:: temporary_tagged_holder<R, decltype(skip)> { std::move(r) };
+    }
 
     template<typename R, typename F>
     struct unzip_filter_t {
@@ -211,6 +216,19 @@ namespace view {
     auto operator| (detail:: temporary_tagged_holder<R, decltype(take)> r_holder, int64_t how_many)
     {
         return take_t<R>{ std:: move(r_holder.m_r), how_many };
+    }
+
+    // skip
+    template<typename R>
+    auto operator| (detail:: temporary_tagged_holder<R, decltype(skip)> r_holder, int64_t how_many)
+    {
+        (void)how_many;
+        auto r = std:: move(r_holder.m_r);
+        while(how_many > 0 && !range:: empty(r)) {
+            range:: advance(r);
+            --how_many;
+        }
+        return r;
     }
 
 } // namespace view
