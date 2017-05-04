@@ -433,11 +433,16 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
 
     vcfGTz:: vcfGTz_reader   reader{file_name};
 
-    constexpr char magic_file_header[] = "vcfGTz.0.0.1";
     auto first_string = reader.read_string0();
-    if(first_string != magic_file_header) {
+    auto first_6 = first_string.substr(0,6);
+    if(first_6 != "vcfGTz") {
+        // It's not suitable for this function. Return nothing and let the system
+        // try the next file format
         return {};
     }
+
+    constexpr char magic_file_header[] = "vcfGTz.0.0.2";
+    assert(first_string == magic_file_header);
 
     PP(first_string, first_string.size());
     assert(first_string == magic_file_header);
