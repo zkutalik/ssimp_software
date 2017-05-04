@@ -190,8 +190,8 @@ template<typename T, typename ...Ts>
 auto mk_vector(T t, Ts ...ts) -> std:: vector<T> {
     return std:: vector<T>{t, ts...};
 }
-template<typename T>
-void print_type(T&&) {
+template<typename ...Ts>
+void print_type(Ts && ...) {
     std:: cout << __PRETTY_FUNCTION__ << std:: endl;
 }
 template<typename T>
