@@ -84,36 +84,17 @@ struct vcfGTz_writer {
                 ,fields.end()
                 );
 
-        ostringstream detokenized_stream;
-        for(auto & any_field : just_last_fields) {
-            if(&any_field != &fields.front()) {
-                detokenized_stream << '\t';
-            }
-            detokenized_stream << any_field;
-        }
-        string detokenized = detokenized_stream.str();
-
-        zlib_vector:: vec_t as_a_vector( detokenized.begin(), detokenized.end() );
-        zlib_vector:: vec_t compressed = zlib_vector:: deflate( as_a_vector );
-
-        // Alternative method, specially tuned to GT fields
-        {
-            zlib_vector:: vec_t doubly_compressed =
-                zlib_vector:: deflate(
-                    vcfGTz:: special_encoder_for_list_of_GT_fields:: deflate(
-                        just_last_fields
-                    )
-                );
-            save_vector_of_char_with_leading_size( doubly_compressed );
-            auto for_verification = vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate( doubly_compressed ) );
-            assert(for_verification ==  (just_last_fields |action:: collect) );
-        }
+        // New method, specially tuned to GT fields
+        zlib_vector:: vec_t doubly_compressed =
+            zlib_vector:: deflate(
+                vcfGTz:: special_encoder_for_list_of_GT_fields:: deflate(
+                    just_last_fields
+                )
+            );
+        save_vector_of_char_with_leading_size( doubly_compressed );
+        //auto for_verification = vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate( doubly_compressed ) ); assert(for_verification ==  (just_last_fields |action:: collect) );
 
 
-        {
-            //assert(fields == tokenize(detokenized,'\t'));
-            assert(as_a_vector == zlib_vector:: inflate( compressed ));
-        }
     }
 
     void save_smart_string0(    string const & s) {
