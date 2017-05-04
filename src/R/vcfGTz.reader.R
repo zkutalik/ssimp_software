@@ -1,6 +1,6 @@
 library(Rcpp)
-delayedAssign("vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
-	, 'IntegerVector vcfGTz_num_SNPs( CharacterVector filename) {
+delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+	, 'IntegerVector vcfGTz_num_SNPs ( CharacterVector filename) {
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
 
@@ -23,8 +23,8 @@ delayedAssign("vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', includes=c
 			int num_SNPs = num_lines - 1; // as the first one is the header
 			return {num_SNPs};
 }'))
-delayedAssign("vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
-	, 'NumericVector vcfGTz_get_internal_offsetsnum_SNPs(CharacterVector filename, IntegerVector indices) {
+delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+	, 'NumericVector vcfGTz_get_internal_offsets (CharacterVector filename, IntegerVector indices) {
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
 
@@ -63,6 +63,40 @@ delayedAssign("vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='cpp14'
 				}
 				else
 					results.push_back(NA_REAL);
+			}
+
+			return results;
+}'))
+delayedAssign(        "vcfGTz_get_CHROM_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+	, 'CharacterVector vcfGTz_get_CHROM_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
+			std:: string filename_ = {filename[0]};
+			vcfGTz:: vcfGTz_reader reader(filename_);
+
+			// read in the "magic" string
+			auto magic = reader.read_string0();
+			if(magic != "vcfGTz.0.0.2")
+				stop("wrong file type?");
+
+			// this time, we like the first block
+			auto remember_this_position = reader.m_f.tellg();
+
+			reader.read_offset_at_start_of_block(); // read this, but ignore it
+
+			auto description_of_first_block = reader.read_string0();
+			if(description_of_first_block != "manylines:GTonly:zlib")
+				stop("wrong file type?");
+
+			CharacterVector results;
+
+			for(auto && o : file_offsets) {
+				if(std::isnan(o)) {
+					results.push_back(NA_STRING);
+				}
+				else {
+					reader.m_f.seekg( remember_this_position.operator+( o ) );
+					auto CHROM = reader.read_smart_string0();
+					results.push_back(CHROM);
+				}
 			}
 
 			return results;
