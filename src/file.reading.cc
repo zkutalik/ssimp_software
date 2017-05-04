@@ -30,6 +30,7 @@ using utils:: ssize;
 using utils:: tokenize;
 using utils:: nice_operator_shift_left;
 using utils:: save_ostream_briefly;
+using vcfGTz:: special_encoder_for_list_of_GT_fields;
 
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
@@ -513,12 +514,15 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
           * This slows down loading though, so consider disabling it
           */
             // TODO: get rid of this
-            auto v = reader.read_vector_of_char_with_leading_size();
-            static_assert( std::is_same<decltype(v), zlib_vector:: vec_t>{} ,"");
-            auto unc = zlib_vector:: inflate(v);
-            auto com = zlib_vector:: deflate(unc);
-            assert(v == com);
-            //PP(range:: range_from_begin_end(unc) |view:: map|[](auto x){return (char)x;});
+            auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
+            static_assert( std::is_same<decltype(doubly_compressed), zlib_vector:: vec_t>{} ,"");
+            auto doubly_uncompressed = special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate(doubly_compressed) );
+            auto com =
+                zlib_vector:: deflate(
+                special_encoder_for_list_of_GT_fields:: deflate( doubly_uncompressed )
+                );
+            assert(doubly_compressed == com);
+            PP(doubly_uncompressed);
         }
     }
 
