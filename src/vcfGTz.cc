@@ -99,15 +99,14 @@ struct vcfGTz_writer {
 
         // Alternative method, specially tuned to GT fields
         {
-            zlib_vector:: vec_t special_encoding_of_list_of_GT_fields = vcfGTz:: special_encoder_for_list_of_GT_fields:: deflate(just_last_fields);
-            zlib_vector:: vec_t compressed_specialGT = zlib_vector:: deflate( special_encoding_of_list_of_GT_fields );
-            //PP(as_a_vector.size(), compressed.size());
-            //PP(special_encoding_of_list_of_GT_fields.size(), compressed_specialGT.size());
-            //PP(compressed.size(), compressed_specialGT.size());
-            //PP( nice_operator_shift_left(string( special_encoding_of_list_of_GT_fields.begin(), special_encoding_of_list_of_GT_fields.end() )));
-            auto un_specialGTed = vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate( special_encoding_of_list_of_GT_fields );
-            //using utils:: operator<<; PP(un_specialGTed);
-            assert(un_specialGTed ==  (just_last_fields |action:: collect) );
+            zlib_vector:: vec_t doubly_compressed =
+                zlib_vector:: deflate(
+                    vcfGTz:: special_encoder_for_list_of_GT_fields:: deflate(
+                        just_last_fields
+                    )
+                );
+            auto for_verification = vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate( doubly_compressed ) );
+            assert(for_verification ==  (just_last_fields |action:: collect) );
         }
 
 
