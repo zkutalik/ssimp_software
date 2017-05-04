@@ -1,3 +1,5 @@
+@all: bin/ssimp bin/vcfGTz;
+
     bin/ssimp
 :   $[LINKER=bin/o/LINKER]
     $[LD_FLAGS=bin/o/LD_FLAGS]
