@@ -14,12 +14,14 @@
 #include "bits.and.pieces/utils.hh"
 #include "range/range_view.hh"
 #include "range/range_action.hh"
+#include "range/range_from.hh"
 #include "zlib-vector-of-char/zlib-vector.hh"
 
 #include "vcfGTz_reader.hh"
 
 namespace action = range:: action;
 namespace view   = range:: view  ;
+namespace from   = range:: from  ;
 
 using std:: ifstream;
 using std:: string;
@@ -30,6 +32,7 @@ using utils:: ssize;
 using utils:: tokenize;
 using utils:: nice_operator_shift_left;
 using utils:: save_ostream_briefly;
+using utils:: print_type;
 using vcfGTz:: special_encoder_for_list_of_GT_fields;
 
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
@@ -604,10 +607,23 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         }
     }
 
-    return reference_data;
+    // Ensure the positions are all increasing. I'll have
+    // to do some reordering if not
+    auto r0 = from:: vector( reference_data->m_all_SNPs );
+    auto r1 = from:: vector( reference_data->m_all_SNPs ) |view::skip| 1;
+    zip_relax_length    (
+                r0
+            ,   r1
+        ) |action::unzip_foreach|
+    []  (   vcfGTz_handle:: metadata_for_one_line const &l
+        ,   vcfGTz_handle:: metadata_for_one_line const &r) {
+        if(l.m_chrpos.chr == r.m_chrpos.chr)
+            assert(l.m_chrpos.pos <= r.m_chrpos.pos);
+        else
+            assert(l.m_chrpos.chr <  r.m_chrpos.chr);
+    };
 
-    DIE("vcfGTz not fully implemented");
-    return {};
+    return reference_data;
 }
 
 static
