@@ -229,6 +229,34 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
     }
 
 };
+struct vcfGTz_handle : public file_reading:: Genotypes_I
+{
+    struct metadata_for_one_line {
+        int64_t     m_offset_from_start_of_file;
+        chrpos      m_chrpos;
+        /* TODO: Maybe remove some of the following entries, or encode them more
+         * efficiently, to save runtime memory
+         */
+        string      m_SNPname;
+        string      m_allele_alt;
+        string      m_allele_ref;
+    };
+
+    vector<metadata_for_one_line> m_many_lines_start_at_MINUS1;
+
+    int             number_of_snps  ()          const { return m_many_lines_start_at_MINUS1.size() - 1; }
+    string          get_SNPname     (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_SNPname; }
+    chrpos          get_chrpos      (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_chrpos; }
+    string          get_allele_ref  (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_ref; }
+    string          get_allele_alt  (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_alt; }
+    virtual std::pair<
+             std::vector<uint8_t>
+            ,std::vector<uint8_t>
+        >           get_calls       (int i)     const {
+            (void)i;
+            return {{}, {}};
+    }
+};
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
     // Try various file types until one succeeds
