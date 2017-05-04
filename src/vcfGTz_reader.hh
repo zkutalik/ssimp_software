@@ -78,6 +78,7 @@ struct vcfGTz_reader {
 
     int64_t     read_offset_at_start_of_block();
 
+    uint32_t    read_uint32_t();
     uint64_t    read_uint64_t();
 };
 
