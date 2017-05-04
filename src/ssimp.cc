@@ -12,7 +12,6 @@
 
 #include "options.hh"
 #include "file.reading.hh"
-#include "compression.hh"
 
 #include "bits.and.pieces/utils.hh"
 #include "mvn/mvn.hh"
@@ -100,19 +99,6 @@ int main(int argc, char **argv) {
 
     cout.imbue(std::locale("")); // apply the user's locale, for example the thousands separator
     cout << std::setprecision(20);
-
-
-    if( !options:: opt_compressed_out.empty() ) {
-        // We're not doing imputation this time. Instead,
-        // we're creating a compressed vcf file for later use
-        options:: opt_gwas_filename.empty() || DIE("Not allowed to use --compressed_out and --gwas simultaneously.");
-        options:: opt_raw_ref.empty()       && DIE("--compressed_out requires a --raw.ref file also");
-        compression:: make_compressed_vcf_file  (   options:: opt_compressed_out
-                                                ,   options:: opt_raw_ref  );
-
-        return 0;
-    }
-
 
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {
         DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
