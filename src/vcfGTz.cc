@@ -216,10 +216,8 @@ int main(int argc, char **argv) {
         auto && s = x |stdget0;
 
         ++SNP_counter;
-        auto counter_at_this_SNP = SNP_counter;
 
         auto fields = tokenize(s, '\t');
-        PP(counter_at_this_SNP, fields.size());
 
         if(SNP_counter == -1) {
             auto first_9_fields =
@@ -277,14 +275,12 @@ int main(int argc, char **argv) {
         /* Now we've finally got a version of the line worth saving
          * Remember that this includes the header line
          */
-        //PP(fields.size(), fields);
         offsets_within_block_for_each_line.push_back( writer.m_f.tellp() - remember_start_of_this_block );
         writer.save_this_line(fields);
     }
     writer.close_this_block(remember_start_of_this_block);
 
     {
-        PP(offsets_within_block_for_each_line);
         auto remember_start_of_second_block = writer.start_a_new_block();
         writer.save_string0("offsets.into.previous.block");
         writer.save_uint64_t( offsets_within_block_for_each_line.size() );
