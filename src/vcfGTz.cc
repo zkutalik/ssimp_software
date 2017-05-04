@@ -29,6 +29,7 @@ using utils:: stdget1;
 using utils:: print_type;
 using utils:: nice_operator_shift_left;
 using utils:: save_ostream_briefly;
+using utils:: ELAPSED;
 using range:: range_from_begin_end;
 using range:: view:: take;
 namespace bit_conversions = vcfGTz:: bit_conversions;
@@ -218,6 +219,10 @@ int main(int argc, char **argv) {
         ++SNP_counter;
 
         auto fields = tokenize(s, '\t');
+
+        if(SNP_counter % 10000 == 0) { // that's about once a minute on one of the big files
+            PP(ELAPSED(), SNP_counter, fields.at(0), fields.at(1), fields.at(2));
+        }
 
         if(SNP_counter == -1) {
             auto first_9_fields =
