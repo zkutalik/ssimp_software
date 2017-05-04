@@ -233,6 +233,7 @@ struct vcfGTz_handle : public file_reading:: Genotypes_I
 {
     struct metadata_for_one_line {
         int64_t     m_offset_from_start_of_file;
+        int         m_line_number; // currently left at -1 usually. Sorry!
         chrpos      m_chrpos;
         /* TODO: Maybe remove some of the following entries, or encode them more
          * efficiently, to save runtime memory
@@ -247,18 +248,47 @@ struct vcfGTz_handle : public file_reading:: Genotypes_I
         }
     };
 
-    vector<metadata_for_one_line> m_many_lines_start_at_MINUS1;
+    vector<metadata_for_one_line>   m_many_lines_start_at_MINUS1;
+    string                          m_underlying_file_name;
 
-    int             number_of_snps  ()          const { return m_many_lines_start_at_MINUS1.size() - 1; }
-    string          get_SNPname     (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_SNPname; }
-    chrpos          get_chrpos      (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_chrpos; }
-    string          get_allele_ref  (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_ref; }
-    string          get_allele_alt  (int i)     const { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_alt; }
-    virtual std::pair<
+    int             number_of_snps  ()          const override { return m_many_lines_start_at_MINUS1.size() - 1; }
+    string          get_SNPname     (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_SNPname; }
+    chrpos          get_chrpos      (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_chrpos; }
+    string          get_allele_ref  (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_ref; }
+    string          get_allele_alt  (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_alt; }
+    std::pair<
              std::vector<uint8_t>
             ,std::vector<uint8_t>
-        >           get_calls       (int i)     const {
-            (void)i;
+        >           get_calls       (int i)     const override {
+            auto relevant_offset_from_beginning = m_many_lines_start_at_MINUS1.at(i+1).m_offset_from_start_of_file;
+            PP(relevant_offset_from_beginning);
+
+            vcfGTz:: vcfGTz_reader reader (   m_underlying_file_name );
+            reader.m_f || DIE("Has that file disappeared? [" << m_underlying_file_name << "]");
+
+            reader.m_f.seekg( relevant_offset_from_beginning, std::ios_base:: beg);
+            assert(reader.m_f);
+            reader.read_smart_string0(); // skip over CHROM
+            reader.read_smart_string0(); // skip over POS
+            reader.read_smart_string0(); // skip over ID
+            reader.read_smart_string0(); // skip over REF
+            reader.read_smart_string0(); // skip over ALTs
+            reader.read_smart_string0(); // skip over QUAL
+            reader.read_smart_string0(); // skip over FILTER
+
+            auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
+            auto doubly_uncompressed = special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate(doubly_compressed) );
+
+            auto lefts_and_rights = parse_many_calls(doubly_uncompressed, m_many_lines_start_at_MINUS1.at(i+1).m_line_number);
+
+            return lefts_and_rights;
+            using utils:: operator<<;
+            PP(lefts_and_rights.first);
+            PP(lefts_and_rights.second);
+            //return lefts_and_rights;
+            //PP(doubly_uncompressed);
+
+            assert(0);
             return {{}, {}};
     }
 };
@@ -482,6 +512,7 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     assert(first_string == magic_file_header);
 
     auto reference_data = std:: make_shared<vcfGTz_handle>();
+    reference_data -> m_underlying_file_name = file_name;
 
     struct block_summary_t {
         string                          m_description;
@@ -538,7 +569,12 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     assert(num_SNPs == ssize(vec_of_positions_for_each_SNP));
 
     for( auto p : vec_of_positions_for_each_SNP ) {
+        vcfGTz_handle:: metadata_for_one_line x;
+
         reader.m_f.seekg( p );
+        x.m_offset_from_start_of_file = reader.m_f.tellg() - reader.m_my_beginning;
+        x.m_line_number = -1;
+
         auto CHROM  = reader.read_smart_string0();
         auto POS    = reader.read_smart_string0();
         auto ID     = reader.read_smart_string0();
@@ -548,7 +584,6 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         auto FILTER = reader.read_smart_string0();
         PP(p, CHROM, POS, ID, REF, ALTs , QUAL, FILTER);
 
-        vcfGTz_handle:: metadata_for_one_line x;
         x.m_chrpos.chr      = utils:: lexical_cast<int> (CHROM);
         x.m_chrpos.pos      = utils:: lexical_cast<int> (POS);
         x.m_SNPname         = ID;
@@ -556,6 +591,8 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         x.m_allele_alt      = ALTs;
 
         x.some_checks();
+
+        reference_data->m_many_lines_start_at_MINUS1.push_back(x);
 
         {/* Not really needed here, but I'll just uncompress and recompress for fun
           * This slows down loading though, so consider disabling it
@@ -573,6 +610,7 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         }
     }
 
+    return reference_data;
 
     DIE("vcfGTz not fully implemented");
     return {};
