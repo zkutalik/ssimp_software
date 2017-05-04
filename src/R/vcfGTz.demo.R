@@ -5,8 +5,11 @@ filename='ref/compressed/50mb.vcfGTz'
 num.SNPs = vcfGTz_num_SNPs(filename)
 PP(num.SNPs)
 
-file_offsets = vcfGTz_get_internal_offsets(filename, 0:3 %c% -1:3)
+file_offsets = vcfGTz_get_internal_offsets(filename, 0:3 %c% -1:3 %c% num.SNPs %c% (num.SNPs+1))
 PP(file_offsets)
 
-vcfGTz_get_CHROM_from_internal_offsets(filename, file_offsets)
+for(which.field in 1:7) {
+    x = vcfGTz_get_1field_from_internal_offsets(filename, file_offsets, which.field)
+    PP(x)
+}
 

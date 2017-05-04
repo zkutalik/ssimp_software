@@ -67,10 +67,16 @@ delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='
 
 			return results;
 }'))
-delayedAssign(        "vcfGTz_get_CHROM_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
-	, 'CharacterVector vcfGTz_get_CHROM_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
+delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+	, 'CharacterVector vcfGTz_get_1field_from_internal_offsets (CharacterVector filename, NumericVector file_offsets, IntegerVector which_field) {
+			which_field.size() == 1 || (stop("only one field maybe be requested, between 1 and 7"),false);
+			which_field.at(0) >= 1  || (stop("only one field maybe be requested, between 1 and 7"),false);
+			which_field.at(0) <= 7  || (stop("only one field maybe be requested, between 1 and 7"),false);
+			int number_of_columns_to_skip = which_field.at(0)-1;
+
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
+			reader.m_f.good() || (stop(std::string("cannot find file: [") + filename_ + "]"),false);
 
 			// read in the "magic" string
 			auto magic = reader.read_string0();
@@ -94,6 +100,9 @@ delayedAssign(        "vcfGTz_get_CHROM_from_internal_offsets", Rcpp:: cppFuncti
 				}
 				else {
 					reader.m_f.seekg( remember_this_position.operator+( o ) );
+					for(int i=0; i<number_of_columns_to_skip; ++i) {
+						reader.read_smart_string0(); // to skip over fields
+					}
 					auto CHROM = reader.read_smart_string0();
 					results.push_back(CHROM);
 				}
