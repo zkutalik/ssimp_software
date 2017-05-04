@@ -248,20 +248,19 @@ struct vcfGTz_handle : public file_reading:: Genotypes_I
         }
     };
 
-    vector<metadata_for_one_line>   m_many_lines_start_at_MINUS1;
+    vector<metadata_for_one_line>   m_all_SNPs;
     string                          m_underlying_file_name;
 
-    int             number_of_snps  ()          const override { return m_many_lines_start_at_MINUS1.size() - 1; }
-    string          get_SNPname     (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_SNPname; }
-    chrpos          get_chrpos      (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_chrpos; }
-    string          get_allele_ref  (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_ref; }
-    string          get_allele_alt  (int i)     const override { return m_many_lines_start_at_MINUS1.at(i+1).m_allele_alt; }
+    int             number_of_snps  ()          const override { return m_all_SNPs.size(); }
+    string          get_SNPname     (int i)     const override { return m_all_SNPs.at(i).m_SNPname; }
+    chrpos          get_chrpos      (int i)     const override { return m_all_SNPs.at(i).m_chrpos; }
+    string          get_allele_ref  (int i)     const override { return m_all_SNPs.at(i).m_allele_ref; }
+    string          get_allele_alt  (int i)     const override { return m_all_SNPs.at(i).m_allele_alt; }
     std::pair<
              std::vector<uint8_t>
             ,std::vector<uint8_t>
         >           get_calls       (int i)     const override {
-            auto relevant_offset_from_beginning = m_many_lines_start_at_MINUS1.at(i+1).m_offset_from_start_of_file;
-            PP(relevant_offset_from_beginning);
+            auto relevant_offset_from_beginning = m_all_SNPs.at(i).m_offset_from_start_of_file;
 
             vcfGTz:: vcfGTz_reader reader (   m_underlying_file_name );
             reader.m_f || DIE("Has that file disappeared? [" << m_underlying_file_name << "]");
@@ -279,7 +278,7 @@ struct vcfGTz_handle : public file_reading:: Genotypes_I
             auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
             auto doubly_uncompressed = special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate(doubly_compressed) );
 
-            auto lefts_and_rights = parse_many_calls(doubly_uncompressed, m_many_lines_start_at_MINUS1.at(i+1).m_line_number);
+            auto lefts_and_rights = parse_many_calls(doubly_uncompressed, m_all_SNPs.at(i).m_line_number);
 
             return lefts_and_rights;
             using utils:: operator<<;
@@ -587,7 +586,7 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
 
         x.some_checks();
 
-        reference_data->m_many_lines_start_at_MINUS1.push_back(x);
+        reference_data->m_all_SNPs.push_back(x);
 
         {/* Not really needed here, but I'll just uncompress and recompress for fun
           * This slows down loading though, so consider disabling it
