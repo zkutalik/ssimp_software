@@ -105,6 +105,9 @@ struct vcfGTz_writer {
             //PP(special_encoding_of_list_of_GT_fields.size(), compressed_specialGT.size());
             //PP(compressed.size(), compressed_specialGT.size());
             //PP( nice_operator_shift_left(string( special_encoding_of_list_of_GT_fields.begin(), special_encoding_of_list_of_GT_fields.end() )));
+            auto un_specialGTed = vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate( special_encoding_of_list_of_GT_fields );
+            //using utils:: operator<<; PP(un_specialGTed);
+            assert(un_specialGTed ==  (just_last_fields |action:: collect) );
         }
 
 

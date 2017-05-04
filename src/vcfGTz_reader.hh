@@ -90,9 +90,47 @@ struct special_encoder_for_list_of_GT_fields {
                                                             ,   one_GT_field.begin()
                                                             ,   one_GT_field.end()
                                                             );
+                special_encoding_of_list_of_GT_fields.push_back( '\0' );
             }
         }
         return special_encoding_of_list_of_GT_fields;
+    }
+
+    static
+    std::vector<std::string>   inflate(vuc_t const & special_encoding_of_list_of_GT_fields) {
+        std::vector<std:: string> vector_of_GT_fields;
+        auto it = special_encoding_of_list_of_GT_fields.begin();
+        auto end = special_encoding_of_list_of_GT_fields.end();
+        while(it != end) {
+            std:: string one_GT_field;
+
+            char typ = *it;
+            ++it;
+
+            if(typ == '\t') {
+                assert(it != end);
+                while(*it != '\0') {
+                    one_GT_field.push_back(*it);
+                    ++it;
+                    assert(it != end);
+                }
+                assert(it != end);
+                assert(*it == '\0');
+                ++it;
+            }
+            else {
+                assert( typ >= '@' && typ <= '_');
+                int together = typ - '@';
+                bool    slash_not_pipe  = together & 1;
+                int     left            = (together>>1) & 3;
+                int     right           = (together>>3) & 3;
+                one_GT_field.push_back('0' + left );
+                one_GT_field.push_back(slash_not_pipe ? '/' : '|');
+                one_GT_field.push_back('0' + right);
+            }
+            vector_of_GT_fields.push_back(one_GT_field);
+        }
+        return vector_of_GT_fields;
     }
 };
 
