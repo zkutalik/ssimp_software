@@ -508,7 +508,6 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     constexpr char magic_file_header[] = "vcfGTz.0.0.2";
     assert(first_string == magic_file_header);
 
-    PP(first_string, first_string.size());
     assert(first_string == magic_file_header);
 
     auto reference_data = std:: make_shared<vcfGTz_handle>();
@@ -538,12 +537,9 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
 
         block_summarys.push_back( block_summary_t{ block_description, start_of_block, reader.m_f.tellg() });
 
-        PP(nice_operator_shift_left(block_description), offset_over_this_block);
-
         reader.m_f.seekg(start_of_block + offset_over_this_block);
     } while(1);
-    using utils:: operator<<;
-    PP(block_summarys);
+    //using utils:: operator<<; PP(block_summarys);
 
     block_summarys.size() == 2 || DIE("vcfGTz not fully implemented");
     block_summarys.at(0).m_description == "manylines:GTonly:zlib" || DIE("vcfGTz not fully implemented. Unexpected blocks.");
@@ -553,7 +549,6 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     reader.m_f.seekg( block_summarys.at(1).m_just_after_description );
     int num_lines = reader.read_uint64_t();
     int num_SNPs = num_lines - 1; // as the first one is the header
-    PP(num_SNPs);
     assert(num_SNPs > 0);
 
     auto start_of_block_0 = block_summarys.at(0).m_start_of_block;
@@ -582,7 +577,7 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         auto ALTs   = reader.read_smart_string0();
         auto QUAL   = reader.read_smart_string0();
         auto FILTER = reader.read_smart_string0();
-        PP(p, CHROM, POS, ID, REF, ALTs , QUAL, FILTER);
+        //PP(p, CHROM, POS, ID, REF, ALTs , QUAL, FILTER);
 
         x.m_chrpos.chr      = utils:: lexical_cast<int> (CHROM);
         x.m_chrpos.pos      = utils:: lexical_cast<int> (POS);
