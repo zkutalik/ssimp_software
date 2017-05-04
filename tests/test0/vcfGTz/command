@@ -1,0 +1,1 @@
+"$SSIMP"  --ref "$REF"/compressed/small.vcf.sample.vcfGTz --wind 300000 --gwas "$GWAS"/small.UKBB.both.csv.gz --out ${OUT_IMPUTATIONS} --lambda 0.01 > "$OUTPUT"
