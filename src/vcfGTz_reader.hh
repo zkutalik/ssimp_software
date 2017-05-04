@@ -68,6 +68,10 @@ struct vcfGTz_reader {
         auto cd = read_code();
         std:: cout << "cd = " << (int) cd << '\n';
         assert(cd == vcfGTz_codes:: code_vector_of_char_with_leading_size_plain_GT);
+        auto length = read_uint32_t();
+        std:: vector<unsigned char> vec(length);
+        m_f.read( reinterpret_cast<char*>(vec.data()), length );
+        return vec;
     }
     vcfGTz_codes    read_code() {
         assert(m_f);

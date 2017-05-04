@@ -14,6 +14,7 @@
 #include "bits.and.pieces/utils.hh"
 #include "range/range_view.hh"
 #include "range/range_action.hh"
+#include "zlib-vector-of-char/zlib-vector.hh"
 
 #include "vcfGTz_reader.hh"
 
@@ -502,9 +503,19 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         auto QUAL   = reader.read_smart_string0();
         auto FILTER = reader.read_smart_string0();
         PP(p, CHROM, CHROM.size(), POS, ID, REF, ALTs , QUAL, FILTER);
-        reader.read_vector_of_char_with_leading_size();
-    }
 
+        {/* Not really needed here, but I'll just uncompress and recompress for fun
+          * This slows down loading though, so consider disabling it
+          */
+            // TODO: get rid of this
+            auto v = reader.read_vector_of_char_with_leading_size();
+            static_assert( std::is_same<decltype(v), zlib_vector:: vec_t>{} ,"");
+            auto unc = zlib_vector:: inflate(v);
+            auto com = zlib_vector:: deflate(unc);
+            assert(v == com);
+            //PP(range:: range_from_begin_end(unc) |view:: map|[](auto x){return (char)x;});
+        }
+    }
 
 
     DIE("vcfGTz not fully implemented");
