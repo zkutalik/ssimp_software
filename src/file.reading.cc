@@ -825,6 +825,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
     header_details hd;
 
     getline(f, current_line);
+    assert(f);
 
     // current_line is now the first line, i.e. the header
     hd = parse_header(current_line);
