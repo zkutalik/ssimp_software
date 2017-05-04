@@ -240,6 +240,11 @@ struct vcfGTz_handle : public file_reading:: Genotypes_I
         string      m_SNPname;
         string      m_allele_alt;
         string      m_allele_ref;
+
+        void        some_checks() {
+            assert(m_chrpos.chr  >= 1);
+            assert(m_chrpos.chr  <= 22); // not sure what to do with X yet
+        }
     };
 
     vector<metadata_for_one_line> m_many_lines_start_at_MINUS1;
@@ -476,6 +481,8 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
     PP(first_string, first_string.size());
     assert(first_string == magic_file_header);
 
+    auto reference_data = std:: make_shared<vcfGTz_handle>();
+
     struct block_summary_t {
         string                          m_description;
         decltype(reader.m_f.tellg())    m_start_of_block;
@@ -513,17 +520,20 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
 
     // Start extracting the SNP-specific positions
     reader.m_f.seekg( block_summarys.at(1).m_just_after_description );
-    int num_SNPs = reader.read_uint64_t();
+    int num_lines = reader.read_uint64_t();
+    int num_SNPs = num_lines - 1; // as the first one is the header
     PP(num_SNPs);
+    assert(num_SNPs > 0);
 
     auto start_of_block_0 = block_summarys.at(0).m_start_of_block;
     vector< decltype( start_of_block_0 ) > vec_of_positions_for_each_SNP;
 
-    for(auto i : range:: ints(num_SNPs)) {
-        (void)i;
+    for(auto i : range:: ints(num_lines)) {
         auto next_offset = reader.read_uint64_t();
         auto position_of_this_SNPs_data = start_of_block_0 .operator+(next_offset);
-        vec_of_positions_for_each_SNP.push_back( position_of_this_SNPs_data );
+        if(i!=0) { // because the first one is the header, I should store it elsewhere
+            vec_of_positions_for_each_SNP.push_back( position_of_this_SNPs_data );
+        }
     }
     assert(num_SNPs == ssize(vec_of_positions_for_each_SNP));
 
@@ -536,7 +546,16 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
         auto ALTs   = reader.read_smart_string0();
         auto QUAL   = reader.read_smart_string0();
         auto FILTER = reader.read_smart_string0();
-        PP(p, CHROM, CHROM.size(), POS, ID, REF, ALTs , QUAL, FILTER);
+        PP(p, CHROM, POS, ID, REF, ALTs , QUAL, FILTER);
+
+        vcfGTz_handle:: metadata_for_one_line x;
+        x.m_chrpos.chr      = utils:: lexical_cast<int> (CHROM);
+        x.m_chrpos.pos      = utils:: lexical_cast<int> (POS);
+        x.m_SNPname         = ID;
+        x.m_allele_ref      = REF;
+        x.m_allele_alt      = ALTs;
+
+        x.some_checks();
 
         {/* Not really needed here, but I'll just uncompress and recompress for fun
           * This slows down loading though, so consider disabling it
@@ -550,7 +569,7 @@ GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name)
                 special_encoder_for_list_of_GT_fields:: deflate( doubly_uncompressed )
                 );
             assert(doubly_compressed == com);
-            PP(doubly_uncompressed);
+            //PP(doubly_uncompressed);
         }
     }
 
