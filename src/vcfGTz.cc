@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
     string arg_output_filename = argv[2];
 
     gz:: igzstream f(arg_input_filename.c_str());
-    f.fail() && DIE("Can't find file [" << arg_input_filename << ']');
+    (f.rdbuf() && (f.rdbuf()->is_open())) || DIE("Can't find file [" << arg_input_filename << ']');
 
     auto r = zip(from::ifstream( f ), range:: ints()) ;
 
