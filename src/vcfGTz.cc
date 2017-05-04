@@ -44,7 +44,7 @@ struct vcfGTz_writer {
     }{
         my_beginning_pos = m_f.tellp();
 
-        constexpr char magic_file_header[] = "vcfGTz.0.0.1";
+        constexpr char magic_file_header[] = "vcfGTz.0.0.2";
         save_string0( magic_file_header );
 
         assert( sizeof(magic_file_header) == get_current_file_offset() );
@@ -95,8 +95,6 @@ struct vcfGTz_writer {
         zlib_vector:: vec_t as_a_vector( detokenized.begin(), detokenized.end() );
         zlib_vector:: vec_t compressed = zlib_vector:: deflate( as_a_vector );
 
-        save_vector_of_char_with_leading_size( compressed );
-
         // Alternative method, specially tuned to GT fields
         {
             zlib_vector:: vec_t doubly_compressed =
@@ -105,6 +103,7 @@ struct vcfGTz_writer {
                         just_last_fields
                     )
                 );
+            save_vector_of_char_with_leading_size( doubly_compressed );
             auto for_verification = vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate( doubly_compressed ) );
             assert(for_verification ==  (just_last_fields |action:: collect) );
         }
