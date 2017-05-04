@@ -66,8 +66,8 @@ struct special_encoder_for_list_of_GT_fields {
         for(auto & one_GT_field : just_last_fields) {
             if  (   one_GT_field.size() == 3
                  && (one_GT_field.at(1) == '|' || one_GT_field.at(1) == '/' )
-                 && (one_GT_field.at(0) >= '0' || one_GT_field.at(0) <= '3' )
-                 && (one_GT_field.at(2) >= '0' || one_GT_field.at(2) <= '3' )
+                 && (one_GT_field.at(0) >= '0' && one_GT_field.at(0) <= '3' )
+                 && (one_GT_field.at(2) >= '0' && one_GT_field.at(2) <= '3' )
                 ) {
                 static_assert('@' == 64 ,"not ASCII?");
                 // encode this in one character
