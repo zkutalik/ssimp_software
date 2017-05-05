@@ -4,7 +4,7 @@
 ; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
 ;
 [subrepo]
-	remote = git@github.com:aaronmcdaid/module-range_.git
+	remote = git@github.com:aaronmcdaid/module-range.git
 	branch = master
 	commit = 1fbc4d557d4f59af5f3db48210744c49a6e09cdf
 	parent = 55e8b32c0be26e4c568a43cbf6ed368b0ed8217d
