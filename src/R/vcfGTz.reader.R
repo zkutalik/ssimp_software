@@ -1,5 +1,7 @@
+if(!exists('directory.of.this.script')) {
 directory.of.this.script = dirname(normalizePath(sys.frame(1)$ofile))   # http://stackoverflow.com/questions/13311180/how-do-i-get-the-absolute-path-of-an-input-file-in-r
                                                                         # http://stackoverflow.com/questions/1815606/rscript-determine-path-of-the-executing-script#16046056
+}
 include.relative.to.this.script <- function(r) {
     paste(sep=''
 		  ,'#include "'
