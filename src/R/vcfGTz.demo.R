@@ -1,6 +1,7 @@
 source('src/R/vcfGTz.reader.R')
 
-filename='ref/compressed/50mb.vcfGTz'
+args = commandArgs(trailing=T)
+filename=args[1]
 
 num.SNPs = vcfGTz_num_SNPs(filename)
 PP(num.SNPs)
