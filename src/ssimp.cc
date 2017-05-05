@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
-#include <cassert>
 #include <unordered_map>
 #include <vector>
 #include <algorithm>

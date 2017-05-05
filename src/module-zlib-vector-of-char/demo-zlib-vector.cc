@@ -1,7 +1,6 @@
 #include "zlib-vector.hh"
 
 #include <string>
-#include <cassert>
 
 #if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(__CYGWIN__)
 #  include <fcntl.h>

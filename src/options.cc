@@ -2,7 +2,6 @@
 
 #include <getopt.h>
 #include <iostream>
-#include <cassert>
 
 #include "bits.and.pieces/DIE.hh"
 #include "bits.and.pieces/utils.hh"

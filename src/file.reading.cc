@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <vector>
 #include <map>
-#include <cassert>
 
 #include <gzstream.h>
 
