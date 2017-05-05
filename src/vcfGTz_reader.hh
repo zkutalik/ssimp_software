@@ -1,3 +1,6 @@
+#ifndef HH_vcfGTz_reader_HH
+#define HH_vcfGTz_reader_HH
+
 #include "bits.and.pieces/utils.hh"
 
 #include<fstream>
@@ -205,3 +208,5 @@ struct vcfGTz_reader {
 };
 
 } // namespace vcfGTz
+
+#endif
