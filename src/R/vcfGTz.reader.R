@@ -118,6 +118,8 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			)
 	, 'IntegerMatrix vcfGTz_get_012calls_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
 
+			#define PP1(x) do{ std::cout << #x << " = " << (x) << "\\n"; }while(0)
+
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
 			reader.m_f.good() || (stop(std::string("cannot find file: [") + filename_ + "]"),false);
@@ -146,7 +148,7 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 				reader.read_smart_string0(); // FILTER - last one before the zlib-ed calls
 
 				auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
-				std:: cout << doubly_compressed.size() << "\\n";
+				//std:: cout << doubly_compressed.size() << "\\n";
 
 				return
 					vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate
@@ -160,13 +162,42 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			int const number_of_individuals = header_line_parsed .size();
 			int const number_of_SNPs        = file_offsets.size();
 
-			std:: cout << "number_of_individuals = " << number_of_individuals << "\\n";
-			std:: cout << "number_of_SNPs        = " << number_of_SNPs        << "\\n";
+			//std:: cout << "number_of_individuals = " << number_of_individuals << "\\n";
+			//std:: cout << "number_of_SNPs        = " << number_of_SNPs        << "\\n";
 
 			IntegerMatrix results(number_of_SNPs, number_of_individuals);
 			colnames(results) = wrap(header_line_parsed);
 
-			//auto one_line_decoded = read_full_line_and_return_decodedGTs();
+			for(int i = 0; i<number_of_SNPs; ++i) {
+				auto && file_offset_of_oneSNP = file_offsets.at(i);
+				if(std::isnan(file_offset_of_oneSNP)) {
+					for(int j=0; j<number_of_individuals; ++j) {
+						results.at(i,j) = NA_INTEGER;
+					}
+				}
+				else {
+					reader.m_f.seekg(remember_this_position .operator+( file_offset_of_oneSNP ));
+					auto one_line_decoded = read_full_line_and_return_decodedGTs();
+					assert(number_of_individuals == one_line_decoded.size() );
+
+					for(int j=0; j<number_of_individuals; ++j) {
+						auto && one_GT_string = one_line_decoded.at(j);
+
+						if(false) {}
+						else if( one_GT_string == "0|0"
+						      || one_GT_string == "0/0") { results.at(i,j) = 0; }
+						else if( one_GT_string == "0|1"
+						      || one_GT_string == "0/1"
+						      || one_GT_string == "1|0"
+						      || one_GT_string == "1/0") { results.at(i,j) = 1; }
+						else if( one_GT_string == "1|1"
+						      || one_GT_string == "1/1") { results.at(i,j) = 2; }
+						else {
+							results.at(i,j) = NA_INTEGER;
+						}
+					}
+				}
+			}
 
 			return results;
 }'))
