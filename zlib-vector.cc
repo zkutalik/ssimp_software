@@ -6,6 +6,7 @@
  * */
 
 #include"zlib-vector.hh"
+#include"../bits.and.pieces/ASSERT.hh"
 
 using zlib_vector:: vec_t;
 
