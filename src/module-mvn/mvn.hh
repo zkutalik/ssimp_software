@@ -7,7 +7,7 @@
 #include<gsl/gsl_matrix.h>
 #include<cmath>
 
-#include<cassert>
+#include "../module-bits.and.pieces/ASSERT.hh"
 
 namespace mvn {
 

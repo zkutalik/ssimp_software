@@ -4,11 +4,12 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <cassert>
 #include <cmath>
 #include <utility> // for tuple::get
 #include <vector>
 #include <string>
+
+#include "ASSERT.hh"
 
 namespace utils {
 namespace impl {
