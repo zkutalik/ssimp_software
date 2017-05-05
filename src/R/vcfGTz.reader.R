@@ -118,7 +118,7 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			)
 	, 'IntegerMatrix vcfGTz_get_012calls_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
 
-			#define PP1(x) do{ std::cout << #x << " = " << (x) << "\\n"; }while(0)
+			//#define PP1(x) do{ std::cout << #x << " = " << (x) << "\\n"; }while(0)
 
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
@@ -138,10 +138,10 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			if(description_of_first_block != "manylines:GTonly:zlib")
 				stop("wrong file type?");
 
-			auto read_full_line_and_return_decodedGTs = [&]() {
+			auto read_full_line_and_return_ID_and_decodedGTs = [&]() {
 				reader.read_smart_string0(); // CHROM
 				reader.read_smart_string0(); // POS
-				reader.read_smart_string0(); // ID
+				auto ID = reader.read_smart_string0(); // ID
 				reader.read_smart_string0(); // REF
 				reader.read_smart_string0(); // ALT
 				reader.read_smart_string0(); // QUAL
@@ -151,37 +151,47 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 				//std:: cout << doubly_compressed.size() << "\\n";
 
 				return
-					vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate
+					make_pair
 					(
-						zlib_vector:: inflate(doubly_compressed)
-					);
+						std::move(ID)
+						,
+						vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate
+						(
+							zlib_vector:: inflate(doubly_compressed)
+						)
+					)
+				;
 			};
 
-			auto header_line_parsed = read_full_line_and_return_decodedGTs();
+			auto header_line_parsed = read_full_line_and_return_ID_and_decodedGTs();
+			//PP1(header_line_parsed.first); // should be "ID"
 
-			int const number_of_individuals = header_line_parsed .size();
+			int const number_of_individuals = header_line_parsed.second .size();
 			int const number_of_SNPs        = file_offsets.size();
 
 			//std:: cout << "number_of_individuals = " << number_of_individuals << "\\n";
 			//std:: cout << "number_of_SNPs        = " << number_of_SNPs        << "\\n";
 
 			IntegerMatrix results(number_of_SNPs, number_of_individuals);
-			colnames(results) = wrap(header_line_parsed);
 
+			CharacterVector intended_rownames (number_of_SNPs);
 			for(int i = 0; i<number_of_SNPs; ++i) {
 				auto && file_offset_of_oneSNP = file_offsets.at(i);
 				if(std::isnan(file_offset_of_oneSNP)) {
+					intended_rownames.at(i) = NA_STRING;
 					for(int j=0; j<number_of_individuals; ++j) {
 						results.at(i,j) = NA_INTEGER;
 					}
 				}
 				else {
 					reader.m_f.seekg(remember_this_position .operator+( file_offset_of_oneSNP ));
-					auto one_line_decoded = read_full_line_and_return_decodedGTs();
-					assert(number_of_individuals == one_line_decoded.size() );
+					auto one_line_decoded = read_full_line_and_return_ID_and_decodedGTs();
+					auto ID = one_line_decoded.first;
+					intended_rownames.at(i) = ID;
+					assert(number_of_individuals == one_line_decoded.second.size() );
 
 					for(int j=0; j<number_of_individuals; ++j) {
-						auto && one_GT_string = one_line_decoded.at(j);
+						auto && one_GT_string = one_line_decoded.second.at(j);
 
 						if(false) {}
 						else if( one_GT_string == "0|0"
@@ -198,6 +208,9 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 					}
 				}
 			}
+
+			colnames(results) = wrap(header_line_parsed.second);
+			rownames(results) = std::move( intended_rownames );
 
 			return results;
 }'))

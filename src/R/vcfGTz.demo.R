@@ -14,4 +14,7 @@ for(which.field in 1:7) {
 }
 
 m = vcfGTz_get_012calls_from_internal_offsets(filename, file_offsets)
-m[1:6,1:10]
+pp(m[                               ,1:15])
+pp(m['rs62224609'                   ,1:15])
+pp(m[(!is.na(rownames(m))) & 'rs62224609' ==rownames(m)   ,1:15])
+pp(m[(!is.na(rownames(m))) & '.'          ==rownames(m)   ,1:15])
