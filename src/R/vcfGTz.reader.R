@@ -114,6 +114,7 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			    '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/R/ASSERT_for_R.hh"'
 			,   "#include<fstream>"
 			,   '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"'
+			,   '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/module-zlib-vector-of-char/zlib-vector.cc"'
 			)
 	, 'IntegerMatrix vcfGTz_get_012calls_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
 
@@ -135,17 +136,50 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			if(description_of_first_block != "manylines:GTonly:zlib")
 				stop("wrong file type?");
 
-			std:: cout << reader.read_smart_string0() << "\\n";
-			std:: cout << reader.read_smart_string0() << "\\n";
-			std:: cout << reader.read_smart_string0() << "\\n";
-			std:: cout << reader.read_smart_string0() << "\\n";
-			std:: cout << reader.read_smart_string0() << "\\n";
-			std:: cout << reader.read_smart_string0() << "\\n";
-			std:: cout << reader.read_smart_string0() << "\\n";
 
-			auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
-			std:: cout << doubly_compressed.size() << "\\n";
-			//auto un_z = zlib_vector:: inflate(doubly_compressed);
+			auto read_full_line_and_return_012s = [&]() {
+				reader.read_smart_string0(); // CHROM
+				reader.read_smart_string0(); // POS
+				reader.read_smart_string0(); // ID
+				reader.read_smart_string0(); // REF
+				reader.read_smart_string0(); // ALT
+				reader.read_smart_string0(); // QUAL
+				reader.read_smart_string0(); // FILTER - last one before the zlib-ed calls
+
+				auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
+				std:: cout << doubly_compressed.size() << "\\n";
+
+				auto un_z = zlib_vector:: inflate(doubly_compressed);
+				std:: vector<int> many_012s;
+				int x = 0;
+				while(x < un_z.size()) {
+					unsigned char & one_person = un_z.at(x);
+					if(one_person == \'\\t\') {
+						while(x < un_z.size() && un_z.at(x) != 0) {
+							++x;
+						}
+						assert(x < un_z.size() && un_z.at(x) == 0);
+						many_012s.push_back(-2);
+					}
+					else {
+						std:: cout << (int) one_person << "\\n";
+						std:: cout << "\\"" << one_person << "\\"\\n";
+						assert(one_person == \'@\');
+						many_012s.push_back(0);
+					}
+					++x;
+				}
+				return many_012s;
+			};
+
+			auto header_line_parsed = read_full_line_and_return_012s();
+			//using utils:: operator<<; std:: cout << header_line_parsed        << "\\n";
+
+			int const number_of_individuals = header_line_parsed .size();
+			int const number_of_SNPs        = file_offsets.size();
+
+			std:: cout << "number_of_individuals = " << number_of_individuals << "\\n";
+			std:: cout << "number_of_SNPs        = " << number_of_SNPs        << "\\n";
 
 			IntegerMatrix results;
 			results.push_back(0);
