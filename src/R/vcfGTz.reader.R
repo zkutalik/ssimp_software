@@ -1,5 +1,18 @@
+directory.of.this.script = dirname(normalizePath(sys.frame(1)$ofile))   # http://stackoverflow.com/questions/13311180/how-do-i-get-the-absolute-path-of-an-input-file-in-r
+                                                                        # http://stackoverflow.com/questions/1815606/rscript-determine-path-of-the-executing-script#16046056
+include.relative.to.this.script <- function(r) {
+    paste(sep=''
+		  ,'#include "'
+		  ,directory.of.this.script
+		  ,'/'
+		  ,r
+		  ,'"')
+}
+
 library(Rcpp)
-delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>"
+                ,include.relative.to.this.script('../vcfGTz_reader.hh')
+                )
 	, 'IntegerVector vcfGTz_num_SNPs ( CharacterVector filename) {
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
@@ -23,7 +36,9 @@ delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', incl
 			int num_SNPs = num_lines - 1; // as the first one is the header
 			return {num_SNPs};
 }'))
-delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>"
+                ,include.relative.to.this.script('../vcfGTz_reader.hh')
+                )
 	, 'NumericVector vcfGTz_get_internal_offsets (CharacterVector filename, IntegerVector indices) {
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
@@ -67,7 +82,9 @@ delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='
 
 			return results;
 }'))
-delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>"
+                    ,include.relative.to.this.script('../vcfGTz_reader.hh')
+                    )
 	, 'CharacterVector vcfGTz_get_1field_from_internal_offsets (CharacterVector filename, NumericVector file_offsets, IntegerVector which_field) {
 			which_field.size() == 1 || (stop("only one field maybe be requested, between 1 and 7"),false);
 			which_field.at(0) >= 1  || (stop("only one field maybe be requested, between 1 and 7"),false);
@@ -111,10 +128,9 @@ delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunct
 			return results;
 }'))
 delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c(
-			    '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/R/ASSERT_for_R.hh"'
-			,   "#include<fstream>"
-			,   '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"'
-			,   '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/module-zlib-vector-of-char/zlib-vector.cc"'
+			     include.relative.to.this.script('ASSERT_for_R.hh')
+				,include.relative.to.this.script('../vcfGTz_reader.hh')
+				,include.relative.to.this.script('../module-zlib-vector-of-char/zlib-vector.cc')
 			)
 	, 'IntegerMatrix vcfGTz_get_012calls_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
 
