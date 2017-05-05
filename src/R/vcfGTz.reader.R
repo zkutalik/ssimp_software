@@ -181,12 +181,7 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			std:: cout << "number_of_individuals = " << number_of_individuals << "\\n";
 			std:: cout << "number_of_SNPs        = " << number_of_SNPs        << "\\n";
 
-			IntegerMatrix results;
-			results.push_back(0);
-			results.push_back(1);
-			results.push_back(2);
-			results.push_back(3);
-			//results.attr("dim") = Dimension(1,4);
+			IntegerMatrix results(number_of_SNPs, number_of_individuals);
 
 			return results;
 }'))
