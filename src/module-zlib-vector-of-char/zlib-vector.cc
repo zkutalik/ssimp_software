@@ -11,7 +11,6 @@
 using zlib_vector:: vec_t;
 
 #include<zlib.h>
-#include<cassert>
 
 namespace exc {
     // Too lazy to make proper std::exception objects to throw. So
