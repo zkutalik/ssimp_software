@@ -63,21 +63,22 @@ delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='
 
 			auto remember_this_position = reader.m_f.tellg();
 
-			NumericVector results; // Numeric is like a 52-bit integer, in case the vcfGTz files are really big
+			NumericVector results(indices.size()); // Numeric is like a 52-bit integer, in case the vcfGTz files are really big
 
-			for( auto && i : indices ) {
+			for(int i_=0; i_ < indices.size(); ++i_) {
+				auto && i = indices.at(i_);
 				if(i>=1 && i<=num_SNPs) {
 					reader.m_f.seekg( remember_this_position .operator+( 8*i ));
 					// 0 would be the header, but we will use base-1
 					// as this is R
 					auto u64 = reader.read_uint64_t();
-					results.push_back(u64);
+					results.at(i_)=u64;
 
-					auto verify = results.at(results.size()-1);
+					auto verify = results.at(i_);
 					u64 == verify || (stop("problem with offsets? Really big file?"),false);
 				}
 				else
-					results.push_back(NA_REAL);
+					results.at(i_)=NA_REAL;
 			}
 
 			return results;
@@ -109,11 +110,12 @@ delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunct
 			if(description_of_first_block != "manylines:GTonly:zlib")
 				stop("wrong file type?");
 
-			CharacterVector results;
+			CharacterVector results(file_offsets.size());
 
-			for(auto && o : file_offsets) {
+			for(int snp=0; snp<file_offsets.size(); ++snp) {
+				auto && o = file_offsets.at(snp);
 				if(std::isnan(o)) {
-					results.push_back(NA_STRING);
+					results.at(snp)=NA_STRING;
 				}
 				else {
 					reader.m_f.seekg( remember_this_position.operator+( o ) );
@@ -121,7 +123,7 @@ delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunct
 						reader.read_smart_string0(); // to skip over fields
 					}
 					auto CHROM = reader.read_smart_string0();
-					results.push_back(CHROM);
+					results.at(snp)=CHROM;
 				}
 			}
 
