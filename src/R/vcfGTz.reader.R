@@ -110,17 +110,12 @@ delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunct
 
 			return results;
 }'))
-delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c(
+			    '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/R/ASSERT_for_R.hh"'
+			,   "#include<fstream>"
+			,   '#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"'
+			)
 	, 'IntegerMatrix vcfGTz_get_012calls_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
-
-			#ifdef NDEBUG
-				#undef assert
-				#ifdef __GNUC__
-					#define assert(condition) do { if(condition) {} else { stop(std::string("assert() failure: (" #condition ") in ") + __PRETTY_FUNCTION__); } }while(0)
-				#else
-					#define assert(condition) do { if(condition) {} else { stop(            "assert() failure: (" #condition ")"                           ); } }while(0)
-				#endif
-			#endif
 
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
@@ -158,12 +153,6 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			results.push_back(2);
 			results.push_back(3);
 			//results.attr("dim") = Dimension(1,4);
-
-			#ifdef NDEBUG
-				#undef assert
-				#define assert(condition) do { }while(0)
-			#endif
-			assert(0);
 
 			return results;
 }'))
