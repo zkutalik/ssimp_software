@@ -13,3 +13,4 @@ for(which.field in 1:7) {
     PP(x)
 }
 
+vcfGTz_get_012calls_from_internal_offsets(filename, file_offsets)

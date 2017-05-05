@@ -110,3 +110,44 @@ delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunct
 
 			return results;
 }'))
+delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>" ,'#include "/home/aaron/Research/Code/Imputation/ssimp_software/src/vcfGTz_reader.hh"')
+	, 'IntegerMatrix vcfGTz_get_012calls_from_internal_offsets (CharacterVector filename, NumericVector file_offsets) {
+			std:: string filename_ = {filename[0]};
+			vcfGTz:: vcfGTz_reader reader(filename_);
+			reader.m_f.good() || (stop(std::string("cannot find file: [") + filename_ + "]"),false);
+
+			// read in the "magic" string
+			auto magic = reader.read_string0();
+			if(magic != "vcfGTz.0.0.2")
+				stop("wrong file type?");
+
+			// this time, we like the first block
+			auto remember_this_position = reader.m_f.tellg();
+
+			reader.read_offset_at_start_of_block(); // read this, but ignore it
+
+			auto description_of_first_block = reader.read_string0();
+			if(description_of_first_block != "manylines:GTonly:zlib")
+				stop("wrong file type?");
+
+			std:: cout << reader.read_smart_string0() << "\\n";
+			std:: cout << reader.read_smart_string0() << "\\n";
+			std:: cout << reader.read_smart_string0() << "\\n";
+			std:: cout << reader.read_smart_string0() << "\\n";
+			std:: cout << reader.read_smart_string0() << "\\n";
+			std:: cout << reader.read_smart_string0() << "\\n";
+			std:: cout << reader.read_smart_string0() << "\\n";
+
+			auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
+			std:: cout << doubly_compressed.size() << "\\n";
+			//auto un_z = zlib_vector:: inflate(doubly_compressed);
+
+			IntegerMatrix results;
+			results.push_back(0);
+			results.push_back(1);
+			results.push_back(2);
+			results.push_back(3);
+			//results.attr("dim") = Dimension(1,4);
+
+			return results;
+}'))
