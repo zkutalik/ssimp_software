@@ -136,8 +136,7 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			if(description_of_first_block != "manylines:GTonly:zlib")
 				stop("wrong file type?");
 
-
-			auto read_full_line_and_return_012s = [&]() {
+			auto read_full_line_and_return_decodedGTs = [&]() {
 				reader.read_smart_string0(); // CHROM
 				reader.read_smart_string0(); // POS
 				reader.read_smart_string0(); // ID
@@ -149,31 +148,14 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 				auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
 				std:: cout << doubly_compressed.size() << "\\n";
 
-				auto un_z = zlib_vector:: inflate(doubly_compressed);
-				std:: vector<int> many_012s;
-				int x = 0;
-				while(x < un_z.size()) {
-					unsigned char & one_person = un_z.at(x);
-					if(one_person == \'\\t\') {
-						while(x < un_z.size() && un_z.at(x) != 0) {
-							++x;
-						}
-						assert(x < un_z.size() && un_z.at(x) == 0);
-						many_012s.push_back(-2);
-					}
-					else {
-						std:: cout << (int) one_person << "\\n";
-						std:: cout << "\\"" << one_person << "\\"\\n";
-						assert(one_person == \'@\');
-						many_012s.push_back(0);
-					}
-					++x;
-				}
-				return many_012s;
+				return
+					vcfGTz:: special_encoder_for_list_of_GT_fields:: inflate
+					(
+						zlib_vector:: inflate(doubly_compressed)
+					);
 			};
 
-			auto header_line_parsed = read_full_line_and_return_012s();
-			//using utils:: operator<<; std:: cout << header_line_parsed        << "\\n";
+			auto header_line_parsed = read_full_line_and_return_decodedGTs();
 
 			int const number_of_individuals = header_line_parsed .size();
 			int const number_of_SNPs        = file_offsets.size();
@@ -182,6 +164,9 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 			std:: cout << "number_of_SNPs        = " << number_of_SNPs        << "\\n";
 
 			IntegerMatrix results(number_of_SNPs, number_of_individuals);
+			colnames(results) = wrap(header_line_parsed);
+
+			//auto one_line_decoded = read_full_line_and_return_decodedGTs();
 
 			return results;
 }'))
