@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:aaronmcdaid/module-mvn.git
+	branch = master
+	commit = ceb40a1d359abdbc03c51fd07337a0fad850e181
+	parent = 3119c48646c4be0162d7a8a45c26763b76d716be
+	cmdver = 0.3.1
