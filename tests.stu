@@ -23,3 +23,10 @@
     bin/vcfGTz "$input" "$target".tmp
     mv -i               "$target".tmp "$target"
 }
+                    ref/${path}.vcf
+{
+    export  target="ref/${path}".vcf
+    export              input="ref/${path}".vcf.gz
+    ls -l "$input"
+    gunzip -k "$input"
+}
