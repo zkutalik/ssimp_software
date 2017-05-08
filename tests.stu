@@ -12,3 +12,14 @@
 
     mv "tests/${testname}"/output.actual.tmp "tests/${testname}"/output.actual
 }
+
+
+                    ref/compressed/${path}.vcfGTz
+:   bin/vcfGTz
+{
+    export  target="ref/compressed/${path}".vcfGTz
+    export              input="ref/${path}".vcf.gz
+    ls -l "$input"
+    bin/vcfGTz "$input" "$target".tmp
+    mv -i               "$target".tmp "$target"
+}
