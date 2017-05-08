@@ -1,6 +1,11 @@
+@test.data.to.be.made.by.stu
+: ref/compressed/small.vcf.sample.vcfGTz
+;
+
     tests/${testname}/output.actual
 :       bin/ssimp
     tests/${testname}/command
+   @test.data.to.be.made.by.stu
 {
     export SSIMP=bin/ssimp
     export   REF=ref
@@ -18,6 +23,7 @@
 :   bin/vcfGTz
 {
     export  target="ref/compressed/${path}".vcfGTz
+    mkdir -p "$(dirname "$target")"
     export              input="ref/${path}".vcf.gz
     ls -l "$input"
     bin/vcfGTz "$input" "$target".tmp
