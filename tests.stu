@@ -1,3 +1,10 @@
+@all.tests
+:   tests/test.lambda1.0/output.actual
+    tests/test0/output.actual
+    tests/test0/gz/output.actual
+    tests/test0/vcfGTz/output.actual
+;
+
 @test.data.to.be.made.by.stu
 : ref/compressed/small.vcf.sample.vcfGTz
 ;
