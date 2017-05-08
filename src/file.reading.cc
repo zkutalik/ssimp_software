@@ -283,14 +283,6 @@ struct vcfGTz_handle : public file_reading:: Genotypes_I
             auto lefts_and_rights = parse_many_calls(doubly_uncompressed, m_all_SNPs.at(i).m_line_number);
 
             return lefts_and_rights;
-            using utils:: operator<<;
-            PP(lefts_and_rights.first);
-            PP(lefts_and_rights.second);
-            //return lefts_and_rights;
-            //PP(doubly_uncompressed);
-
-            assert(0);
-            return {{}, {}};
     }
 };
 

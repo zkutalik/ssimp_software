@@ -190,21 +190,44 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
-            auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
-            auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
-            if(w_ref_narrow_begin == c_end)
-                break; // Finished with this chromosome
-            if(w_ref_narrow_begin == w_ref_narrow_end)
-                continue; // Nothing to impute, skip to the next region
+
+            /*
+             * For a given window, there are three "ranges" to consider:
+             *  -   The range of GWAS SNPs in the "broad" window (i.e. including the flanking region)
+             *  -   The range of reference SNPs in the "broad" window.
+             *  -   The range of rererence SNPs in the "narrow" window (i.e. without the flanking region)
+             *
+             *  The intersection of the first two of these three ranges is the set of SNPs that
+             *  are useful as tags. The third range is the set of targets.
+             *
+             *  (For now, we're including every tag as a target too.
+             *
+             *  In the next few lines, we find the endpoints (begin and end) of each of these
+             *  three ranges.
+             */
+
+            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
+            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
             auto w_ref_wide_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_ref_wide_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width });
 
-            // Look up this region in the GWAS (taking account of the flanking width also)
-            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
-            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
+            auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
+            auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
 
-            // New, more flexible, method for finding tags
+            // Check if the current target window is past the end of the chromosome, in which case
+            // we 'break' out in order to allow it to finish this chromosome and move onto
+            // the next chromosome
+            if(w_ref_narrow_begin == c_end)
+                break; // Finished with this chromosome
+
+            // If the current target window has no SNPs, then 'continue' to the next window
+            if(w_ref_narrow_begin == w_ref_narrow_end)
+                continue; // Nothing to impute, skip to the next window
+
+
+            // Next, look up each 'tag candidate' in turn and - if it's a suitable SNP - store
+            // it's z-statistic and an iterator to the reference panel data for the same SNP.
             vector<double>                          tag_zs;
             vector<SNPiterator<GenotypeFileHandle>> tag_its;
             for(auto tag_candidate = range:: range_from_begin_end( w_gwas_begin, w_gwas_end )
@@ -212,11 +235,16 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     ;   tag_candidate.advance()
                     ) {
                 auto crps = tag_candidate.current_it().get_chrpos();
-                // Find the ref panel entries in the same range
+                // Find the ref panel entries at the exact same chr:pos
                 auto ref_candidates = range:: range_from_begin_end(
                          std:: lower_bound( w_ref_wide_begin , w_ref_wide_end, crps )
                         ,std:: upper_bound( w_ref_wide_begin , w_ref_wide_end, crps )
                         );
+
+                // There may be multiple reference panel SNPs at the same chr:pos, for
+                // example an 'indel' as well as a conventional biallelic SNP.
+                // These next few lines find the collection of reference panel SNPs
+                // that have appropriate alleles.
                 vector<double> one_tag_zs;
                 vector<SNPiterator<GenotypeFileHandle>> one_tag_its;
                 for(; ! ref_candidates.empty(); ref_candidates.advance()) {
@@ -233,8 +261,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         break; case which_direction_t:: NO_ALLELE_MATCH             : ;
                     }
                 }
+                // Finally, we make the decision on whether to include this tag or not.
+                // A tag is useful if there is exactly one reference SNP that corresponds
+                // to it (where 'correspond' means that the positions and alleles match).
                 assert(one_tag_zs.size() == one_tag_its.size());
-                assert(one_tag_zs.size() <= 1);
                 if(1==one_tag_zs.size()) {
                     for(auto z : one_tag_zs)
                         tag_zs.push_back(z);
@@ -256,17 +286,22 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
                 auto const & z12_for_this_SNP = cache.lookup_one_ref_get_calls(it);
                 if (z12_for_this_SNP.empty()) {
-                    // empty vector means the SNP is not binary in the reference panel
+                    // Empty vector means the SNP is not binary in the reference panel.
+                    // For now, we're ignoring such SNPs, but maybe we could include them
+                    // by simply using 'NA' in place of the awkward individuals.
                     continue;
                 }
                 auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
                 if  (*z12_minmax.first == *z12_minmax.second){
-                    continue; // no variation in this SNP within the ref panel, therefore useless for imputation
+                    continue;   // no variation in the allele counts for this SNP within
+                                //the ref panel, therefore useless for imputation
                 }
                 SNPs_all_targets.push_back( it.get_chrpos() );
                 unk_its         .push_back( it              );
             }
 
+
+            // Next few lines are kind of boring, just printing some statistics.
 
             // We have at least one SNP here, so let's print some numbers about this region
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
@@ -282,50 +317,35 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_tags                                 << " # SNPs in both (i.e. useful as tags)\n";
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
 
-            // Next, copy the calls in from the reference panel, ready for computation of correlation
+            // Next, actually look up all the relevant SNPs within the reference panel
             vector<vector<int>> genotypes_for_the_tags = lookup_many_ref_rows(tag_its, cache);
             vector<vector<int>> genotypes_for_the_unks = lookup_many_ref_rows(unk_its, cache);
 
-
-            assert(number_of_tags == utils:: ssize(genotypes_for_the_tags));
+            assert(number_of_tags        == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
 
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_unks) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
 
-            int const N_ref = genotypes_for_the_tags.at(0).size();
+            int const N_ref = genotypes_for_the_tags.at(0).size(); // the number of individuals
             assert(N_ref > 0);
 
-            mvn:: SquareMatrix C = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
-            mvn:: VecCol C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs));
-            mvn:: Matrix      c = make_c_unkn_tags_matrix( genotypes_for_the_tags
+            /*
+             * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
+             */
+            mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
+            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs));
+            mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
                                                          , tag_its
                                                          , unk_its
                                                          , options:: opt_lambda
                                                          );
-
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
 
-#if 0
-            { // verify that this gets the same results
-                auto cCzs = multiply_matrix_by_colvec_giving_colvec
-                            ( c
-                            , multiply_matrix_by_colvec_giving_colvec
-                              ( invert_a_matrix(C)
-                              , mvn:: make_VecCol(tag_zs)
-                              )
-                            );
-                assert(number_of_all_targets == ssize(cCzs));
-                auto diff = c_Cinv_zs - cCzs;
-                double mn, mx;
-                gsl_vector_minmax(diff.get(), &mn, &mx);
-                assert(mn > -1e-10);
-                assert(mx <  1e-10);
-            }
-#endif
 
 
+            // Finally, print out the imputations
             assert(number_of_all_targets == ssize(c_Cinv_zs));
             for(int i=0; i<number_of_all_targets; ++i) {
                 auto crps = SNPs_all_targets.at(i);
