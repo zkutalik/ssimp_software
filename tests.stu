@@ -34,7 +34,7 @@
     export              input="ref/${path}".vcf.gz
     ls -l "$input"
     bin/vcfGTz "$input" "$target".tmp
-    mv -i               "$target".tmp "$target"
+    mv                  "$target".tmp "$target"
 }
                     ref/${path}.vcf
 {
