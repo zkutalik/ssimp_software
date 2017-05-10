@@ -5,27 +5,38 @@
 #include <algorithm>
 #include <vector>
 #include <map>
-#include <cassert>
 
 #include <gzstream.h>
 
-#include "other/DIE.hh"
-#include "other/PP.hh"
-#include "other/utils.hh"
-#include "other/range_view.hh"
+#include "bits.and.pieces/DIE.hh"
+#include "bits.and.pieces/PP.hh"
+#include "bits.and.pieces/utils.hh"
+#include "range/range_view.hh"
+#include "range/range_action.hh"
+#include "range/range_from.hh"
+#include "zlib-vector-of-char/zlib-vector.hh"
+
+#include "vcfGTz_reader.hh"
+
+namespace action = range:: action;
+namespace view   = range:: view  ;
+namespace from   = range:: from  ;
 
 using std:: ifstream;
 using std:: string;
 using std:: vector;
 using std:: map;
+using std:: cout;
 using utils:: ssize;
 using utils:: tokenize;
+using utils:: nice_operator_shift_left;
+using utils:: save_ostream_briefly;
+using utils:: print_type;
+using vcfGTz:: special_encoder_for_list_of_GT_fields;
 
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
 namespace file_reading {
-    using utils:: operator<<; // to print vectors
-
     template<typename G>
     SNPiterator<G> &       SNPiterator<G>:: operator++()        {
         assert(m_line_number < m_gfh->number_of_snps());
@@ -114,6 +125,8 @@ struct header_details {
 // Some forward declarations
 static
 GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name);
+static
+GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name);
 static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int);
 static
@@ -205,7 +218,7 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
             (   [](auto && ...xs) {
                     return std:: make_pair( std::forward<decltype(xs)>(xs)...);
                 }
-            ,   move(z_out) | view:: unzip_collect_transpose
+            ,   move(z_out) | action:: unzip_collect_transpose
             );
 
         return all_calls_decoded_pair; // use the decompressed version
@@ -218,10 +231,66 @@ struct PlainVCFfile : public file_reading:: Genotypes_I
     }
 
 };
+struct vcfGTz_handle : public file_reading:: Genotypes_I
+{
+    struct metadata_for_one_line {
+        int64_t     m_offset_from_start_of_file;
+        int         m_line_number; // currently left at -1 usually. Sorry!
+        chrpos      m_chrpos;
+        /* TODO: Maybe remove some of the following entries, or encode them more
+         * efficiently, to save runtime memory
+         */
+        string      m_SNPname;
+        string      m_allele_alt;
+        string      m_allele_ref;
+
+        void        some_checks() {
+            assert(m_chrpos.chr  >= 1);
+            assert(m_chrpos.chr  <= 22); // not sure what to do with X yet
+        }
+    };
+
+    vector<metadata_for_one_line>   m_all_SNPs;
+    string                          m_underlying_file_name;
+
+    int             number_of_snps  ()          const override { return m_all_SNPs.size(); }
+    string          get_SNPname     (int i)     const override { return m_all_SNPs.at(i).m_SNPname; }
+    chrpos          get_chrpos      (int i)     const override { return m_all_SNPs.at(i).m_chrpos; }
+    string          get_allele_ref  (int i)     const override { return m_all_SNPs.at(i).m_allele_ref; }
+    string          get_allele_alt  (int i)     const override { return m_all_SNPs.at(i).m_allele_alt; }
+    std::pair<
+             std::vector<uint8_t>
+            ,std::vector<uint8_t>
+        >           get_calls       (int i)     const override {
+            auto relevant_offset_from_beginning = m_all_SNPs.at(i).m_offset_from_start_of_file;
+
+            vcfGTz:: vcfGTz_reader reader (   m_underlying_file_name );
+            reader.m_f || DIE("Has that file disappeared? [" << m_underlying_file_name << "]");
+
+            reader.m_f.seekg( relevant_offset_from_beginning, std::ios_base:: beg);
+            assert(reader.m_f);
+            reader.read_smart_string0(); // skip over CHROM
+            reader.read_smart_string0(); // skip over POS
+            reader.read_smart_string0(); // skip over ID
+            reader.read_smart_string0(); // skip over REF
+            reader.read_smart_string0(); // skip over ALTs
+            reader.read_smart_string0(); // skip over QUAL
+            reader.read_smart_string0(); // skip over FILTER
+
+            auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
+            auto doubly_uncompressed = special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate(doubly_compressed) );
+
+            auto lefts_and_rights = parse_many_calls(doubly_uncompressed, m_all_SNPs.at(i).m_line_number);
+
+            return lefts_and_rights;
+    }
+};
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
-    // I really should detect the file-type.
-    // But for now, we'll just assume a plain (non-gzipped) vcf file.
+    // Try various file types until one succeeds
+    auto gt_fh = read_in_vcfGTz_file(file_name);
+    if(gt_fh)
+        return gt_fh;
     return read_in_a_raw_ref_file_as_VCF(file_name);
 }
 
@@ -267,7 +336,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
     // using gzstream to read gzipped input data. Thanks for http://www.cs.unc.edu/Research/compgeom/gzstream/#doc
     // It's LGPL license, we should remember to document this
     gz:: igzstream f(file_name.c_str());
-    (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << file_name << ']');
+    (f.rdbuf() && (f.rdbuf()->is_open())) || DIE("Can't find file [" << file_name << ']');
     string current_line;
 
     int simple_line_number = 0;
@@ -313,7 +382,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 int const N_ref = hd.unaccounted.size();
                 vector<string> calls_as_strings;
-                range:: ints(N_ref) |view:: foreach| [&](int person) {
+                range:: ints(N_ref) |action:: foreach| [&](int person) {
                     auto column_number = hd.unaccounted.at(person).m_offset;
                     assert(column_number-9 == person);
                     string & call_for_this_person = all_split_up.at(column_number);
@@ -327,7 +396,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 zip_val( range:: range_from_begin_end(lefts_and_rights.first)
                        , range:: range_from_begin_end(lefts_and_rights.second))
-                |view:: foreach|
+                |action:: foreach|
                 [&](auto x) {
                     ++ count_the_call_types[ std:: make_pair(std::get<0>(x)
                                                             ,std::get<1>(x)
@@ -356,7 +425,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 map<call_type, int> map_call_to_contiguous_ids;
                 view:: enumerate_vector(most_popular_first)
-                |view::unzip_foreach|
+                |action:: unzip_foreach|
                 [&](int i, count_and_call_t cac){
                     map_call_to_contiguous_ids[ cac.as_pair() ] = i;
                 };
@@ -368,7 +437,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
                 zip_val( range:: range_from_begin_end(lefts_and_rights.first)
                        , range:: range_from_begin_end(lefts_and_rights.second))
-                |view:: unzip_foreach|
+                |action:: unzip_foreach|
                 [&](int left, int right) {
                     int code = map_call_to_contiguous_ids.at( std:: make_pair(left,right) );
                     assert(code >= 0);
@@ -388,7 +457,7 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
                     return call_type{ cac.left
                                     , cac.right };
                 }
-                | view:: collect;
+                | action:: collect;
                 ols.m_calls_compressed_codes = just_calls_ordered_by_popularity;
             }
 
@@ -415,6 +484,138 @@ GenotypeFileHandle      read_in_a_raw_ref_file_as_VCF(std:: string file_name) {
 
     return p;
 }
+static
+GenotypeFileHandle      read_in_vcfGTz_file             (std:: string file_name) {
+    // Return an empty pointer if this is the wrong file type
+
+    vcfGTz:: vcfGTz_reader   reader{file_name};
+
+    auto first_string = reader.read_string0();
+    auto first_6 = first_string.substr(0,6);
+    if(first_6 != "vcfGTz") {
+        // It's not suitable for this function. Return nothing and let the system
+        // try the next file format
+        return {};
+    }
+
+    constexpr char magic_file_header[] = "vcfGTz.0.0.2";
+    assert(first_string == magic_file_header);
+
+    assert(first_string == magic_file_header);
+
+    auto reference_data = std:: make_shared<vcfGTz_handle>();
+    reference_data -> m_underlying_file_name = file_name;
+
+    struct block_summary_t {
+        string                          m_description;
+        decltype(reader.m_f.tellg())    m_start_of_block;
+        decltype(reader.m_f.tellg())    m_just_after_description;
+
+        string to_string() const {
+            std::ostringstream oss;
+            oss << '(' << m_start_of_block << ')';
+            oss << '(' << m_just_after_description << ')';
+            oss << m_description;
+            return oss.str();
+        }
+    };
+    vector<block_summary_t> block_summarys;
+
+    do {
+        auto start_of_block = reader.m_f.tellg();
+        auto offset_over_this_block = reader.read_offset_at_start_of_block();
+        if(offset_over_this_block == 0)
+            break;
+        auto block_description = reader.read_string0();
+
+        block_summarys.push_back( block_summary_t{ block_description, start_of_block, reader.m_f.tellg() });
+
+        reader.m_f.seekg(start_of_block + offset_over_this_block);
+    } while(1);
+    //using utils:: operator<<; PP(block_summarys);
+
+    block_summarys.size() == 2 || DIE("vcfGTz not fully implemented");
+    block_summarys.at(0).m_description == "manylines:GTonly:zlib" || DIE("vcfGTz not fully implemented. Unexpected blocks.");
+    block_summarys.at(1).m_description == "offsets.into.previous.block" || DIE("vcfGTz not fully implemented. Unexpected blocks.");
+
+    // Start extracting the SNP-specific positions
+    reader.m_f.seekg( block_summarys.at(1).m_just_after_description );
+    int num_lines = reader.read_uint64_t();
+    int num_SNPs = num_lines - 1; // as the first one is the header
+    assert(num_SNPs > 0);
+
+    auto start_of_block_0 = block_summarys.at(0).m_start_of_block;
+    vector< decltype( start_of_block_0 ) > vec_of_positions_for_each_SNP;
+
+    for(auto i : range:: ints(num_lines)) {
+        auto next_offset = reader.read_uint64_t();
+        auto position_of_this_SNPs_data = start_of_block_0 .operator+(next_offset);
+        if(i!=0) { // because the first one is the header, I should store it elsewhere
+            vec_of_positions_for_each_SNP.push_back( position_of_this_SNPs_data );
+        }
+    }
+    assert(num_SNPs == ssize(vec_of_positions_for_each_SNP));
+
+    for( auto p : vec_of_positions_for_each_SNP ) {
+        vcfGTz_handle:: metadata_for_one_line x;
+
+        reader.m_f.seekg( p );
+        x.m_offset_from_start_of_file = reader.m_f.tellg() - reader.m_my_beginning;
+        x.m_line_number = -1;
+
+        auto CHROM  = reader.read_smart_string0();
+        auto POS    = reader.read_smart_string0();
+        auto ID     = reader.read_smart_string0();
+        auto REF    = reader.read_smart_string0();
+        auto ALTs   = reader.read_smart_string0();
+        auto QUAL   = reader.read_smart_string0();
+        auto FILTER = reader.read_smart_string0();
+        //PP(p, CHROM, POS, ID, REF, ALTs , QUAL, FILTER);
+
+        x.m_chrpos.chr      = utils:: lexical_cast<int> (CHROM);
+        x.m_chrpos.pos      = utils:: lexical_cast<int> (POS);
+        x.m_SNPname         = ID;
+        x.m_allele_ref      = REF;
+        x.m_allele_alt      = ALTs;
+
+        x.some_checks();
+
+        reference_data->m_all_SNPs.push_back(x);
+
+        {/* Not really needed here, but I'll just uncompress and recompress for fun
+          * This slows down loading though, so consider disabling it
+          */
+            // TODO: get rid of this
+            auto doubly_compressed = reader.read_vector_of_char_with_leading_size();
+            static_assert( std::is_same<decltype(doubly_compressed), zlib_vector:: vec_t>{} ,"");
+            auto doubly_uncompressed = special_encoder_for_list_of_GT_fields:: inflate( zlib_vector:: inflate(doubly_compressed) );
+            auto com =
+                zlib_vector:: deflate(
+                special_encoder_for_list_of_GT_fields:: deflate( doubly_uncompressed )
+                );
+            assert(doubly_compressed == com);
+            //PP(doubly_uncompressed);
+        }
+    }
+
+    // Ensure the positions are all increasing. I'll have
+    // to do some reordering if not
+    auto r0 = from:: vector( reference_data->m_all_SNPs );
+    auto r1 = from:: vector( reference_data->m_all_SNPs ) |view::skip| 1;
+    zip_relax_length    (
+                r0
+            ,   r1
+        ) |action::unzip_foreach|
+    []  (   vcfGTz_handle:: metadata_for_one_line const &l
+        ,   vcfGTz_handle:: metadata_for_one_line const &r) {
+        if(l.m_chrpos.chr == r.m_chrpos.chr)
+            assert(l.m_chrpos.pos <= r.m_chrpos.pos);
+        else
+            assert(l.m_chrpos.chr <  r.m_chrpos.chr);
+    };
+
+    return reference_data;
+}
 
 static
 std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> const & calls_as_strings, int line_number) {
@@ -424,11 +625,11 @@ std::pair<vector<uint8_t>,vector<uint8_t>> parse_many_calls (vector<string> cons
 
     zip_val( range:: ints(calls_as_strings.size())
            , range:: range_from_begin_end(calls_as_strings) )
-    |view:: unzip_foreach|
+    |action:: unzip_foreach|
     [&](int person, string const & call_for_this_person) {
         z_out.push_back( parse_call_pair(call_for_this_person, person, line_number) );
     };
-    auto l3 = move(z_out) | view:: unzip_collect_transpose;
+    auto l3 = move(z_out) | action:: unzip_collect_transpose;
 
     return make_pair(std::get<0>(l3)
                     ,std::get<1>(l3) );
@@ -437,15 +638,37 @@ static
 std:: pair<int,int> parse_call_pair (string const & call_for_this_person, int column_number, int line_number) {
     int d1, d2;
     int n;
-    int ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
+    int ret;
+
+    ret = sscanf(call_for_this_person.c_str(), "%d|%d %n", &d1,&d2, &n); // note the space to allow trailing whitespace
     if(   ret == 2 // two digits
        && n == ssize(call_for_this_person) // all characters of input were consumed
        && d1 >= 0
        && d2 >= 0)
-    {} else
-        DIE("Couldn't parse \"" << call_for_this_person << "\" in the " << 1+column_number << "th column in the " << 1+line_number << "th SNP in the ref panel");
+    {
+        return {d1,d2};
+    }
 
-    return {d1,d2};
+    ret = sscanf(call_for_this_person.c_str(), "%d|%d:%n", &d1,&d2, &n); // note the space to allow trailing whitespace
+    if(   ret == 2 // two digits
+       // In this case, we don't care what n is
+       && d1 >= 0
+       && d2 >= 0)
+    {
+        return {d1,d2};
+    }
+
+    ret = sscanf(call_for_this_person.c_str(), "%d/%d:%n", &d1,&d2, &n); // note the space to allow trailing whitespace
+    if(   ret == 2 // two digits
+       // In this case, we don't care what n is
+       && d1 >= 0
+       && d2 >= 0)
+    {
+        return {d1,d2};
+    }
+
+    DIE("Couldn't parse \"" << call_for_this_person << "\" in the " << 1+column_number << "th column in the " << 1+line_number << "th SNP in the ref panel");
+    return {-1,-1}; // won't reach here - this doesn't matter
 };
 
 static
@@ -494,7 +717,8 @@ header_details   parse_header( string      const & header_line ) {
             hd.filter = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"INFO"})) {
-            hd.info = header_details:: offset_and_name(field_counter, one_field_name);
+            // actually, ignore this big field
+            //hd.info = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
@@ -608,6 +832,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
     header_details hd;
 
     getline(f, current_line);
+    assert(f);
 
     // current_line is now the first line, i.e. the header
     hd = parse_header(current_line);
@@ -657,7 +882,6 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
     return p;
 }
-using utils:: operator<<;
 vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
 
     if(m_cache_of_z12.count(crps) == 1) {

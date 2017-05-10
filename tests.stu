@@ -1,13 +1,45 @@
+@all.tests
+:   tests/test.lambda1.0/output.actual
+    tests/test0/output.actual
+    tests/test0/gz/output.actual
+    tests/test0/vcfGTz/output.actual
+;
+
+@test.data.to.be.made.by.stu
+: ref/compressed/small.vcf.sample.vcfGTz
+;
+
     tests/${testname}/output.actual
 :       bin/ssimp
     tests/${testname}/command
+   @test.data.to.be.made.by.stu
 {
-    export SSIMP="$(pwd | tr -d '\n'; echo /bin/ssimp)"
-    export   REF="$(pwd | tr -d '\n'; echo /ref)"
-    export  GWAS="$(pwd | tr -d '\n'; echo /gwas)"
-    cd    "tests/${testname}"
-    export OUTPUT=output.actual.tmp
-    export OUT_IMPUTATIONS=imputations.txt
-    bash command
-    mv output.actual.tmp output.actual
+    export SSIMP=bin/ssimp
+    export   REF=ref
+    export  GWAS=gwas
+    export OUTPUT="tests/${testname}"/output.actual.tmp
+    export OUT_IMPUTATIONS="tests/${testname}"/imputations.txt
+
+    bash "tests/${testname}"/command
+
+    mv "tests/${testname}"/output.actual.tmp "tests/${testname}"/output.actual
+}
+
+
+                    ref/compressed/${path}.vcfGTz
+:   bin/vcfGTz
+{
+    export  target="ref/compressed/${path}".vcfGTz
+    mkdir -p "$(dirname "$target")"
+    export              input="ref/${path}".vcf.gz
+    ls -l "$input"
+    bin/vcfGTz "$input" "$target".tmp
+    mv                  "$target".tmp "$target"
+}
+                    ref/${path}.vcf
+{
+    export  target="ref/${path}".vcf
+    export              input="ref/${path}".vcf.gz
+    ls -l "$input"
+    gunzip -k "$input"
 }

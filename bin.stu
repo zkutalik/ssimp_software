@@ -1,3 +1,5 @@
+@all: bin/ssimp bin/vcfGTz;
+
     bin/ssimp
 :   $[LINKER=bin/o/LINKER]
     $[LD_FLAGS=bin/o/LD_FLAGS]
@@ -5,9 +7,9 @@
     bin/o/ssimp.o
     bin/o/options.o
     bin/o/file.reading.o
-    bin/o/other/mvn.o
-    bin/o/other/utils.o
+    bin/o/mvn/mvn.o
     bin/o/gz/gzstream/gzstream.o
+    bin/o/zlib-vector-of-char/zlib-vector.o
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
     echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
@@ -15,9 +17,9 @@
         bin/o/options.o \
         bin/o/ssimp.o \
         bin/o/file.reading.o \
-        bin/o/other/mvn.o \
-        bin/o/other/utils.o       \
+        bin/o/mvn/mvn.o \
         bin/o/gz/gzstream/gzstream.o \
+        bin/o/zlib-vector-of-char/zlib-vector.o \
         ${LD_FLAGS}               \
     -o bin/ssimp
 }
@@ -46,6 +48,23 @@
 {
     mkdir -p bin/o/gz/gzstream
     ${CXX_WITH_FLAGS} -c "src/gz/gzstream/gzstream.C" -o "bin/o/gz/gzstream/gzstream.o"
+}
+
+    bin/vcfGTz
+:   $[LINKER=bin/o/LINKER]
+    $[LD_FLAGS=bin/o/LD_FLAGS]
+    bin/o/vcfGTz.o
+    bin/o/gz/gzstream/gzstream.o
+    bin/o/zlib-vector-of-char/zlib-vector.o
+{
+    echo LINKER:"${LINKER}" | tr '\n' ' '; echo
+    echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
+    ${LINKER} \
+        bin/o/vcfGTz.o \
+        bin/o/gz/gzstream/gzstream.o \
+        bin/o/zlib-vector-of-char/zlib-vector.o \
+        ${LD_FLAGS}               \
+    -o bin/vcfGTz
 }
 
 >       bin/o/GCC_OR_CLANG
@@ -120,7 +139,8 @@
         @clean
 {
     rm bin/ssimp                 || :
+    rm bin/vcfGTz                || :
     rm bin/o/CXX_WITH_FLAGS      || :
-    rm bin/LIST_OF_HH_FILES
+    rm bin/LIST_OF_HH_FILES      || :
     find bin/o -name '*.o' -exec rm {} \;
 }

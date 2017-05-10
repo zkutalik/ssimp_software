@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:aaronmcdaid/module-bits.and.pieces.git
+	branch = master
+	commit = f09041c41f677c4b0d50d3cc0df6bf4cd108afc2
+	parent = c9141e2ed8d279e4d484cbcc217d967b3c573e25
+	cmdver = 0.3.1
