@@ -127,9 +127,7 @@ struct vcfGTz_writer {
             m_f << (char) u8;
         }
     }
-    template<typename T>
-    void            save_uint64_t(T sz) {
-        static_assert(std:: is_same<T, uint64_t>{}, "");
+    void            save_uint64_t(uint64_t sz) {
         auto arr8bytes = bit_conversions:: convert_to_some_bytes<8>(sz);
         assert(sz == bit_conversions:: convert_from_some_bytes(arr8bytes));
         for(uint8_t u8: arr8bytes) {
