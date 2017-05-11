@@ -27,7 +27,7 @@
 
 
                     ref/compressed/${path}.vcfGTz
-:   bin/vcfGTz
+:   -p bin/vcfGTz
 {
     export  target="ref/compressed/${path}".vcfGTz
     mkdir -p "$(dirname "$target")"

@@ -12,12 +12,15 @@ include.relative.to.this.script <- function(r) {
 }
 
 library(Rcpp)
-delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>"
-                ,include.relative.to.this.script('../vcfGTz_reader.hh')
-                )
+delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', includes=c(
+				 include.relative.to.this.script('ASSERT_for_R.hh')
+				,"#include<fstream>"
+				,include.relative.to.this.script('../vcfGTz_reader.hh')
+				)
 	, 'IntegerVector vcfGTz_num_SNPs ( CharacterVector filename) {
 			std:: string filename_ = {filename[0]};
 			vcfGTz:: vcfGTz_reader reader(filename_);
+			reader.m_f.good() || (stop(std::string("cannot find file: [") + filename_ + "]"),false);
 
 			// read in the "magic" string
 			auto magic = reader.read_string0();
@@ -38,7 +41,9 @@ delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', incl
 			int num_SNPs = num_lines - 1; // as the first one is the header
 			return {num_SNPs};
 }'))
-delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>"
+delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c(
+				 include.relative.to.this.script('ASSERT_for_R.hh')
+				,"#include<fstream>"
                 ,include.relative.to.this.script('../vcfGTz_reader.hh')
                 )
 	, 'NumericVector vcfGTz_get_internal_offsets (CharacterVector filename, IntegerVector indices) {
@@ -85,9 +90,11 @@ delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='
 
 			return results;
 }'))
-delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c("#include<fstream>"
-                    ,include.relative.to.this.script('../vcfGTz_reader.hh')
-                    )
+delayedAssign(        "vcfGTz_get_1field_from_internal_offsets", Rcpp:: cppFunction( plugins='cpp14', includes=c(
+				 include.relative.to.this.script('ASSERT_for_R.hh')
+				,"#include<fstream>"
+				,include.relative.to.this.script('../vcfGTz_reader.hh')
+				)
 	, 'CharacterVector vcfGTz_get_1field_from_internal_offsets (CharacterVector filename, NumericVector file_offsets, IntegerVector which_field) {
 			which_field.size() == 1 || (stop("only one field maybe be requested, between 1 and 7"),false);
 			which_field.at(0) >= 1  || (stop("only one field maybe be requested, between 1 and 7"),false);
