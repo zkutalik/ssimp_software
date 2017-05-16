@@ -1,7 +1,23 @@
-if(!exists('directory.of.this.script')) {
-directory.of.this.script = dirname(normalizePath(sys.frame(1)$ofile))   # http://stackoverflow.com/questions/13311180/how-do-i-get-the-absolute-path-of-an-input-file-in-r
-                                                                        # http://stackoverflow.com/questions/1815606/rscript-determine-path-of-the-executing-script#16046056
-}
+directory.of.this.script = local({
+    # First, we need to find the directory of this script,
+    # This works if it has been 'source'd - not sure about
+    # other methods (i.e. I dunno if it will work inside
+    # knitr.
+    # The method on stackoverflow doesn't work. It's
+    # not guaranteed to be sys.frame(1). We have to
+    # find the last sys.frame(?) with an $ofile member
+
+    ofiles.in.the.current.stack =
+    sapply( 1:sys.nframe(), i %\% {
+                                  x = sys.frame(i)$ofile
+                                  if(is.null(x))
+                                      NA
+                                  else
+                                      x
+    })
+    rev(na.omit(ofiles.in.the.current.stack))[1] %>%normalizePath %>% dirname
+})
+
 include.relative.to.this.script <- function(r) {
     paste(sep=''
 		  ,'#include "'
