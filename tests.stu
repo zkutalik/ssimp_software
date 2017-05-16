@@ -19,6 +19,7 @@
     export  GWAS=gwas
     export OUTPUT="tests/${testname}"/output.actual.tmp
     export OUT_IMPUTATIONS="tests/${testname}"/imputations.txt
+    export FORCE_THOUSANDS_SEPARATOR="'"
 
     bash "tests/${testname}"/command
 
