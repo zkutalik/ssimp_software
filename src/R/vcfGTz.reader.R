@@ -229,7 +229,7 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 					auto one_line_decoded = read_full_line_and_return_ID_and_decodedGTs();
 					auto ID = one_line_decoded.first;
 					intended_rownames.at(i) = ID;
-					assert(number_of_individuals == one_line_decoded.second.size() );
+					assert(number_of_individuals == utils::ssize(one_line_decoded.second) );
 
 					for(int j=0; j<number_of_individuals; ++j) {
 						auto && one_GT_string = one_line_decoded.second.at(j);
