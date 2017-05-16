@@ -258,9 +258,9 @@ namespace range {
                 ( std::forward<V>(v), 0 );
     }
 
-    template<constexpr bool enforce_same_length, typename idx, typename ... range_types>
+    template<bool enforce_same_length, typename idx, typename ... range_types>
     struct zip_val_t;
-    template<constexpr bool enforce_same_length, size_t ...Is, typename ...Rs>
+    template<bool enforce_same_length, size_t ...Is, typename ...Rs>
     struct zip_val_t<enforce_same_length, std::index_sequence<Is...>, Rs...> {
         std:: tuple<Rs...> m_ranges;
 
@@ -312,7 +312,7 @@ namespace range {
                    utils:: ignore( ((void)range:: push_back(std::get<Is>( id{}(m_ranges)), std::get<Is>(p)),0) ... )
         )
     };
-    template<constexpr bool enforce_same_length, size_t ...Is, typename ...Rs>
+    template<bool enforce_same_length, size_t ...Is, typename ...Rs>
     typename zip_val_t<enforce_same_length, std::index_sequence<Is...>, Rs...> ::
         value_type
     zip_val_t<enforce_same_length, std::index_sequence<Is...>, Rs...> ::
