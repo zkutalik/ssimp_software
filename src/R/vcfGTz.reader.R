@@ -46,7 +46,7 @@ delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', incl
 			reader.seek_relative(offset_over_this_block-8);
 
 			// now read the start of the second block
-			auto another_offset = reader.read_offset_at_start_of_block();
+			auto another_offset = reader.read_offset_at_start_of_block(); (void)another_offset;
 			auto description_of_second_block = reader.read_string0();
 			if(description_of_second_block != "offsets.into.previous.block")
 				stop("wrong file type?");
@@ -74,7 +74,7 @@ delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='
 			reader.seek_relative(offset_over_this_block-8);
 
 			// now read the start of the second block
-			auto another_offset = reader.read_offset_at_start_of_block();
+			auto another_offset = reader.read_offset_at_start_of_block(); (void)another_offset;
 			auto description_of_second_block = reader.read_string0();
 			if(description_of_second_block != "offsets.into.previous.block")
 				stop("wrong file type?");
