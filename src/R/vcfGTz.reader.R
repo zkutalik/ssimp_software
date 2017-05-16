@@ -1,4 +1,4 @@
-directory.of.this.script = local({
+get.full.path.to.this.sourced.script = function() {
     # First, we need to find the directory of this script,
     # This works if it has been 'source'd - not sure about
     # other methods (i.e. I dunno if it will work inside
@@ -7,16 +7,14 @@ directory.of.this.script = local({
     # not guaranteed to be sys.frame(1). We have to
     # find the last sys.frame(?) with an $ofile member
 
-    ofiles.in.the.current.stack =
-    sapply( 1:sys.nframe(), i %\% {
-                                  x = sys.frame(i)$ofile
-                                  if(is.null(x))
-                                      NA
-                                  else
-                                      x
-    })
-    rev(na.omit(ofiles.in.the.current.stack))[1] %>%normalizePath %>% dirname
-})
+    for(i in sys.nframe():1) {  # Go through all the call frames,
+                                # in *reverse* order.
+        x = sys.frame(i)$ofile
+        if(!is.null(x))
+            return(normalizePath(x))
+    }
+}
+directory.of.this.script = dirname(get.full.path.to.this.sourced.script())
 
 include.relative.to.this.script <- function(r) {
     paste(sep=''
