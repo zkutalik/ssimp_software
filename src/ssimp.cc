@@ -91,12 +91,49 @@ static
     );
 } // namespace ssimp
 
+static
+void    set_appropriate_locale(ostream & stream) {
+    // By default, apply the user's locale, for example the thousands separator ...
+    stream.imbue(std::locale(""));
+
+    /*  However, within our test scripts, we force apostrophe ['] as the thousands
+     *  separator so that we can compare results consistently across different developers
+     *
+     *  More info: http://en.cppreference.com/w/cpp/locale/numpunct/thousands_sep
+     */
+
+    if(std:: getenv("FORCE_THOUSANDS_SEPARATOR") != nullptr) {
+        auto force_thousands_separator = std::string(std:: getenv("FORCE_THOUSANDS_SEPARATOR"));
+        if(force_thousands_separator.size() ==1) {
+            struct custom_thousands_separator : std::numpunct<char> {
+                char    m_custom_separator;
+
+                custom_thousands_separator(char c) : m_custom_separator(c) {}
+
+                char do_thousands_sep()   const { return m_custom_separator; }
+                std::string do_grouping() const { return "\3"; } // groups of 3 digits
+            };
+            stream.imbue(   std::locale (   stream.getloc()
+                                        ,   new custom_thousands_separator(force_thousands_separator.at(0))
+                                        // Nobody likes 'new' nowadays, but apparently this won't
+                                        // leak. From http://en.cppreference.com/w/cpp/locale/locale/locale:
+                                        //
+                                        //  "Overload 7 is typically called with its second argument, f, obtained directly from a
+                                        //   new-expression: the locale is responsible for calling the matching delete from its
+                                        //   own destructor."
+                                        )
+                        );
+        }
+    }
+}
+
 int main(int argc, char **argv) {
 
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
 
-    cout.imbue(std::locale("")); // apply the user's locale, for example the thousands separator
+    set_appropriate_locale(cout);
+
     cout << std::setprecision(20);
 
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {

@@ -1,7 +1,21 @@
-if(!exists('directory.of.this.script')) {
-directory.of.this.script = dirname(normalizePath(sys.frame(1)$ofile))   # http://stackoverflow.com/questions/13311180/how-do-i-get-the-absolute-path-of-an-input-file-in-r
-                                                                        # http://stackoverflow.com/questions/1815606/rscript-determine-path-of-the-executing-script#16046056
+get.full.path.to.this.sourced.script = function() {
+    # First, we need to find the directory of this script,
+    # This works if it has been 'source'd - not sure about
+    # other methods (i.e. I dunno if it will work inside
+    # knitr.
+    # The method on stackoverflow doesn't work. It's
+    # not guaranteed to be sys.frame(1). We have to
+    # find the last sys.frame(?) with an $ofile member
+
+    for(i in sys.nframe():1) {  # Go through all the call frames,
+                                # in *reverse* order.
+        x = sys.frame(i)$ofile
+        if(!is.null(x))
+            return(normalizePath(x))
+    }
 }
+directory.of.this.script = dirname(get.full.path.to.this.sourced.script())
+
 include.relative.to.this.script <- function(r) {
     paste(sep=''
 		  ,'#include "'
@@ -32,7 +46,7 @@ delayedAssign(      "vcfGTz_num_SNPs", Rcpp:: cppFunction( plugins='cpp14', incl
 			reader.seek_relative(offset_over_this_block-8);
 
 			// now read the start of the second block
-			auto another_offset = reader.read_offset_at_start_of_block();
+			auto another_offset = reader.read_offset_at_start_of_block(); (void)another_offset;
 			auto description_of_second_block = reader.read_string0();
 			if(description_of_second_block != "offsets.into.previous.block")
 				stop("wrong file type?");
@@ -60,7 +74,7 @@ delayedAssign(      "vcfGTz_get_internal_offsets", Rcpp:: cppFunction( plugins='
 			reader.seek_relative(offset_over_this_block-8);
 
 			// now read the start of the second block
-			auto another_offset = reader.read_offset_at_start_of_block();
+			auto another_offset = reader.read_offset_at_start_of_block(); (void)another_offset;
 			auto description_of_second_block = reader.read_string0();
 			if(description_of_second_block != "offsets.into.previous.block")
 				stop("wrong file type?");
@@ -215,7 +229,7 @@ delayedAssign(        "vcfGTz_get_012calls_from_internal_offsets", Rcpp:: cppFun
 					auto one_line_decoded = read_full_line_and_return_ID_and_decodedGTs();
 					auto ID = one_line_decoded.first;
 					intended_rownames.at(i) = ID;
-					assert(number_of_individuals == one_line_decoded.second.size() );
+					assert(number_of_individuals == utils::ssize(one_line_decoded.second) );
 
 					for(int j=0; j<number_of_individuals; ++j) {
 						auto && one_GT_string = one_line_decoded.second.at(j);
