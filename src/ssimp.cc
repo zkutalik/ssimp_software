@@ -383,20 +383,16 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
 
             // Finally, print out the imputations
-            assert(number_of_all_targets == ssize(c_Cinv_zs));
+            assert(number_of_all_targets == ssize(unk_its));
             for(int i=0; i<number_of_all_targets; ++i) {
-                auto crps = SNPs_all_targets.at(i);
-                auto it = map_chrpos_to_SNPname.find(crps);
-                assert(it != map_chrpos_to_SNPname.end());
-                while (it != map_chrpos_to_SNPname.end() && it->first == crps) {
-                    auto SNPname = it->second;
+                    auto && target = unk_its.at(i);
+                    auto crps = target.get_chrpos();
+                    auto SNPname = target.get_SNPname();
                     (*out_stream_ptr)
                         << crps
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
                         << endl;
-                    ++it;
-                }
             }
         }
     }
