@@ -4,5 +4,5 @@
     --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
-    --impute.range  chr1:1000000-chr1:2000000                                       \
+    --impute.snps   "${COMMANDDIR}"/a.list.of.snps.txt                              \
     > "$OUTPUT"

@@ -10,6 +10,8 @@
 #include <gsl/gsl_vector.h>
 #include<gsl/gsl_blas.h>
 
+#include <gzstream.h>
+
 #include "options.hh"
 #include "file.reading.hh"
 
@@ -141,6 +143,16 @@ int main(int argc, char **argv) {
         DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
     }
 
+    if( !options:: opt_impute_snps.empty() ) {
+        gz:: igzstream f(options:: opt_impute_snps.c_str());
+        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_impute_snps << ']');
+        string one_SNPname_or_chrpos;
+        while(getline( f, one_SNPname_or_chrpos)) {
+            options:: opt_impute_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+        }
+        options:: opt_impute_snps_as_a_uset.empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
+    }
+
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         PP( options:: opt_raw_ref
           , options:: opt_gwas_filename
@@ -195,10 +207,14 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
      )
         return false;
 
-    // You can't apply both
+    // You can't apply both. Only one or the other:
     assert( options:: opt_impute_range.empty() != options:: opt_impute_snps.empty());
 
-    assert(options:: opt_impute_snps.empty()); // not ready to handle this yet
+    if(!options:: opt_impute_snps.empty()) {
+        // --impute.snps was specified, so the file has been loaded into ...
+        assert(!options:: opt_impute_snps_as_a_uset.empty());
+        return  options:: opt_impute_snps_as_a_uset.count( it.get_SNPname() ) == 0;
+    }
 
     if(!options:: opt_impute_range.empty()) {
         // impute.range will either be an entire chromosome,

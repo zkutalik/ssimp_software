@@ -18,6 +18,7 @@ namespace options {
         double                  opt_lambda  = 0.0;
         std:: string            opt_impute_range;
         std:: string            opt_impute_snps;
+        std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
