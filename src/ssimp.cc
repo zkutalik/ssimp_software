@@ -204,18 +204,34 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
         // impute.range will either be an entire chromosome,
         // or two locations seperated by a '-'
 
-        if(options:: opt_impute_range.find('-') == string:: npos) {
-            // no hyphen, it's just a chromosome name
+        auto separated_by_hyphen = utils:: tokenize(options:: opt_impute_range, '-');
 
-            char const * chromosome_name = options:: opt_impute_range.c_str();
-            if(     options:: opt_impute_range.substr(0,3) == "chr"
-                 || options:: opt_impute_range.substr(0,3) == "Chr" ) {
-                chromosome_name += 3; // skip over three characters
+        // remove any leading 'chr' or 'Chr'
+        for(auto &s : separated_by_hyphen) {
+            if(     s.substr(0,3) == "chr"
+                 || s.substr(0,3) == "Chr")
+                s = s.substr(3);
+        };
+
+        auto lambda_chrpos_text_to_object = [](string const &as_text) {
+            auto separated_by_colon = utils:: tokenize(as_text,':');
+            chrpos position;
+            switch(separated_by_colon.size()) {
+                break; case 1: // no colon, just a chromosome
+                        position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
+                        position.pos = std:: numeric_limits<int>::lowest();
+                break; case 2:
+                        position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
+                        position.pos = utils:: lexical_cast<int>(separated_by_colon.at(1));
+                break; default:
+                        DIE("too many colons in [" << as_text << "]");
             }
-            int chromosome_number = utils:: lexical_cast<int> (chromosome_name);
+            return position;
+        };
 
-            chrpos  lower_allowed{ chromosome_number, std::numeric_limits<int>::lowest() };
-            chrpos  upper_allowed{ chromosome_number, std::numeric_limits<int>::max()    };
+        if(separated_by_hyphen.size()==1) {
+            chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str());
+            chrpos  upper_allowed{ lower_allowed.chr, std::numeric_limits<int>::max()    };
             return  !(  it.get_chrpos() >= lower_allowed
                      && it.get_chrpos() <= upper_allowed    );
         }
