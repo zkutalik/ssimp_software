@@ -351,6 +351,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
             int  number_of_all_targets                          = unk_its.size();
 
+            if(number_of_all_targets == 0)
+                continue;
+
             cout
                 << '\n'
                 << "chrm" << chrm
@@ -371,8 +374,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_unks) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
 
+            assert(!genotypes_for_the_tags.empty());
+            assert(!genotypes_for_the_unks.empty());
+
             int const N_ref = genotypes_for_the_tags.at(0).size(); // the number of individuals
             assert(N_ref > 0);
+
 
             /*
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
