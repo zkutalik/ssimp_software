@@ -467,9 +467,15 @@ make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_th
             double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
                                                    , &genotypes_for_the_tags.at(l).front(), 1
                                                    , N_ref );
-            if(c_kl > 1.0) { // sometimes it sneaks above one, don't really know how
+            if(c_kl > (1.0-1e-10)) { // sometimes it sneaks above one, don't really know how
                 assert(c_kl-1.0 < 1e-5);
+                assert(c_kl-1.0 >-1e-5);
                 c_kl = 1.0;
+            }
+            if(c_kl < (-1.0+1e-10)) { // in case it goes below -1.0 also
+                assert(c_kl+1.0 < 1e-5);
+                assert(c_kl+1.0 >-1e-5);
+                c_kl =-1.0;
             }
             assert(c_kl >= -1.0);
             assert(c_kl <=  1.0);
@@ -534,9 +540,15 @@ mvn:: Matrix make_c_unkn_tags_matrix
                 double c_ku = gsl_stats_int_correlation( &calls_at_k.at(0), 1
                                                        , &calls_at_u.at(0), 1
                                                        , N_ref );
-                if(c_ku > 1.0) {
+                if(c_ku > (1.0-1e-10)) {
                     assert(c_ku-1.0 < 1e-5);
+                    assert(c_ku-1.0 >-1e-5);
                     c_ku = 1.0;
+                }
+                if(c_ku < (-1.0+1e-10)) {
+                    assert(c_ku+1.0 < 1e-5);
+                    assert(c_ku+1.0 >-1e-5);
+                    c_ku = -1.0;
                 }
 
                 if(tag_its_k.m_line_number == unk_its_u.m_line_number) {
