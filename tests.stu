@@ -3,11 +3,12 @@
     tests/test0/output.actual
     tests/test0/gz/output.actual
     tests/test0/vcfGTz/output.actual
-    tests/3.chromosomes/UKB.every100/imputations.txt
+    tests/3.chromosomes/UKB.every100/output.actual
 ;
 
-@test.data.to.be.made.by.stu
-: ref/compressed/small.vcf.sample.vcfGTz
+@test.data.to.be.made.by.stu :
+    ref/compressed/small.vcf.sample.vcfGTz
+    ref/compressed/TWINSUK.every100thRS.chrm123.100people.vcfGTz
 ;
 
     tests/${testname}/output.actual
