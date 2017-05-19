@@ -394,16 +394,13 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                                                          , unk_its
                                                          , options:: opt_lambda
                                                          );
-            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
 
+            // Next two lines, are the imputation, and its quality
+            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
             auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans(invert_a_matrix (C) , c);
-            auto c_Cinv_c  = c * mvn:: multiply_NoTrans_Trans(invert_a_matrix (C) , c); // only interested in the diagonal, is there a better way?
 
             assert( (int)Cinv_c.size1() == number_of_tags );
             assert( (int)Cinv_c.size2() == number_of_all_targets );
-
-            assert( c_Cinv_c.size1() == c_Cinv_zs.size() );
-            assert( c_Cinv_c.size2() == c_Cinv_zs.size() );
 
 
             // Finally, print out the imputations
@@ -413,16 +410,18 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     auto && target = unk_its.at(i);
                     auto crps = target.get_chrpos();
                     auto SNPname = target.get_SNPname();
-                    auto imp_qual = c_Cinv_c(i,i);
-                    {
+
+                    auto imp_qual = [&](){ // multiply one vector by another, to directly get
+                                            // the diagonal of the imputation quality matrix.
+                                            // This should be quicker than fully computing
+                                            // c' * inv(C) * c
                         auto lhs = gsl_matrix_const_submatrix(     c.get(), i, 0, 1, number_of_tags);
                         auto rhs = gsl_matrix_const_submatrix(Cinv_c.get(), 0, i, number_of_tags, 1);
-
                         const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
                         assert(res_0 == 0);
+                        return to_store_one_imputation_quality(0,0);
+                    }();
 
-                        imp_qual = to_store_one_imputation_quality(0,0);
-                    }
                     (*out_stream_ptr)
                         << crps
                         << '\t' << c_Cinv_zs(i)
