@@ -194,10 +194,34 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
      && options:: opt_impute_snps.empty()
      )
         return false;
+
+    // You can't apply both
+    assert( options:: opt_impute_range.empty() != options:: opt_impute_snps.empty());
+
     assert(options:: opt_impute_snps.empty()); // not ready to handle this yet
 
-    if(options:: opt_impute_range == "chr2") {
-        return  it.get_chrpos().chr != 2;
+    if(!options:: opt_impute_range.empty()) {
+        // impute.range will either be an entire chromosome,
+        // or two locations seperated by a '-'
+
+        if(options:: opt_impute_range.find('-') == string:: npos) {
+            // no hyphen, it's just a chromosome name
+
+            char const * chromosome_name = options:: opt_impute_range.c_str();
+            if(     options:: opt_impute_range.substr(0,3) == "chr"
+                 || options:: opt_impute_range.substr(0,3) == "Chr" ) {
+                chromosome_name += 3; // skip over three characters
+            }
+            int chromosome_number = utils:: lexical_cast<int> (chromosome_name);
+
+            chrpos  lower_allowed{ chromosome_number, std::numeric_limits<int>::lowest() };
+            chrpos  upper_allowed{ chromosome_number, std::numeric_limits<int>::max()    };
+            return  !(  it.get_chrpos() >= lower_allowed
+                     && it.get_chrpos() <= upper_allowed    );
+        }
+        else {
+            assert(0);
+        }
     }
 
     assert(0);
