@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:aaronmcdaid/module-bits.and.pieces.git
 	branch = master
-	commit = f09041c41f677c4b0d50d3cc0df6bf4cd108afc2
-	parent = c9141e2ed8d279e4d484cbcc217d967b3c573e25
+	commit = a428cbda3e88ec816ded5b261c7a0c45b78eeefb
+	parent = 25a9501f306e1d915b6cf105b8e8e2440b88caa5
 	cmdver = 0.3.1
