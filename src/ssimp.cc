@@ -21,6 +21,7 @@
 #include "bits.and.pieces/PP.hh"
 #include "range/range_view.hh"
 #include "range/range_action.hh"
+#include "format/format.hh"
 
 namespace view = range:: view;
 namespace action = range:: action;
@@ -213,7 +214,9 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
     if(!options:: opt_impute_snps.empty()) {
         // --impute.snps was specified, so the file has been loaded into ...
         assert(!options:: opt_impute_snps_as_a_uset.empty());
-        return  options:: opt_impute_snps_as_a_uset.count( it.get_SNPname() ) == 0;
+        return  (   options:: opt_impute_snps_as_a_uset.count( it.get_SNPname() )
+                +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", it.get_chrpos().chr, it.get_chrpos().pos ) )
+                ) == 0;
     }
 
     if(!options:: opt_impute_range.empty()) {
