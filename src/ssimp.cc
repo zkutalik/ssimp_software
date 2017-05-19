@@ -189,6 +189,22 @@ using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
 static
+bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       const & it ) {
+    if( options:: opt_impute_range.empty()
+     && options:: opt_impute_snps.empty()
+     )
+        return false;
+    assert(options:: opt_impute_snps.empty()); // not ready to handle this yet
+
+    if(options:: opt_impute_range == "chr2") {
+        return  it.get_chrpos().chr != 2;
+    }
+
+    assert(0);
+    return false;
+}
+
+static
 void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                              , file_reading:: GwasFileHandle             gwas
                              ) {
@@ -335,10 +351,15 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 continue;
 
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
+            // But some SNPs will have to be dropped, depending on --impute.range and --impute.snps
             vector<chrpos>  SNPs_all_targets;
             vector<SNPiterator<GenotypeFileHandle>> unk_its;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
+
+                bool skip_this = decide_whether_to_skip_this_tag(it);
+                if(skip_this)
+                    continue;
 
                 auto const & z12_for_this_SNP = cache.lookup_one_ref_get_calls(it);
                 if (z12_for_this_SNP.empty()) {
