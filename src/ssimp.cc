@@ -406,6 +406,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         << crps
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
+                        << '\t' << target.get_allele_ref()
+                        << '\t' << target.get_allele_alt()
                         << endl;
             }
         }
