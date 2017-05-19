@@ -4,8 +4,8 @@
 ; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
 ;
 [subrepo]
-	remote = git@github.com:aaronmcdaid/module-bits.and.pieces.git
+	remote = git@github.com:aaronmcdaid/module-format.git
 	branch = master
-	commit = a428cbda3e88ec816ded5b261c7a0c45b78eeefb
-	parent = 25a9501f306e1d915b6cf105b8e8e2440b88caa5
+	commit = cef3376326e669d937e86f2df0725dfcffe7de05
+	parent = 073009556feb3cadec0f245d877087e3d2d0a325
 	cmdver = 0.3.1

@@ -8,6 +8,9 @@
 #include <iterator>
 #include <gsl/gsl_statistics_int.h>
 #include <gsl/gsl_vector.h>
+#include<gsl/gsl_blas.h>
+
+#include <gzstream.h>
 
 #include "options.hh"
 #include "file.reading.hh"
@@ -18,6 +21,7 @@
 #include "bits.and.pieces/PP.hh"
 #include "range/range_view.hh"
 #include "range/range_action.hh"
+#include "format/format.hh"
 
 namespace view = range:: view;
 namespace action = range:: action;
@@ -140,6 +144,16 @@ int main(int argc, char **argv) {
         DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
     }
 
+    if( !options:: opt_impute_snps.empty() ) {
+        gz:: igzstream f(options:: opt_impute_snps.c_str());
+        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_impute_snps << ']');
+        string one_SNPname_or_chrpos;
+        while(getline( f, one_SNPname_or_chrpos)) {
+            options:: opt_impute_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+        }
+        options:: opt_impute_snps_as_a_uset.empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
+    }
+
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         PP( options:: opt_raw_ref
           , options:: opt_gwas_filename
@@ -188,6 +202,79 @@ using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
 static
+bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       const & it ) {
+    if( options:: opt_impute_range.empty()
+     && options:: opt_impute_snps.empty()
+     )
+        return false;
+
+    // You can't apply both. Only one or the other:
+    assert( options:: opt_impute_range.empty() != options:: opt_impute_snps.empty());
+
+    if(!options:: opt_impute_snps.empty()) {
+        // --impute.snps was specified, so the file has been loaded into ...
+        assert(!options:: opt_impute_snps_as_a_uset.empty());
+        return  (   options:: opt_impute_snps_as_a_uset.count( it.get_SNPname() )
+                +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", it.get_chrpos().chr, it.get_chrpos().pos ) )
+                ) == 0;
+    }
+
+    if(!options:: opt_impute_range.empty()) {
+        // impute.range will either be an entire chromosome,
+        // or two locations seperated by a '-'
+
+        auto separated_by_hyphen = utils:: tokenize(options:: opt_impute_range, '-');
+
+        // remove any leading 'chr' or 'Chr'
+        for(auto &s : separated_by_hyphen) {
+            if(     s.substr(0,3) == "chr"
+                 || s.substr(0,3) == "Chr")
+                s = s.substr(3);
+        };
+
+        auto lambda_chrpos_text_to_object = [](string const &as_text, bool to_end_of_chromosome) {
+            auto separated_by_colon = utils:: tokenize(as_text,':');
+            chrpos position;
+            switch(separated_by_colon.size()) {
+                break; case 1: // no colon, just a chromosome
+                        position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
+                        position.pos = to_end_of_chromosome
+                                        ?  std:: numeric_limits<int>::max()
+                                        :  std:: numeric_limits<int>::lowest() ;
+                break; case 2:
+                        position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
+                        position.pos = utils:: lexical_cast<int>(separated_by_colon.at(1));
+                break; default:
+                        DIE("too many colons in [" << as_text << "]");
+            }
+            return position;
+        };
+
+        switch(separated_by_hyphen.size()) {
+            break; case 1:
+            {
+                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
+                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), true);
+                return  !(  it.get_chrpos() >= lower_allowed
+                         && it.get_chrpos() <= upper_allowed    );
+            }
+            break; case 2:
+            {
+                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
+                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
+                return  !(  it.get_chrpos() >= lower_allowed
+                         && it.get_chrpos() <= upper_allowed    );
+            }
+           break; default:
+                        DIE("too many hyphens in [" << options:: opt_impute_range << "]");
+        }
+    }
+
+    assert(0); // shouldn't get here
+    return false;
+}
+
+static
 void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                              , file_reading:: GwasFileHandle             gwas
                              ) {
@@ -203,6 +290,17 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
         out_stream_ptr = & cout;
     }
     assert(out_stream_ptr);
+    {   // print the header line
+                    (*out_stream_ptr)
+                        << "chr:pos"
+                        << '\t' << "z_imp"
+                        << '\t' << "SNPname"
+                        << '\t' << gwas->get_column_name_allele_ref() // copy column name from the GWAS input
+                        << '\t' << gwas->get_column_name_allele_alt() // copy column name from the GWAS input
+                        << '\t' << "impqual"
+                        << endl;
+    }
+
     auto const b_ref  = begin_from_file(ref_panel);
     auto const e_ref  =   end_from_file(ref_panel);
     auto const b_gwas = begin_from_file(gwas);
@@ -286,6 +384,13 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 vector<SNPiterator<GenotypeFileHandle>> one_tag_its;
                 for(; ! ref_candidates.empty(); ref_candidates.advance()) {
                     assert( ref_candidates.current_it().get_chrpos() == crps );
+
+                    // If there is more than one alt allele, we need to skip this,
+                    // *and* if there is no variation on the 012
+                    if(cache.lookup_one_ref_get_calls(ref_candidates.current_it()) .size() == 0) {
+                        continue;
+                    }
+
                     auto dir = decide_on_a_direction( ref_candidates.current_it()
                                          , tag_candidate .current_it() );
                     switch(dir) {
@@ -316,10 +421,15 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 continue;
 
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
+            // But some SNPs will have to be dropped, depending on --impute.range and --impute.snps
             vector<chrpos>  SNPs_all_targets;
             vector<SNPiterator<GenotypeFileHandle>> unk_its;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
+
+                bool skip_this = decide_whether_to_skip_this_tag(it);
+                if(skip_this)
+                    continue;
 
                 auto const & z12_for_this_SNP = cache.lookup_one_ref_get_calls(it);
                 if (z12_for_this_SNP.empty()) {
@@ -344,6 +454,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
             int  number_of_all_targets                          = unk_its.size();
 
+            if(number_of_all_targets == 0)
+                continue;
+
             cout
                 << '\n'
                 << "chrm" << chrm
@@ -364,8 +477,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
             static_assert( std:: is_same< vector<vector<int>> , decltype(genotypes_for_the_unks) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
 
+            assert(!genotypes_for_the_tags.empty());
+            assert(!genotypes_for_the_unks.empty());
+
             int const N_ref = genotypes_for_the_tags.at(0).size(); // the number of individuals
             assert(N_ref > 0);
+
 
             /*
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
@@ -378,25 +495,42 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                                                          , unk_its
                                                          , options:: opt_lambda
                                                          );
-            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
 
+            // Next two lines, are the imputation, and its quality
+            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
+            auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans(invert_a_matrix (C) , c);
+
+            assert( (int)Cinv_c.size1() == number_of_tags );
+            assert( (int)Cinv_c.size2() == number_of_all_targets );
 
 
             // Finally, print out the imputations
-            assert(number_of_all_targets == ssize(c_Cinv_zs));
+            assert(number_of_all_targets == ssize(unk_its));
+            mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
             for(int i=0; i<number_of_all_targets; ++i) {
-                auto crps = SNPs_all_targets.at(i);
-                auto it = map_chrpos_to_SNPname.find(crps);
-                assert(it != map_chrpos_to_SNPname.end());
-                while (it != map_chrpos_to_SNPname.end() && it->first == crps) {
-                    auto SNPname = it->second;
+                    auto && target = unk_its.at(i);
+                    auto crps = target.get_chrpos();
+                    auto SNPname = target.get_SNPname();
+
+                    auto imp_qual = [&](){ // multiply one vector by another, to directly get
+                                            // the diagonal of the imputation quality matrix.
+                                            // This should be quicker than fully computing
+                                            // c' * inv(C) * c
+                        auto lhs = gsl_matrix_const_submatrix(     c.get(), i, 0, 1, number_of_tags);
+                        auto rhs = gsl_matrix_const_submatrix(Cinv_c.get(), 0, i, number_of_tags, 1);
+                        const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
+                        assert(res_0 == 0);
+                        return to_store_one_imputation_quality(0,0);
+                    }();
+
                     (*out_stream_ptr)
                         << crps
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
+                        << '\t' << target.get_allele_ref()
+                        << '\t' << target.get_allele_alt()
+                        << '\t' << imp_qual
                         << endl;
-                    ++it;
-                }
             }
         }
     }
@@ -457,9 +591,15 @@ make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_th
             double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k).front(), 1
                                                    , &genotypes_for_the_tags.at(l).front(), 1
                                                    , N_ref );
-            if(c_kl > 1.0) { // sometimes it sneaks above one, don't really know how
+            if(c_kl > (1.0-1e-10)) { // sometimes it sneaks above one, don't really know how
                 assert(c_kl-1.0 < 1e-5);
+                assert(c_kl-1.0 >-1e-5);
                 c_kl = 1.0;
+            }
+            if(c_kl < (-1.0+1e-10)) { // in case it goes below -1.0 also
+                assert(c_kl+1.0 < 1e-5);
+                assert(c_kl+1.0 >-1e-5);
+                c_kl =-1.0;
             }
             assert(c_kl >= -1.0);
             assert(c_kl <=  1.0);
@@ -468,7 +608,6 @@ make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_th
                 C.set(k,l,c_kl);
             }
             else {
-                assert(c_kl <  1.0);
                 C.set(k,l,c_kl * (1.0-lambda));
             }
         }
@@ -524,9 +663,15 @@ mvn:: Matrix make_c_unkn_tags_matrix
                 double c_ku = gsl_stats_int_correlation( &calls_at_k.at(0), 1
                                                        , &calls_at_u.at(0), 1
                                                        , N_ref );
-                if(c_ku > 1.0) {
+                if(c_ku > (1.0-1e-10)) {
                     assert(c_ku-1.0 < 1e-5);
+                    assert(c_ku-1.0 >-1e-5);
                     c_ku = 1.0;
+                }
+                if(c_ku < (-1.0+1e-10)) {
+                    assert(c_ku+1.0 < 1e-5);
+                    assert(c_ku+1.0 >-1e-5);
+                    c_ku = -1.0;
                 }
 
                 if(tag_its_k.m_line_number == unk_its_u.m_line_number) {

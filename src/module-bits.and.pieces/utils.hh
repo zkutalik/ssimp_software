@@ -280,23 +280,14 @@ struct priority_tag : public priority_tag<i-1> {};
 template<>
 struct priority_tag<0> {};
 
-template<typename ...>
-struct and_all_impl;
-
-template<typename ...Ts>
+// and_all
+//auto and_all(void) = delete; // This seems to break gcc. Should consider a bug report
+template<typename T>
 constexpr
-auto and_all(Ts ...ts) { return and_all_impl<Ts...>::impl(ts...); }
-
-template<typename T0>
-struct and_all_impl<T0> {
-    static constexpr
-    T0  impl(T0 t0) { return t0; }
-};
+auto and_all(T t) { return t; }
 template<typename T0, typename T1, typename ...Ts>
-struct and_all_impl<T0, T1, Ts...> {
-    static constexpr
-    auto  impl(T0 t0, T1 t1, Ts ...ts) { return and_all(t0 && t1, ts...); }
-};
+constexpr
+auto and_all(T0 t0, T1 t1, Ts ...ts) { return and_all( t0&&t1, ts... ); }
 
 // This is my own 'apply', as it's officially only in c++17, not c++14
 namespace detail {
@@ -402,6 +393,82 @@ struct save_ostream_briefly {
     }
 };
 
+
+//   make_a_pack_and_apply_it(F&&f);
+namespace detail {
+    template<typename T, typename F, T ...Idxs>
+    decltype(auto) make_a_pack_and_apply_it(std:: integer_sequence<T, Idxs...>, F&&f) {
+        return std::forward<F>(f) ( std:: integral_constant<T, Idxs>{} ... );
+    }
+}
+template<size_t N, typename T, typename F>
+decltype(auto) make_a_pack_and_apply_it(F&&f) {
+    return  detail:: make_a_pack_and_apply_it<T>
+            (   std:: make_index_sequence<N>{}
+            ,   std::forward<F>(f)
+            );
+}
+
+template<char ... chars>
+struct char_pack {
+    constexpr static char   c_str0_[] =  {chars..., '\0'};
+
+    constexpr static size_t size()      { return sizeof...(chars); }
+    constexpr static char   const   (&c_str0(void)) [size()+1]     { return c_str0_; }
+    constexpr static char   at(size_t i)        { return c_str0_[i]; }
+    template<typename ...C>
+    constexpr static size_t find_first_of(C ... targets) {
+        for(size_t i=0; i<   1+ size(); ++i) {
+            if( !utils:: and_all( at(i) != targets ... ))
+                return i;
+        }
+        return -1;
+    }
+    template<size_t l>
+    constexpr static auto   substr(void) {
+        return
+        make_a_pack_and_apply_it<l, size_t>([](auto ... idxs) {
+            return utils:: char_pack< char_pack:: at(idxs) ... >{};
+        });
+    }
+    template<size_t b, size_t e>
+    constexpr static auto   substr(void) {
+        static_assert( e>=b ,"");
+        return
+        make_a_pack_and_apply_it<e-b, size_t>([](auto ... idxs) {
+            return utils:: char_pack< char_pack:: at(b+idxs) ... >{};
+        });
+    }
+};
+template<char ... chars>
+constexpr char   char_pack<chars...>:: c_str0_[];
+
+template<typename T, T c>
+struct compile_time_constant_as_a_type {
+    constexpr
+    bool    operator==  (T other)   const   {   return c == other; }
+
+    constexpr
+    operator T  ()                  const   {   return c; }
+};
+
+template<typename T, T c>
+constexpr compile_time_constant_as_a_type<T, c>     cx_val  = {}; // Consider using my own type here instead of integral_constant?
+
+template<typename T, T c1, T c2>
+constexpr
+auto    operator+   (   compile_time_constant_as_a_type<T,c1>
+                    ,   compile_time_constant_as_a_type<T,c2>   )
+{
+    return cx_val<T, c1+c2>;
+}
+template<typename T, T c1, T c2>
+constexpr
+auto    operator==  (   compile_time_constant_as_a_type<T,c1>
+                    ,   compile_time_constant_as_a_type<T,c2>   )
+{
+    return cx_val<bool, c1==c2>;
+}
 
 } // namespace utils
 
