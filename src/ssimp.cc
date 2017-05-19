@@ -484,7 +484,6 @@ make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_th
                 C.set(k,l,c_kl);
             }
             else {
-                assert(c_kl <  1.0);
                 C.set(k,l,c_kl * (1.0-lambda));
             }
         }
