@@ -28,6 +28,12 @@ struct chrpos {
     bool operator!=(chrpos const & other) const {
         return !(*this == other);
     }
+    bool operator<=(chrpos const & other) const {
+        return !(*this > other);
+    }
+    bool operator>=(chrpos const & other) const {
+        return !(*this < other);
+    }
 };
 } // end that namespace, in order to define std:: hash
 
