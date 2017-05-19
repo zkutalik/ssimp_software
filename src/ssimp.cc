@@ -8,6 +8,8 @@
 #include <iterator>
 #include <gsl/gsl_statistics_int.h>
 #include <gsl/gsl_vector.h>
+#include<gsl/gsl_linalg.h>
+#include<gsl/gsl_blas.h>
 
 #include "options.hh"
 #include "file.reading.hh"
@@ -394,7 +396,11 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                                                          );
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
 
+            auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans(invert_a_matrix (C) , c);
             auto c_Cinv_c  = c * mvn:: multiply_NoTrans_Trans(invert_a_matrix (C) , c); // only interested in the diagonal, is there a better way?
+
+            assert( (int)Cinv_c.size1() == number_of_tags );
+            assert( (int)Cinv_c.size2() == number_of_all_targets );
 
             assert( c_Cinv_c.size1() == c_Cinv_zs.size() );
             assert( c_Cinv_c.size2() == c_Cinv_zs.size() );
@@ -402,17 +408,28 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // Finally, print out the imputations
             assert(number_of_all_targets == ssize(unk_its));
+            mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
             for(int i=0; i<number_of_all_targets; ++i) {
                     auto && target = unk_its.at(i);
                     auto crps = target.get_chrpos();
                     auto SNPname = target.get_SNPname();
+                    auto imp_qual = c_Cinv_c(i,i);
+                    {
+                        auto lhs = gsl_matrix_const_submatrix(     c.get(), i, 0, 1, number_of_tags);
+                        auto rhs = gsl_matrix_const_submatrix(Cinv_c.get(), 0, i, number_of_tags, 1);
+
+                        const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
+                        assert(res_0 == 0);
+
+                        imp_qual = to_store_one_imputation_quality(0,0);
+                    }
                     (*out_stream_ptr)
                         << crps
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
                         << '\t' << target.get_allele_ref()
                         << '\t' << target.get_allele_alt()
-                        << '\t' << c_Cinv_c(i,i)
+                        << '\t' << imp_qual
                         << endl;
             }
         }
