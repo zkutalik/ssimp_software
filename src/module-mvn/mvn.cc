@@ -455,7 +455,7 @@ Matrix		operator* (const Matrix &lhs, const       Matrix &rhs) {
 	assert(res_0 == 0);
 	return answer;
 }
-Matrix		muliply_NoTrans_Trans (const SquareMatrix &lhs, const Matrix &rhs) {
+Matrix		multiply_NoTrans_Trans (const SquareMatrix &lhs, const Matrix &rhs) {
 	const size_t D1 = lhs.size1();
 	const size_t D2 = lhs.size2();
 	const size_t D3 = rhs.size2();

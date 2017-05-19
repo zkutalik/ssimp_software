@@ -132,7 +132,7 @@ namespace mvn {
 
 	Matrix operator*(const Matrix &lhs, const SquareMatrix &rhs);
 	Matrix operator*(const Matrix &lhs, const       Matrix &rhs);
-    Matrix		muliply_NoTrans_Trans (const SquareMatrix &lhs, const Matrix &rhs);
+    Matrix		multiply_NoTrans_Trans (const SquareMatrix &lhs, const Matrix &rhs);
 
 
 bool veccol_is_close_to_zero(const VecCol &x);
