@@ -950,18 +950,20 @@ vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeF
     assert(!pv.second.empty());
 
     auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
-    int fst_max = *max_element(pv.first .begin(), pv.first .end());
-    int snd_max = *max_element(pv.second.begin(), pv.second.end());
-    if(fst_max>1 || snd_max>1) {
-        assert(has_more_than_one_alt_allele);
+    if(has_more_than_one_alt_allele) { // TODO: return NAs instead, and try to compute correlation accordingly
         return {};
     }
+
+    assert(!has_more_than_one_alt_allele);
+    int fst_max = *max_element(pv.first .begin(), pv.first .end());
+    int snd_max = *max_element(pv.second.begin(), pv.second.end());
+    ((fst_max | 1) == 1) || DIE("Too many alleles? I didn't see any ',' in [" << it.get_allele_alt() << "], fst_max=" << fst_max);
+    ((snd_max | 1) == 1) || DIE("Too many alleles? I didn't see any ',' in [" << it.get_allele_alt() << "], snd_max=" << snd_max);
 
     assert(fst_max <= 1);
     assert(snd_max <= 1);
 
     assert(pv.first.size() == pv.second.size());
-    assert(!has_more_than_one_alt_allele);
 
     int const N = pv.first.size();
 
@@ -971,10 +973,16 @@ vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeF
     }
 
     auto max_z12 = *max_element(z12.begin(), z12.end());
+    auto min_z12 = *min_element(z12.begin(), z12.end());
     assert(max_z12 == 2
             || max_z12 == 1
             || max_z12 == 0
             );
+
+    if(max_z12 == min_z12) {
+        // no variation at this SNP. Can't be used
+        return {};
+    }
 
     return z12;
 }

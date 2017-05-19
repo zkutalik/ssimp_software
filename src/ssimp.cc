@@ -286,6 +286,13 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 vector<SNPiterator<GenotypeFileHandle>> one_tag_its;
                 for(; ! ref_candidates.empty(); ref_candidates.advance()) {
                     assert( ref_candidates.current_it().get_chrpos() == crps );
+
+                    // If there is more than one alt allele, we need to skip this,
+                    // *and* if there is no variation on the 012
+                    if(cache.lookup_one_ref_get_calls(ref_candidates.current_it()) .size() == 0) {
+                        continue;
+                    }
+
                     auto dir = decide_on_a_direction( ref_candidates.current_it()
                                          , tag_candidate .current_it() );
                     switch(dir) {
