@@ -83,6 +83,8 @@ struct Effects_I : public AnyFile_I {
     virtual void        set_chrpos         (int, chrpos)  = 0; // so that we can fill them in from the ref data
     virtual void        sort_my_entries    ()             = 0;
     virtual double      get_z              (int) const    = 0;
+    virtual std::string get_column_name_allele_ref () const       = 0;
+    virtual std::string get_column_name_allele_alt () const       = 0;
 };
 
 using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;

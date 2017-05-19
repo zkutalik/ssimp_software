@@ -771,6 +771,7 @@ struct SimpleGwasFile : public file_reading:: Effects_I
     vector<GwasLineSummary> m_each_SNP_and_its_z;
     string                  m_underlying_file_name;
     char                    m_delimiter;
+    header_details          m_header_details;
 
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_z.size();
@@ -803,6 +804,8 @@ struct SimpleGwasFile : public file_reading:: Effects_I
         assert(existing.m_chrpos.pos == -1);
         existing.m_chrpos = crps;
     }
+    virtual std::string get_column_name_allele_ref () const  { return m_header_details.allele_ref.m_name; }
+    virtual std::string get_column_name_allele_alt () const  { return m_header_details.allele_alt.m_name; }
     virtual void        sort_my_entries   () {
         sort( m_each_SNP_and_its_z.begin()
             , m_each_SNP_and_its_z.end()
@@ -840,6 +843,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
     auto p = std:: make_shared<SimpleGwasFile>();
     p->m_underlying_file_name = file_name;
     p->m_delimiter            = hd.m_delimiter;
+    p->m_header_details       = hd;
 
     while(1) {
         GwasLineSummary gls;

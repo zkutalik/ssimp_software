@@ -204,6 +204,17 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
         out_stream_ptr = & cout;
     }
     assert(out_stream_ptr);
+    {   // print the header line
+                    (*out_stream_ptr)
+                        << "chr:pos"
+                        << '\t' << "z_imp"
+                        << '\t' << "SNPname"
+                        << '\t' << gwas->get_column_name_allele_ref() // copy column name from the GWAS input
+                        << '\t' << gwas->get_column_name_allele_alt() // copy column name from the GWAS input
+                        << '\t' << "impqual"
+                        << endl;
+    }
+
     auto const b_ref  = begin_from_file(ref_panel);
     auto const e_ref  =   end_from_file(ref_panel);
     auto const b_gwas = begin_from_file(gwas);
