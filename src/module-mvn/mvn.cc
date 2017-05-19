@@ -434,11 +434,36 @@ SquareMatrix		cholesky_upper(SquareMatrix thematrix) {
 Matrix		operator* (const Matrix &lhs, const SquareMatrix &rhs) {
 	const size_t D1 = lhs.size1();
 	const size_t D2 = lhs.size2();
-	const size_t D3 = rhs.size();
-	assert(D2 == rhs.size());
+	const size_t D3 = rhs.size1();
+	const size_t D4 = rhs.size2();
+	assert(D2 == D3);
 
-	Matrix answer(D1, D3);
+	Matrix answer(D1, D4);
 	const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, lhs.get(), rhs.get(), 0, answer.get());
+	assert(res_0 == 0);
+	return answer;
+}
+Matrix		operator* (const Matrix &lhs, const       Matrix &rhs) {
+	const size_t D1 = lhs.size1();
+	const size_t D2 = lhs.size2();
+	const size_t D3 = rhs.size1();
+	const size_t D4 = rhs.size2();
+	assert(D2 == D3);
+
+	Matrix answer(D1, D4);
+	const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, lhs.get(), rhs.get(), 0, answer.get());
+	assert(res_0 == 0);
+	return answer;
+}
+Matrix		muliply_NoTrans_Trans (const SquareMatrix &lhs, const Matrix &rhs) {
+	const size_t D1 = lhs.size1();
+	const size_t D2 = lhs.size2();
+	const size_t D3 = rhs.size2();
+	const size_t D4 = rhs.size1();
+	assert(D2 == D3);
+
+	Matrix answer(D1, D4);
+	const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasTrans, 1.0, lhs.get(), rhs.get(), 0, answer.get());
 	assert(res_0 == 0);
 	return answer;
 }
