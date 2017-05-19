@@ -213,13 +213,15 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
                 s = s.substr(3);
         };
 
-        auto lambda_chrpos_text_to_object = [](string const &as_text) {
+        auto lambda_chrpos_text_to_object = [](string const &as_text, bool to_end_of_chromosome) {
             auto separated_by_colon = utils:: tokenize(as_text,':');
             chrpos position;
             switch(separated_by_colon.size()) {
                 break; case 1: // no colon, just a chromosome
                         position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
-                        position.pos = std:: numeric_limits<int>::lowest();
+                        position.pos = to_end_of_chromosome
+                                        ?  std:: numeric_limits<int>::max()
+                                        :  std:: numeric_limits<int>::lowest() ;
                 break; case 2:
                         position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
                         position.pos = utils:: lexical_cast<int>(separated_by_colon.at(1));
@@ -232,15 +234,15 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
         switch(separated_by_hyphen.size()) {
             break; case 1:
             {
-                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str());
-                chrpos  upper_allowed{ lower_allowed.chr, std::numeric_limits<int>::max()    };
+                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
+                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), true);
                 return  !(  it.get_chrpos() >= lower_allowed
                          && it.get_chrpos() <= upper_allowed    );
             }
             break; case 2:
             {
-                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str());
-                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str());
+                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
+                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
                 return  !(  it.get_chrpos() >= lower_allowed
                          && it.get_chrpos() <= upper_allowed    );
             }
