@@ -22,6 +22,7 @@
     export SSIMP=bin/ssimp
     export   REF=ref
     export  GWAS=gwas
+    export COMMANDDIR="tests/${testname}"
     export OUTPUT="tests/${testname}"/output.actual.tmp
     export OUT_IMPUTATIONS="tests/${testname}"/imputations.txt
     export FORCE_THOUSANDS_SEPARATOR="'"
