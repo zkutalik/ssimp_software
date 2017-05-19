@@ -3,6 +3,7 @@
     tests/test0/output.actual
     tests/test0/gz/output.actual
     tests/test0/vcfGTz/output.actual
+    tests/3.chromosomes/UKB.every100/imputations.txt
 ;
 
 @test.data.to.be.made.by.stu
