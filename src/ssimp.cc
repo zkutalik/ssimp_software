@@ -394,8 +394,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                                                          );
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
 
-            mvn:: Matrix        Cinv_c    = mvn:: muliply_NoTrans_Trans(invert_a_matrix (C) , c);
-            auto                c_Cinv_c  = c * Cinv_c;
+            auto c_Cinv_c  = c * mvn:: muliply_NoTrans_Trans(invert_a_matrix (C) , c);
 
             assert( c_Cinv_c.size1() == c_Cinv_zs.size() );
             assert( c_Cinv_c.size2() == c_Cinv_zs.size() );
