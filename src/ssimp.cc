@@ -229,18 +229,27 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
             return position;
         };
 
-        if(separated_by_hyphen.size()==1) {
-            chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str());
-            chrpos  upper_allowed{ lower_allowed.chr, std::numeric_limits<int>::max()    };
-            return  !(  it.get_chrpos() >= lower_allowed
-                     && it.get_chrpos() <= upper_allowed    );
-        }
-        else {
-            assert(0);
+        switch(separated_by_hyphen.size()) {
+            break; case 1:
+            {
+                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str());
+                chrpos  upper_allowed{ lower_allowed.chr, std::numeric_limits<int>::max()    };
+                return  !(  it.get_chrpos() >= lower_allowed
+                         && it.get_chrpos() <= upper_allowed    );
+            }
+            break; case 2:
+            {
+                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str());
+                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str());
+                return  !(  it.get_chrpos() >= lower_allowed
+                         && it.get_chrpos() <= upper_allowed    );
+            }
+           break; default:
+                        DIE("too many hyphens in [" << options:: opt_impute_range << "]");
         }
     }
 
-    assert(0);
+    assert(0); // shouldn't get here
     return false;
 }
 
