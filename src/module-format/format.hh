@@ -84,6 +84,7 @@ namespace format {
         }
     };
 
+    inline
     std:: pair<string_view, string_view>  consume_simple(string_view all)     {
         /* Consume one of four things:
          *  - literal '{{', representing a single '{'
@@ -366,6 +367,7 @@ namespace format {
         return std:: make_pair( formatter<decltype(head)>{}, tail);
     }
 
+    inline
     auto parse_many_things(utils:: char_pack<>) {
         return std:: make_tuple();
     }
