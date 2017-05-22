@@ -23,6 +23,8 @@
 #include "range/range_action.hh"
 #include "format/format.hh"
 
+#include "file.reading.vcfgztbi.hh"
+
 namespace view = range:: view;
 namespace action = range:: action;
 
@@ -312,6 +314,11 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
     auto const map_chrpos_to_SNPname           = ssimp:: make_map_chrpos_to_SNPname( ref_panel );
 
+    tbi:: read_vcf_with_tbi ref_vcf {
+        "ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz"
+        //options:: opt_raw_ref
+    };
+
     for(int chrm =  1; chrm <= 22; ++chrm) {
         file_reading:: CacheOfRefPanelData cache(ref_panel);;
 
@@ -349,6 +356,62 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
             auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
+
+            struct RefRecord {
+                int     pos;
+                string  ID;
+                string  ref;
+                string  alt;
+                vector<int> z12;
+            };
+
+            vector<RefRecord>   all_nearby_ref_data;
+            {   // Read in all the reference panel data in this broad window, but bi-allele SNPs.
+                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
+                                    ,   chrpos{chrm,current_window_end   + options:: opt_flanking_width}
+                                    );
+                VcfRecord record;
+                int N = -1; // just to verify it is constant
+                while(ref_vcf.reader.readRecord(record)) {
+                    RefRecord rr;
+                    rr.pos      =   record.get1BasedPosition();
+                    rr.ID       =   record.getIDStr();
+                    rr.ref      =   record.getRefStr();
+                    rr.alt      =   record.getAltStr();
+                    assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
+                    assert(record.hasAllGenotypeAlleles());
+                    if(N==-1) {
+                        N = record.getNumSamples();
+                    }
+                    assert(N == record.getNumSamples());
+                    for(int i=0;i<N;++i) {
+                        assert(2==record.getNumGTs(i));
+                        int l = record.getGT(i, 0);
+                        int r = record.getGT(i, 1);
+                        assert((l | 1) == 1);
+                        assert((r | 1) == 1);
+                        rr.z12.push_back(l+r);
+                    }
+                    assert(N == ssize(rr.z12));
+
+                    all_nearby_ref_data.push_back(rr);
+
+                    if(0)
+                    PP( record.getChromStr()
+                      , record.get1BasedPosition()
+                      , record.getIDStr()
+                      , record.getNumSamples()         // TODO: Check this is constant?
+                      , record.hasAllGenotypeAlleles() // TODO: Should always be true?
+                      );
+
+                }
+
+                for(int o=0; o+1 < ssize(all_nearby_ref_data); ++o) { // check position is monotonic
+                    assert(all_nearby_ref_data.at(o).pos <= all_nearby_ref_data.at(o+1).pos);
+                    assert(all_nearby_ref_data.at(o).pos <  all_nearby_ref_data.at(o+1).pos); // TODO: remove this, after making sure it breaks somewhere!
+                }
+            }
+            PP(all_nearby_ref_data.size());
 
             // Check if the current target window is past the end of the chromosome, in which case
             // we 'break' out in order to allow it to finish this chromosome and move onto
