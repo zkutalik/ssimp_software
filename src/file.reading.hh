@@ -1,3 +1,6 @@
+#ifndef HH_FILE_READING_HH
+#define HH_FILE_READING_HH
+
 #include <vector>
 #include <string>
 #include <memory>
@@ -184,3 +187,4 @@ public:
 };
 
 } // namespace file_reading
+#endif
