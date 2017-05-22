@@ -7,9 +7,11 @@
     bin/o/ssimp.o
     bin/o/options.o
     bin/o/file.reading.o
+    bin/o/file.reading.vcfgztbi.o
     bin/o/mvn/mvn.o
     bin/o/gz/gzstream/gzstream.o
     bin/o/zlib-vector-of-char/zlib-vector.o
+    src/libStatGen/libStatGen.a # I need to think of a rule to automatically build this - must talk to the author about including her code
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
     echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
@@ -17,9 +19,11 @@
         bin/o/options.o \
         bin/o/ssimp.o \
         bin/o/file.reading.o \
+        bin/o/file.reading.vcfgztbi.o \
         bin/o/mvn/mvn.o \
         bin/o/gz/gzstream/gzstream.o \
         bin/o/zlib-vector-of-char/zlib-vector.o \
+        src/libStatGen/libStatGen.a \
         ${LD_FLAGS}               \
     -o bin/ssimp
 }
