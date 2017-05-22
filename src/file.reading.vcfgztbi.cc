@@ -1,5 +1,4 @@
-
-#include "libStatGen/include/VcfFileReader.h"
+#include"file.reading.vcfgztbi.hh"
 
 #include "bits.and.pieces/utils.hh"
 #include "bits.and.pieces/PP.hh"
@@ -9,7 +8,10 @@ void first_attempt_at_vcfgztbi_file() {
     VcfHeader header;
 
     // reader.open will throw if the file doesn't exist
-    auto ret = reader.open("/data/sgg/aaron/shared/ref_panels/1kg/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz", header);
+    auto ret = reader.open(
+            "ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz"
+            //"/data/sgg/aaron/shared/ref_panels/1kg/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
+            , header);
 
     auto ret2 = reader.readVcfIndex(); // should find the .tbi file nearby
 
@@ -46,5 +48,4 @@ void first_attempt_at_vcfgztbi_file() {
         PP(reader.getNumKeptRecords());
         PP(reader.getTotalReadRecords());
     reader.close();
-    exit(0);
 }
