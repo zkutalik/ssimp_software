@@ -485,7 +485,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             // But some SNPs will have to be dropped, depending on --impute.range and --impute.snps
-            vector<chrpos>  SNPs_all_targets;
             vector<SNPiterator<GenotypeFileHandle>> unk_its;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
@@ -506,7 +505,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     continue;   // no variation in the allele counts for this SNP within
                                 //the ref panel, therefore useless for imputation
                 }
-                SNPs_all_targets.push_back( it.get_chrpos() );
                 unk_its         .push_back( it              );
             }
 
