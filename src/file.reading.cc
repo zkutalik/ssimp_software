@@ -146,8 +146,6 @@ static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 static
 char   decide_delimiter( string      const & header_line );
-static
-vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it);
 
 using call_type = std::pair<uint8_t,uint8_t>;
 struct OneLineSummary {
@@ -887,110 +885,6 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
     /* Note: Sort them by position here */
 
     return p;
-}
-vector<int> CacheOfRefPanelData :: lookup_one_chr_pos(chrpos crps) {
-
-    if(m_cache_of_z12.count(crps) == 1) {
-        return m_cache_of_z12[crps];
-    }
-
-    auto const b_ref  = begin_from_file(m_rfh);
-    auto const e_ref  =   end_from_file(m_rfh);
-    auto const    it  = std:: lower_bound(b_ref, e_ref, crps);
-    assert(it.get_chrpos() == crps);
-    auto pv = it.get_calls();
-    assert(!pv.first.empty());
-    assert(!pv.second.empty());
-
-    auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
-    int fst_max = *max_element(pv.first .begin(), pv.first .end());
-    int snd_max = *max_element(pv.second.begin(), pv.second.end());
-    if(fst_max>1 || snd_max>1) {
-        assert(has_more_than_one_alt_allele);
-        return {};
-    }
-
-    assert(fst_max <= 1);
-    assert(snd_max <= 1);
-
-    assert(pv.first.size() == pv.second.size());
-    assert(!has_more_than_one_alt_allele);
-
-    int const N = pv.first.size();
-
-    vector<int> z12;
-    for(int i=0; i<N; ++i) {
-        z12.push_back( pv.first.at(i) + pv.second.at(i) );
-    }
-
-    auto max_z12 = *max_element(z12.begin(), z12.end());
-    assert(max_z12 == 2
-            || max_z12 == 1
-            || max_z12 == 0
-            );
-
-    assert(m_cache_of_z12.count(crps) == 0);
-    m_cache_of_z12[crps] = z12;
-    assert(m_cache_of_z12.count(crps) == 1);
-    return lookup_one_chr_pos(crps);
-}
-vector<int> CacheOfRefPanelData:: lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
-    auto cache_key = it.m_line_number;
-    if(        m_cache_of_z12_line_number.count(cache_key)==1) {
-        return m_cache_of_z12_line_number.at(cache_key);
-    }
-
-
-    m_cache_of_z12_line_number.insert(
-                make_pair(cache_key, actual_lookup_one_ref_get_calls(it))
-            );
-
-    assert(m_cache_of_z12_line_number.count(cache_key)==1);
-    return lookup_one_ref_get_calls(it);
-}
-static
-vector<int>                actual_lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it) {
-
-    auto pv = it.get_calls();
-    assert(!pv.first.empty());
-    assert(!pv.second.empty());
-
-    auto has_more_than_one_alt_allele = it.get_allele_alt().find(',') != std::string::npos;
-    if(has_more_than_one_alt_allele) { // TODO: return NAs instead, and try to compute correlation accordingly
-        return {};
-    }
-
-    assert(!has_more_than_one_alt_allele);
-    int fst_max = *max_element(pv.first .begin(), pv.first .end());
-    int snd_max = *max_element(pv.second.begin(), pv.second.end());
-    ((fst_max | 1) == 1) || DIE("Too many alleles? I didn't see any ',' in [" << it.get_allele_alt() << "], fst_max=" << fst_max);
-    ((snd_max | 1) == 1) || DIE("Too many alleles? I didn't see any ',' in [" << it.get_allele_alt() << "], snd_max=" << snd_max);
-
-    assert(fst_max <= 1);
-    assert(snd_max <= 1);
-
-    assert(pv.first.size() == pv.second.size());
-
-    int const N = pv.first.size();
-
-    vector<int> z12;
-    for(int i=0; i<N; ++i) {
-        z12.push_back( pv.first.at(i) + pv.second.at(i) );
-    }
-
-    auto max_z12 = *max_element(z12.begin(), z12.end());
-    auto min_z12 = *min_element(z12.begin(), z12.end());
-    assert(max_z12 == 2
-            || max_z12 == 1
-            || max_z12 == 0
-            );
-
-    if(max_z12 == min_z12) {
-        // no variation at this SNP. Can't be used
-        return {};
-    }
-
-    return z12;
 }
 
 } // namespace file_reading

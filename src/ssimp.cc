@@ -64,9 +64,6 @@ static
 std:: unordered_map<string, chrpos>
             map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 static
-std:: unordered_multimap<chrpos, string>
-            make_map_chrpos_to_SNPname( file_reading:: GenotypeFileHandle raw_ref_file);
-static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix(
                     vector<vector<int>>              const & genotypes_for_the_tags
@@ -332,15 +329,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
       ,options:: opt_flanking_width
             );
 
-    auto const map_chrpos_to_SNPname           = ssimp:: make_map_chrpos_to_SNPname( ref_panel );
-
     tbi:: read_vcf_with_tbi ref_vcf {
         "ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz"
         //options:: opt_raw_ref
     };
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
-        file_reading:: CacheOfRefPanelData cache(ref_panel);;
 
         // First, find the begin and end of this chromosome
         auto c_begin = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::lowest() });
@@ -637,17 +631,6 @@ std:: unordered_map<string, chrpos>
             continue;
         auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
         rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
-    }
-    return m;
-}
-static
-std:: unordered_multimap<chrpos, string>
-            make_map_chrpos_to_SNPname( file_reading:: GenotypeFileHandle raw_ref_file ) {
-    auto       b = begin_from_file(raw_ref_file);
-    auto const e =   end_from_file(raw_ref_file);
-    std:: unordered_multimap<chrpos, string> m;
-    for(;b<e; ++b) {
-        m.insert( std:: make_pair(b.get_chrpos(), b.get_SNPname()) );
     }
     return m;
 }

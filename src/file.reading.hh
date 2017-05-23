@@ -173,18 +173,5 @@ GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name);
 GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name);
 void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas, std:: unordered_map<std:: string, file_reading:: chrpos> const & m );
 
-struct CacheOfRefPanelData {
-private:
-    GenotypeFileHandle m_rfh;
-    std:: unordered_map< chrpos , std::vector<int> > m_cache_of_z12;
-    std:: unordered_map< int    , std::vector<int> > m_cache_of_z12_line_number;
-
-public:
-                                    CacheOfRefPanelData     (GenotypeFileHandle rfh) : m_rfh(rfh) {}
-
-    std::vector<int>                lookup_one_chr_pos      (chrpos crps);
-    std:: vector<int>               lookup_one_ref_get_calls(SNPiterator<GenotypeFileHandle> it);
-};
-
 } // namespace file_reading
 #endif
