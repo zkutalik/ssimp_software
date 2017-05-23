@@ -1,9 +1,8 @@
-options:: opt_raw_ref,options:: opt_gwas_filename,options:: opt_window_width:	ref/compressed/TWINSUK.every100thRS.chrm123.100people.vcfGTz , gwas/UKB.parental.lifespan.every100thSNP.txt , 300'000
+options:: opt_raw_ref,options:: opt_gwas_filename,options:: opt_window_width:	ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz , gwas/UKB.parental.lifespan.every100thSNP.txt , 300'000
 file_name:gwas/UKB.parental.lifespan.every100thSNP.txt
 
-raw_ref_file->number_of_snps():40'059
 gwas->number_of_snps():7'353
-number_of_GWASsnps_with_unknown_position:5'806
+number_of_GWASsnps_with_unknown_position:7'353
 
 options:: opt_window_width,options:: opt_flanking_width:	300'000 , 250'000
 

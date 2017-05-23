@@ -1,9 +1,8 @@
-options:: opt_raw_ref,options:: opt_gwas_filename,options:: opt_window_width:	ref/compressed/small.vcf.sample.vcfGTz , gwas/small.UKBB.both.csv.gz , 300'000
+options:: opt_raw_ref,options:: opt_gwas_filename,options:: opt_window_width:	ref/tbi/small.vcf.sample.vcf.gz , gwas/small.UKBB.both.csv.gz , 300'000
 file_name:gwas/small.UKBB.both.csv.gz
 
-raw_ref_file->number_of_snps():9'747
 gwas->number_of_snps():49
-number_of_GWASsnps_with_unknown_position:45
+number_of_GWASsnps_with_unknown_position:49
 
 options:: opt_window_width,options:: opt_flanking_width:	300'000 , 250'000
 
