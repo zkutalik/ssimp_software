@@ -53,6 +53,9 @@ using utils:: stdget1;
 
 namespace ssimp {
 // Some forward declarations
+
+struct RefRecord;
+
 static
 void impute_all_the_regions( file_reading:: GenotypeFileHandle         raw_ref_file
                              , file_reading:: GwasFileHandle             gwas
@@ -100,6 +103,22 @@ static
     ( SNPiterator<GenotypeFileHandle> const & //r
     , SNPiterator<GwasFileHandle>     const & //g
     );
+
+struct RefRecord {
+    int     pos;
+    string  ID;
+    string  ref;
+    string  alt;
+    vector<int> z12;
+
+    bool operator< (file_reading:: chrpos crps) const {
+        return pos < crps.pos;
+    }
+};
+bool operator<( file_reading:: chrpos const & crps, RefRecord const & rr) {
+    return crps.pos < rr.pos;
+}
+
 } // namespace ssimp
 
 static
@@ -361,18 +380,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
             auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
-
-            struct RefRecord {
-                int     pos;
-                string  ID;
-                string  ref;
-                string  alt;
-                vector<int> z12;
-
-                bool operator< (file_reading:: chrpos crps) {
-                                                                    return pos < crps.pos;
-                                                                }
-            };
 
             vector<RefRecord>   all_nearby_ref_data;
             {   // Read in all the reference panel data in this broad window, but bi-allele SNPs.
