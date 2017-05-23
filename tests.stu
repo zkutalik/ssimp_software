@@ -10,8 +10,6 @@
 ;
 
 @test.data.to.be.made.by.stu :
-    ref/compressed/small.vcf.sample.vcfGTz
-    ref/compressed/TWINSUK.every100thRS.chrm123.100people.vcfGTz
     ref/tbi/small.vcf.sample.vcf.gz.tbi
     ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz.tbi
 ;
