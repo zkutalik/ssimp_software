@@ -320,8 +320,6 @@ void impute_all_the_regions(   string                                   filename
                         << endl;
     }
 
-    auto const b_gwas = begin_from_file(gwas);
-    auto const e_gwas =   end_from_file(gwas);
 
     PP(options:: opt_window_width
       ,options:: opt_flanking_width
@@ -335,9 +333,6 @@ void impute_all_the_regions(   string                                   filename
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
-        // Find the range of GWAS entries on this chromosome
-        auto const c_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::lowest() });
-        auto const c_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::max()    });
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
@@ -358,19 +353,12 @@ void impute_all_the_regions(   string                                   filename
              *  three ranges.
              */
 
-            auto w_gwas_begin = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
-            auto w_gwas_end   = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
-
             // Are we finished with this chromosome?
-            if(w_gwas_begin == c_gwas_end) {
-                // No tags here, nor in the remainder of this chromosome
-                break; // break out of this loop over windows, to allow it to go to the next chromosome
-            }
-
             vector<RefRecord>   all_nearby_ref_data;
+            bool not_the_last_window = false;
             {   // Read in all the reference panel data in this broad window, but bi-allele SNPs.
                 ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
-                                    ,   chrpos{chrm,current_window_end   + options:: opt_flanking_width}
+                                    ,   chrpos{chrm,std::numeric_limits<int>::max()                    } // in theory, to the end of the chromosome. See a few lines below
                                     );
                 VcfRecord record;
                 int N = -1; // just to verify it is constant
@@ -378,6 +366,14 @@ void impute_all_the_regions(   string                                   filename
                     RefRecord rr;
                     rr.pos      =   record.get1BasedPosition();
                     rr.ID       =   record.getIDStr();
+                    /*
+                     * if the position is beyond the current wide window, it means
+                     * this is *not* the last window
+                     */
+                    if(rr.pos   >= current_window_end   + options:: opt_flanking_width) {
+                        not_the_last_window = true;
+                        break;
+                    }
                     rr.ref      =   record.getRefStr();
                     rr.alt      =   record.getAltStr();
                     assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
@@ -398,14 +394,6 @@ void impute_all_the_regions(   string                                   filename
 
                     all_nearby_ref_data.push_back(rr);
 
-                    if(0)
-                    PP( record.getChromStr()
-                      , record.get1BasedPosition()
-                      , record.getIDStr()
-                      , record.getNumSamples()         // TODO: Check this is constant?
-                      , record.hasAllGenotypeAlleles() // TODO: Should always be true?
-                      );
-
                 }
 
                 for(int o=0; o+1 < ssize(all_nearby_ref_data); ++o) { // check position is monotonic
@@ -414,10 +402,22 @@ void impute_all_the_regions(   string                                   filename
                 }
             }
 
+            if(all_nearby_ref_data.empty() && !not_the_last_window) {
+                // No more reference panel data, therefore no tags, therefore end of chromosome
+                break;
+            }
+
             if(all_nearby_ref_data.empty()) {
                 // no tags
                 continue;
             }
+
+            auto const b_gwas = begin_from_file(gwas);
+            auto const e_gwas =   end_from_file(gwas);
+            auto const c_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::lowest() });
+            auto const c_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::max()    });
+            auto w_gwas_begin = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
+            auto w_gwas_end   = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
             vector<double>                          tag_zs_;
             vector<RefRecord const *              > tag_its_;
