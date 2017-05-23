@@ -58,11 +58,8 @@ struct RefRecord;
 
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
-                             , file_reading:: GwasFileHandle             gwas
+                             , file_reading:: GwasFileHandle_NONCONST   gwas
                              );
-static
-std:: unordered_map<string, chrpos>
-            map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file);
 static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix(
@@ -93,7 +90,7 @@ string to_string(which_direction_t dir) {
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & //r
-    , SNPiterator<GwasFileHandle>     const & //g
+    , SNPiterator<file_reading:: GwasFileHandle_NONCONST>     const & //g
     );
 
 struct RefRecord {
@@ -178,20 +175,7 @@ int main(int argc, char **argv) {
           , options:: opt_window_width
           );
 
-        // Load the two files
-        auto raw_ref_file = file_reading:: read_in_a_raw_ref_file(options:: opt_raw_ref);
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
-
-        // Compare the chrpos in both files.
-        // If GWAS has chrpos, it should be the same as in the RefPanel.
-        // If GWAS doesn't have chrpos, copy it from the ref panel
-        auto m            = ssimp:: map_rs_to_chrpos( raw_ref_file );
-        update_positions_by_comparing_to_another_set( gwas, m );
-
-        // The RefPanel has already been automatically sorted by chrpos,
-        // but now we must do it for the GWAS, as the positions might have
-        // changed in the GWAS.
-        gwas->sort_my_entries();
 
         // Count how many GWAS SNPs have no position, and therefore
         // will be ignored.
@@ -203,7 +187,6 @@ int main(int argc, char **argv) {
 
         // Print the various SNP counts
         cout << '\n';
-        PP(raw_ref_file->number_of_snps());
         PP(        gwas->number_of_snps());
         PP(number_of_GWASsnps_with_unknown_position);
 
@@ -295,7 +278,7 @@ bool decide_whether_to_skip_this_tag( RefRecord const *                    it, i
 
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
-                             , file_reading:: GwasFileHandle             gwas
+                             , file_reading:: GwasFileHandle_NONCONST   gwas
                              ) {
     unique_ptr<ofstream>   out_stream_for_imputations;
     ostream              * out_stream_ptr = nullptr;
@@ -427,7 +410,9 @@ void impute_all_the_regions(   string                                   filename
                         }
                     }
                 }
-                //for(auto & msp : map_SNPname_to_pos) { using utils:: operator<<; PP(msp); }
+                for(auto & msp : map_SNPname_to_pos) {
+                    assert(msp.second != -1); // TODO: remove these instead
+                }
 
                 // Now that we have the data from ref panel, see if we can copy it into the GWAS data
                 auto gwas_it = begin_from_file(gwas);
@@ -436,10 +421,20 @@ void impute_all_the_regions(   string                                   filename
                     auto gwas_SNPname = gwas_it.get_SNPname();
                     if(                     map_SNPname_to_pos.count( gwas_SNPname )) {
                         auto pos_in_ref =   map_SNPname_to_pos      [ gwas_SNPname ];
-                        //PP(gwas_it.get_chrpos(), pos_in_ref);
-                        assert(gwas_it.get_chrpos().pos == pos_in_ref);
+                        if  (   gwas_it.get_chrpos().chr == chrm
+                             && gwas_it.get_chrpos().pos == pos_in_ref) {
+                            // this fine, nothing to change, the two data sources agree
+                        }
+                        else if (   gwas_it.get_chrpos().chr == -1
+                                 && gwas_it.get_chrpos().pos == -1) {
+                            // just copy it in
+                                gwas_it.set_chrpos(chrpos{chrm,pos_in_ref});
+                        }
+                        else
+                            DIE("disagreement on position");
                     }
                 }
+                gwas->sort_my_entries();
             }
 
             auto const b_gwas = begin_from_file(gwas);
@@ -637,21 +632,6 @@ void impute_all_the_regions(   string                                   filename
 }
 
 static
-std:: unordered_map<string, chrpos>
-            map_rs_to_chrpos( file_reading:: GenotypeFileHandle raw_ref_file ) {
-    auto       b = begin_from_file(raw_ref_file);
-    auto const e =   end_from_file(raw_ref_file);
-    std:: unordered_map<string, chrpos> m;
-    for(;b<e; ++b) {
-        if(b.get_SNPname() == ".") // skip these
-            continue;
-        auto rel = m.insert( std:: make_pair(b.get_SNPname(), b.get_chrpos()) );
-        rel.second || DIE("same SNPname twice in the ref panel [" << b.get_SNPname() << "]");
-    }
-    return m;
-}
-
-static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix( vector<vector<int>>              const & genotypes_for_the_tags
                      , double                                   lambda
@@ -767,7 +747,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & r
-    , SNPiterator<GwasFileHandle>     const & g
+    , SNPiterator<file_reading:: GwasFileHandle_NONCONST>     const & g
     ) {
         auto const rp_ref = r.ref;
         auto const rp_alt = r.alt;
