@@ -286,7 +286,6 @@ struct vcfGTz_handle : public file_reading:: Genotypes_I
 };
 
 GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name) {
-    first_attempt_at_vcfgztbi_file();
     // Try various file types until one succeeds
     auto gt_fh = read_in_vcfGTz_file(file_name);
     if(gt_fh)
