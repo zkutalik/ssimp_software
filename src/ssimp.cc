@@ -412,6 +412,36 @@ void impute_all_the_regions(   string                                   filename
                 continue;
             }
 
+            {   // Update the gwas data with position information from the ref panel
+                std:: unordered_map<string, int> map_SNPname_to_pos; // just for this broad window
+                for(auto & rr : all_nearby_ref_data) {
+                    switch(map_SNPname_to_pos.count(rr.ID)) {
+                        break; case 0:
+                            map_SNPname_to_pos[rr.ID] = rr.pos;
+                        break; case 1:
+                        {
+                            if(map_SNPname_to_pos[rr.ID] != rr.pos) {
+                                PP(rr.ID); // TODO: remove this. I think it will be ID='.'
+                                map_SNPname_to_pos[rr.ID] = -1;
+                            }
+                        }
+                    }
+                }
+                //for(auto & msp : map_SNPname_to_pos) { using utils:: operator<<; PP(msp); }
+
+                // Now that we have the data from ref panel, see if we can copy it into the GWAS data
+                auto gwas_it = begin_from_file(gwas);
+                auto const e_gwas =   end_from_file(gwas);
+                for(; gwas_it != e_gwas; ++gwas_it) {
+                    auto gwas_SNPname = gwas_it.get_SNPname();
+                    if(                     map_SNPname_to_pos.count( gwas_SNPname )) {
+                        auto pos_in_ref =   map_SNPname_to_pos      [ gwas_SNPname ];
+                        //PP(gwas_it.get_chrpos(), pos_in_ref);
+                        assert(gwas_it.get_chrpos().pos == pos_in_ref);
+                    }
+                }
+            }
+
             auto const b_gwas = begin_from_file(gwas);
             auto const e_gwas =   end_from_file(gwas);
             auto const c_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::lowest() });
