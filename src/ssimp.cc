@@ -76,8 +76,8 @@ static
 mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int>>              const & genotypes_for_the_tags
         , vector<vector<int>>              const & genotypes_for_the_unks
-        , vector<SNPiterator<GenotypeFileHandle>> const & tag_its
-        , vector<SNPiterator<GenotypeFileHandle>> const & unk_its
+        , vector<RefRecord const *              > const & tag_its
+        , vector<RefRecord const *              > const & unk_its
         , double                                          lambda
         );
 
@@ -93,11 +93,6 @@ string to_string(which_direction_t dir) {
     assert(1==2);
     return ""; // should never get here
 }
-static
-    which_direction_t decide_on_a_direction
-    ( SNPiterator<GenotypeFileHandle> const & //r
-    , SNPiterator<GwasFileHandle>     const & //g
-    );
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & //r
@@ -497,57 +492,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // Next, look up each 'tag candidate' in turn and - if it's a suitable SNP - store
             // it's z-statistic and an iterator to the reference panel data for the same SNP.
-            vector<double>                          tag_zs;
-            vector<SNPiterator<GenotypeFileHandle>> tag_its;
-            for(auto tag_candidate = range:: range_from_begin_end( w_gwas_begin, w_gwas_end )
-                    ; ! tag_candidate.empty()
-                    ;   tag_candidate.advance()
-                    ) {
-                auto crps = tag_candidate.current_it().get_chrpos();
-                // Find the ref panel entries at the exact same chr:pos
-                auto ref_candidates = range:: range_from_begin_end(
-                         std:: lower_bound( w_ref_wide_begin , w_ref_wide_end, crps )
-                        ,std:: upper_bound( w_ref_wide_begin , w_ref_wide_end, crps )
-                        );
 
-                // There may be multiple reference panel SNPs at the same chr:pos, for
-                // example an 'indel' as well as a conventional biallelic SNP.
-                // These next few lines find the collection of reference panel SNPs
-                // that have appropriate alleles.
-                vector<double> one_tag_zs;
-                vector<SNPiterator<GenotypeFileHandle>> one_tag_its;
-                for(; ! ref_candidates.empty(); ref_candidates.advance()) {
-                    assert( ref_candidates.current_it().get_chrpos() == crps );
+            // There may be multiple reference panel SNPs at the same chr:pos, for
+            // example an 'indel' as well as a conventional biallelic SNP.
+            // These next few lines find the collection of reference panel SNPs
+            // that have appropriate alleles.
 
-                    // If there is more than one alt allele, we need to skip this,
-                    // *and* if there is no variation on the 012
-                    if(cache.lookup_one_ref_get_calls(ref_candidates.current_it()) .size() == 0) {
-                        continue;
-                    }
-
-                    auto dir = decide_on_a_direction( ref_candidates.current_it()
-                                         , tag_candidate .current_it() );
-                    switch(dir) {
-                        break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED:
-                            one_tag_zs.push_back( -tag_candidate.current_it().get_z() );
-                            one_tag_its.push_back( ref_candidates.current_it()        );
-                        break; case which_direction_t:: DIRECTION_AS_IS             :
-                            one_tag_zs.push_back(  tag_candidate.current_it().get_z() );
-                            one_tag_its.push_back( ref_candidates.current_it()        );
-                        break; case which_direction_t:: NO_ALLELE_MATCH             : ;
-                    }
-                }
-                // Finally, we make the decision on whether to include this tag or not.
-                // A tag is useful if there is exactly one reference SNP that corresponds
-                // to it (where 'correspond' means that the positions and alleles match).
-                assert(one_tag_zs.size() == one_tag_its.size());
-                if(1==one_tag_zs.size()) {
-                    for(auto z : one_tag_zs)
-                        tag_zs.push_back(z);
-                    for(auto it : one_tag_its)
-                        tag_its.push_back(it);
-                }
-            }
             assert(tag_zs_.size() == tag_its_.size());
 
             int const number_of_tags = tag_zs_.size();
@@ -557,7 +507,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             // But some SNPs will have to be dropped, depending on --impute.range and --impute.snps
             vector<SNPiterator<GenotypeFileHandle>> unk_its;
-            vector<RefRecord*>                      unk2_its;
+            vector<RefRecord const*>                unk2_its;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
 
@@ -633,7 +583,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // We have at least one SNP here, so let's print some numbers about this region
             auto number_of_snps_in_the_gwas_in_this_region      = w_gwas_end - w_gwas_begin;
-            int  number_of_all_targets                          = unk_its.size();
+            int  number_of_all_targets                          = unk2_its.size();
 
             if(number_of_all_targets == 0)
                 continue;
@@ -672,8 +622,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
             mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
-                                                         , tag_its
-                                                         , unk_its
+                                                         , tag_its_
+                                                         , unk2_its
                                                          , options:: opt_lambda
                                                          );
 
@@ -787,8 +737,8 @@ static
 mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int>>              const & genotypes_for_the_tags
         , vector<vector<int>>              const & genotypes_for_the_unks
-        , vector<SNPiterator<GenotypeFileHandle>> const & tag_its
-        , vector<SNPiterator<GenotypeFileHandle>> const & unk_its
+        , vector<RefRecord const *              > const & tag_its
+        , vector<RefRecord const *              > const & unk_its
         , double                                          lambda
         ) {
     int const number_of_tags = genotypes_for_the_tags.size();
@@ -819,7 +769,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
         |action:: unzip_foreach|
         [&] (   int
                     u
-            ,   SNPiterator<GenotypeFileHandle>
+            ,   RefRecord const *
                     unk_its_u
             ,   std:: reference_wrapper< vector<int> const >
                     calls_at_u_rw
@@ -843,7 +793,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
                     c_ku = -1.0;
                 }
 
-                if(tag_its_k.m_line_number == unk_its_u.m_line_number) {
+                if(tag_its_k == unk_its_u) { // identical pointer value, i.e. same reference entry
                     assert(c_ku ==  1.0);
                     c.set(u,k,c_ku);
                 }
@@ -856,30 +806,6 @@ mvn:: Matrix make_c_unkn_tags_matrix
     }
     return c;
 };
-static
-    which_direction_t decide_on_a_direction
-    ( SNPiterator<GenotypeFileHandle> const & r
-    , SNPiterator<GwasFileHandle>     const & g
-    ) {
-        auto const rp_ref = r.get_allele_ref();
-        auto const rp_alt = r.get_allele_alt();
-        auto const gw_ref = g.get_allele_ref();
-        auto const gw_alt = g.get_allele_alt();
-
-        //PP(r.get_chrpos() ,rp_ref ,rp_alt ,gw_ref ,gw_alt);
-        assert(rp_ref != rp_alt);
-        assert(gw_ref != gw_alt);
-
-        if( rp_ref == gw_ref
-         && rp_alt == gw_alt)
-            return which_direction_t:: DIRECTION_AS_IS;
-
-        if( rp_ref == gw_alt
-         && rp_alt == gw_ref)
-            return which_direction_t:: DIRECTION_SHOULD_BE_REVERSED;
-
-        return which_direction_t:: NO_ALLELE_MATCH;
-    }
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & r
