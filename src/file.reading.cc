@@ -38,45 +38,34 @@ using vcfGTz:: special_encoder_for_list_of_GT_fields;
 #define LOOKUP(hd, fieldname, vec) lookup(hd . fieldname, vec, #fieldname)
 
 namespace file_reading {
-    template<typename G>
-    SNPiterator<G> &       SNPiterator<G>:: operator++()        {
+    SNPiterator    &       SNPiterator   :: operator++()        {
         assert(m_line_number < m_gfh->number_of_snps());
         ++m_line_number;
         return *this;
     }
-    template<typename G>
-    bool                SNPiterator<G>:: operator==(SNPiterator<G> const & other) const {
+    bool                SNPiterator   :: operator==(SNPiterator    const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number == other.m_line_number;
     }
-    template<typename G>
-    bool                SNPiterator<G>:: operator!=(SNPiterator<G> const & other) const {
+    bool                SNPiterator   :: operator!=(SNPiterator    const & other) const {
         return !(*this == other);
     }
-    template<typename G>
-    bool                SNPiterator<G>:: operator< (SNPiterator<G> const & other) const {
+    bool                SNPiterator   :: operator< (SNPiterator    const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number < other.m_line_number;
     }
-    template<typename G>
-    bool                SNPiterator<G>:: operator>=(SNPiterator<G> const & other) const { return !(*this < other); }
-    template<typename G>
-    int                 SNPiterator<G>:: operator- (SNPiterator<G> const & other) const {
+    bool                SNPiterator   :: operator>=(SNPiterator    const & other) const { return !(*this < other); }
+    int                 SNPiterator   :: operator- (SNPiterator    const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number - other.m_line_number;
     }
-    template<typename G>
-    chrpos              SNPiterator<G>:: operator* () const {
+    chrpos              SNPiterator   :: operator* () const {
         return get_chrpos();
     }
-    template<typename G>
-    SNPiterator<G> &       SNPiterator<G>:: operator+=(long int            ran)   {
+    SNPiterator    &       SNPiterator   :: operator+=(long int            ran)   {
         m_line_number += ran;
         return *this;
     }
-
-    template struct
-    SNPiterator<GwasFileHandle_NONCONST>;
 
 struct header_details {
     struct offset_and_name {

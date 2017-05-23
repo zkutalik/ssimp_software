@@ -92,15 +92,14 @@ struct Effects_I : public AnyFile_I {
 
 using GwasFileHandle_NONCONST     = std:: shared_ptr<Effects_I>;
 
-template<typename GWASorREF> // GwasFileHandle *or* GenotypeFileHandle
 struct SNPiterator
 : public std::iterator<std:: random_access_iterator_tag, chrpos>
 {
+    using GWASorREF = GwasFileHandle_NONCONST; // TODO: get rid of this
+
     GWASorREF m_gfh;
     int                m_line_number; // 0 means the first SNP that was read, 1 the second, and so on
 
-    static_assert(std::is_same< GWASorREF , GwasFileHandle_NONCONST     >{}
-              , "");
 
     // Constructor
                         SNPiterator(GWASorREF gfh, int line_number) : m_gfh(gfh), m_line_number(line_number) {}
@@ -137,12 +136,6 @@ struct SNPiterator
         return                           m_gfh  -> set_chrpos(m_line_number, crps);
     }
     template<typename T = void>
-    auto   get_calls()  const
-        -> decltype ( (std::declval<T>(),m_gfh) -> get_calls(m_line_number) )
-    {
-        return                           m_gfh  -> get_calls(m_line_number);
-    }
-    template<typename T = void>
     auto   get_z()  const
         -> decltype ( (std::declval<T>(),m_gfh) -> get_z(m_line_number) )
     {
@@ -150,12 +143,12 @@ struct SNPiterator
     }
 };
 
-template<typename GWASorREF>
-SNPiterator<GWASorREF> begin_from_file(GWASorREF fh) {
+inline
+SNPiterator begin_from_file(GwasFileHandle_NONCONST fh) {
     return {fh, 0};
 }
-template<typename GWASorREF>
-SNPiterator<GWASorREF>   end_from_file(GWASorREF fh) {
+inline
+SNPiterator   end_from_file(GwasFileHandle_NONCONST fh) {
     return {fh, fh->number_of_snps()};
 }
 

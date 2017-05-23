@@ -88,7 +88,7 @@ string to_string(which_direction_t dir) {
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & //r
-    , SNPiterator<file_reading:: GwasFileHandle_NONCONST>     const & //g
+    , SNPiterator     const & //g
     );
 
 struct RefRecord {
@@ -741,7 +741,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & r
-    , SNPiterator<file_reading:: GwasFileHandle_NONCONST>     const & g
+    , SNPiterator     const & g
     ) {
         auto const rp_ref = r.ref;
         auto const rp_alt = r.alt;
