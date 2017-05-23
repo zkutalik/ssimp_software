@@ -57,7 +57,7 @@ namespace ssimp {
 struct RefRecord;
 
 static
-void impute_all_the_regions( file_reading:: GenotypeFileHandle         raw_ref_file
+void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle             gwas
                              );
 static
@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
         cout << '\n';
         // Go through regions, printing how many
         // SNPs there are in each region
-        ssimp:: impute_all_the_regions(raw_ref_file, gwas);
+        ssimp:: impute_all_the_regions(options:: opt_raw_ref, gwas);
     }
 }
 
@@ -294,7 +294,7 @@ bool decide_whether_to_skip_this_tag( RefRecord const *                    it, i
 }
 
 static
-void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
+void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle             gwas
                              ) {
     unique_ptr<ofstream>   out_stream_for_imputations;
@@ -320,8 +320,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         << endl;
     }
 
-    auto const b_ref  = begin_from_file(ref_panel);
-    auto const e_ref  =   end_from_file(ref_panel);
     auto const b_gwas = begin_from_file(gwas);
     auto const e_gwas =   end_from_file(gwas);
 
@@ -330,18 +328,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             );
 
     tbi:: read_vcf_with_tbi ref_vcf {
-        "ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz"
+        filename_of_vcf
+        //"ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz"
         //options:: opt_raw_ref
     };
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
-
-        // First, find the begin and end of this chromosome
-        auto c_begin = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::lowest() });
-        auto c_end   = std:: lower_bound(b_ref, e_ref, chrpos{chrm, std::numeric_limits<int>::max()  });
-        assert(c_end >= c_begin);
-        if(c_begin != c_end)
-            assert(c_begin.get_chrpos().pos >= 0); // first position is at least zero
 
         // Find the range of GWAS entries on this chromosome
         auto const c_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::lowest() });
@@ -368,9 +360,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             auto w_gwas_begin = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_gwas_end   = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
-
-            auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
-            auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
 
             // Are we finished with this chromosome?
             if(w_gwas_begin == c_gwas_end) {
