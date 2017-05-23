@@ -20,8 +20,9 @@ namespace tbi {
             ret || DIE("Can't open that vcf(.gz) file: [" << filename << "]");
             ret2 || DIE("Can't open that vcf(.gz).tbi file: [" << filename << "]");
 
-            reader.setDiscardRules  (   VcfFileReader:: DISCARD_FILTERED
-                                    |   VcfFileReader:: DISCARD_NON_PHASED
+            reader.setDiscardRules  (   0
+                                    |   VcfFileReader:: DISCARD_FILTERED
+                                    //|   VcfFileReader:: DISCARD_NON_PHASED // TODO: Ask SR and ZK if we should include this. This discards '/' doesn't it?
                                     |   VcfFileReader:: DISCARD_MISSING_GT
                                     |   VcfFileReader:: DISCARD_MULTIPLE_ALTS
                                     );
