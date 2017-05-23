@@ -358,6 +358,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
         if(c_begin != c_end)
             assert(c_begin.get_chrpos().pos >= 0); // first position is at least zero
 
+        // Find the range of GWAS entries on this chromosome
+        auto const c_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::lowest() });
+        auto const c_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::max()    });
+
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
@@ -377,14 +381,20 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
              *  three ranges.
              */
 
-            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
-            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
+            auto w_gwas_begin = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
+            auto w_gwas_end   = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
             auto w_ref_wide_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_ref_wide_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width });
 
             auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
             auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
+
+            // Are we finished with this chromosome?
+            if(w_gwas_begin == c_gwas_end) {
+                // No tags here, nor in the remainder of this chromosome
+                break; // break out of this loop over windows, to allow it to go to the next chromosome
+            }
 
             vector<RefRecord>   all_nearby_ref_data;
             {   // Read in all the reference panel data in this broad window, but bi-allele SNPs.
@@ -481,7 +491,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // Check if the current target window is past the end of the chromosome, in which case
             // we 'break' out in order to allow it to finish this chromosome and move onto
             // the next chromosome
-            if(w_ref_narrow_begin == c_end)
+            //assert(w_ref_narrow_begin != c_end);
+            if(w_ref_narrow_begin == c_end) // TODO: this is kinda redundant, but not quite
                 break; // Finished with this chromosome
 
             // If the current target window has no SNPs, then 'continue' to the next window
