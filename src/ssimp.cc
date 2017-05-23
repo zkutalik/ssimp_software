@@ -223,7 +223,8 @@ using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
 static
-bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       const & it ) {
+bool decide_whether_to_skip_this_tag( RefRecord const *                    it, int chrm ) {
+    assert(it);
     if( options:: opt_impute_range.empty()
      && options:: opt_impute_snps.empty()
      )
@@ -235,8 +236,8 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
     if(!options:: opt_impute_snps.empty()) {
         // --impute.snps was specified, so the file has been loaded into ...
         assert(!options:: opt_impute_snps_as_a_uset.empty());
-        return  (   options:: opt_impute_snps_as_a_uset.count( it.get_SNPname() )
-                +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", it.get_chrpos().chr, it.get_chrpos().pos ) )
+        return  (   options:: opt_impute_snps_as_a_uset.count( it->ID )
+                +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, it->pos ) )
                 ) == 0;
     }
 
@@ -276,15 +277,15 @@ bool decide_whether_to_skip_this_tag( SNPiterator<GenotypeFileHandle>       cons
             {
                 chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
                 chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), true);
-                return  !(  it.get_chrpos() >= lower_allowed
-                         && it.get_chrpos() <= upper_allowed    );
+                return  !(  chrpos{chrm, it->pos} >= lower_allowed
+                         && chrpos{chrm, it->pos} <= upper_allowed    );
             }
             break; case 2:
             {
                 chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
                 chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
-                return  !(  it.get_chrpos() >= lower_allowed
-                         && it.get_chrpos() <= upper_allowed    );
+                return  !(  chrpos{chrm, it->pos} >= lower_allowed
+                         && chrpos{chrm, it->pos} <= upper_allowed    );
             }
            break; default:
                         DIE("too many hyphens in [" << options:: opt_impute_range << "]");
@@ -506,29 +507,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             // But some SNPs will have to be dropped, depending on --impute.range and --impute.snps
-            vector<SNPiterator<GenotypeFileHandle>> unk_its;
             vector<RefRecord const*>                unk2_its;
-            for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
-                // actually, we should think about ignoring SNPs in certain situations
-
-                bool skip_this = decide_whether_to_skip_this_tag(it);
-                if(skip_this)
-                    continue;
-
-                auto const & z12_for_this_SNP = cache.lookup_one_ref_get_calls(it);
-                if (z12_for_this_SNP.empty()) {
-                    // Empty vector means the SNP is not binary in the reference panel.
-                    // For now, we're ignoring such SNPs, but maybe we could include them
-                    // by simply using 'NA' in place of the awkward individuals.
-                    continue;
-                }
-                auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
-                if  (*z12_minmax.first == *z12_minmax.second){
-                    continue;   // no variation in the allele counts for this SNP within
-                                //the ref panel, therefore useless for imputation
-                }
-                unk_its         .push_back( it              );
-            }
             {
                 auto w_ref_narrow_begin = std:: lower_bound (   all_nearby_ref_data.begin()
                                                             ,   all_nearby_ref_data.end()
@@ -543,7 +522,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                     // actually, we should think about ignoring SNPs in certain situations
 
-                    //bool skip_this = decide_whether_to_skip_this_tag(it); if(skip_this) continue; // TODO: implement this
+                    bool skip_this = decide_whether_to_skip_this_tag(&*it, chrm);
+                    if(skip_this)
+                        continue;
 
                     auto const & z12_for_this_SNP = it->z12;
                     auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
@@ -554,29 +535,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     unk2_its    .push_back( &*it       );
                 }
             }
-#if 0
-            for(auto && l : unk_its) {
-                PP(l.get_chrpos().pos
-                  ,l.get_SNPname()
-                  ,l.get_allele_ref()
-                  ,l.get_allele_alt()   );
-            }
-            for(auto && r : unk2_its) {
-                PP(r->pos, r->ID, r->ref, r->alt);
-            }
-            PP(unk_its.size() , unk2_its.size());
-            for(auto && x : range:: zip( from::vector(unk_its), from::vector(unk2_its))) {
-                auto && l = x | stdget0;
-                auto && r = x | stdget1;
-                PP    (l.get_chrpos().pos   ,       r->pos);
-                assert(l.get_chrpos().pos   ==      r->pos);
-                assert(l.get_SNPname()      ==      r->ID);
-                assert(l.get_allele_ref()   ==      r->ref);
-                assert(l.get_allele_alt()   ==      r->alt);
-            }
-            PP(unk_its.size() , unk2_its.size());
-#endif
-            assert(unk_its.size() == unk2_its.size());
 
 
             // Next few lines are kind of boring, just printing some statistics.
@@ -636,12 +594,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
 
 
             // Finally, print out the imputations
-            assert(number_of_all_targets == ssize(unk_its));
+            assert(number_of_all_targets == ssize(unk2_its));
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
             for(int i=0; i<number_of_all_targets; ++i) {
-                    auto && target = unk_its.at(i);
-                    auto pos  = target.get_chrpos().pos;
-                    auto SNPname = target.get_SNPname();
+                    auto && target = unk2_its.at(i);
+                    auto pos  = target->pos;
+                    auto SNPname = target->ID;
 
                     auto imp_qual = [&](){ // multiply one vector by another, to directly get
                                             // the diagonal of the imputation quality matrix.
@@ -659,8 +617,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         << "chr" << chrm << ':' << pos
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
-                        << '\t' << target.get_allele_ref()
-                        << '\t' << target.get_allele_alt()
+                        << '\t' << target->ref
+                        << '\t' << target->alt
                         << '\t' << imp_qual
                         << endl;
             }
