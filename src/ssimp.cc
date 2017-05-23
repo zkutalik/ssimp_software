@@ -640,7 +640,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
             for(int i=0; i<number_of_all_targets; ++i) {
                     auto && target = unk_its.at(i);
-                    auto crps = target.get_chrpos();
+                    auto pos  = target.get_chrpos().pos;
                     auto SNPname = target.get_SNPname();
 
                     auto imp_qual = [&](){ // multiply one vector by another, to directly get
@@ -649,13 +649,14 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                                             // c' * inv(C) * c
                         auto lhs = gsl_matrix_const_submatrix(     c.get(), i, 0, 1, number_of_tags);
                         auto rhs = gsl_matrix_const_submatrix(Cinv_c.get(), 0, i, number_of_tags, 1);
+                        // TODO: Maybe move the next line into mvn.{hh,cc}?
                         const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
                         assert(res_0 == 0);
                         return to_store_one_imputation_quality(0,0);
                     }();
 
                     (*out_stream_ptr)
-                        << crps
+                        << "chr" << chrm << ':' << pos
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
                         << '\t' << target.get_allele_ref()
