@@ -67,11 +67,6 @@ static
 std:: unordered_multimap<chrpos, string>
             make_map_chrpos_to_SNPname( file_reading:: GenotypeFileHandle raw_ref_file);
 static
-vector<vector<int>>
-lookup_many_ref_rows( vector<SNPiterator<GenotypeFileHandle>>   const &  snps
-                , file_reading:: CacheOfRefPanelData              &  cache
-                );
-static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix(
                     vector<vector<int>>              const & genotypes_for_the_tags
@@ -553,11 +548,9 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         tag_its.push_back(it);
                 }
             }
-            assert(tag_zs_ == tag_zs);
-            assert(tag_its_.size() == tag_its.size());
-            assert(tag_zs.size() == tag_its.size());
+            assert(tag_zs_.size() == tag_its_.size());
 
-            int const number_of_tags = tag_zs.size();
+            int const number_of_tags = tag_zs_.size();
             if(number_of_tags == 0)
                 continue;
 
@@ -656,12 +649,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
 
             // Next, actually look up all the relevant SNPs within the reference panel
-            vector<vector<int>> genotypes_for_the_tags = lookup_many_ref_rows(tag_its, cache);
-            vector<vector<int>> genotypes_for_the_unks = lookup_many_ref_rows(unk_its, cache);
-            vector<vector<int>> genotypes_for_the_tags_ = from:: vector(tag_its_) |view::map| [](RefRecord const *rrp) { return rrp->z12; } |action::collect;
-            vector<vector<int>> genotypes_for_the_unks_ = from:: vector(unk2_its) |view::map| [](RefRecord const *rrp) { return rrp->z12; } |action::collect;
-            assert(genotypes_for_the_unks == genotypes_for_the_unks_);
-            assert(genotypes_for_the_tags == genotypes_for_the_tags_);
+            vector<vector<int>> genotypes_for_the_tags  = from:: vector(tag_its_) |view::map| [](RefRecord const *rrp) { return rrp->z12; } |action::collect;
+            vector<vector<int>> genotypes_for_the_unks  = from:: vector(unk2_its) |view::map| [](RefRecord const *rrp) { return rrp->z12; } |action::collect;
 
             assert(number_of_tags        == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
@@ -680,7 +669,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
              */
             mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
-            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs));
+            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
             mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
                                                          , tag_its
@@ -752,18 +741,6 @@ std:: unordered_multimap<chrpos, string>
         m.insert( std:: make_pair(b.get_chrpos(), b.get_SNPname()) );
     }
     return m;
-}
-static
-vector<vector<int>>
-lookup_many_ref_rows( vector<SNPiterator<GenotypeFileHandle>>   const &  snps
-                , file_reading:: CacheOfRefPanelData              &  cache
-                ) {
-    vector<vector<int>> many_calls;
-    for(auto crps : snps) {
-        many_calls.push_back( cache.lookup_one_ref_get_calls(crps));
-    }
-    assert(many_calls.size() == snps.size());
-    return many_calls;
 }
 
 static
