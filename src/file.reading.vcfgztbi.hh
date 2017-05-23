@@ -39,5 +39,20 @@ namespace tbi {
              */
         }
     };
+    struct RefRecord {
+        int     pos;
+        std::string  ID;
+        std::string  ref;
+        std::string  alt;
+        std::vector<int> z12;
+
+        bool operator< (file_reading:: chrpos crps) const {
+            return pos < crps.pos;
+        }
+    };
+    inline
+    bool operator<( file_reading:: chrpos const & crps, RefRecord const & rr) {
+        return crps.pos < rr.pos;
+    }
 }
 void first_attempt_at_vcfgztbi_file();

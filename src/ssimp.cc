@@ -48,11 +48,11 @@ using utils:: print_type;
 using utils:: stdget0;
 using utils:: stdget1;
 
+using tbi:: RefRecord;
+
 
 namespace ssimp {
 // Some forward declarations
-
-struct RefRecord;
 
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
@@ -91,20 +91,6 @@ static
     , SNPiterator     const & //g
     );
 
-struct RefRecord {
-    int     pos;
-    string  ID;
-    string  ref;
-    string  alt;
-    vector<int> z12;
-
-    bool operator< (file_reading:: chrpos crps) const {
-        return pos < crps.pos;
-    }
-};
-bool operator<( file_reading:: chrpos const & crps, RefRecord const & rr) {
-    return crps.pos < rr.pos;
-}
 
 } // namespace ssimp
 
@@ -284,14 +270,9 @@ void impute_all_the_regions(   string                                   filename
       ,options:: opt_flanking_width
             );
 
-    tbi:: read_vcf_with_tbi ref_vcf {
-        filename_of_vcf
-        //"ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz"
-        //options:: opt_raw_ref
-    };
+    tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
-
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
@@ -301,7 +282,7 @@ void impute_all_the_regions(   string                                   filename
              * For a given window, there are three "ranges" to consider:
              *  -   The range of GWAS SNPs in the "broad" window (i.e. including the flanking region)
              *  -   The range of reference SNPs in the "broad" window.
-             *  -   The range of rererence SNPs in the "narrow" window (i.e. without the flanking region)
+             *  -   The range of reference SNPs in the "narrow" window (i.e. without the flanking region)
              *
              *  The intersection of the first two of these three ranges is the set of SNPs that
              *  are useful as tags. The third range is the set of targets.
@@ -312,7 +293,9 @@ void impute_all_the_regions(   string                                   filename
              *  three ranges.
              */
 
-            // Are we finished with this chromosome?
+            // First, load up all the reference data in the broad window.
+            // If this is empty, and it's the last window, then we can finish with this chromosome.
+
             vector<RefRecord>   all_nearby_ref_data;
             bool not_the_last_window = false;
             {   // Read in all the reference panel data in this broad window, but bi-allele SNPs.
