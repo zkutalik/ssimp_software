@@ -42,8 +42,6 @@ using std:: ostream;
 
 using file_reading:: chrpos;
 using file_reading:: SNPiterator;
-using file_reading:: GenotypeFileHandle;
-using file_reading:: GwasFileHandle;
 
 using utils:: ssize;
 using utils:: print_type;
@@ -198,9 +196,6 @@ int main(int argc, char **argv) {
 }
 
 namespace ssimp{
-
-using file_reading:: GenotypeFileHandle;
-using file_reading:: GwasFileHandle;
 
 static
 bool decide_whether_to_skip_this_tag( RefRecord const *                    it, int chrm ) {

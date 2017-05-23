@@ -82,12 +82,6 @@ struct AnyFile_I {
     //virtual char        get_delimiter      ()       const = 0;
 };
 
-struct Genotypes_I : public AnyFile_I {
-    virtual std::pair<
-             std::vector<uint8_t>
-            ,std::vector<uint8_t>
-        > get_calls          (int)     const = 0;
-};
 struct Effects_I : public AnyFile_I {
     virtual void        set_chrpos         (int, chrpos)  = 0; // so that we can fill them in from the ref data
     virtual void        sort_my_entries    ()             = 0;
@@ -96,8 +90,6 @@ struct Effects_I : public AnyFile_I {
     virtual std::string get_column_name_allele_alt () const       = 0;
 };
 
-using GenotypeFileHandle = std:: shared_ptr<Genotypes_I const>;
-using GwasFileHandle     = std:: shared_ptr<Effects_I   const>;
 using GwasFileHandle_NONCONST     = std:: shared_ptr<Effects_I>;
 
 template<typename GWASorREF> // GwasFileHandle *or* GenotypeFileHandle
@@ -107,9 +99,7 @@ struct SNPiterator
     GWASorREF m_gfh;
     int                m_line_number; // 0 means the first SNP that was read, 1 the second, and so on
 
-    static_assert(std::is_same< GWASorREF , GenotypeFileHandle >{}
-              ||  std::is_same< GWASorREF , GwasFileHandle_NONCONST     >{}
-              ||  std::is_same< GWASorREF , GwasFileHandle     >{}
+    static_assert(std::is_same< GWASorREF , GwasFileHandle_NONCONST     >{}
               , "");
 
     // Constructor
@@ -169,7 +159,6 @@ SNPiterator<GWASorREF>   end_from_file(GWASorREF fh) {
     return {fh, fh->number_of_snps()};
 }
 
-GenotypeFileHandle      read_in_a_raw_ref_file(std:: string file_name);
 GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name);
 void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas, std:: unordered_map<std:: string, file_reading:: chrpos> const & m );
 
