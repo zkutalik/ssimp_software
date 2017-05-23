@@ -8,6 +8,7 @@
 #include "bits.and.pieces/PP.hh"
 
 namespace tbi {
+    struct RefRecord;
     struct read_vcf_with_tbi {
         VcfFileReader reader;
         VcfHeader header;
@@ -38,6 +39,8 @@ namespace tbi {
              * This is what we want - http://genome.sph.umich.edu/wiki/LibStatGen:_VCF#Specifying_Discard_Rules
              */
         }
+        inline
+        bool    read_record_into_a_RefRecord(RefRecord &rr);
     };
     struct RefRecord {
         int     pos;
@@ -74,6 +77,15 @@ namespace tbi {
         }
         assert(N == utils:: ssize(rr.z12));
         return rr;
+    }
+    inline
+    bool    read_vcf_with_tbi:: read_record_into_a_RefRecord(RefRecord &rr) {
+                VcfRecord record;
+                bool b = reader.readRecord(record);
+                if(b) {
+                    rr = tbi:: convert_VcfRecord_to_RefRecord(record);
+                }
+                return b;
     }
 }
 void first_attempt_at_vcfgztbi_file();

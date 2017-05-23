@@ -302,9 +302,8 @@ void impute_all_the_regions(   string                                   filename
                 ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
                                     ,   chrpos{chrm,std::numeric_limits<int>::max()                    } // in theory, to the end of the chromosome. See a few lines below
                                     );
-                VcfRecord record;
-                while(ref_vcf.reader.readRecord(record)) {
-                    RefRecord rr = tbi:: convert_VcfRecord_to_RefRecord(record);
+                RefRecord rr;
+                while(ref_vcf.read_record_into_a_RefRecord(rr)) {
 
                     /*
                      * if the position is beyond the current wide window, it means
