@@ -330,10 +330,11 @@ void impute_all_the_regions(   string                                   filename
 
             if(all_nearby_ref_data.empty()) {
                 // no tags
-                continue;
+                continue; // to the next window in this chromosome
             }
 
             {   // Update the gwas data with position information from the ref panel
+                // I should put this chunk of code into another function
                 std:: unordered_map<string, int> map_SNPname_to_pos; // just for this broad window
                 for(auto & rr : all_nearby_ref_data) {
                     switch(map_SNPname_to_pos.count(rr.ID)) {
@@ -352,7 +353,7 @@ void impute_all_the_regions(   string                                   filename
                     assert(msp.second != -1); // TODO: remove these instead
                 }
 
-                // Now that we have the data from ref panel, see if we can copy it into the GWAS data
+                // Now that we have the position data from ref panel, see if we can copy it into the GWAS data
                 auto gwas_it = begin_from_file(gwas);
                 auto const e_gwas =   end_from_file(gwas);
                 for(; gwas_it != e_gwas; ++gwas_it) {
@@ -372,16 +373,18 @@ void impute_all_the_regions(   string                                   filename
                             DIE("disagreement on position");
                     }
                 }
-                gwas->sort_my_entries();
             }
+            // Now, thanks to the block just completed, we have all the positions in the GWAS
+            // that are relevant for this window.
+            gwas->sort_my_entries(); // Sort them by position
 
+            // Of the next four lines, only the two are interesting (to find the range of GWAS snps for this window)
             auto const b_gwas = begin_from_file(gwas);
             auto const e_gwas =   end_from_file(gwas);
-            auto const c_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::lowest() });
-            auto const c_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm, std::numeric_limits<int>::max()    });
-            auto w_gwas_begin = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
-            auto w_gwas_end   = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
+            auto w_gwas_begin = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_start - options:: opt_flanking_width});
+            auto w_gwas_end   = std:: lower_bound(b_gwas, e_gwas, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
+            // Next, find tags
             vector<double>                          tag_zs_;
             vector<RefRecord const *              > tag_its_;
             {   // Look for tags in the broad window.
@@ -428,44 +431,23 @@ void impute_all_the_regions(   string                                   filename
                 }
             }
 
-            // Check if the current target window is past the end of the chromosome, in which case
-            // we 'break' out in order to allow it to finish this chromosome and move onto
-            // the next chromosome
-            //assert(w_ref_narrow_begin != c_end);
-
-
-            // Next, look up each 'tag candidate' in turn and - if it's a suitable SNP - store
-            // it's z-statistic and an iterator to the reference panel data for the same SNP.
-
-            // There may be multiple reference panel SNPs at the same chr:pos, for
-            // example an 'indel' as well as a conventional biallelic SNP.
-            // These next few lines find the collection of reference panel SNPs
-            // that have appropriate alleles.
-
             assert(tag_zs_.size() == tag_its_.size());
 
             int const number_of_tags = tag_zs_.size();
             if(number_of_tags == 0)
-                continue;
+                continue; // to the next window
 
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             // But some SNPs will have to be dropped, depending on --impute.range and --impute.snps
             vector<RefRecord const*>                unk2_its;
             {
-                auto w_ref_narrow_begin = std:: lower_bound (   all_nearby_ref_data.begin()
-                                                            ,   all_nearby_ref_data.end()
-                                                            ,   chrpos{chrm,current_window_start}
-                                                            //,   [](RefRecord &l, file_reading:: chrpos crps) { return l.pos < crps.pos; }
-                                                            );
-                auto w_ref_narrow_end = std:: lower_bound (   all_nearby_ref_data.begin()
-                                                            ,   all_nearby_ref_data.end()
-                                                            ,   chrpos{chrm,current_window_end}
-                                                            //,   [](RefRecord &l, file_reading:: chrpos crps) { return l.pos < crps.pos; }
-                                                            );
+                auto w_ref_narrow_begin = std:: lower_bound (   all_nearby_ref_data.begin() ,   all_nearby_ref_data.end()
+                                                            ,   chrpos{chrm,current_window_start});
+                auto w_ref_narrow_end   = std:: lower_bound (   all_nearby_ref_data.begin() ,   all_nearby_ref_data.end()
+                                                            ,   chrpos{chrm,current_window_end});
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
-                    // actually, we should think about ignoring SNPs in certain situations
 
-                    bool skip_this = decide_whether_to_skip_this_tag(&*it, chrm);
+                    bool skip_this = decide_whether_to_skip_this_tag(&*it, chrm); // based on --impute.range or --impute.snps
                     if(skip_this)
                         continue;
 
@@ -474,6 +456,8 @@ void impute_all_the_regions(   string                                   filename
                     if  (*z12_minmax.first == *z12_minmax.second){
                         continue;   // no variation in the allele counts for this SNP within
                                     //the ref panel, therefore useless for imputation
+                                    //(Actually, I think this might never happen, as the DISCARD rule will
+                                    // take this into account. Anyway, no harm to leave this in.
                     }
                     unk2_its    .push_back( &*it       );
                 }
@@ -488,6 +472,11 @@ void impute_all_the_regions(   string                                   filename
 
             if(number_of_all_targets == 0)
                 continue;
+
+
+            // We now have at least one tag, and at least one target, so we can proceed
+
+            // TODO: I still am including all the tags among the targets - change this?
 
             cout
                 << '\n'
@@ -528,7 +517,7 @@ void impute_all_the_regions(   string                                   filename
                                                          , options:: opt_lambda
                                                          );
 
-            // Next two lines, are the imputation, and its quality
+            // Next two lines are the imputation, and its quality.
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
             auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans(invert_a_matrix (C) , c);
 
