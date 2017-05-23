@@ -124,18 +124,6 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 static
 char   decide_delimiter( string      const & header_line );
 
-using call_type = std::pair<uint8_t,uint8_t>;
-struct OneLineSummary {
-    int                      m_simple_line_number;
-    string                   m_SNPname;
-    int                      m_chromosome;
-    int                      m_position;
-    string                   m_allele_alt;
-    string                   m_allele_ref;
-
-    vector<bool>             m_calls_compressed;
-    vector<call_type>        m_calls_compressed_codes;
-};
 struct GwasLineSummary {
     string                   m_SNPname;
     chrpos                   m_chrpos;
@@ -143,34 +131,6 @@ struct GwasLineSummary {
     string                   m_allele_ref;
     double                   m_z;
 };
-
-void update_positions_by_comparing_to_another_set( GwasFileHandle_NONCONST gwas, std:: unordered_map<std:: string, file_reading:: chrpos> const & m ) {
-    auto       b_gwas = begin_from_file(gwas);
-    auto const e_gwas =   end_from_file(gwas);
-    for(;b_gwas < e_gwas; ++b_gwas) {
-        auto nm= b_gwas.get_SNPname();
-        auto chrpos_in_gwas = b_gwas.get_chrpos();
-        auto try_to_find_in_ref = m.find(nm);
-
-        if(try_to_find_in_ref != m.end()) {
-            auto chrpos_in_ref = try_to_find_in_ref->second;
-
-            // If the gwas doesn't have chrpos, copy it from the ref panel,
-            // otherwise, check that they agree on the chrpos:
-            if(chrpos_in_gwas == chrpos{-1,-1}) {
-                    b_gwas.set_chrpos(chrpos_in_ref);
-            }
-            else {
-                (chrpos_in_gwas == chrpos_in_ref) || DIE("position mismatch between GWAS and RefPanel. "
-                        << "What should we do?. "
-                        << '[' << nm << ']'
-                        << ' ' << chrpos_in_ref
-                        << ' ' << chrpos_in_gwas
-                        );
-            }
-        }
-    }
-}
 
 GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name) {
     // I really should detect the file-type.
