@@ -12,6 +12,8 @@
 @test.data.to.be.made.by.stu :
     ref/compressed/small.vcf.sample.vcfGTz
     ref/compressed/TWINSUK.every100thRS.chrm123.100people.vcfGTz
+    ref/tbi/small.vcf.sample.vcf.gz.tbi
+    ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz.tbi
 ;
 
     tests/${testname}/output.actual
@@ -49,4 +51,17 @@
     export              input="ref/${path}".vcf.gz
     ls -l "$input"
     gunzip -k "$input"
+}
+
+    ref/tbi/${path}.vcf.gz.tbi
+:   ref/tbi/${path}.vcf.gz
+{
+    tabix ref/tbi/${path}.vcf.gz
+}
+                ref/tbi/${path}.vcf.gz
+{
+export  target="ref/tbi/${path}.vcf.gz"
+    ls -l "ref/${path}".vcf.gz
+    zcat "ref/${path}".vcf.gz | bgzip > "${target}".tmp
+    mv "${target}"{.tmp,}
 }
