@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
         // Print the various SNP counts
         cout << '\n';
         PP(        gwas->number_of_snps());
-        PP(number_of_GWASsnps_with_unknown_position);
+        PP(number_of_GWASsnps_with_unknown_position); // TODO: this isn't accurate any more
 
         cout << '\n';
         // Go through regions, printing how many
