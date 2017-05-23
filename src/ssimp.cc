@@ -381,7 +381,6 @@ void impute_all_the_regions(   string                                   filename
 
                 for(int o=0; o+1 < ssize(all_nearby_ref_data); ++o) { // check position is monotonic
                     assert(all_nearby_ref_data.at(o).pos <= all_nearby_ref_data.at(o+1).pos);
-                    assert(all_nearby_ref_data.at(o).pos <  all_nearby_ref_data.at(o+1).pos); // TODO: remove this, after making sure it breaks somewhere!
                 }
             }
 
