@@ -298,16 +298,14 @@ void impute_all_the_regions(   string                                   filename
 
             vector<RefRecord>   all_nearby_ref_data;
             bool not_the_last_window = false;
-            {   // Read in all the reference panel data in this broad window, but bi-allele SNPs.
+            {   // Read in all the reference panel data in this broad window, only bi-allelic SNPs.
                 ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
                                     ,   chrpos{chrm,std::numeric_limits<int>::max()                    } // in theory, to the end of the chromosome. See a few lines below
                                     );
                 VcfRecord record;
-                int N = -1; // just to verify it is constant
                 while(ref_vcf.reader.readRecord(record)) {
-                    RefRecord rr;
-                    rr.pos      =   record.get1BasedPosition();
-                    rr.ID       =   record.getIDStr();
+                    RefRecord rr = tbi:: convert_VcfRecord_to_RefRecord(record);
+
                     /*
                      * if the position is beyond the current wide window, it means
                      * this is *not* the last window
@@ -316,23 +314,6 @@ void impute_all_the_regions(   string                                   filename
                         not_the_last_window = true;
                         break;
                     }
-                    rr.ref      =   record.getRefStr();
-                    rr.alt      =   record.getAltStr();
-                    assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
-                    assert(record.hasAllGenotypeAlleles());
-                    if(N==-1) {
-                        N = record.getNumSamples();
-                    }
-                    assert(N == record.getNumSamples());
-                    for(int i=0;i<N;++i) {
-                        assert(2==record.getNumGTs(i));
-                        int l = record.getGT(i, 0);
-                        int r = record.getGT(i, 1);
-                        assert((l | 1) == 1);
-                        assert((r | 1) == 1);
-                        rr.z12.push_back(l+r);
-                    }
-                    assert(N == ssize(rr.z12));
 
                     all_nearby_ref_data.push_back(rr);
 

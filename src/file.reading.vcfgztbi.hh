@@ -54,5 +54,26 @@ namespace tbi {
     bool operator<( file_reading:: chrpos const & crps, RefRecord const & rr) {
         return crps.pos < rr.pos;
     }
+    inline
+    RefRecord   convert_VcfRecord_to_RefRecord(VcfRecord & record) {
+        RefRecord rr;
+        rr.pos      =   record.get1BasedPosition();
+        rr.ID       =   record.getIDStr();
+        rr.ref      =   record.getRefStr();
+        rr.alt      =   record.getAltStr();
+        assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
+        assert(record.hasAllGenotypeAlleles());
+        int const N = record.getNumSamples(); // TODO: verify this is the same in every SNP?
+        for(int i=0;i<N;++i) {
+            assert(2==record.getNumGTs(i));
+            int l = record.getGT(i, 0);
+            int r = record.getGT(i, 1);
+            assert((l | 1) == 1);
+            assert((r | 1) == 1);
+            rr.z12.push_back(l+r);
+        }
+        assert(N == utils:: ssize(rr.z12));
+        return rr;
+    }
 }
 void first_attempt_at_vcfgztbi_file();
