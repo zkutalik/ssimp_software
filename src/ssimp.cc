@@ -168,27 +168,8 @@ int main(int argc, char **argv) {
     }
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
-        PP( options:: opt_raw_ref
-          , options:: opt_gwas_filename
-          , options:: opt_window_width
-          );
-
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
 
-        // Count how many GWAS SNPs have no position, and therefore
-        // will be ignored.
-        auto number_of_GWASsnps_with_unknown_position = std:: count_if(
-                begin_from_file(gwas)
-               ,  end_from_file(gwas)
-               , [](auto v) { return v == chrpos{-1,-1}; }
-               );
-
-        // Print the various SNP counts
-        cout << '\n';
-        PP(        gwas->number_of_snps());
-        PP(number_of_GWASsnps_with_unknown_position); // TODO: this isn't accurate any more
-
-        cout << '\n';
         // Go through regions, printing how many
         // SNPs there are in each region
         ssimp:: impute_all_the_regions(options:: opt_raw_ref, gwas);
