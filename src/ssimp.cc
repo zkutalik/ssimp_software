@@ -369,9 +369,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             auto w_gwas_begin = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
             auto w_gwas_end   = std:: lower_bound(c_gwas_begin, c_gwas_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width});
 
-            auto w_ref_wide_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start - options:: opt_flanking_width});
-            auto w_ref_wide_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end   + options:: opt_flanking_width });
-
             auto w_ref_narrow_begin = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_start});
             auto w_ref_narrow_end   = std:: lower_bound(c_begin, c_end, chrpos{chrm,current_window_end  });
 
@@ -427,6 +424,12 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     assert(all_nearby_ref_data.at(o).pos <  all_nearby_ref_data.at(o+1).pos); // TODO: remove this, after making sure it breaks somewhere!
                 }
             }
+
+            if(all_nearby_ref_data.empty()) {
+                // no tags
+                continue;
+            }
+
             vector<double>                          tag_zs_;
             vector<RefRecord const *              > tag_its_;
             {   // Look for tags in the broad window.
@@ -477,12 +480,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // we 'break' out in order to allow it to finish this chromosome and move onto
             // the next chromosome
             //assert(w_ref_narrow_begin != c_end);
-            if(w_ref_narrow_begin == c_end) // TODO: this is kinda redundant, but not quite
-                break; // Finished with this chromosome
-
-            // If the current target window has no SNPs, then 'continue' to the next window
-            if(w_ref_narrow_begin == w_ref_narrow_end)
-                continue; // Nothing to impute, skip to the next window
 
 
             // Next, look up each 'tag candidate' in turn and - if it's a suitable SNP - store
