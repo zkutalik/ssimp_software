@@ -103,6 +103,11 @@ static
     ( SNPiterator<GenotypeFileHandle> const & //r
     , SNPiterator<GwasFileHandle>     const & //g
     );
+static
+    which_direction_t decide_on_a_direction
+    ( RefRecord                       const & //r
+    , SNPiterator<GwasFileHandle>     const & //g
+    );
 
 struct RefRecord {
     int     pos;
@@ -427,6 +432,51 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     assert(all_nearby_ref_data.at(o).pos <  all_nearby_ref_data.at(o+1).pos); // TODO: remove this, after making sure it breaks somewhere!
                 }
             }
+            vector<double>                          tag_zs_;
+            vector<RefRecord const *              > tag_its_;
+            {   // Look for tags in the broad window.
+                // This means moving monotonically through 'all_nearby_ref_data' and
+                // the gwas data in parallel, and identifying suitable 'pairs'
+                for(auto tag_candidate = range:: range_from_begin_end( w_gwas_begin, w_gwas_end )
+                        ; ! tag_candidate.empty()
+                        ;   tag_candidate.advance()
+                        ) {
+                    auto crps = tag_candidate.current_it().get_chrpos();
+                    // Find the ref panel entries at the exact same chr:pos
+                    auto ref_candidates = range:: range_from_begin_end(
+                             std:: lower_bound( all_nearby_ref_data.begin() , all_nearby_ref_data.end(), chrpos(crps) )
+                            ,std:: upper_bound( all_nearby_ref_data.begin() , all_nearby_ref_data.end(), chrpos(crps) )
+                            );
+                    vector<double> one_tag_zs;
+                    vector<RefRecord const *> one_tag_its;
+                    for(; ! ref_candidates.empty(); ref_candidates.advance()) {
+                        auto & current_ref = ref_candidates.front_ref();
+                        assert( current_ref.pos == crps.pos );
+
+                        auto dir = decide_on_a_direction( current_ref
+                                             , tag_candidate .current_it() );
+                        switch(dir) {
+                            break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED:
+                                one_tag_zs.push_back( -tag_candidate.current_it().get_z() );
+                                one_tag_its.push_back( &current_ref        );
+                            break; case which_direction_t:: DIRECTION_AS_IS             :
+                                one_tag_zs.push_back(  tag_candidate.current_it().get_z() );
+                                one_tag_its.push_back( &current_ref        );
+                            break; case which_direction_t:: NO_ALLELE_MATCH             : ;
+                        }
+                    }
+                    // Finally, we make the decision on whether to include this tag or not.
+                    // A tag is useful if there is exactly one reference SNP that corresponds
+                    // to it (where 'correspond' means that the positions and alleles match).
+                    assert(one_tag_zs.size() == one_tag_its.size());
+                    if(1==one_tag_zs.size()) {
+                        for(auto z : one_tag_zs)
+                            tag_zs_.push_back(z);
+                        for(auto it : one_tag_its)
+                            tag_its_.push_back(it);
+                    }
+                }
+            }
 
             // Check if the current target window is past the end of the chromosome, in which case
             // we 'break' out in order to allow it to finish this chromosome and move onto
@@ -492,6 +542,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                         tag_its.push_back(it);
                 }
             }
+            assert(tag_zs_ == tag_zs);
+            assert(tag_its_.size() == tag_its.size());
             assert(tag_zs.size() == tag_its.size());
 
             int const number_of_tags = tag_zs.size();
@@ -595,8 +647,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // Next, actually look up all the relevant SNPs within the reference panel
             vector<vector<int>> genotypes_for_the_tags = lookup_many_ref_rows(tag_its, cache);
             vector<vector<int>> genotypes_for_the_unks = lookup_many_ref_rows(unk_its, cache);
-            vector<vector<int>> genotypes_for_the_unks_ = from:: vector(unk2_its) |view::map| [](RefRecord *rrp) { return rrp->z12; } |action::collect;
+            vector<vector<int>> genotypes_for_the_tags_ = from:: vector(tag_its_) |view::map| [](RefRecord const *rrp) { return rrp->z12; } |action::collect;
+            vector<vector<int>> genotypes_for_the_unks_ = from:: vector(unk2_its) |view::map| [](RefRecord const *rrp) { return rrp->z12; } |action::collect;
             assert(genotypes_for_the_unks == genotypes_for_the_unks_);
+            assert(genotypes_for_the_tags == genotypes_for_the_tags_);
 
             assert(number_of_tags        == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
@@ -821,6 +875,30 @@ static
     ) {
         auto const rp_ref = r.get_allele_ref();
         auto const rp_alt = r.get_allele_alt();
+        auto const gw_ref = g.get_allele_ref();
+        auto const gw_alt = g.get_allele_alt();
+
+        //PP(r.get_chrpos() ,rp_ref ,rp_alt ,gw_ref ,gw_alt);
+        assert(rp_ref != rp_alt);
+        assert(gw_ref != gw_alt);
+
+        if( rp_ref == gw_ref
+         && rp_alt == gw_alt)
+            return which_direction_t:: DIRECTION_AS_IS;
+
+        if( rp_ref == gw_alt
+         && rp_alt == gw_ref)
+            return which_direction_t:: DIRECTION_SHOULD_BE_REVERSED;
+
+        return which_direction_t:: NO_ALLELE_MATCH;
+    }
+static
+    which_direction_t decide_on_a_direction
+    ( RefRecord                       const & r
+    , SNPiterator<GwasFileHandle>     const & g
+    ) {
+        auto const rp_ref = r.ref;
+        auto const rp_alt = r.alt;
         auto const gw_ref = g.get_allele_ref();
         auto const gw_alt = g.get_allele_alt();
 
