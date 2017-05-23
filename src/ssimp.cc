@@ -20,12 +20,14 @@
 #include "bits.and.pieces/DIE.hh"
 #include "bits.and.pieces/PP.hh"
 #include "range/range_view.hh"
+#include "range/range_from.hh"
 #include "range/range_action.hh"
 #include "format/format.hh"
 
 #include "file.reading.vcfgztbi.hh"
 
 namespace view = range:: view;
+namespace from = range:: from;
 namespace action = range:: action;
 
 using std:: cout;
@@ -44,6 +46,9 @@ using file_reading:: GenotypeFileHandle;
 using file_reading:: GwasFileHandle;
 
 using utils:: ssize;
+using utils:: print_type;
+using utils:: stdget0;
+using utils:: stdget1;
 
 
 namespace ssimp {
@@ -363,6 +368,10 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 string  ref;
                 string  alt;
                 vector<int> z12;
+
+                bool operator< (file_reading:: chrpos crps) {
+                                                                    return pos < crps.pos;
+                                                                }
             };
 
             vector<RefRecord>   all_nearby_ref_data;
@@ -411,7 +420,6 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                     assert(all_nearby_ref_data.at(o).pos <  all_nearby_ref_data.at(o+1).pos); // TODO: remove this, after making sure it breaks somewhere!
                 }
             }
-            PP(all_nearby_ref_data.size());
 
             // Check if the current target window is past the end of the chromosome, in which case
             // we 'break' out in order to allow it to finish this chromosome and move onto
@@ -486,6 +494,7 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // Now, find suitable targets - i.e. anything in the reference panel in the narrow window
             // But some SNPs will have to be dropped, depending on --impute.range and --impute.snps
             vector<SNPiterator<GenotypeFileHandle>> unk_its;
+            vector<RefRecord*>                      unk2_its;
             for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
                 // actually, we should think about ignoring SNPs in certain situations
 
@@ -507,6 +516,54 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
                 }
                 unk_its         .push_back( it              );
             }
+            {
+                auto w_ref_narrow_begin = std:: lower_bound (   all_nearby_ref_data.begin()
+                                                            ,   all_nearby_ref_data.end()
+                                                            ,   chrpos{chrm,current_window_start}
+                                                            //,   [](RefRecord &l, file_reading:: chrpos crps) { return l.pos < crps.pos; }
+                                                            );
+                auto w_ref_narrow_end = std:: lower_bound (   all_nearby_ref_data.begin()
+                                                            ,   all_nearby_ref_data.end()
+                                                            ,   chrpos{chrm,current_window_end}
+                                                            //,   [](RefRecord &l, file_reading:: chrpos crps) { return l.pos < crps.pos; }
+                                                            );
+                for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
+                    // actually, we should think about ignoring SNPs in certain situations
+
+                    //bool skip_this = decide_whether_to_skip_this_tag(it); if(skip_this) continue; // TODO: implement this
+
+                    auto const & z12_for_this_SNP = it->z12;
+                    auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
+                    if  (*z12_minmax.first == *z12_minmax.second){
+                        continue;   // no variation in the allele counts for this SNP within
+                                    //the ref panel, therefore useless for imputation
+                    }
+                    unk2_its    .push_back( &*it       );
+                }
+            }
+#if 0
+            for(auto && l : unk_its) {
+                PP(l.get_chrpos().pos
+                  ,l.get_SNPname()
+                  ,l.get_allele_ref()
+                  ,l.get_allele_alt()   );
+            }
+            for(auto && r : unk2_its) {
+                PP(r->pos, r->ID, r->ref, r->alt);
+            }
+            PP(unk_its.size() , unk2_its.size());
+            for(auto && x : range:: zip( from::vector(unk_its), from::vector(unk2_its))) {
+                auto && l = x | stdget0;
+                auto && r = x | stdget1;
+                PP    (l.get_chrpos().pos   ,       r->pos);
+                assert(l.get_chrpos().pos   ==      r->pos);
+                assert(l.get_SNPname()      ==      r->ID);
+                assert(l.get_allele_ref()   ==      r->ref);
+                assert(l.get_allele_alt()   ==      r->alt);
+            }
+            PP(unk_its.size() , unk2_its.size());
+#endif
+            assert(unk_its.size() == unk2_its.size());
 
 
             // Next few lines are kind of boring, just printing some statistics.
@@ -531,6 +588,8 @@ void impute_all_the_regions( file_reading:: GenotypeFileHandle         ref_panel
             // Next, actually look up all the relevant SNPs within the reference panel
             vector<vector<int>> genotypes_for_the_tags = lookup_many_ref_rows(tag_its, cache);
             vector<vector<int>> genotypes_for_the_unks = lookup_many_ref_rows(unk_its, cache);
+            vector<vector<int>> genotypes_for_the_unks_ = from:: vector(unk2_its) |view::map| [](RefRecord *rrp) { return rrp->z12; } |action::collect;
+            assert(genotypes_for_the_unks == genotypes_for_the_unks_);
 
             assert(number_of_tags        == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
