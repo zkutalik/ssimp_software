@@ -168,8 +168,24 @@ struct skipper_target_I {
     virtual bool    skip_me(int chrm, RefRecord const * rrp)    =0;
 };
 
-static // forward decl
-bool decide_whether_to_skip_this_tag( RefRecord const *                    it, int chrm );
+static
+chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_chromosome) {
+    auto separated_by_colon = utils:: tokenize(as_text,':');
+    chrpos position;
+    switch(separated_by_colon.size()) {
+        break; case 1: // no colon, just a chromosome
+                position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
+                position.pos = to_end_of_chromosome
+                                ?  std:: numeric_limits<int>::max()
+                                :  std:: numeric_limits<int>::lowest() ;
+        break; case 2:
+                position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
+                position.pos = utils:: lexical_cast<int>(separated_by_colon.at(1));
+        break; default:
+                DIE("too many colons in [" << as_text << "]");
+    }
+    return position;
+}
 
 unique_ptr<skipper_target_I> make_skipper_for_targets() {
     if( options:: opt_impute_range.empty() && options:: opt_impute_snps.empty())
@@ -194,43 +210,8 @@ unique_ptr<skipper_target_I> make_skipper_for_targets() {
     }
     if( !options:: opt_impute_range.empty() && options:: opt_impute_snps.empty())
     {   // --impute.range was specified
-        struct local : skipper_target_I {
-            bool    skip_me(int chrm, RefRecord const * rrp)   override {
-                return decide_whether_to_skip_this_tag(rrp, chrm);
-            }
-        };
-        return make_unique<local>();
-    }
-    // TODO: clean up the end of this function
-    assert(0);
-        struct local : skipper_target_I {
-            bool    skip_me(int     , RefRecord const *    )   override { return false; }
-        };
-        return make_unique<local>();
-}
-
-static
-bool decide_whether_to_skip_this_tag( RefRecord const *                    it, int chrm ) {
-    assert(it);
-    if( options:: opt_impute_range.empty()
-     && options:: opt_impute_snps.empty()
-     )
-        return false;
-
-    // You can't apply both. Only one or the other:
-    assert( options:: opt_impute_range.empty() != options:: opt_impute_snps.empty());
-
-    if(!options:: opt_impute_snps.empty()) {
-        // --impute.snps was specified, so the file has been loaded into ...
-        assert(!options:: opt_impute_snps_as_a_uset.empty());
-        return  (   options:: opt_impute_snps_as_a_uset.count( it->ID )
-                +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, it->pos ) )
-                ) == 0;
-    }
-
-    if(!options:: opt_impute_range.empty()) {
-        // impute.range will either be an entire chromosome,
-        // or two locations seperated by a '-'
+        // --impute.range will either be an entire chromosome,
+        // or two locations in one chromosome separated by a '-'
 
         auto separated_by_hyphen = utils:: tokenize(options:: opt_impute_range, '-');
 
@@ -241,46 +222,43 @@ bool decide_whether_to_skip_this_tag( RefRecord const *                    it, i
                 s = s.substr(3);
         };
 
-        auto lambda_chrpos_text_to_object = [](string const &as_text, bool to_end_of_chromosome) {
-            auto separated_by_colon = utils:: tokenize(as_text,':');
-            chrpos position;
-            switch(separated_by_colon.size()) {
-                break; case 1: // no colon, just a chromosome
-                        position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
-                        position.pos = to_end_of_chromosome
-                                        ?  std:: numeric_limits<int>::max()
-                                        :  std:: numeric_limits<int>::lowest() ;
-                break; case 2:
-                        position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
-                        position.pos = utils:: lexical_cast<int>(separated_by_colon.at(1));
-                break; default:
-                        DIE("too many colons in [" << as_text << "]");
+        struct local : skipper_target_I {
+            chrpos  lower_allowed;
+            chrpos  upper_allowed;
+            bool    skip_me(int chrm, RefRecord const * rrp)   override {
+                bool b = !(  chrpos{chrm, rrp->pos} >= lower_allowed && chrpos{chrm, rrp->pos} <= upper_allowed    );
+                return b;
             }
-            return position;
         };
+        auto up = make_unique<local>();
 
         switch(separated_by_hyphen.size()) {
             break; case 1:
             {
-                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
-                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), true);
-                return  !(  chrpos{chrm, it->pos} >= lower_allowed
-                         && chrpos{chrm, it->pos} <= upper_allowed    );
+                up->lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
+                up->upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), true);
             }
             break; case 2:
             {
-                chrpos  lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
-                chrpos  upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
-                return  !(  chrpos{chrm, it->pos} >= lower_allowed
-                         && chrpos{chrm, it->pos} <= upper_allowed    );
+                up->lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
+                up->upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
             }
            break; default:
                         DIE("too many hyphens in [" << options:: opt_impute_range << "]");
         }
+        return std::move(up);
     }
 
-    assert(0); // shouldn't get here
-    return false;
+    assert  (   options:: opt_impute_range.empty()
+             && options:: opt_impute_snps.empty());
+    DIE("--impute.range and --impute.snps can't be used together. (I thought I had already checked for this)");
+    return nullptr;
+    // TODO: clean up the end of this function
+    assert(0);
+        struct local : skipper_target_I {
+            bool    skip_me(int     , RefRecord const *    )   override { return false; }
+        };
+        return make_unique<local>();
 }
 
 static
@@ -494,10 +472,8 @@ void impute_all_the_regions(   string                                   filename
                                                             ,   chrpos{chrm,current_window_end});
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
 
-                    bool skip_this = decide_whether_to_skip_this_tag(&*it, chrm); // based on --impute.range or --impute.snps
                     bool skip_this_target = skipper_target->skip_me(chrm, &*it);
-                    assert(skip_this == skip_this_target);
-                    if(skip_this)
+                    if(skip_this_target)
                         continue;
 
                     auto const & z12_for_this_SNP = it->z12;
