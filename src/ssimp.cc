@@ -323,6 +323,7 @@ void impute_all_the_regions(   string                                   filename
             );
 
     auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, &options:: opt_impute_snps_as_a_uset, options:: opt_impute_maf);
+    auto skipper_tags   = make_skipper_for_targets(options:: opt_tags_range  , &options:: opt_tags_snps_as_a_uset  , options:: opt_tags_maf);
 
     tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
 
@@ -459,6 +460,10 @@ void impute_all_the_regions(   string                                   filename
                     for(; ! ref_candidates.empty(); ref_candidates.advance()) {
                         auto & current_ref = ref_candidates.front_ref();
                         assert( current_ref.pos == crps.pos );
+
+                        if(skipper_tags->skip_me(chrm, &current_ref)) {
+                            continue; // this tag skipped due to --tags.maf or --tags.range or --tags.snps
+                        }
 
                         auto dir = decide_on_a_direction( current_ref
                                              , tag_candidate .current_it() );

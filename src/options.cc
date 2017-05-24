@@ -16,10 +16,17 @@ namespace options {
         int                     opt_window_width = 1'000'000;
         int                     opt_flanking_width = 250'000;
         double                  opt_lambda  = 0.0;
+
         std:: string            opt_impute_range;
         std:: string            opt_impute_snps;
         std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
-        double                  opt_impute_maf =0.0; // target not imputed unless maf (in reference) is at least this.
+        double                  opt_impute_maf =0.0;
+
+        // The next few are like the --impute.* above, but applying to tags instead
+        std:: string            opt_tags_range;
+        std:: string            opt_tags_snps;
+        std::unordered_set<std::string>    opt_tags_snps_as_a_uset;
+        double                  opt_tags_maf =0.0; // target not imputed unless maf (in reference) is at least this.
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
@@ -35,6 +42,9 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"impute.range"       ,  required_argument, 0,  8 },
             {"impute.snps"        ,  required_argument, 0,  9 },
             {"impute.maf"         ,  required_argument, 0, 10 },
+            {"tags.range"         ,  required_argument, 0, 11 },
+            {"tags.snps"          ,  required_argument, 0, 12 },
+            {"tags.maf"           ,  required_argument, 0, 13 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -81,6 +91,21 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_impute_maf == 0.0 || DIE("--impute.maf specified twice?");
             assert(string("impute.maf") == long_options[long_option_index].name);
             options::  opt_impute_maf = utils:: lexical_cast<double>(optarg);
+        }
+        if (c == 11) {
+            options:: opt_tags_range.empty() || DIE("--tags.range specified twice?");
+            assert(string("tags.range") == long_options[long_option_index].name);
+            options::  opt_tags_range = optarg;
+        }
+        if (c == 12) {
+            options:: opt_tags_snps.empty() || DIE("--tags.snps specified twice?");
+            assert(string("tags.snps") == long_options[long_option_index].name);
+            options::  opt_tags_snps = optarg;
+        }
+        if (c == 13) {
+            options:: opt_tags_maf == 0.0 || DIE("--tags.maf specified twice?");
+            assert(string("tags.maf") == long_options[long_option_index].name);
+            options::  opt_tags_maf = utils:: lexical_cast<double>(optarg);
         }
     }
 }

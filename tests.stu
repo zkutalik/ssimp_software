@@ -9,6 +9,7 @@
     tests/impute.range/chr2/output.actual
     tests/impute.snps/a.list.of.snps/output.actual
     tests/impute.maf/0.05/output.actual
+    tests/tags.maf/tags.maf.0.01/output.actual
 ;
 
 @test.data.to.be.made.by.stu :
