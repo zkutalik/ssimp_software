@@ -291,6 +291,7 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << "SNPname"
                         << '\t' << gwas->get_column_name_allele_ref() // copy column name from the GWAS input
                         << '\t' << gwas->get_column_name_allele_alt() // copy column name from the GWAS input
+                        << '\t' << "maf"
                         << '\t' << "impqual"
                         << endl;
     }
@@ -583,6 +584,7 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << SNPname
                         << '\t' << target->ref
                         << '\t' << target->alt
+                        << '\t' << target->maf
                         << '\t' << imp_qual
                         << endl;
             }
