@@ -18,6 +18,8 @@
 
     tests/1KG/towards.really.1KG.data/output.actual
 
+    #tests/1KG/towards.really.1KG.data.allofchr22/output.actual # 1 hour (without profiling)
+
 ;
 
 @test.data.to.be.made.by.stu :
