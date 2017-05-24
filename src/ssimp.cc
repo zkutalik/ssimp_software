@@ -342,14 +342,24 @@ void impute_all_the_regions(   string                                   filename
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
+        if  ( chrm < skipper_target->conservative_lower_bound().chr ) { continue; }
+        if  ( chrm > skipper_target->conservative_upper_bound().chr ) { continue; }
+
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
 
-            if(chrpos{chrm,current_window_start                               } > skipper_target->conservative_upper_bound()) { break; }
-            if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > skipper_tags  ->conservative_upper_bound()) { break; }
-            //if(chrpos{chrm,current_window_end                                 } < skipper_target->conservative_lower_bound()) { continue; }
-            //if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < skipper_tags  ->conservative_lower_bound()) { continue; }
+            if(chrm == skipper_target->conservative_upper_bound().chr) {
+                if(chrpos{chrm,current_window_start                               } > skipper_target->conservative_upper_bound()) { break; }
+                if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > skipper_tags  ->conservative_upper_bound()) { break; }
+            }
+
+            // applying the lower bound is a little trickier. Must only be applied on the correct
+            // chromosome, or else we get an infinite loop.
+            if(chrm == skipper_target->conservative_lower_bound().chr) {
+                if(chrpos{chrm,current_window_end                                 } < skipper_target->conservative_lower_bound()) { continue; }
+                if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < skipper_tags  ->conservative_lower_bound()) { continue; }
+            }
 
             /*
              * For a given window, there are three "ranges" to consider:
