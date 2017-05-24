@@ -152,6 +152,15 @@ int main(int argc, char **argv) {
         }
         options:: opt_impute_snps_as_a_uset.empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
     }
+    if( !options:: opt_tags_snps.empty() ) {
+        gz:: igzstream f(options:: opt_tags_snps.c_str());
+        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_tags_snps << ']');
+        string one_SNPname_or_chrpos;
+        while(getline( f, one_SNPname_or_chrpos)) {
+            options:: opt_tags_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+        }
+        options:: opt_tags_snps_as_a_uset.empty() && DIE("Nothing in --tags.snps file? [" << options:: opt_tags_snps << "]");
+    }
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
