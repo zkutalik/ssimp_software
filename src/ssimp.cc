@@ -187,33 +187,39 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
     return position;
 }
 
-unique_ptr<skipper_target_I> make_skipper_for_targets() {
-    if( options:: opt_impute_range.empty() && options:: opt_impute_snps.empty())
+unique_ptr<skipper_target_I> make_skipper_for_targets
+        (   std:: string                                    range_as_string
+        ,   std::unordered_set<std::string>     const &     uset_of_strings
+        ) {
+    if( range_as_string.empty() && uset_of_strings.empty())
     {
         struct local : skipper_target_I {
             bool    skip_me(int     , RefRecord const *    )   override { return false; }
         };
         return make_unique<local>();
     }
-    if( options:: opt_impute_range.empty() && !options:: opt_impute_snps.empty())
+    if( range_as_string.empty() && !uset_of_strings.empty())
     {   // --impute.snps was specified
         // We check if either the ID, or the chr:pos is in the --impute.snps file
         struct local : skipper_target_I {
+            decltype(uset_of_strings) const & m_uset_of_strings;
+            local(decltype(m_uset_of_strings) const & r) : m_uset_of_strings(r) {}
+
             bool    skip_me(int chrm, RefRecord const * rrp)   override {
-                assert(!options:: opt_impute_snps_as_a_uset.empty());
-                return  (   options:: opt_impute_snps_as_a_uset.count( rrp->ID )
-                        +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rrp->pos ) )
+                assert(!m_uset_of_strings.empty());
+                return  (   m_uset_of_strings.count( rrp->ID )
+                        +   m_uset_of_strings.count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rrp->pos ) )
                         ) == 0;
             }
         };
-        return make_unique<local>();
+        return make_unique<local>(uset_of_strings);
     }
-    if( !options:: opt_impute_range.empty() && options:: opt_impute_snps.empty())
+    if( !range_as_string.empty() && uset_of_strings.empty())
     {   // --impute.range was specified
         // --impute.range will either be an entire chromosome,
         // or two locations in one chromosome separated by a '-'
 
-        auto separated_by_hyphen = utils:: tokenize(options:: opt_impute_range, '-');
+        auto separated_by_hyphen = utils:: tokenize(range_as_string, '-');
 
         // remove any leading 'chr' or 'Chr'
         for(auto &s : separated_by_hyphen) {
@@ -244,13 +250,13 @@ unique_ptr<skipper_target_I> make_skipper_for_targets() {
                 up->upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
             }
            break; default:
-                        DIE("too many hyphens in [" << options:: opt_impute_range << "]");
+                        DIE("too many hyphens in [" << range_as_string << "]");
         }
         return std::move(up);
     }
 
-    assert  (   options:: opt_impute_range.empty()
-             && options:: opt_impute_snps.empty());
+    assert  (   range_as_string.empty()
+             && uset_of_strings.empty());
     DIE("--impute.range and --impute.snps can't be used together. (I thought I had already checked for this)");
     return nullptr;
     // TODO: clean up the end of this function
@@ -293,7 +299,7 @@ void impute_all_the_regions(   string                                   filename
       ,options:: opt_flanking_width
             );
 
-    auto skipper_target = make_skipper_for_targets();
+    auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, options:: opt_impute_snps_as_a_uset);
 
     tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
 
