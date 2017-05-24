@@ -164,6 +164,39 @@ int main(int argc, char **argv) {
 
 namespace ssimp{
 
+struct skipper_target_I {
+    virtual bool    skip_me(int chrm, RefRecord const * rrp)    =0;
+};
+
+unique_ptr<skipper_target_I> make_skipper_for_targets() {
+    if( options:: opt_impute_range.empty() && options:: opt_impute_snps.empty())
+    {
+        struct local : skipper_target_I {
+            bool    skip_me(int     , RefRecord const *    )   override { return false; }
+        };
+        return make_unique<local>();
+    }
+    if( options:: opt_impute_range.empty() && !options:: opt_impute_snps.empty())
+    {   // --impute.snps was specified
+        // We check if either the ID, or the chr:pos is in the --impute.snps file
+        struct local : skipper_target_I {
+            bool    skip_me(int chrm, RefRecord const * rrp)   override {
+                assert(!options:: opt_impute_snps_as_a_uset.empty());
+                return  (   options:: opt_impute_snps_as_a_uset.count( rrp->ID )
+                        +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rrp->pos ) )
+                        ) == 0;
+            }
+        };
+        return make_unique<local>();
+    }
+    // TODO: clean up the end of this function
+    assert(0);
+        struct local : skipper_target_I {
+            bool    skip_me(int     , RefRecord const *    )   override { return false; }
+        };
+        return make_unique<local>();
+}
+
 static
 bool decide_whether_to_skip_this_tag( RefRecord const *                    it, int chrm ) {
     assert(it);
@@ -269,6 +302,8 @@ void impute_all_the_regions(   string                                   filename
     PP(options:: opt_window_width
       ,options:: opt_flanking_width
             );
+
+    auto skipper_target = make_skipper_for_targets();
 
     tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
 
@@ -448,6 +483,8 @@ void impute_all_the_regions(   string                                   filename
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
 
                     bool skip_this = decide_whether_to_skip_this_tag(&*it, chrm); // based on --impute.range or --impute.snps
+                    bool skip_this_target = skipper_target->skip_me(chrm, &*it);
+                    assert(skip_this == skip_this_target);
                     if(skip_this)
                         continue;
 
