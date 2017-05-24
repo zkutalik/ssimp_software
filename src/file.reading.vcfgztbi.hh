@@ -7,6 +7,8 @@
 #include "bits.and.pieces/DIE.hh"
 #include "bits.and.pieces/PP.hh"
 
+#include<algorithm>
+
 namespace tbi {
     struct RefRecord;
     struct read_vcf_with_tbi {
@@ -48,6 +50,7 @@ namespace tbi {
         std::string  ref;
         std::string  alt;
         std::vector<int> z12;
+        double          maf; // *Minor allele frequency, i.e. always <= 0.50
 
         bool operator< (file_reading:: chrpos crps) const {
             return pos < crps.pos;
@@ -76,6 +79,17 @@ namespace tbi {
             rr.z12.push_back(l+r);
         }
         assert(N == utils:: ssize(rr.z12));
+        int total_alternative_alleles = std:: accumulate( rr.z12.begin(), rr.z12.end(), 0);
+        double maf = double(total_alternative_alleles) / (2*N);
+        //PP(rr.ID, maf);
+        assert(maf >= 0.0);
+        assert(maf >  0.0);
+        assert(maf <= 1.0);
+        assert(maf <  1.0);
+        if(maf > 0.5) maf = 1.0-maf;
+        assert(maf <= 0.5);
+        //assert(maf <  0.5);
+        rr.maf = maf;
         return rr;
     }
     inline
