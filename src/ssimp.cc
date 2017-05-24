@@ -175,6 +175,8 @@ namespace ssimp{
 
 struct skipper_target_I {
     virtual bool    skip_me(int chrm, RefRecord const * rrp)    =0;
+    virtual chrpos  conservative_upper_bound()                  { return chrpos{std::numeric_limits<int>::max()   , std::numeric_limits<int>::max()   }; }
+    virtual chrpos  conservative_lower_bound()                  { return chrpos{std::numeric_limits<int>::lowest(), std::numeric_limits<int>::lowest()}; }
 };
 
 static
@@ -262,6 +264,8 @@ unique_ptr<skipper_target_I> make_skipper_for_targets
         struct local : skipper_target_I {
             chrpos  lower_allowed;
             chrpos  upper_allowed;
+            virtual chrpos  conservative_upper_bound()         override { return upper_allowed; }
+            virtual chrpos  conservative_lower_bound()         override { return lower_allowed; }
             bool    skip_me(int chrm, RefRecord const * rrp)   override {
                 bool b = !(  chrpos{chrm, rrp->pos} >= lower_allowed && chrpos{chrm, rrp->pos} <= upper_allowed    );
                 return b;
@@ -341,6 +345,11 @@ void impute_all_the_regions(   string                                   filename
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
+
+            if(chrpos{chrm,current_window_start                               } > skipper_target->conservative_upper_bound()) { break; }
+            if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > skipper_tags  ->conservative_upper_bound()) { break; }
+            //if(chrpos{chrm,current_window_end                                 } < skipper_target->conservative_lower_bound()) { continue; }
+            //if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < skipper_tags  ->conservative_lower_bound()) { continue; }
 
             /*
              * For a given window, there are three "ranges" to consider:
