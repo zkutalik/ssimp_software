@@ -14,4 +14,6 @@ chrm22	   16'200'000-16'500'000
 chrm22	   16'500'000-16'800'000
        3 # GWAS     SNPs in this window (with 250'000 flanking)
        3 # SNPs in both (i.e. useful as tags)
-   3'619 # target SNPs (anything in narrow window, will include some tags)
+   4'454 # target SNPs (anything in narrow window, will include some tags)
+rr.ID:rs7410429
+rr.ID:rs7410429
