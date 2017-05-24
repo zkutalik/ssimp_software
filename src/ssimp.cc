@@ -168,6 +168,9 @@ struct skipper_target_I {
     virtual bool    skip_me(int chrm, RefRecord const * rrp)    =0;
 };
 
+static // forward decl
+bool decide_whether_to_skip_this_tag( RefRecord const *                    it, int chrm );
+
 unique_ptr<skipper_target_I> make_skipper_for_targets() {
     if( options:: opt_impute_range.empty() && options:: opt_impute_snps.empty())
     {
@@ -185,6 +188,15 @@ unique_ptr<skipper_target_I> make_skipper_for_targets() {
                 return  (   options:: opt_impute_snps_as_a_uset.count( rrp->ID )
                         +   options:: opt_impute_snps_as_a_uset.count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rrp->pos ) )
                         ) == 0;
+            }
+        };
+        return make_unique<local>();
+    }
+    if( !options:: opt_impute_range.empty() && options:: opt_impute_snps.empty())
+    {   // --impute.range was specified
+        struct local : skipper_target_I {
+            bool    skip_me(int chrm, RefRecord const * rrp)   override {
+                return decide_whether_to_skip_this_tag(rrp, chrm);
             }
         };
         return make_unique<local>();
