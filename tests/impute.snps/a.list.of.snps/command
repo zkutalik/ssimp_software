@@ -1,5 +1,5 @@
 "$SSIMP"                                                                            \
-    --ref "$REF"/compressed/TWINSUK.every100thRS.chrm123.100people.vcfGTz           \
+    --ref "$REF"/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz                  \
     --wind 300000                                                                   \
     --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
     --out "${OUT_IMPUTATIONS}"                                                      \
