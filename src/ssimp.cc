@@ -369,7 +369,13 @@ void impute_all_the_regions(   string                                   filename
                         break;
                     }
 
-                    all_nearby_ref_data.push_back(rr);
+                    if  (   skipper_tags  ->skip_me(chrm, &rr)
+                         && skipper_target->skip_me(chrm, &rr)
+                        )
+                    { /* skip this entirely as it's neither useful as a tag nor a target */ }
+                    else {
+                        all_nearby_ref_data.push_back(rr);
+                    }
 
                 }
 
