@@ -15,6 +15,9 @@
     tests/tags.range/chr2-3/output.actual
     tests/tags.range/chr2/output.actual
     tests/tags.snps/a.list.of.snps/output.actual
+
+    tests/1KG/towards.really.1KG.data/output.actual
+
 ;
 
 @test.data.to.be.made.by.stu :

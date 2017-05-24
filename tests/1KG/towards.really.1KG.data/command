@@ -1,0 +1,9 @@
+"$SSIMP"                                                                            \
+    --ref "$REF"/tbi/small.vcf.sample.vcf.gz                                        \
+    --wind 300000                                                                   \
+    --gwas "$GWAS"/small.UKBB.both.csv                                              \
+    --out "${OUT_IMPUTATIONS}"                                                      \
+    --lambda 0.01                                                                   \
+    --impute.snps   "${COMMANDDIR}"/all.IDs.in.thevcf                                \
+    --tags.snp      "${COMMANDDIR}"/all.IDs.in.thevcf                                \
+    > "$OUTPUT"
