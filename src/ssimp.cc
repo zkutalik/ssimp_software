@@ -448,6 +448,16 @@ void impute_all_the_regions(   string                                   filename
                         }
                     }
                 }
+                auto it = map_SNPname_to_pos.begin();
+                while(it != map_SNPname_to_pos.end()) {
+                    if(it->second == -1) {
+                        it = map_SNPname_to_pos.erase(it);
+                    }
+                    else {
+                        ++it;
+                    }
+                }
+
                 for(auto & msp : map_SNPname_to_pos) {
                     assert(msp.second != -1); // TODO: remove these instead
                 }
