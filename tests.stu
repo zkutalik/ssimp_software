@@ -34,11 +34,18 @@
     export   REF=ref
     export  GWAS=gwas
     export COMMANDDIR="tests/${testname}"
+    export PROF_CHANGE_DIR_AT_THE_LAST_MINUTE="${COMMANDDIR}"
     export OUTPUT="tests/${testname}"/output.actual.tmp
     export OUT_IMPUTATIONS="tests/${testname}"/imputations.txt
     export FORCE_THOUSANDS_SEPARATOR="'"
 
+    rm                    "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out 2>/dev/null || :
     bash "tests/${testname}"/command
+
+    if test -e "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out; then
+        gprof "${SSIMP}" "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out > "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.txt
+        rm               "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out
+    fi
 
     mv "tests/${testname}"/output.actual.tmp "tests/${testname}"/output.actual
 }

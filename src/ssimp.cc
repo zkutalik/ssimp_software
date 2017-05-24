@@ -1,3 +1,4 @@
+#include <unistd.h> // for 'chdir'
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -131,6 +132,15 @@ void    set_appropriate_locale(ostream & stream) {
 }
 
 int main(int argc, char **argv) {
+    struct change_dir_at_the_last_minute {
+        static void go(void) {
+            auto PROF_CHANGE_DIR_AT_THE_LAST_MINUTE = getenv("PROF_CHANGE_DIR_AT_THE_LAST_MINUTE");
+            if(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE) {
+                chdir(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE);
+            }
+        }
+    };
+    atexit( change_dir_at_the_last_minute:: go  );
 
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
