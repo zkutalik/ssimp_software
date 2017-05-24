@@ -11,9 +11,10 @@ extern  int                     opt_flanking_width;
 extern  double                  opt_lambda;
 extern  std:: string            opt_impute_range;
 extern  std:: string            opt_impute_snps;
+extern  std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
+extern  double                  opt_impute_maf/* =0.0*/; // target not imputed unless maf (in reference) is at least this.
 
         void                    read_in_all_command_line_options(int argc, char **argv);
 
-extern  std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
 
 } // namespace options

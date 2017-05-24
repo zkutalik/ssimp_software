@@ -190,8 +190,29 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
 unique_ptr<skipper_target_I> make_skipper_for_targets
         (   std:: string                                    range_as_string
         ,   std::unordered_set<std::string>     const *     uset_of_strings
+        ,   double                                          minmaf
         ) {
     assert(uset_of_strings); // always a non-null pointer, even if the pointee is empty
+
+    if(minmaf != 0.0) {
+        assert( range_as_string.empty() );
+        assert( uset_of_strings->empty());
+
+        struct local : skipper_target_I {
+            double m_minmaf;
+            local(double minmaf) : m_minmaf(minmaf) {
+                assert(minmaf >= 0   ); // I should check this first in options.cc, in a more user friendly way
+                assert(minmaf <= 0.5 ); // I should check this first in options.cc, in a more user friendly way
+            }
+
+            bool    skip_me(int     , RefRecord const * rrp)   override {
+                assert(rrp);
+                return rrp->maf < m_minmaf;
+            }
+        };
+        return make_unique<local>(minmaf);
+    }
+
     if( range_as_string.empty() && uset_of_strings->empty())
     {
         struct local : skipper_target_I {
@@ -301,7 +322,7 @@ void impute_all_the_regions(   string                                   filename
       ,options:: opt_flanking_width
             );
 
-    auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, &options:: opt_impute_snps_as_a_uset);
+    auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, &options:: opt_impute_snps_as_a_uset, options:: opt_impute_maf);
 
     tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
 

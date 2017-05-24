@@ -19,6 +19,7 @@ namespace options {
         std:: string            opt_impute_range;
         std:: string            opt_impute_snps;
         std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
+        double                  opt_impute_maf =0.0; // target not imputed unless maf (in reference) is at least this.
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
@@ -33,6 +34,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"out"                ,  required_argument, 0,  7 },
             {"impute.range"       ,  required_argument, 0,  8 },
             {"impute.snps"        ,  required_argument, 0,  9 },
+            {"impute.maf"         ,  required_argument, 0, 10 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -74,6 +76,11 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_impute_snps.empty() || DIE("--impute.snps specified twice?");
             assert(string("impute.snps") == long_options[long_option_index].name);
             options::  opt_impute_snps = optarg;
+        }
+        if (c == 10) {
+            options:: opt_impute_maf == 0.0 || DIE("--impute.maf specified twice?");
+            assert(string("impute.maf") == long_options[long_option_index].name);
+            options::  opt_impute_maf = utils:: lexical_cast<double>(optarg);
         }
     }
 }
