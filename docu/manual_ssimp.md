@@ -1,8 +1,11 @@
+[//]: ==================================
 # Manual of SSimp
+[//]: ==================================
 
-This command line software tool enables summary statistics imputation (SSimp) for GWAS data. 
+This command line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
 	
 ## Minimal example
+[//]: -------------------------------
 The minimal requirements are: (1) GWAS summary statistics file with at least a SNP id, Z, reference alleles and risk alleles, and (2) the path to the reference panel. 
 
 `../bin/ssimp --gwas ../data/gwas1.txt --ref ../ref/small.vcf.sample.vcf` will generate a `gwas1.imp.log` file and a `gwas1.imp.out` file.
@@ -39,43 +42,52 @@ Arguments can be shortend, e.g. `--wind` instead of `--window.width`
 `--missingness [TRUE]` enable variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 
 ### Note	
+[//]: -------
 - If no `impute.range`, not `impute.snps` is chosen, then all variants in the refpanel are imputed that are not provided as tag SNPs.
 - if your positions are not on hg19, you can use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
 - The option `missingness` is automatically set to FALSE if `N` is not provided or `N` is set to `NA`.
 
 ## Format of GWAS dataset
-Column names are automatically recognized. The log file will indicate which columns are used and recognized. Positions should be coded as the same as the reference panel. It is not needed, but N should be reported. 
+[//]: -------------------------------
+Column names are automatically recognized using commonly used names. The `log` file will indicate which columns are used and recognized. Positions should match the positions in the reference panel (e.g. both hg19). It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
+
+## Reference panel
+[//]: -------------------------------
+
 
 ## Imputation
-For more details on the imputation, please see us (2017). 
-`insert here a brief recap`
+[//]: -------------------------------
+For more details on the summary statistics imputation method, please see our-paper (2017). 
 
-- if SNP ids are present in the GWAS, then pos copied from reference panel. 
-- if SNP ids are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
-- Because either SNP ids or Chr:Pos:A1:A2 are used as identifier, it is also possible to impute indels.
-- Z statistics is imputed, along with the `N.imp` (an estimate for the sample size) and `r2.pred` (imputation quality)
+`insert here a brief recap of the method`
+
+- If SNP-ID are present in the GWAS, then pos copied from reference panel. 
+- If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
+- Because either SNP-ID or Chr:Pos:A1:A2 are used as identifier, it is also possible to impute indels.
+- Z statistics are imputed, along with `N.imp` (an estimate for the sample size) and `r2.pred` (adjusted imputation quality).
+- To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window. The window number is reported in the `.imp.out` file. 
 
  
 ## Output
+[//]: -------------------------------
+
 ### log file
-The `.imp.log` file provides a summary of the imputation done and the results of sanity checks. 
+[//]: -------
+The `.imp.log` file provides a summary of the imputation done and the sanity check results. 
 
 ### out file
-The `.imp.out` file has
-the following columns:
+[//]: -------
+The `.imp.out` file has the following columns:
 
-- `SNP` SNP id (if present)
+- `SNP` SNP-ID
 - `Chr` Chromosome (only 1 to 22 right now)
-- `Pos` Position (HG19)
-- `Z.imp` Z
-- `N.imp` estimation of N (only if missingness was set to `TRUE`)
-- `r2.pred` imputation quality (adjusted as in ...)
-- `A1` reference allele
-- `A2` effect allele
+- `Pos` Position (hg19, or same as in reference panel)
+- `Z.imp` Imputed Z statistics
+- `N.imp` Estimation of N (only if missingness was set to `TRUE`)
+- `r2.pred` Imputation quality (adjusted as in ...)
+- `A1` Reference allele
+- `A2` Effect allele
 - `window.nbr` in which window imputed
 - `lambda` lambda used to impute
-
-`.out.not` lists all the SNPs that were not found in the reference panel 
-`.out.tnot` lists all the tSNPs that were not used as tSNPs (but needed): not found in the reference panel or had an NA in Z
 
 if `Z.imp NA` and `r2.pred 0` means that there was not tag SNP.
