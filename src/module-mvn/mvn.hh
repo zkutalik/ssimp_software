@@ -53,6 +53,8 @@ namespace mvn {
 		~SquareMatrix(); // Rule Of Five
 		void set_identity();
 		size_t size() const { assert(a); return a->size1;}
+		size_t size1()const { assert(a); return a->size1;}
+		size_t size2()const { assert(a); return a->size2;}
 		int    len () const { assert(a); return a->size1;}
 		gsl_matrix * get() {
 			assert(a); return a;
@@ -129,6 +131,8 @@ namespace mvn {
 	SquareMatrix		cholesky_upper(SquareMatrix copy_with_which_to_do_LL) ;
 
 	Matrix operator*(const Matrix &lhs, const SquareMatrix &rhs);
+	Matrix operator*(const Matrix &lhs, const       Matrix &rhs);
+    Matrix		multiply_NoTrans_Trans (const SquareMatrix &lhs, const Matrix &rhs);
 
 
 bool veccol_is_close_to_zero(const VecCol &x);

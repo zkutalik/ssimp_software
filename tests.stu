@@ -3,10 +3,15 @@
     tests/test0/output.actual
     tests/test0/gz/output.actual
     tests/test0/vcfGTz/output.actual
+    tests/3.chromosomes/UKB.every100/output.actual
+    tests/impute.range/chr1_1000000-chr1_2000000/output.actual
+    tests/impute.range/chr2-3/output.actual
+    tests/impute.range/chr2/output.actual
 ;
 
-@test.data.to.be.made.by.stu
-: ref/compressed/small.vcf.sample.vcfGTz
+@test.data.to.be.made.by.stu :
+    ref/compressed/small.vcf.sample.vcfGTz
+    ref/compressed/TWINSUK.every100thRS.chrm123.100people.vcfGTz
 ;
 
     tests/${testname}/output.actual
@@ -17,6 +22,7 @@
     export SSIMP=bin/ssimp
     export   REF=ref
     export  GWAS=gwas
+    export COMMANDDIR="tests/${testname}"
     export OUTPUT="tests/${testname}"/output.actual.tmp
     export OUT_IMPUTATIONS="tests/${testname}"/imputations.txt
     export FORCE_THOUSANDS_SEPARATOR="'"

@@ -16,6 +16,9 @@ namespace options {
         int                     opt_window_width = 1'000'000;
         int                     opt_flanking_width = 250'000;
         double                  opt_lambda  = 0.0;
+        std:: string            opt_impute_range;
+        std:: string            opt_impute_snps;
+        std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
@@ -28,6 +31,8 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"gwas"               ,  required_argument, 0,  5 },
             {"lambda"             ,  required_argument, 0,  6 },
             {"out"                ,  required_argument, 0,  7 },
+            {"impute.range"       ,  required_argument, 0,  8 },
+            {"impute.snps"        ,  required_argument, 0,  9 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -59,6 +64,16 @@ void read_in_all_command_line_options(int argc, char **argv) {
         if (c == 7) {
             assert(string("out") == long_options[long_option_index].name);
             options::  opt_out = optarg;
+        }
+        if (c == 8) {
+            options:: opt_impute_range.empty() || DIE("--impute.range specified twice?");
+            assert(string("impute.range") == long_options[long_option_index].name);
+            options::  opt_impute_range = optarg;
+        }
+        if (c == 9) {
+            options:: opt_impute_snps.empty() || DIE("--impute.snps specified twice?");
+            assert(string("impute.snps") == long_options[long_option_index].name);
+            options::  opt_impute_snps = optarg;
         }
     }
 }

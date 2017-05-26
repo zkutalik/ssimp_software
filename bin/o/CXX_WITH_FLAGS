@@ -1,0 +1,6 @@
+/usr/bin/clang++
+ -O2
+ -Wall -Wextra -std=c++14
+ -isystem src/gz/gzstream 
+ -DGZSTREAM_NAMESPACE=gz 
+-I/usr/local/Cellar/gsl/1.16/include

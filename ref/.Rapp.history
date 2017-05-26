@@ -1,0 +1,577 @@
+qplot()
+tryCatch(library(fastVCF),error = "fastVCF not loaded")
+loadlib <- function(lib) {#
+    out <- tryCatch(#
+        {#
+            message("This is the 'try' part")#
+            library(fastVCF)          #
+#
+     	},#
+        error=function(cond) {#
+            message(paste("URL does not seem to exist:", url))#
+            message("Here's the original error message:")#
+            message(cond)#
+            # Choose a return value in case of error#
+            return(NA)#
+        },#
+        warning=function(cond) {#
+            message(paste("URL caused a warning:", url))#
+            message("Here's the original warning message:")#
+            message(cond)#
+            # Choose a return value in case of warning#
+            return(NULL)#
+        },#
+        finally={#
+        # NOTE:#
+        # Here goes everything that should be executed at the end,#
+        # regardless of success or error.#
+        # If you want more than one expression to be executed, then you #
+        # need to wrap them in curly brackets ({...}); otherwise you could#
+        # just have written 'finally=<expression>' #
+            message(paste("Processed URL:", url))#
+            message("Some other message at the end")#
+        }#
+    )    #
+    return(out)#
+}
+loadlib(fastVCF)
+loadlib <- function(lib) {#
+    out <- tryCatch(#
+        {#
+            message("This is the 'try' part")#
+            library(fastVCF)          #
+#
+     	},#
+        error=function(cond) {#
+            message(paste("URL does not seem to exist:",lib))#
+            message("Here's the original error message:")#
+            message(cond)#
+            # Choose a return value in case of error#
+            return(NA)#
+        },#
+        warning=function(cond) {#
+            message(paste("URL caused a warning:",lib))#
+            message("Here's the original warning message:")#
+            message(cond)#
+            # Choose a return value in case of warning#
+            return(NULL)#
+        },#
+        finally={#
+        # NOTE:#
+        # Here goes everything that should be executed at the end,#
+        # regardless of success or error.#
+        # If you want more than one expression to be executed, then you #
+        # need to wrap them in curly brackets ({...}); otherwise you could#
+        # just have written 'finally=<expression>' #
+            message(paste("Processed URL:",lib))#
+            message("Some other message at the end")#
+        }#
+    )    #
+    return(out)#
+}
+loadlib(fastVCF)
+source(paste0(path, "cookbook/settings_dgm.R"))
+qplot()
+library("MASS")
+loadlib("fastVCF")
+source(paste0(path, "cookbook/settings_dgm.R"))
+install.packages("plotly")
+source(paste0(path, "cookbook/settings_dgm.R"))
+## ---------#
+source(paste0(path, "cookbook/settings_dgm.R"))#
+source(paste0(path, "Projects/functions_dgm.R"))#
+#
+source(paste0(path, "Projects/Fibrosis/code/A_dataprep.R"))
+source("A_dataprep.R")
+source(paste0(path, "cookbook/functions_dgm.R"))
+source("A_dataprep.R")
+q <- 0.2
+x <- rbinom(100, 2, q)
+x
+var(x)
+2*q*(1-q)
+x <- rbinom(10000, 2, q)
+2*q*(1-q)
+var(x)
+var.x <- sapply(1:100, function(i)#
+ x <- rbinom(10000, 2, q)#
+	var(x)#
+)
+var.x <- sapply(1:100, function(i)#
+{#
+	x <- rbinom(10000, 2, q)#
+	var(x)#
+})
+var(var.x)#
+q*(1-q)/100
+q*(1-q)/sqrt(100)
+var(var.x)#
+q*(1-q)/(100-1)
+var.x <- sapply(1:100, function(i)#
+{#
+	x <- rbinom(1000, 2, q)#
+	var(x)#
+})#
+var(var.x)#
+q*(1-q)/(100-1)
+(100-1)^2
+var(var.x)#
+q*(1-q)/(100-1)^2
+var.x <- sapply(1:100, function(i)#
+{#
+	x <- rbinom(1000, 2, q)#
+	var(x)#
+})#
+var(var.x)#
+q*(1-q)/(100-1)^2
+var.x <- sapply(1:100, function(i)#
+{#
+	x <- rbinom(1000, 2, q)#
+	var(x)#
+})#
+var(var.x)#
+q*(1-q)/(100-1)
+var(var.x)#
+q*(1-q)/(100-1)/2
+q*(1-q)/(1000-1)
+var.x <- sapply(1:100, function(i)#
+{#
+	x <- rbinom(1000, 2, q)#
+	var(x)#
+})#
+var(var.x)#
+q*(1-q)/(1000-1)
+sqrt(0.03/1)
+sample(1:42, 7)
+sample(1:42, 7, replace = TRUE)
+sample(1:42, 7)
+sample(1:6, 4, replace = TRUE)
+sample(1:42, 6)
+sort(sample(1:42, 6))
+2/3781
+1/3781
+6/3781
+0.01*3781
+10/3781
+10/50
+0.01*500
+5/3781
+library(xtable)
+xtable(iris)
+8*230/8
+8*230
+340+140+75
+555/4
+555/3
+340+140+75+5.4*6
+340+140+75+5.4*6/3
+(340+140+75+5.4*6)/3
+623.20/4
+9000/23
+sample(c("G", "A", "C", "T"), 100, replace = TRUE)
+paste(sample(c("G", "A", "C", "T"), 100, replace = TRUE), collapse = "")
+1/268
+sqrt(1/2)
+sqrt(10000)
+sqrt(100000)
+2/3000
+2/300
+1/50
+library(powerMediation)
+install.packages("powerMediation")
+install.packages("/Users/admin/powerMediation_0.2.6.gz", repos = TRUE)
+install.packages("/Users/admin/powerMediation_0.2.6.tar.gz", repos = TRUE)
+install.packages("powerMediation")
+install.packages("powerMediation", dependencies = TRUE)
+system("defaults write org.R-project.R force.LANG en_US.UTF-8")
+install.packages("powerMediation", dependencies = TRUE)
+system("defaults write org.R-project.R force.LANG en_US.UTF-8")
+install.packages("powerMediation", dependencies = TRUE)
+library(powerMediation)
+0.35*n
+n <- 469
+0.35*n
+171/n
+0.36*171
+(1-0.36)*171
+n <- 469#
+n1 <- 61 ## diseased and CVC.removal == T#
+n2 <- 109 ## diseased and CVC.removal == F#
+p1 <- n1/n#
+p2 <- n2/n#
+B <- 171/n ## proportion of sample CVC.removal == T#
+powerLogisticBin(n = 1281, p1 = p1, p2 = p2, B = B, alpha = 0.05)
+library(powerMediation)
+??powerLogisticBin
+dat <- read.csv("cvc.power.calc.csv", header = TRUE, skip = 1)
+dir()
+pwd()
+getwd()
+2.60*1.85*1.5
+2.6*1.6*1.4
+768/1024
+5571-5043
+library(dplyr)#
+df %>% #
+  #group by the varialbe cl#
+  group_by(cl) %>%#
+  #sum every column#
+  summarize_each(funs(sum)) %>%#
+  #select the three needed columns#
+  select(ab, bc, de) %>%#
+  #transpose the df#
+  t
+df <- structure(list(ab = c(0, 1, 1, 1, 1, 0, 0, 0, 1, 1), bc = c(1, #
+1, 1, 1, 0, 0, 0, 1, 0, 1), de = c(0, 0, 1, 1, 1, 0, 1, 1, 0, #
+1), cl = c(1, 2, 3, 1, 2, 3, 1, 2, 3, 2)), .Names = c("ab", "bc", #
+"de", "cl"), row.names = c(NA, -10L), class = "data.frame")
+library(dplyr)#
+df %>% #
+  #group by the varialbe cl#
+  group_by(cl) %>%#
+  #sum every column#
+  summarize_each(funs(sum)) %>%#
+  #select the three needed columns#
+  select(ab, bc, de) %>%#
+  #transpose the df#
+  t
+head(df)
+qnorm(0.05)
+394-70
+324*431/394
+5/78
+1/17
+C <- diag(c(1,1))
+rho <- c(0.5, 0.5)
+C <- matrix(c(1,0.99, 0.99, 1),byrow = TRUE)
+Z <- c(3.5, 4)
+rho %*% solve(C) %*% Z
+t()rho) %*% solve(C) %*% Z
+t(rho) %*% solve(C) %*% Z
+C
+C <- matrix(c(1,0.99, 0.99, 1),byrow = TRUE, ncol = 2)
+Z <- c(3.5, 4)
+t(rho) %*% solve(C) %*% Z
+C
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.8, 0.7)#
+C <- matrix(c(1,0.6, 0.6, 1),byrow = TRUE, ncol = 2)#
+Z <- c(3.5, 4)
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.5, 0.5)#
+C <- matrix(c(1, 0.99, 0.99, 1),byrow = TRUE, ncol = 2)#
+Z <- c(0.92, 2.78)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.8, 0.7)#
+C <- matrix(c(1, 0.99, 0.99, 1),byrow = TRUE, ncol = 2)#
+Z <- c(0.92, 2.78)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.6, 0.6)#
+C <- matrix(c(1, 0.99, 0.99, 1),byrow = TRUE, ncol = 2)#
+Z <- c(0.92, 2.78)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.8, 0.9)#
+C <- matrix(c(1,0.5, 0.5, 1),byrow = TRUE, ncol = 2)#
+Z <- c(3.5, 4)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+Z <- c(1.79,4.62)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+t(rho) %*% solve(C) %*% rho#
+#
+## missingness example#
+Z <- c(1.8,4.6)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho * sqrt(n/nmax)
+delta <- diag(c(1,1))#
+delta[1,2] <- sqrt(n[1]/n[2])
+rho <- c(0.8, 0.9)#
+n <- c(100, 1000)#
+nmax <- 1200#
+C <- matrix(c(1,0.5, 0.5, 1),byrow = TRUE, ncol = 2)#
+#
+## maximum#
+delta <- diag(c(1,1))#
+delta[1,2] <- sqrt(n[1]/n[2])
+d <- rho * sqrt(n/nmax)#
+D <- C * delta
+D <- C * z
+delta
+delta[2,1] <- sqrt(n[1]/n[2])
+## missingness example#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+delta <- diag(c(0,0))#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta
+## results#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+delta <- diag(c(1,1))#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta#
+#
+## results#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+delta <- diag(c(1,1))#
+delta[1,2] <- sqrt(n[1]*n[2])/nmax#
+delta[2,1] <- sqrt(n[1]/n[2])/nmax#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta#
+#
+## results#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+delta <- diag(c(1,1))#
+delta[1,2] <- sqrt(n[1]/n[2])#
+delta[2,1] <- sqrt(n[1]/n[2])#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta#
+#
+## results#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+rho <- c(0.8, 0.9)#
+C <- matrix(c(1,0.5, 0.5, 1),byrow = TRUE, ncol = 2)#
+Z <- c(3.5, 4)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho#
+#
+## missingness example#
+Z <- c(1.8,4.6)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+d
+D
+## results#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z
+## independent#
+## ================#
+delta <- diag(c(1,1))#
+delta[1,2] <- sqrt(n[1]*n[2])/nmax#
+delta[2,1] <- sqrt(n[1]/n[2])/nmax#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta#
+#
+## results#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+## least overlap#
+## ================#
+delta <- diag(c(1,1))#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta#
+#
+## results#
+Z <- c(1.8,4.6)#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+Z <- c(2, 6)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.9, 0.8)#
+C <- matrix(c(1,0.5, 0.5, 1),byrow = TRUE, ncol = 2)#
+Z <- c(3.5, 4)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.9, 0.8)#
+C <- matrix(c(1,0.5, 0.5, 1),byrow = TRUE, ncol = 2)#
+Z <- c(3.5, 4)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho#
+#
+## missingness example#
+## ----------------------#
+#
+Z <- c(2, 6)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+rho <- c(0.8, 0.9)#
+C <- matrix(c(1,0.5, 0.5, 1),byrow = TRUE, ncol = 2)#
+Z <- c(3.5, 4)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho#
+#
+## missingness example#
+## ----------------------#
+#
+Z <- c(1.5, 4.7)#
+t(rho) %*% solve(C) %*% Z#
+t(rho) %*% solve(C) %*% rho
+## missingness#
+## //////////////////#
+rho <- c(0.8, 0.9)#
+n <- c(100, 1000)#
+nmax <- 1200#
+C <- matrix(c(1,0.5, 0.5, 1),byrow = TRUE, ncol = 2)#
+#
+## maximum#
+## ==========#
+delta <- diag(c(1,1))#
+delta[1,2] <- sqrt(n[1]/n[2])#
+delta[2,1] <- sqrt(n[1]/n[2])#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+delta <- diag(c(1,1))#
+delta[1,2] <- sqrt(n[1]*n[2])/nmax#
+delta[2,1] <- sqrt(n[1]/n[2])/nmax#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta#
+#
+## results#
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+## least overlap#
+## ================#
+delta <- diag(c(1,1))#
+d <- rho * sqrt(n/nmax)#
+D <- C * delta
+t(d) %*% solve(D) %*% Z#
+t(d) %*% solve(D) %*% rho
+sqrt(n[1]*n[2])/nmax
+sqrt(100/1000)
+setwd("/Users/admin/Documents/Work/Projects/tagging/ssimp_software/ref/")#
+library(readr)#
+vcf.raw <- read_tsv("1000genomes_90snps_100samples.vcf")
+## ref#
+vcf.raw <- read_tsv("1000genomes_90snps_100samples.vcf")#
+snps <- vcf.raw$ID[vcf]#
+#
+## gwas#
+gwas <- read_tsv(tmp, paste0(path.gwas, "gwas_example.txt"))
+## ref#
+vcf.raw <- read_tsv("1000genomes_90snps_100samples.vcf")#
+snps <- vcf.raw$ID#
+#
+## gwas#
+gwas <- read_tsv(tmp, paste0(path.gwas, "gwas_example.txt"))
+gwas <- read_tsv(paste0(path.gwas, "gwas_example.txt"))
+## gwas#
+path.gwas <- "/Users/admin/Documents/Work/Projects/tagging/ssimp_software/gwas/"#
+gwas <- read_tsv(paste0(path.gwas, "gwas_example.txt"))
+?intersect
+set.diff(snps, gwas$SNP)
+setdiff(snps, gwas$SNP)
+snps2imp <- setdiff(snps, gwas$SNP)#
+tsnps <- intersect(snps, gwas$SNP)
+tsnps
+snps2imp
+head(vcf.raw)
+vcf.raw[1,]
+cor(vcf.raw[,-c(1:9)])
+vcf.raw[,-c(1:9)]
+map <- vcf.raw[,1:5]
+G <- vcf.raw[,-(1:9)]
+G <- as.data.frame(vcf.raw[,-(1:9)])
+head(G)
+G <- t(as.data.frame(vcf.raw[,-(1:9)]))
+G
+table(G)
+G <- matrix(NA, ncol = ncol(G.char), nrow = nrow(G.char))
+G.char <- t(as.data.frame(vcf.raw[,-(1:9)]))#
+G <- matrix(NA, ncol = ncol(G.char), nrow = nrow(G.char))
+G[G.char == "0|0"]
+G <- matrix(NA, ncol = ncol(G.char), nrow = nrow(G.char))#
+G[G.char == "0|0"] <- 0#
+G[G.char == "0|1"] <- 1#
+G[G.char == "1|0"] <- 1#
+G[G.char == "1|1"] <- 2
+names(G) <- map$ID
+names(G)
+G.char <- t(as.data.frame(vcf.raw[,-(1:9)]))#
+G <- matrix(NA, ncol = ncol(G.char), nrow = nrow(G.char))#
+G[G.char == "0|0"] <- 0#
+G[G.char == "0|1"] <- 1#
+G[G.char == "1|0"] <- 1#
+G[G.char == "1|1"] <- 2#
+colnames(G) <- map$ID
+colnames(G)
+# imputation#
+C <- cor(G)
+C
+G <- matrix(NA, ncol = ncol(G.char), nrow = nrow(G.char))#
+G[G.char == "0|0"] <- 0#
+G[G.char == "0|1"] <- 1#
+G[G.char == "1|0"] <- 1#
+G[G.char == "1|1"] <- 2#
+colnames(G) <- map$ID
+G
+C <- cor(G, use = "pairwise")
+C
+Sigma <- cor(G, use = "pairwise")
+C.mat <- cor(G, use = "pairwise")
+C[snps2imp,]
+rho <- C.mat[tsnps, snps2imp]
+C[tsnps, tsnps]
+C <- C.mat[tsnps, tsnps]
+rho <- C.mat[tsnps, snps2imp]#
+C <- C.mat[tsnps, tsnps]
+head(gwas)
+gwas.sub <- gwas[gwas$SNP %in% tsnps, ]
+Z <- gwas.sub$BETA/gwas.sub$SE
+lambda <- 2/sqrt(nrow(G))
+C.mat <- (C.mat * (1-lambda)) + diag(C.mat) * lambda#
+rho <- C.mat[tsnps, snps2imp]#
+C <- C.mat[tsnps, tsnps]
+rho[is.na(rho)] <- 0#
+C[is.na(C)] <- 0
+t(rho) %*% solve(C) %*% Z
+C
+t(rho) %*% solve(C) %*% Z
+v.g <- apply(G, 2, var)
+v.g
+which(v.g == 0)
+C.mat <- cor(G[,v.g > 0], use = "pairwise")
+C.mat
+lambda <- 2/sqrt(nrow(G))
+C.mat <- (C.mat * (1-lambda)) + diag(C.mat) * lambda
+tsnps <- intersect(tsnps, colnames(C.mat))
+snps2imp <- intersect(snps2imp, colnames(C.mat))
+rho <- C.mat[tsnps, snps2imp]#
+C <- C.mat[tsnps, tsnps]
+rho
+C
+tsnps
+snps2imp
+rho <- C.mat[tsnps, snps2imp]#
+C <- C.mat[tsnps, tsnps]
+## actual imputaton#
+t(rho) %*% solve(C) %*% Z
+olve(C)
+solve(C)
+dim(rho)
+Z
+gwas.sub <- gwas[gwas$SNP %in% tsnps, ]#
+Z <- gwas.sub$BETA/gwas.sub$SE
+## actual imputaton#
+t(rho) %*% solve(C) %*% Z
+write.out("test1.R.out")
+res <- t(rho) %*% solve(C) %*% Z
+write_table(res, "test1.R.out")
+readr
+library(readr)
+apropos("write_")
+write_file(res, "test1.R.out")
+write_tsv(res, "test1.R.out")
+res
+res <- t(rho) %*% solve(C) %*% Z
+out <- data.frame(SNP = rownames(res), Z.imp = res)
+write_tsv(out, "test1.R.out")
+pwd()
+getwd()
