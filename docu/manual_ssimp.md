@@ -9,7 +9,7 @@ The minimal requirements are: (1) GWAS summary statistics file with at least a S
 	
 
 ## Arguments
-[//]: <> (This is also a comment.)
+[]: -------------------------------
 Arguments can be shortend, e.g. `--wind` instead of `--window.width`
 
 `--gwas [no default]`, path to GWAS dataset, extension does not matter, nor does text separation.  Columns should be named. Missings have to be marked as `NA`. quicktest, snptest, metal and plink output files will be automatically recognised. Minimal columns are SNP-id, Z, reference allele and risk allele. More info see below.
