@@ -1,0 +1,15 @@
+
+## Some numbers:
+
+- XX SNPs were imputed
+- on average, XX SNPs were used as tag SNPs
+- in total, XX tag SNPS were used
+- Sample size ranges from XX to XX
+- time used to impute
+
+## sanity check: take some tag SNPs at random, remove them from the GWAS file, impute them, and check.
+
+## here list all the SNPs that were in the GWAS dataset, but not found in the reference panel (therefore could not be utilized as tag SNPs)
+
+## here list all the SNPs that were demanded in the option --impute.snp, but were not in the reference panel availalbe
+
