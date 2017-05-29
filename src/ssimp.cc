@@ -497,6 +497,29 @@ void impute_all_the_regions(   string                                   filename
             // Now, thanks to the block just completed, we have all the positions in the GWAS
             // that are relevant for this window.
             gwas->sort_my_entries(); // Sort them by position
+            {   /* What follows is another optional speed optimization:
+                 * If we now know all the positions of the tags, we may be able
+                 * to skip windows (on the current chromome)
+                 */
+                if(gwas->get_chrpos(0) != chrpos{-1,-1}) { // every GWAS SNP has known position now
+                    // check if the last tag on this chromosome is already too far back
+                    auto x = std:: lower_bound( begin_from_file(gwas), end_from_file(gwas), chrpos{ chrm, std::numeric_limits<int>::lowest() });
+                    auto last_tag_on_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::lowest() };
+                    while(x != end_from_file(gwas) && x.get_chrpos().chr == chrm) {
+                        auto cur = x.get_chrpos();
+                        PPe(last_tag_on_this_chromosome, cur);
+                        assert( cur >= last_tag_on_this_chromosome );
+                        last_tag_on_this_chromosome = cur;
+                        ++x;
+                    }
+                    PPe(last_tag_on_this_chromosome, current_window_start - options:: opt_flanking_width);
+                    assert(chrm == last_tag_on_this_chromosome.chr);
+                    if(last_tag_on_this_chromosome.pos < current_window_start - options:: opt_flanking_width) {
+                        PPe("break out", last_tag_on_this_chromosome.pos , current_window_start - options:: opt_flanking_width);
+                        break;
+                    }
+                }
+            }
 
             // Of the next four lines, only the two are interesting (to find the range of GWAS snps for this window)
             auto const b_gwas = begin_from_file(gwas);
