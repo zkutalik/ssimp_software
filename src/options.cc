@@ -58,6 +58,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_raw_ref = optarg;
         }
         if (c == 3) {
+            options::  opt_window_width  == 1'000'000 || DIE("--window width specified twice?");
             assert(string("window.width") == long_options[long_option_index].name);
             options::  opt_window_width  = utils:: lexical_cast<int>(optarg);
         }
