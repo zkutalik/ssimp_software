@@ -356,7 +356,6 @@ void impute_all_the_regions(   string                                   filename
     auto const tag_cub = skipper_tags  ->conservative_upper_bound();
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
-
         if  ( chrm < trg_clb.chr ) { continue; }
         if  ( chrm > trg_cub.chr ) { continue; }
         if  ( chrm < tag_clb.chr ) { continue; }
@@ -507,15 +506,13 @@ void impute_all_the_regions(   string                                   filename
                     auto last_tag_on_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::lowest() };
                     while(x != end_from_file(gwas) && x.get_chrpos().chr == chrm) {
                         auto cur = x.get_chrpos();
-                        PPe(last_tag_on_this_chromosome, cur);
                         assert( cur >= last_tag_on_this_chromosome );
                         last_tag_on_this_chromosome = cur;
                         ++x;
                     }
-                    PPe(last_tag_on_this_chromosome, current_window_start - options:: opt_flanking_width);
                     assert(chrm == last_tag_on_this_chromosome.chr);
                     if(last_tag_on_this_chromosome.pos < current_window_start - options:: opt_flanking_width) {
-                        PPe("break out", last_tag_on_this_chromosome.pos , current_window_start - options:: opt_flanking_width);
+                        //PPe("break out", last_tag_on_this_chromosome.pos , current_window_start - options:: opt_flanking_width);
                         break;
                     }
                 }

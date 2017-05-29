@@ -17,8 +17,8 @@
     tests/tags.snps/a.list.of.snps/output.actual
 
     tests/1KG/towards.really.1KG.data/output.actual
-
     tests/1KG/towards.really.1KG.data.limit.the.tags/output.actual
+    tests/1KG/towards.really.1KG.data.a.bit.more/output.actual
 
 ;
 
