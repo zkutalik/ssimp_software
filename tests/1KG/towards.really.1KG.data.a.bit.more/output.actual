@@ -8,10 +8,10 @@ chrm22	   15'900'000-16'200'000
 
 chrm22	   16'200'000-16'500'000
        4 # GWAS     SNPs in this window (with 250'000 flanking)
-       4 # SNPs in both (i.e. useful as tags)
+       3 # SNPs in both (i.e. useful as tags)
    4'421 # target SNPs (anything in narrow window, will include some tags)
 
 chrm22	   16'500'000-16'800'000
        3 # GWAS     SNPs in this window (with 250'000 flanking)
-       3 # SNPs in both (i.e. useful as tags)
+       2 # SNPs in both (i.e. useful as tags)
    4'454 # target SNPs (anything in narrow window, will include some tags)
