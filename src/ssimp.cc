@@ -354,6 +354,8 @@ void impute_all_the_regions(   string                                   filename
 
         if  ( chrm < skipper_target->conservative_lower_bound().chr ) { continue; }
         if  ( chrm > skipper_target->conservative_upper_bound().chr ) { continue; }
+        if  ( chrm < skipper_tags  ->conservative_lower_bound().chr ) { continue; }
+        if  ( chrm > skipper_tags  ->conservative_upper_bound().chr ) { continue; }
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
@@ -361,6 +363,8 @@ void impute_all_the_regions(   string                                   filename
 
             if(chrm == skipper_target->conservative_upper_bound().chr) {
                 if(chrpos{chrm,current_window_start                               } > skipper_target->conservative_upper_bound()) { break; }
+            }
+            if(chrm == skipper_tags  ->conservative_upper_bound().chr) {
                 if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > skipper_tags  ->conservative_upper_bound()) { break; }
             }
 
@@ -368,6 +372,8 @@ void impute_all_the_regions(   string                                   filename
             // chromosome, or else we get an infinite loop.
             if(chrm == skipper_target->conservative_lower_bound().chr) {
                 if(chrpos{chrm,current_window_end                                 } < skipper_target->conservative_lower_bound()) { continue; }
+            }
+            if(chrm == skipper_tags  ->conservative_lower_bound().chr) {
                 if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < skipper_tags  ->conservative_lower_bound()) { continue; }
             }
 

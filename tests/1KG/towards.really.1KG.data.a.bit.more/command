@@ -4,7 +4,6 @@
     --gwas "$GWAS"/small.UKBB.both.csv                                              \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
-    --impute.range  chr22:6644620-chr22:16697166                                    \
     --tags.range    chr22:6644620-chr22:16644620                                    \
     > "$OUTPUT"
     #--ref "$REF"/tbi/small.vcf.sample.vcf.gz                                        \
