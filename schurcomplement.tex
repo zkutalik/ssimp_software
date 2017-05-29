@@ -1,0 +1,78 @@
+\documentclass{article}
+\usepackage{bm}
+\newcommand{\tensor}[1]{#1}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section*{Efficient computation of $\tensor{C}^{-1}$ for blocks of $\tensor{C}$ using Schur complement}
+
+Sina Rueger, \today, after a draft by Zoltan.\\
+
+%% -----------------------------------------------------------------------------
+Say you have a set of $m$ tag SNPs (meaning, $m$ is a list of rs numbers) and you want to impute each of the tag SNPs in a leave-one-out fashion. To avoid calculating the inversion of the correlation matrix for each leave-one-out run, we can use an efficient computation of $\tensor{C}^{-1}$, where we only have to calculate the inverse of the full matrix $\tensor{C}^{-1}$, and then adapt the original equation slightly.
+
+Here is the original equation to impute SNP $u$ using the set of $m$ tag SNPs:
+\begin{equation*}
+  \widehat{z_{u}|\bm{z_{m}}} = \tensor{c}'  \tensor{C}^{-1}  \widehat{\bm{z_m}}
+\end{equation*}
+
+Now we want to impute a SNP $i$ from the set $m$ tag SNPs. We can rewrite the previous equation as:
+\begin{equation*}
+ \widehat{z_{i}|\bm{z_{-i}}}  = \tensor{C}_{i,-i} \cdot (\tensor{C}_{-i,-i})^{-1} \cdot  \widehat{\bm{z_{-i}}}
+ \end{equation*}
+
+For simplicity we can assume that $\tensor{C}$ is full rank. 
+
+
+%% ===========================================================
+%\textit{(my own version,  block matrix inversion part with schur complement from wikipedia, some help from david)}\\
+
+Lets define matrix $\tensor{K}$:
+\begin{equation*}
+ \tensor{K} = \left( \begin{array}{cc} \tensor{C}_{i,i} & \tensor{C}_{i,-i}\\ \tensor{C}_{-i,i} & \tensor{C}_{-i,-i} \end{array} \right) 
+\end{equation*}
+
+Then its inverse can be expressed using the Schur complement for block matrix inversion:
+
+\begin{equation*}
+   K^{-1}=\left( \begin{array}{cc} (\tensor{K}^{-1})_{i,i} &  (\tensor{K}^{-1})_{i,-i}\\
+     (\tensor{K})_{-i,i} &(\tensor{K}^{-1})_{-i,-i} \end{array} \right)\\
+   
+   = \left( \begin{array}{cc} (1/k) &
+    -(1/k) \cdot \tensor{C}_{i,-i}\cdot \tensor{C}^{-1}_{-i,-i}\\
+    \tensor{C}^{-1}_{-i,-i} \cdot \tensor{C}_{i,-i} \cdot (1/k) &
+    \tensor{C}^{-1}_{-i,-i} + \tensor{C}^{-1}_{-i,-i}\cdot \tensor{C}_{i,-i} \cdot (1/k) \cdot \tensor{C}_{i,-i} \cdot \tensor{C}^{-1}_{-i,-i} \end{array} \right)
+\end{equation*}
+\\
+
+where $k= \tensor{C}_{i,i}-\tensor{C}_{i,-i} \cdot \tensor{C}^{-1}_{-i,-i} \cdot \tensor{C}_{i,-i}$, and for example $(\tensor{K}^{-1})_{i,i}$ reads 'element i-i of K-inverse'. Hence the imputed value for $\widehat{z_i|\bm{z_{-i}}}$ takes the form of
+
+\begin{equation*}
+  \widehat{z_i|\bm{z_{-i}}} = \frac{(-1) \cdot (\tensor{K}^{-1})_{i,-i} \cdot \widehat{\bm{z_{-i}}}}{(\tensor{K}^{-1})_{i,i}}
+\end{equation*}
+
+%% %% ===========================================================
+%% \textit{(zoltans version, copied from randommating.pdf document)}\\
+
+%% If matrix $\mats{C}$ is expressed as
+
+%% \begin{equation*}
+%%  \mat{C} = \left( \begin{array}{cc} \mat{C}_{-i,-i} & \mat{C}_{-i,i}\\ \mat{C}_{i,-i} & \mat{C}_{i,i} \end{array} \right) 
+%% \end{equation*}
+
+%% Then its inverse can be expressed using the Schur complement for block matrix inversion:
+
+%% \begin{equation*}
+%%   \mat{C}^{-1} = \left( \begin{array}{cc} \mat{C}^{-1}_{-i,-i} + (1/k)\cdot \mat{C}^{-1}_{-i,-i}\cdot \mat{C}_{-i,i} \cdot \mat{C}_{i,-i} \cdot \mat{C}^{-1}_{-i,-i} & -(1/k) \cdot \mat{C}^{-1}_{-i,-i}\cdot \mat{C}_{-i,i}\\ -(1/k)\cdot \mat{C}_{i,-i} \cdot \mat{C}^{-1}_{-i,-i} & (1/k) \end{array} \right) 
+%% \end{equation*}
+
+%% where $k=1-\mat{C}^{-1}_{i,-i} \cdot \mat{C}^{-1}_{-i,-i} \cdot \mat{C}_{-i,i}$. Hence the imputed value for $z_k|z_M$ takes the form of
+
+%% \begin{equation*}
+%%   \widehat{z_{k|M}}_{\lambda}  = z_i\cdot \frac{(\mat{C}^{-1})_{i,i}}{(\mat{C}^{-1})_{i,i} - 1} - \frac{\vec{z^T_{M}} \cdot (\mat{C}^{-1})_{.,i}}{(\mat{C}^{-1})_{i,i} - 1}
+%% \end{equation*}
+
+%% The corresponding imputation quality is $\frac{(\mat{C}^{-1})_{i,i}-1}{(\mat{C}^{-1})_{i,i}}$
+
+\end{document}
