@@ -1,4 +1,4 @@
-file_name:gwas/small.UKBB.both.csv
+file_name:gwas/small.UKBB.both.just.4.csv
 options:: opt_window_width,options:: opt_flanking_width:	300'000 , 250'000
 
 chrm22	   15'900'000-16'200'000
