@@ -5,7 +5,7 @@
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
     --impute.range  chr22:6644620-chr22:16697166                                    \
-    --tags.range    chr22:6644620-chr22:16495832                                    \
+    --tags.range    chr22:6644620-chr22:16644620                                    \
     > "$OUTPUT"
     #--ref "$REF"/tbi/small.vcf.sample.vcf.gz                                        \
     #--ref "$REF"/link.to.1kg.data/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
