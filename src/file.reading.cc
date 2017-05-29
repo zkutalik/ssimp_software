@@ -162,7 +162,7 @@ header_details   parse_header( string      const & header_line ) {
         ++field_counter;
         // go through each field name in turn and try to account for it
         if(false) {}
-        else if(is_in_this_list(one_field_name, {"ID","rnpid"})) {
+        else if(is_in_this_list(one_field_name, {"ID","rnpid","snpid"})) {
             hd.SNPname = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"#CHROM","chr"})) {
@@ -191,8 +191,9 @@ header_details   parse_header( string      const & header_line ) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"z.from.peff"
-                                                ,"binary.mean.beta"
-                                                ,"beta"
+                                                ,"z"
+                                                //,"binary.mean.beta"
+                                                //,"beta"
                                                 })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
         }
