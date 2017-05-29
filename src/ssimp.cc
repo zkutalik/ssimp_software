@@ -350,10 +350,10 @@ void impute_all_the_regions(   string                                   filename
 
     tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
 
-    auto trg_clb = skipper_target->conservative_lower_bound();
-    auto trg_cub = skipper_target->conservative_upper_bound();
-    auto tag_clb = skipper_tags  ->conservative_lower_bound();
-    auto tag_cub = skipper_tags  ->conservative_upper_bound();
+    auto const trg_clb = skipper_target->conservative_lower_bound();
+    auto const trg_cub = skipper_target->conservative_upper_bound();
+    auto const tag_clb = skipper_tags  ->conservative_lower_bound();
+    auto const tag_cub = skipper_tags  ->conservative_upper_bound();
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
