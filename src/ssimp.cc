@@ -350,31 +350,36 @@ void impute_all_the_regions(   string                                   filename
 
     tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
 
+    auto trg_clb = skipper_target->conservative_lower_bound();
+    auto trg_cub = skipper_target->conservative_upper_bound();
+    auto tag_clb = skipper_tags  ->conservative_lower_bound();
+    auto tag_cub = skipper_tags  ->conservative_upper_bound();
+
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
-        if  ( chrm < skipper_target->conservative_lower_bound().chr ) { continue; }
-        if  ( chrm > skipper_target->conservative_upper_bound().chr ) { continue; }
-        if  ( chrm < skipper_tags  ->conservative_lower_bound().chr ) { continue; }
-        if  ( chrm > skipper_tags  ->conservative_upper_bound().chr ) { continue; }
+        if  ( chrm < trg_clb.chr ) { continue; }
+        if  ( chrm > trg_cub.chr ) { continue; }
+        if  ( chrm < tag_clb.chr ) { continue; }
+        if  ( chrm > tag_cub.chr ) { continue; }
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
 
-            if(chrm == skipper_target->conservative_upper_bound().chr) {
-                if(chrpos{chrm,current_window_start                               } > skipper_target->conservative_upper_bound()) { break; }
+            if(chrm == trg_cub.chr) {
+                if(chrpos{chrm,current_window_start                               } > trg_cub) { break; }
             }
-            if(chrm == skipper_tags  ->conservative_upper_bound().chr) {
-                if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > skipper_tags  ->conservative_upper_bound()) { break; }
+            if(chrm == tag_cub.chr) {
+                if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > tag_cub) { break; }
             }
 
             // applying the lower bound is a little trickier. Must only be applied on the correct
             // chromosome, or else we get an infinite loop.
-            if(chrm == skipper_target->conservative_lower_bound().chr) {
-                if(chrpos{chrm,current_window_end                                 } < skipper_target->conservative_lower_bound()) { continue; }
+            if(chrm == trg_clb.chr) {
+                if(chrpos{chrm,current_window_end                                 } < trg_clb) { continue; }
             }
-            if(chrm == skipper_tags  ->conservative_lower_bound().chr) {
-                if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < skipper_tags  ->conservative_lower_bound()) { continue; }
+            if(chrm == tag_clb.chr) {
+                if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < tag_clb) { continue; }
             }
 
             /*
