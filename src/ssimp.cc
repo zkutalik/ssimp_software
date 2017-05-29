@@ -364,6 +364,8 @@ void impute_all_the_regions(   string                                   filename
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
+            //PPe(chrm, w, current_window_start, current_window_end, utils::ELAPSED());
+            //PP(__LINE__, utils:: ELAPSED());
 
             if(chrm == trg_cub.chr) {
                 if(chrpos{chrm,current_window_start                               } > trg_cub) { break; }
@@ -405,6 +407,7 @@ void impute_all_the_regions(   string                                   filename
                 ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
                                     ,   chrpos{chrm,std::numeric_limits<int>::max()                    } // in theory, to the end of the chromosome. See a few lines below
                                     );
+                //PP(__LINE__, utils:: ELAPSED());
                 RefRecord rr;
                 while(ref_vcf.read_record_into_a_RefRecord(rr)) {
 
@@ -426,6 +429,7 @@ void impute_all_the_regions(   string                                   filename
                     }
 
                 }
+                //PP(__LINE__, utils:: ELAPSED(), all_nearby_ref_data.size());
 
                 for(int o=0; o+1 < ssize(all_nearby_ref_data); ++o) { // check position is monotonic
                     assert(all_nearby_ref_data.at(o).pos <= all_nearby_ref_data.at(o+1).pos);
@@ -493,6 +497,7 @@ void impute_all_the_regions(   string                                   filename
                     }
                 }
             }
+            //PP(__LINE__, utils:: ELAPSED());
             // Now, thanks to the block just completed, we have all the positions in the GWAS
             // that are relevant for this window.
             gwas->sort_my_entries(); // Sort them by position
@@ -606,6 +611,7 @@ void impute_all_the_regions(   string                                   filename
                     unk2_its    .push_back( &*it       );
                 }
             }
+            //PP(__LINE__, utils:: ELAPSED());
 
 
             // Next few lines are kind of boring, just printing some statistics.
@@ -648,18 +654,22 @@ void impute_all_the_regions(   string                                   filename
             int const N_ref = genotypes_for_the_tags.at(0).size(); // the number of individuals
             assert(N_ref > 0);
 
+            //PP(__LINE__, utils:: ELAPSED());
 
             /*
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
              */
             mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
+            //PP(__LINE__, utils:: ELAPSED());
             mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
+            //PP(__LINE__, utils:: ELAPSED());
             mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
                                                          , tag_its_
                                                          , unk2_its
                                                          , options:: opt_lambda
                                                          );
+            //PP(__LINE__, utils:: ELAPSED());
 
             // Next two lines are the imputation, and its quality.
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
