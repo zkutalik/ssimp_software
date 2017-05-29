@@ -67,11 +67,12 @@ namespace tbi {
         rr.ID       =   record.getIDStr();
         rr.ref      =   record.getRefStr();
         rr.alt      =   record.getAltStr();
-        assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
-        assert(record.hasAllGenotypeAlleles());
+        //assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
+        //assert(record.hasAllGenotypeAlleles());
         int const N = record.getNumSamples(); // TODO: verify this is the same in every SNP?
+        rr.z12.reserve(N);
         for(int i=0;i<N;++i) {
-            assert(2==record.getNumGTs(i));
+            //assert(2==record.getNumGTs(i));
             int l = record.getGT(i, 0);
             int r = record.getGT(i, 1);
             assert((l | 1) == 1);

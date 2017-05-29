@@ -80,7 +80,7 @@
     # Also, include some general args we want to always pass,
     # regardless of whether we're compiling or linking
 
-    echo " -O2"
+    echo " -O4"
     echo " -Wall -Wextra -std=c++14"
     if   test "$(whoami)" = 'amcdaid'  \
            -o "$(whoami)" = 'aaron'
