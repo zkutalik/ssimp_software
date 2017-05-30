@@ -4,4 +4,5 @@
     --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt.swap.some.alleles        \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
+    --reimpute.tags                                                                 \
     > "$OUTPUT"

@@ -73,6 +73,10 @@ mvn:: Matrix make_c_unkn_tags_matrix
         , vector<RefRecord const *              > const & unk_its
         , double                                          lambda
         );
+static
+void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
+                                ,   mvn:: SquareMatrix const & C_inv
+                                , std:: vector<double> const & tag_zs_);
 
 enum class which_direction_t { DIRECTION_SHOULD_BE_REVERSED
                              , NO_ALLELE_MATCH
@@ -711,8 +715,12 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << imp_qual
                         << endl;
             }
-        }
-    }
+
+            if(options:: opt_reimpute_tags) {
+                reimpute_tags_one_by_one(C, Cinv, tag_zs_);
+            }
+        } // loop over windows
+    } // loop over chromosomes
 }
 
 static
@@ -852,5 +860,50 @@ static
 
         return which_direction_t:: NO_ALLELE_MATCH;
     }
+
+static
+void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
+                                ,   mvn:: SquareMatrix const & C_inv
+                                , std:: vector<double> const & zs) {
+    assert(C.size() == zs.size());
+    assert(C.size() == C_inv.size());
+    int const M = C.size();
+    if(M==1)
+        return;
+    assert(M>1);
+if(M>=5) // for now, just use the first time when there are five tags
+{
+    PP(C);
+    for(int m=0; m<M; ++m) {
+        auto z_real = zs.at(m);
+        auto z_slow = [&]() {
+            // I'll simply set the correlations to zero
+            auto C_zeroed = C;
+            for(int n=0; n<M; ++n) {
+                if(n!=m) {
+                    C_zeroed.set(n,m,0);
+                    C_zeroed.set(m,n,0);
+                }
+            }
+            auto C_zeroed_inv = invert_a_matrix(C_zeroed);
+            mvn:: VecCol vec(M);
+            for(int n=0; n<M; ++n) {
+                vec.set(n, C(n,m));
+            }
+            auto z_slow_imp
+                =   multiply_rowvec_by_colvec_giving_scalar
+                    (   vec
+                    ,   multiply_matrix_by_colvec_giving_colvec
+                        (   C_zeroed_inv
+                        , mvn:: make_VecCol(zs)
+                        )
+                    );
+            return z_slow_imp;
+        }();
+        PPe(m, z_real, z_slow);
+    }
+    exit(0);
+}
+}
 
 } // namespace ssimp

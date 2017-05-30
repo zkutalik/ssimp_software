@@ -28,6 +28,8 @@ namespace options {
         std::unordered_set<std::string>    opt_tags_snps_as_a_uset;
         double                  opt_tags_maf =0.0; // target not imputed unless maf (in reference) is at least this.
 
+        bool                    opt_reimpute_tags = false;
+
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
         int long_option_index;
@@ -45,6 +47,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"tags.range"         ,  required_argument, 0, 11 },
             {"tags.snps"          ,  required_argument, 0, 12 },
             {"tags.maf"           ,  required_argument, 0, 13 },
+            {"reimpute.tags"      ,        no_argument, 0, 14 }, // one-by-one, reimpute each tag by masking it
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -107,6 +110,10 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_tags_maf == 0.0 || DIE("--tags.maf specified twice?");
             assert(string("tags.maf") == long_options[long_option_index].name);
             options::  opt_tags_maf = utils:: lexical_cast<double>(optarg);
+        }
+        if (c == 14) {
+            assert(string("reimpute.tags") == long_options[long_option_index].name);
+            options::  opt_reimpute_tags = true;
         }
     }
 }

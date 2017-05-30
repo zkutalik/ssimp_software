@@ -21,6 +21,8 @@ extern  std:: string            opt_tags_snps;
 extern  std::unordered_set<std::string>    opt_tags_snps_as_a_uset;
 extern  double                  opt_tags_maf/* =0.0*/;
 
+extern  bool                    opt_reimpute_tags;
+
         void                    read_in_all_command_line_options(int argc, char **argv);
 
 
