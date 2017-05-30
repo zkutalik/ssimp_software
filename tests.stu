@@ -80,6 +80,8 @@
 {
 export  target="ref/tbi/${path}.vcf.gz"
     ls -l "ref/${path}".vcf.gz
+    mkdir -p "$(dirname "$target")"
     zcat "ref/${path}".vcf.gz | bgzip > "${target}".tmp
-    mv "${target}"{.tmp,}
+    mv "${target}".tmp \
+       "${target}"
 }
