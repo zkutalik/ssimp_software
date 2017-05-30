@@ -136,7 +136,8 @@ int main(int argc, char **argv) {
         static void go(void) {
             auto PROF_CHANGE_DIR_AT_THE_LAST_MINUTE = getenv("PROF_CHANGE_DIR_AT_THE_LAST_MINUTE");
             if(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE) {
-                chdir(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE);
+                int ret = chdir(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE);
+                (void)ret; // we don't care about this. But we need it anyway regarding a `warn_unused_result` attribute
             }
         }
     };
