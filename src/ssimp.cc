@@ -674,7 +674,8 @@ void impute_all_the_regions(   string                                   filename
 
             // Next two lines are the imputation, and its quality.
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
-            auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans(invert_a_matrix (C) , c);
+            auto   Cinv    =                 invert_a_matrix ( C        );
+            auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans( Cinv  , c);
 
             assert( (int)Cinv_c.size1() == number_of_tags );
             assert( (int)Cinv_c.size2() == number_of_all_targets );
