@@ -2,6 +2,7 @@
     wc -l          "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel.EUR.samplenames
 "$SSIMP"                                                                            \
     --ref "$REF"/link.to.1kg.data/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel.EUR.samplenames    \
     --wind 300000                                                                   \
     --gwas "$GWAS"/small.UKBB.both.csv                                              \
     --out "${OUT_IMPUTATIONS}"                                                      \
@@ -13,4 +14,3 @@
     #--ref "$REF"/link.to.1kg.data/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
     #--impute.snps   "${COMMANDDIR}"/all.IDs.in.thevcf                                \
     #--tags.snp      "${COMMANDDIR}"/all.IDs.in.thevcf                                \
-    #--sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel.EUR.samplenames    \
