@@ -17,12 +17,7 @@ namespace tbi {
         VcfHeader header;
 
         read_vcf_with_tbi(std:: string filename) {
-            auto ret = [&](){
-                if(options:: opt_sample_names.empty())
-                    return reader.open( filename.c_str() , header);
-                else
-                    return reader.open( filename.c_str() , header, NULL, NULL, options:: opt_sample_names.c_str() );
-            }();
+            auto ret = reader.open( filename.c_str() , header, NULL, NULL, options:: opt_sample_names.c_str() );
 
             auto ret2 = reader.readVcfIndex(); // should find the .tbi file nearby
 
