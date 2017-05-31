@@ -20,6 +20,8 @@
     tests/1KG/towards.really.1KG.data.limit.the.tags/output.actual
     tests/1KG/towards.really.1KG.data.a.bit.more/output.actual
 
+    tests/1KG/EUR/output.actual
+
     tests/swapping/swap.just.the.allele.headers/output.actual
     tests/swapping/swap.some.alleles/output.actual
     tests/swapping/swap.some.alleles.and.their.zs/output.actual
