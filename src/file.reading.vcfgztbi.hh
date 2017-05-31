@@ -22,7 +22,7 @@ namespace tbi {
                     return reader.open( filename.c_str() , header );
                 }
                 else {
-                    return reader.open( filename.c_str() , header, NULL, NULL, options:: opt_sample_names.c_str() );
+                    return reader.open( filename.c_str() , header, options:: opt_sample_names.c_str(), NULL, NULL );
                 }
             }();
 
