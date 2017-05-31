@@ -30,6 +30,8 @@ namespace options {
 
         bool                    opt_reimpute_tags = false;
 
+        std:: string            opt_sample_names;
+
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
         int long_option_index;
@@ -48,6 +50,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"tags.snps"          ,  required_argument, 0, 12 },
             {"tags.maf"           ,  required_argument, 0, 13 },
             {"reimpute.tags"      ,        no_argument, 0, 14 }, // one-by-one, reimpute each tag by masking it
+            {"sample.names"       ,  required_argument, 0, 15 }, // one-by-one, reimpute each tag by masking it
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -114,6 +117,11 @@ void read_in_all_command_line_options(int argc, char **argv) {
         if (c == 14) {
             assert(string("reimpute.tags") == long_options[long_option_index].name);
             options::  opt_reimpute_tags = true;
+        }
+        if (c == 15) {
+            options:: opt_sample_names.empty() || DIE("--sample.names specified twice?");
+            assert(string("sample.names") == long_options[long_option_index].name);
+            options::  opt_sample_names = optarg;
         }
     }
 }

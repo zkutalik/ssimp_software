@@ -6,6 +6,7 @@
 #include "file.reading.hh" // just for 'chrpos', I think
 #include "bits.and.pieces/DIE.hh"
 #include "bits.and.pieces/PP.hh"
+#include "options.hh"
 
 #include<algorithm>
 
@@ -16,7 +17,12 @@ namespace tbi {
         VcfHeader header;
 
         read_vcf_with_tbi(std:: string filename) {
-            auto ret = reader.open( filename.c_str() , header);
+            auto ret = [&](){
+                if(options:: opt_sample_names.empty())
+                    return reader.open( filename.c_str() , header);
+                else
+                    return reader.open( filename.c_str() , header, NULL, NULL, options:: opt_sample_names.c_str() );
+            }();
 
             auto ret2 = reader.readVcfIndex(); // should find the .tbi file nearby
 
