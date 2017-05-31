@@ -876,6 +876,18 @@ if(M>=5) // for now, just use the first time when there are five tags
     PP(C);
     for(int m=0; m<M; ++m) {
         auto z_real = zs.at(m);
+        auto z_fast = [&]() {
+            mvn:: VecCol vec(M);
+            for(int n=0; n<M; ++n) {
+                vec.set(n, C_inv(n,m));
+            }
+            vec.set(m,0); // to ensure the known z is ignored
+
+            auto x = multiply_rowvec_by_colvec_giving_scalar( vec, mvn:: make_VecCol(zs) )(0) ;
+            auto y =C_inv(m,m);
+            //PP(x,y);
+            return - x / y;
+        }();
         auto z_slow = [&]() {
             // I'll simply set the correlations to zero
             auto C_zeroed = C;
@@ -904,7 +916,9 @@ if(M>=5) // for now, just use the first time when there are five tags
                     );
             return z_slow_imp(0);
         }();
-        PPe(m, z_real, z_slow);
+        PPe(m, z_real, z_fast, z_slow
+                , z_fast - z_slow
+                );
     }
     exit(0);
 }
