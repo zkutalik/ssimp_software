@@ -881,15 +881,19 @@ if(M>=5) // for now, just use the first time when there are five tags
             auto C_zeroed = C;
             for(int n=0; n<M; ++n) {
                 if(n!=m) {
+                    // the 'real' value has no correlation with the other tags
                     C_zeroed.set(n,m,0);
                     C_zeroed.set(m,n,0);
                 }
+                else
+                    assert(C_zeroed(n,m)==1);
             }
             auto C_zeroed_inv = invert_a_matrix(C_zeroed);
             mvn:: VecCol vec(M);
             for(int n=0; n<M; ++n) {
                 vec.set(n, C(n,m));
             }
+            vec.set(m, 0); // and the target has no correlation with the 'real' value
             auto z_slow_imp
                 =   multiply_rowvec_by_colvec_giving_scalar
                     (   vec
@@ -898,7 +902,7 @@ if(M>=5) // for now, just use the first time when there are five tags
                         , mvn:: make_VecCol(zs)
                         )
                     );
-            return z_slow_imp;
+            return z_slow_imp(0);
         }();
         PPe(m, z_real, z_slow);
     }
