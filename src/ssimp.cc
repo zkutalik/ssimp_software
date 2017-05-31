@@ -871,13 +871,12 @@ void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
     if(M==1)
         return;
     assert(M>1);
-if(M>=5) // for now, just use the first time when there are five tags
+if(M>=1) // for now, just use the first time when there are five tags
 {
-    PP(C);
+    mvn:: VecCol vec(M);
     for(int m=0; m<M; ++m) {
         auto z_real = zs.at(m);
         auto z_fast = [&]() {
-            mvn:: VecCol vec(M);
             for(int n=0; n<M; ++n) {
                 vec.set(n, C_inv(n,m));
             }
@@ -885,9 +884,9 @@ if(M>=5) // for now, just use the first time when there are five tags
 
             auto x = multiply_rowvec_by_colvec_giving_scalar( vec, mvn:: make_VecCol(zs) )(0) ;
             auto y =C_inv(m,m);
-            //PP(x,y);
-            return - x / y;
+            return std:: make_pair(- x / y, C(m,m)-1.0/y);
         }();
+        PP(M, m, z_real, z_fast.first, z_fast.second);
         auto z_slow = [&]() {
             // I'll simply set the correlations to zero
             auto C_zeroed = C;
@@ -914,13 +913,20 @@ if(M>=5) // for now, just use the first time when there are five tags
                         , mvn:: make_VecCol(zs)
                         )
                     );
-            return z_slow_imp(0);
+            auto z_slow_IQ
+                =   multiply_rowvec_by_colvec_giving_scalar
+                    (   vec
+                    ,   multiply_matrix_by_colvec_giving_colvec
+                        (   C_zeroed_inv
+                        , vec
+                        )
+                    );
+            return std:: make_pair( z_slow_imp(0), z_slow_IQ(0) );
         }();
-        PPe(m, z_real, z_fast, z_slow
-                , z_fast - z_slow
-                );
+        assert(std:: fabs(z_slow.first - z_fast.first) < 1e-5);
+        assert(std:: fabs(z_slow.second- z_fast.second)< 1e-5);
     }
-    exit(0);
+    //exit(0);
 }
 }
 
