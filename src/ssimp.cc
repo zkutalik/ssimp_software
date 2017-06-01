@@ -76,7 +76,9 @@ mvn:: Matrix make_c_unkn_tags_matrix
 static
 void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
                                 ,   mvn:: SquareMatrix const & C_inv
-                                , std:: vector<double> const & tag_zs_);
+                                , std:: vector<double> const & tag_zs_
+                                , std:: vector<RefRecord const *> const & rrs
+                                );
 
 enum class which_direction_t { DIRECTION_SHOULD_BE_REVERSED
                              , NO_ALLELE_MATCH
@@ -717,7 +719,7 @@ void impute_all_the_regions(   string                                   filename
             }
 
             if(options:: opt_reimpute_tags) {
-                reimpute_tags_one_by_one(C, Cinv, tag_zs_);
+                reimpute_tags_one_by_one(C, Cinv, tag_zs_, tag_its_);
             }
         } // loop over windows
     } // loop over chromosomes
@@ -864,9 +866,12 @@ static
 static
 void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
                                 ,   mvn:: SquareMatrix const & C_inv
-                                , std:: vector<double> const & zs) {
+                                , std:: vector<double> const & zs
+                                , std:: vector<RefRecord const *> const & rrs
+                                ) {
     assert(C.size() == zs.size());
     assert(C.size() == C_inv.size());
+    assert(C.size() == rrs.size());
     int const M = C.size();
     if(M==1)
         return;
@@ -876,6 +881,7 @@ if(M>=1) // for now, just use the first time when there are five tags
     mvn:: VecCol vec(M);
     for(int m=0; m<M; ++m) {
         auto z_real = zs.at(m);
+        auto * rrp = rrs.at(m);
         auto z_fast = [&]() {
             for(int n=0; n<M; ++n) {
                 vec.set(n, C_inv(n,m));
@@ -886,7 +892,7 @@ if(M>=1) // for now, just use the first time when there are five tags
             auto y =C_inv(m,m);
             return std:: make_pair(- x / y, C(m,m)-1.0/y);
         }();
-        PP(M, m, z_real, z_fast.first, z_fast.second);
+        PP(M, m, z_real, z_fast.first, z_fast.second, rrp->maf);
         auto z_slow = [&]() {
             // I'll simply set the correlations to zero
             auto C_zeroed = C;
