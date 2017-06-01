@@ -470,6 +470,15 @@ auto    operator==  (   compile_time_constant_as_a_type<T,c1>
     return cx_val<bool, c1==c2>;
 }
 
+template<typename T, typename U>
+bool is_in(T && t, std:: initializer_list<U> l) {
+    for(auto && x : l) {
+        if(t==x)
+            return true;
+    }
+    return false;
+}
+
 } // namespace utils
 
 #endif
