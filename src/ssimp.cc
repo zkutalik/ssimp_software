@@ -896,6 +896,7 @@ void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
     if(M==1)
         return;
     assert(M>1);
+    PPe(M, rrs.front()->pos, rrs.back()->pos);
 if(M>=1) // for now, just use the first time when there are five tags
 {
     mvn:: VecCol vec(M);
@@ -912,7 +913,13 @@ if(M>=1) // for now, just use the first time when there are five tags
             auto y =C_inv(m,m);
             return std:: make_pair(- x / y, C(m,m)-1.0/y);
         }();
-        PP(M, m, z_real, z_fast.first, z_fast.second, rrp->maf);
+        PP(M, m, z_real, z_fast.first, z_fast.second
+                , rrp->maf
+                , rrp->ID
+                , rrp->pos
+                , rrp->ref
+                , rrp->alt
+                );
 #if 0
         auto z_slow = [&]() {
             // I'll simply set the correlations to zero
