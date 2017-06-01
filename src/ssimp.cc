@@ -848,9 +848,29 @@ static
         auto const gw_ref = g.get_allele_ref();
         auto const gw_alt = g.get_allele_alt();
 
-        //PP(r.get_chrpos() ,rp_ref ,rp_alt ,gw_ref ,gw_alt);
+        //PPe(r.pos ,rp_ref ,rp_alt ,gw_ref ,gw_alt);
         assert(rp_ref != rp_alt);
         assert(gw_ref != gw_alt);
+
+        if(1)
+        { // check for palindromes - we can't be sure of their direction
+            if  (   rp_ref.find_first_of("AT") != string:: npos
+                 && rp_alt.find_first_of("AT") != string:: npos) { // palindromic - can't really use it. TODO: Should this be a command line option?
+                return which_direction_t:: NO_ALLELE_MATCH;
+            }
+            if  (   rp_ref.find_first_of("GC") != string:: npos
+                 && rp_alt.find_first_of("GC") != string:: npos) { // palindromic - can't really use it. TODO: Should this be a command line option?
+                return which_direction_t:: NO_ALLELE_MATCH;
+            }
+            if  (   gw_ref.find_first_of("AT") != string:: npos
+                 && gw_alt.find_first_of("AT") != string:: npos) { // palindromic - can't really use it. TODO: Should this be a command line option?
+                return which_direction_t:: NO_ALLELE_MATCH;
+            }
+            if  (   gw_ref.find_first_of("GC") != string:: npos
+                 && gw_alt.find_first_of("GC") != string:: npos) { // palindromic - can't really use it. TODO: Should this be a command line option?
+                return which_direction_t:: NO_ALLELE_MATCH;
+            }
+        }
 
         if( rp_ref == gw_ref
          && rp_alt == gw_alt)
