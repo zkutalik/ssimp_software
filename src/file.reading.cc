@@ -327,6 +327,9 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
             gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
             gls.m_z          = utils:: lexical_cast<double> (LOOKUP( hd, effect_z, all_split_up));
 
+            for(char & c : gls.m_allele_alt) { c = toupper(c); }
+            for(char & c : gls.m_allele_ref) { c = toupper(c); }
+
             // Try to read in chromosome and position, but they may not be present
             // If missing, we'll fill them in much later from the reference panel
             gls.m_chrpos.chr = -1;
