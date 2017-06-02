@@ -8,6 +8,8 @@
 
 #include <gzstream.h>
 
+#include <gsl/gsl_cdf.h>
+
 #include "bits.and.pieces/DIE.hh"
 #include "bits.and.pieces/PP.hh"
 #include "bits.and.pieces/utils.hh"
@@ -104,6 +106,8 @@ struct header_details {
     offset_and_name    info;
     offset_and_name    format;
     offset_and_name    effect_z;
+    offset_and_name    effect_beta; // just for direction - we'll use this with 'p', if 'z' isn't present
+    offset_and_name    effect_p;
     vector<offset_and_name> unaccounted;
 };
 
@@ -192,10 +196,15 @@ header_details   parse_header( string      const & header_line ) {
         }
         else if(is_in_this_list(one_field_name, {"z.from.peff"
                                                 ,"z"
-                                                //,"binary.mean.beta"
-                                                //,"beta"
                                                 })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        else if(is_in_this_list(one_field_name, {"P-value"})) {
+            hd.effect_p = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        else if(is_in_this_list(one_field_name, {"beta"})) {
+            // Note: this is only for the direction. We use this with effect_p, if effect_z isn't known
+            hd.effect_beta = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else {
             hd.unaccounted.push_back( header_details:: offset_and_name(field_counter, one_field_name) );
@@ -325,7 +334,24 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
             gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
             gls.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
             gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
-            gls.m_z          = utils:: lexical_cast<double> (LOOKUP( hd, effect_z, all_split_up));
+            gls.m_z          = [&](){
+                if(hd.effect_z.m_offset != -1) {
+                    return utils:: lexical_cast<double> (LOOKUP( hd, effect_z, all_split_up));
+                }
+                else { // no 'z' field. Must infer it from 'p' and 'beta', with 'beta' used only for 'direction'
+                    auto beta   = utils:: lexical_cast<double> (LOOKUP( hd, effect_beta, all_split_up));
+                    auto p      = utils:: lexical_cast<double> (LOOKUP( hd, effect_p   , all_split_up));
+                    auto z_undir = gsl_cdf_gaussian_Pinv( p / 2.0 ,1);
+                    assert(z_undir <= 0.0);
+                    double z;
+                    if(beta > 0)
+                        z = -z_undir;
+                    else
+                        z =  z_undir;
+                    //PP(p, z, beta);
+                    return z;
+                }
+            }();
 
             for(char & c : gls.m_allele_alt) { c = toupper(c); }
             for(char & c : gls.m_allele_ref) { c = toupper(c); }
