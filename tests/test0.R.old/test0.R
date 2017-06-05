@@ -1,10 +1,10 @@
-## target.snps <- c("rs587697622", "rs587755077","rs587654921")#setdiff(sm$SNP, tag.snps)
+target.snps <- c("rs587697622", "rs587755077","rs587654921")#setdiff(sm$SNP, tag.snps)
 ## only impute the first three target snps of aarons imputation in ../test0/
 
 lambda <- "sqrt"
 
-nam.gwas <- "GIANT_HEIGHT_Wood_somechr22snps.txt"
-what.to.impute <- "Z"
+nam.gwas <- "small.UKBB.both.csv"
+what.to.impute <- "z.from.peff"
 ## a1 effect allele
 
 
@@ -22,20 +22,30 @@ setwd(path.out)
 
 ## load function
 ## -------------------
-source("../r-function.R")
+source("r-function.R")
 
 ## load gwas dataset
 ## -------------------
-library(readr)
-dat <- read_tsv(paste0(path.gwas, nam.gwas))
-dat$Z <- dat$b/dat$SE
-dat$SNP <- dat$MarkerName
+dat <- read.table(paste0(path.gwas, nam.gwas), sep = ",", header = TRUE)
+dat$SNP <- dat$rnpid
 rownames(dat) <- dat$SNP
 
+## region
+## ---------------
+chr <- 22
+corew <- 1e6
+sw <- 250e3
+core.start <- 16500000
+core.end <- core.start + corew
+window.start <- core.start - sw
+window.end <- core.end + sw
+
+
 ## load vcf
-## ------
+## ------ß
 library(readr)
-ref <- read_delim(paste0(path.ref, "1000genomes_somechr22snps_EURsamples.vcf"), delim = "\t", comment = "##")
+ref <- read_delim(paste0(path.ref, "1000genomes_90snps_100samples.vcf"), delim = "\t", comment = "##")
+ref <- read_delim(paste0(path.ref, "small.vcf.sample.vcf"), delim = "\t", comment = "##")
 G.raw <- ref[,10:ncol(ref)]
 sm <- ref[,1:5] ## sm is the summary dataset with columns SNP, chr, pos, REF and ALT
 sm$SNP <- sm$ID
@@ -81,39 +91,19 @@ names(G) <- sm$SNP
 stopifnot(ncol(G) == nrow(sm))
 save(G, sm, file = "tmp_G_sm.RData")
 
-
-## remove monomorphic from refpanel
-## -------------------------------
-v.g <- apply(G, 2, var)
-rem <- which(v.g == 0)
-G <- G[,-rem]
-sm <- sm[-rem, ]
-
-## remove missing from refpanel
-## -------------------------------
-missing.g <- apply(is.na(G), 2, sum)
-rem <- which(missing.g > 0)
-G <- G[,-rem]
-sm <- sm[-rem, ]
-
 ## allele swaping
 ## --------------
 dat.swap <- merge(dat, sm, by = "SNP")
 rownames(dat.swap) <- dat.swap$SNP
 
-## swap alleles if REF != Allele1 and ALT != Allele2
-ind.swap <- which(dat.swap$REF != dat.swap$Allele1 & dat.swap$ALT != dat.swap$Allele2)
-ind.keep <- which(dat.swap$REF == dat.swap$Allele1 & dat.swap$ALT == dat.swap$Allele2)
-
+## swap alleles if REF != a2 and ALT != a1
+ind.swap <- which(dat.swap$REF != dat.swap$a2 & dat.swap$ALT != dat.swap$a1)
 
 if(length(ind.swap) > 0) dat.swap[ind,what.to.impute] <- dat.swap[ind,what.to.impute] * (-1)
-
-dat.swap <- dat.swap[c(ind.swap, ind.keep),]
 
 ## define tag snps and target snps
 ## -------------------------------
 tag.snps <- intersect(as.character(dat.swap$SNP), sm$SNP)
-target.snps <- setdiff(sm$SNP, tag.snps)
 
 ## estimate C and rho
 ## --------------------
@@ -121,7 +111,6 @@ C <- extract.C(G, tag.snps)
 rho <- extract.rho(G, tag.snps, target.snps)
 
 ## remove NAs
-## ---------------
 
 
 ## imputation
@@ -132,7 +121,7 @@ if (lambda = "sqrt")
 }
 
 svd.C <- f.svd(C)
-estim <- tagging.speed(betah = dat.swap[tag.snps, ], rho = rho, C = svd.C, lambda = lambda, tau = 1, to.imp = what.to.impute)
+estim <- tagging.speed(betah = dat.swap[tag.snps, ], rho = rho, C = svd.C, lambda = lambda), tau = 1, to.imp = what.to.impute)
 estim.tag <- f.impute.schur(C, tag.snps, betah = dat.swap[tag.snps, ], lambda = lambda, what.to.imp  = what.to.impute)
   
 plot(estim.tag$estim, dat.swap[tag.snps, what.to.impute])
@@ -151,8 +140,8 @@ write_delim(out, path = paste0(path.out, "imputation.txt"), delim = "\t")
 
 ## compare with aarons results
 ## -----------------------------
-#out.aaron <- read_delim("/Users/admin/Documents/Work/Projects/tagging/ssimp_software/tests/test0/imputations.txt", skip = 1, n_max = 3, delim = "\t", col_names = FALSE)
-#out.aaron
-#out
+out.aaron <- read_delim("/Users/admin/Documents/Work/Projects/tagging/ssimp_software/tests/test0/imputations.txt", skip = 1, n_max = 3, delim = "\t", col_names = FALSE)
+out.aaron
+out
 
 
