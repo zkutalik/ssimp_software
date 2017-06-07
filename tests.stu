@@ -27,6 +27,7 @@
     tests/swapping/swap.some.alleles.and.their.zs/output.actual
 
     tests/test.wood.R/imputations.txt
+    tests/test0.R/imputations.txt
 
 ;
 
