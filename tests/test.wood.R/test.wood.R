@@ -21,7 +21,7 @@ ssimp(path.gwas = "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt",
       gwas.names = c("MarkerName", NA, NA, "Allele1","Allele2","b", "SE", NA, "N"),
       tag.snps = c("rs136382","rs136383", "rs136389"),
       #target.snps = "rs16987627", #it's biallelic, so we'll ignore it
-      target.snps = "rs5753284",
+      target.snps = c("rs5753220","rs5753231","rs5753236","rs5753259","rs5753260","rs5753263","rs5753268","rs5753271","rs5753272","rs5753281","rs5753284","rs5753285","rs5753290","rs5753298"),
       impute.tags = FALSE
       )
 
