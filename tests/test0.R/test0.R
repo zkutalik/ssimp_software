@@ -22,7 +22,7 @@ ssimp(path.gwas = paste0("../../gwas/", "small.UKBB.both.csv"),
                    #, "rs200923174" # just used by SR
                      "rs62224618"
                    ,"rs138257042"
-                   , "rs79847867"
+                   #, "rs79847867" # why wasn't I used this?
                    ),
       target.snps = c("rs587697622", "rs587755077","rs587654921"),
       impute.tags = FALSE
