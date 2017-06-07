@@ -1,1 +1,7 @@
-"$SSIMP"  --ref "$REF"/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz --wind 300000 --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt.swap.just.the.allele.headers --out "${OUT_IMPUTATIONS}" --lambda 0.01 > "$OUTPUT"
+"$SSIMP"                                                                        \
+    --ref "$REF"/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz              \
+    --wind 300000                                                               \
+    --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt.swap.just.the.allele.headers     \
+    --out "${OUT_IMPUTATIONS}"                                                  \
+    --lambda 0.01                                                               \
+    > "$OUTPUT"

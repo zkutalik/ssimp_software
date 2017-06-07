@@ -1,1 +1,7 @@
-"$SSIMP"  --ref "$REF"/tbi/small.vcf.sample.vcf.gz --wind 300000 --gwas "$GWAS"/small.UKBB.both.csv --out "${OUT_IMPUTATIONS}" --lambda 0.01 > "$OUTPUT"
+"$SSIMP"                                                                        \
+    --ref "$REF"/tbi/small.vcf.sample.vcf.gz                                    \
+    --wind 300000                                                               \
+    --gwas "$GWAS"/small.UKBB.both.csv                                          \
+    --out "${OUT_IMPUTATIONS}"                                                  \
+    --lambda 0.01                                                               \
+    > "$OUTPUT"
