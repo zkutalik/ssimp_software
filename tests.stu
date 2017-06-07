@@ -101,3 +101,10 @@ export  target="ref/tbi/${path}.vcf.gz"
     export outdir="tests/test.wood.R"
     Rscript --vanilla tests/test.wood.R/test.wood.R
 }
+        tests/test0.R/imputations.txt
+    :   tests/test0.R/test0.R
+        tests/r-function.R
+{
+    cd tests/test0.R
+    Rscript --vanilla test0.R
+}
