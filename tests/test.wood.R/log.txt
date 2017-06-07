@@ -1,0 +1,29 @@
+GWAS:
+[1] "/Users/admin/Documents/Work/Projects/tagging/ssimp_software/gwas/GIANT_HEIGHT_Wood_somechr22snps.txt"
+
+reference panel used:
+[1] "/Users/admin/Documents/Work/Projects/tagging/ssimp_software/ref/1000genomes_somechr22snps_EURsamples.vcf"
+
+column name in GWAS to impute:
+[1] "Z"
+
+tag.snps:
+[1] "rs136382" "rs136383" "rs136389"
+
+snps2impute:
+[1] "rs16987627"
+
+lambda:
+[1] 0.08917559
+
+C matrix:
+          rs136382  rs136383  rs136389
+rs136382 1.0000000 0.6923148 0.4454205
+rs136383 0.6923148 1.0000000 0.6638013
+rs136389 0.4454205 0.6638013 1.0000000
+
+c matrix:
+           rs16987627
+rs136382  0.024040687
+rs136383  0.007450957
+rs136389 -0.088002646
