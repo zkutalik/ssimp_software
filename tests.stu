@@ -26,6 +26,8 @@
     tests/swapping/swap.some.alleles/output.actual
     tests/swapping/swap.some.alleles.and.their.zs/output.actual
 
+    tests/test.wood.R/imputations.txt
+
 ;
 
 @test.data.to.be.made.by.stu :
@@ -90,4 +92,10 @@ export  target="ref/tbi/${path}.vcf.gz"
     zcat "ref/${path}".vcf.gz | bgzip > "${target}".tmp
     mv "${target}".tmp \
        "${target}"
+}
+
+        tests/test.wood.R/imputations.txt
+    :   tests/test.wood.R/test.wood.R     {
+    export outdir="tests/test.wood.R"
+    Rscript tests/test.wood.R/test.wood.R
 }

@@ -3,8 +3,7 @@ rm(list = ls())
 
 ## set paths
 ## -------------------
-#path.out <- "/Users/admin/Documents/Work/Projects/tagging/ssimp_software/tests/test.wood.R/"
-#setwd(path.out)
+path.outdir = Sys.getenv('outdir')
 
 ## load function
 ## -------------------
