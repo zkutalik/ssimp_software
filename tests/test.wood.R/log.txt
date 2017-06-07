@@ -1,5 +1,5 @@
 GWAS:
-[1] "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt"
+[1] "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt"
 
 reference panel used:
 [1] "ref/1000genomes_somechr22snps_EURsamples.vcf"

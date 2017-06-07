@@ -13,7 +13,7 @@ source("tests/r-function.R")
 
 ## run ssimp function
 ## ---------------
-ssimp(path.gwas = "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt",
+ssimp(path.gwas = "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt",
       path.ref  = "ref/1000genomes_somechr22snps_EURsamples.vcf",
       path.outdir = 'tests/test.wood.R/',
       lambda = "sqrt",
