@@ -45,14 +45,22 @@ ssimp <- function(path.gwas,
     library(readr)
     dat <- read_tsv(path.gwas)
   }
-  names(dat)[names(dat) %in% gwas.names] <- c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N")[!is.na(gwas.names)]
-  
+
+  # Two steps for applying 'gwas.names':
+  # First, put the columns in the appropriate order:
+  cbind.data.frame(
+  lapply(gwas.names, function(col.name) {
+      if(is.na(col.name)) NA else dat[,col.name]
+  })) -> dat
+  # ... Second step: override the column names
+  names(dat) <- c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N")
+
   ## only for giant
   if(all(!(names(dat) %in% "Z")) & what.to.impute == "Z")
   {
     dat$Z <- dat$b/dat$SE
   }
-  
+
   ## load vcf
   ## ------
   library(readr)
