@@ -1,3 +1,4 @@
+{ lambda }	|=|  0.08917559
 GWAS:
 [1] "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt"
 

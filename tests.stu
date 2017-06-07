@@ -95,7 +95,9 @@ export  target="ref/tbi/${path}.vcf.gz"
 }
 
         tests/test.wood.R/imputations.txt
-    :   tests/test.wood.R/test.wood.R     {
+    :   tests/test.wood.R/test.wood.R
+        tests/r-function.R
+{
     export outdir="tests/test.wood.R"
-    Rscript tests/test.wood.R/test.wood.R
+    Rscript --vanilla tests/test.wood.R/test.wood.R
 }

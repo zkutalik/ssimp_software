@@ -4,6 +4,8 @@
 ## and are now used to test aarons functions
 ## =================================================
 
+library(data.table) # for 'rbindlist'
+
 
 ## top level function to impute
 ## roughly the same arguments as aarons function
@@ -196,6 +198,8 @@ ssimp <- function(path.gwas,
   ## print log file
   ## ---------------
   sink(paste0(path.outdir,"log.txt"))
+
+  pp(lambda)
   
   cat("GWAS:\n")
   print(path.gwas)
@@ -572,3 +576,53 @@ f.eff.number.tests <- function(mat, cor.true = FALSE)
 #   return(list(target.snps = target.snps, tag.snps = tag.snps))
 # }
 # 
+
+
+
+
+pp <- function(...) {
+	sl = substitute(list(...))
+	N=length(sl)
+	pf=parent.frame()
+
+	old.options.width=options()$width # store the old width
+	options(width=old.options.width-6) # subtract 6 to make space for the six spaces
+
+	rbindlist( lapply(2:N, function(n) {
+		paste0(deparse(sl[[n]],width.cutoff=500),collapse='') -> nm
+		#my.deparse(sl[[n]]) -> nm
+		utils::capture.output( eval (sl[[n]]
+									, envir=pf
+									) ) -> val
+		l = length(val)
+		if(l>1) {
+			val = paste0('      ', val) # six spaces
+		}
+		list(nm=nm,str=paste0(collapse='\n',val),l=l)
+	})) -> nms.and.vals
+
+	options(width=old.options.width) # restore the old width
+
+	nms.and.vals[  l==1 & substr(str,1,4) == "[1] "
+				 , str := substr(str,5,100000)     ]
+	nms.and.vals[l==1, if(length(nm)>0) {
+		cat(sep=''
+			,'{ '
+			, paste0(collapse=',', nm)
+			, ' }\t|=|  '
+			)
+		catn( paste0(collapse='\t|  ', str) )
+		NULL
+	}]
+	nms.and.vals[, {
+        if(l!=1) {
+            catn(sep='', '{{ ', nm, ' }}:' )
+            catn( str )
+        }
+    NULL} ,by=1:nrow(nms.and.vals)]
+	invisible(NULL)
+}
+catn <- function(...) {
+	cat(...)
+	cat('\n')
+}
