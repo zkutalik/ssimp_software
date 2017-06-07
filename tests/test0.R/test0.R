@@ -18,7 +18,11 @@ ssimp(path.gwas = paste0("../../gwas/", "small.UKBB.both.csv"),
       lambda = 0.01,
       what.to.impute = "Z", 
       gwas.names = c("rnpid", NA, NA, "a2","a1",NA, NA, "z.from.peff", "N"),
-      tag.snps = c("rs138257042", "rs200923174", "rs62224618", "rs79847867"),
+      tag.snps = c("rs138257042"
+                   #, "rs200923174" # just used by SR
+                   , "rs62224618"
+                   , "rs79847867"
+                   ),
       target.snps = c("rs587697622", "rs587755077","rs587654921"),
       impute.tags = FALSE
 )
