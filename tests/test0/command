@@ -3,6 +3,6 @@
     --wind 300000                                                               \
     --gwas "$GWAS"/small.UKBB.both.csv                                          \
     --out "${OUT_IMPUTATIONS}"                                                  \
-    --lambda 0.01                                                               \
+    --lambda 0.000000001                                                               \
     --impute.snps <(echo rs587697622 rs587755077 rs587654921 | tr ' ' '\n')     \
     > "$OUTPUT"
