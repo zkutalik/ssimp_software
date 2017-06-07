@@ -199,7 +199,6 @@ ssimp <- function(path.gwas,
   ## ---------------
   sink(paste0(path.outdir,"log.txt"))
 
-  pp(lambda)
   
   cat("GWAS:\n")
   print(path.gwas)
@@ -215,9 +214,8 @@ ssimp <- function(path.gwas,
   
   cat("\nsnps2impute:\n")
   print(target.snps)
-  
-  cat("\nlambda:\n")
-  print(lambda) 
+
+  pp(lambda)
   
   cat("\nC matrix:\n")
   print(C)

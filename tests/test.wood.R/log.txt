@@ -1,4 +1,3 @@
-{ lambda }	|=|  0.08917559
 GWAS:
 [1] "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt"
 
@@ -13,9 +12,7 @@ tag.snps:
 
 snps2impute:
 [1] "rs5753284"
-
-lambda:
-[1] 0.08917559
+{ lambda }	|=|  0.08917559
 
 C matrix:
           rs136382  rs136383  rs136389
