@@ -4,4 +4,5 @@
     --gwas "$GWAS"/small.UKBB.both.csv                                          \
     --out "${OUT_IMPUTATIONS}"                                                  \
     --lambda 0.01                                                               \
+    --impute.snps <(echo rs587697622 rs587755077 rs587654921 | tr ' ' '\n')     \
     > "$OUTPUT"
