@@ -15,7 +15,7 @@ source("../r-function.R")
 ssimp(path.gwas = paste0("../../gwas/", "small.UKBB.both.csv"),
       path.ref = paste0("../../ref/","small.vcf.sample.vcf"), 
       path.outdir = './',
-      lambda = 0.000000001,
+      lambda = "sqrt",
       what.to.impute = "Z", 
       gwas.names = c("rnpid", NA, NA, "a2","a1",NA, NA, "z.from.peff", "N"),
       tag.snps = c(

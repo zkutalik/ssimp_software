@@ -12,7 +12,7 @@ tag.snps:
 
 snps2impute:
 [1] "rs587697622" "rs587755077" "rs587654921"
-{ lambda }	|=|  1e-09
+{ lambda }	|=|  0.03996804
 
 C matrix:
             rs62224618 rs138257042
