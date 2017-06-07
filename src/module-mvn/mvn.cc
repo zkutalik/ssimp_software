@@ -551,44 +551,44 @@ double norm_2(const VecCol &x) {
 } // namespace mvn
 
 	std :: ostream& std :: operator << (std :: ostream & o, const mvn :: VecCol &v) {
-		std :: cout << "[";
+		o << "[";
 		for(size_t d=0; d < v.size(); ++d) {
 			if(d!=0)
-				std :: cout << ',';
-			std :: cout << gsl_vector_get(v.get(), d);
+				o << ',';
+			o << gsl_vector_get(v.get(), d);
 		}
-		std :: cout << "]";
+		o << "]";
 		return o;
 	}
 	std :: ostream& std :: operator << (std :: ostream & o, const mvn :: SquareMatrix &v) {
 		for(size_t r=0; r < v.size(); ++r) {
 			if(r==0)
-				std :: cout << "[[";
+				o << "[[";
 			else
-				std :: cout << " [";
+				o << " [";
 			for(size_t c=0; c < v.size(); ++c) {
-				std :: cout << '\t' << gsl_matrix_get(v.a, r, c);
+				o << '\t' << gsl_matrix_get(v.a, r, c);
 			}
 			if(r+1 == v.size())
-				cout << "]]";
+				o << "]]";
 			else
-				cout << "]" << endl;
+				o << "]" << endl;
 		}
 		return o;
 	}
 	std :: ostream& std :: operator << (std :: ostream & o, const mvn :: Matrix &v) {
 		for(size_t r=0; r < v.size1(); ++r) {
 			if(r==0)
-				std :: cout << "[[";
+				o << "[[";
 			else
-				std :: cout << " [";
+				o << " [";
 			for(size_t c=0; c < v.size2(); ++c) {
-				std :: cout << '\t' << gsl_matrix_get(v.a, r, c);
+				o << '\t' << gsl_matrix_get(v.a, r, c);
 			}
 			if(r+1 == v.size1())
-				cout << "]]";
+				o << "]]";
 			else
-				cout << "]" << endl;
+				o << "]" << endl;
 		}
 		return o;
 	}
