@@ -166,7 +166,13 @@ header_details   parse_header( string      const & header_line ) {
         ++field_counter;
         // go through each field name in turn and try to account for it
         if(false) {}
-        else if(is_in_this_list(one_field_name, {"ID","rnpid","snpid","rsid"})) {
+        else if(is_in_this_list(one_field_name, {
+                         "ID"
+                        ,"rnpid"
+                        ,"snpid"
+                        ,"rsid"
+                        ,"MarkerName"
+                    })) {
             hd.SNPname = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"#CHROM","chr"})) {
@@ -175,10 +181,20 @@ header_details   parse_header( string      const & header_line ) {
         else if(is_in_this_list(one_field_name, {"POS"})) {
             hd.position = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"REF","a1","A1"})) {
+        else if(is_in_this_list(one_field_name, {
+                         "REF"
+                        ,"a1"
+                        ,"A1"
+                        ,"Allele1"
+                    })) {
             hd.allele_ref = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"ALT","a2","A2"})) {
+        else if(is_in_this_list(one_field_name, {
+                         "ALT"
+                        ,"a2"
+                        ,"A2"
+                        ,"Allele2"
+                        })) {
             hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list(one_field_name, {"QUAL"})) {
@@ -196,6 +212,7 @@ header_details   parse_header( string      const & header_line ) {
         }
         else if(is_in_this_list(one_field_name, {"z.from.peff"
                                                 ,"z"
+                                                ,"Z"
                                                 })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
         }
