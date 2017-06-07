@@ -10,6 +10,7 @@
 ## -----------------------------------------------
 ssimp <- function(path.gwas, 
                   path.ref, 
+                  path.outdir,
                   lambda = "sqrt", 
                   what.to.impute = "Z", 
                   gwas.names = c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N"),
@@ -190,11 +191,11 @@ ssimp <- function(path.gwas,
   
   out <- data.frame(SNP = target.snps, Z.imp = estim$imp, impqual = r2$r2.penal.b)
   
-  write_tsv(out, path = paste0("imputations.txt"))
+  write_tsv(out, path = paste0(path.outdir, "imputations.txt"))
   
   ## print log file
   ## ---------------
-  sink("log.txt")
+  sink(paste0(path.outdir,"log.txt"))
   
   cat("GWAS:\n")
   print(path.gwas)
@@ -233,7 +234,7 @@ ssimp <- function(path.gwas,
     # plot(dat.swap[tag.snps.fake, what.to.impute], estim.tag$imp)
     #abline(a = 0, b=1)
     out.tag <- data.frame(estim.tag, Z.real = dat.swap[tag.snps.fake, what.to.impute])
-    write_tsv(out.tag, path = paste0("imputations_tag.txt"))
+    write_tsv(out.tag, path = paste0(path.outdir, "imputations_tag.txt"))
   }
   
 }
