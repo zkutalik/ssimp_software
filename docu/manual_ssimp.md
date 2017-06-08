@@ -43,9 +43,11 @@ Arguments can be shortend, e.g. `--wind` instead of `--window.width`
 
 ### Note	
 [//]: -------
-- If no `impute.range`, not `impute.snps` is chosen, then all variants in the refpanel are imputed that are not provided as tag SNPs.
-- if your positions are not on hg19, you can use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
+- If `impute.range` and `impute.snps` are not defined, then all variants in the refpanel are imputed that are not provided as tag SNPs.
+- If the GWAS positions do not match the reference panel positionn, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
 - The option `missingness` is automatically set to FALSE if `N` is not provided or `N` is set to `NA`.
+- The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
+- Odds ratios need to be provided as Z-statistics or log-transformed into effect sizes.
 
 ## Format of GWAS dataset
 [//]: -------------------------------
