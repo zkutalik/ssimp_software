@@ -374,7 +374,7 @@ f.impqual.r2.penal <- function(C, rho, target.snps, tag.snps,lambda = 1e-8,  n =
   out <- f.impqual.r2(C, rho, target.snps, tag.snps, lambda)
   ## penal version
   m <- length(tag.snps)
-  m.eff <- f.eff.number.tests(C)
+  m.eff <- f.eff.number.tests(C, TRUE)
   
   r2.penal.m <- out$r2.classic - m/n
   r2.penal.a <- out$r2.classic - m.eff/n
