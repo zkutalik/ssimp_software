@@ -10,7 +10,6 @@
     bin/o/file.reading.vcfgztbi.o
     bin/o/mvn/mvn.o
     bin/o/gz/gzstream/gzstream.o
-    bin/o/zlib-vector-of-char/zlib-vector.o
     src/libStatGen/libStatGen.a # I need to think of a rule to automatically build this - must talk to the author about including her code
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
@@ -22,7 +21,6 @@
         bin/o/file.reading.vcfgztbi.o \
         bin/o/mvn/mvn.o \
         bin/o/gz/gzstream/gzstream.o \
-        bin/o/zlib-vector-of-char/zlib-vector.o \
         src/libStatGen/libStatGen.a \
         ${LD_FLAGS}               \
     -o bin/ssimp
@@ -144,6 +142,6 @@ src/libStatGen/include/VcfFileReader.h
     rm bin/o/CXX_WITH_FLAGS      || :
     rm bin/LIST_OF_HH_FILES      || :
     find bin/o -name '*.o' -exec rm {} \;
-    cd src/libStatGen
-    make clean
+    #cd src/libStatGen
+    #make clean
 }
