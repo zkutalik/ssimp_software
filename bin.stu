@@ -1,4 +1,4 @@
-@all: bin/ssimp bin/vcfGTz;
+@all: bin/ssimp;
 
     bin/ssimp
 :   $[LINKER=bin/o/LINKER]
@@ -53,23 +53,6 @@
 {
     mkdir -p bin/o/gz/gzstream
     ${CXX_WITH_FLAGS} -c "src/gz/gzstream/gzstream.C" -o "bin/o/gz/gzstream/gzstream.o"
-}
-
-    bin/vcfGTz
-:   $[LINKER=bin/o/LINKER]
-    $[LD_FLAGS=bin/o/LD_FLAGS]
-    bin/o/vcfGTz.o
-    bin/o/gz/gzstream/gzstream.o
-    bin/o/zlib-vector-of-char/zlib-vector.o
-{
-    echo LINKER:"${LINKER}" | tr '\n' ' '; echo
-    echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
-    ${LINKER} \
-        bin/o/vcfGTz.o \
-        bin/o/gz/gzstream/gzstream.o \
-        bin/o/zlib-vector-of-char/zlib-vector.o \
-        ${LD_FLAGS}               \
-    -o bin/vcfGTz
 }
 
 >       bin/o/GCC_OR_CLANG
