@@ -378,7 +378,7 @@ f.impqual.r2.penal <- function(C, rho, target.snps, tag.snps,lambda = 1e-8,  n =
   
   r2.penal.m <- out$r2.classic - m/n
   r2.penal.a <- out$r2.classic - m.eff/n
-  r2.penal.b <- 1- (1 - out$r2.classic) * (n - 1)/(n - m.eff)
+  r2.penal.b <- 1- (1 - out$r2.classic) * (n - 1)/(n - m.eff - 1)
   
   ## out
   out <- data.frame(out, r2.classic.pasaniuc = out.pasaniuc$r2.classic, r2.penal.m = r2.penal.m, r2.penal.a = r2.penal.a, r2.penal.b =
