@@ -138,7 +138,6 @@ src/libStatGen/include/VcfFileReader.h
         @clean
 {
     rm bin/ssimp                 || :
-    rm bin/vcfGTz                || :
     rm bin/o/CXX_WITH_FLAGS      || :
     rm bin/LIST_OF_HH_FILES      || :
     find bin/o -name '*.o' -exec rm {} \;
