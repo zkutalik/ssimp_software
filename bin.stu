@@ -138,6 +138,17 @@
 }
 @mkdir..${path} : [deps.empty/mkdir..${path}];
 
+src/libStatGen/libStatGen.a {
+    # This builds 'libStatGen', used by 'ssimp' to read '.vcf.gz' files, and their '.tbi' indices.
+    # We've copied the relevant code into this project, minus a few subdirectories.
+    #
+    # More info on 'libStatGen' http://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen#Clone_.28get_your_own_copy.29
+    #
+    # It's GPL, as is 'ssimp'
+    cd src/libStatGen
+    make all
+}
+
 @unconditional {}
 
         @clean
