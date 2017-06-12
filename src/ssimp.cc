@@ -10,6 +10,7 @@
 #include <gsl/gsl_statistics_int.h>
 #include <gsl/gsl_vector.h>
 #include<gsl/gsl_blas.h>
+#include<gsl/gsl_eigen.h>
 
 #include <gzstream.h>
 
@@ -667,6 +668,8 @@ void impute_all_the_regions(   string                                   filename
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
              */
             mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
+            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0);
+            mvn:: SquareMatrix  C_1e8lambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
             //PP(__LINE__, utils:: ELAPSED());
             mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
             //PP(__LINE__, utils:: ELAPSED());
@@ -676,16 +679,55 @@ void impute_all_the_regions(   string                                   filename
                                                          , unk2_its
                                                          , options:: opt_lambda
                                                          );
+            mvn:: Matrix        c_0Lambda   = make_c_unkn_tags_matrix( genotypes_for_the_tags
+                                                         , genotypes_for_the_unks
+                                                         , tag_its_
+                                                         , unk2_its
+                                                         , 0.0
+                                                         );
             //PP(__LINE__, utils:: ELAPSED());
 
             // Next two lines are the imputation, and its quality.
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
             auto   Cinv    =                 invert_a_matrix ( C        );
             auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans( Cinv  , c);
+            auto   C1e8inv_czero  =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_0Lambda);
 
             assert( (int)Cinv_c.size1() == number_of_tags );
             assert( (int)Cinv_c.size2() == number_of_all_targets );
 
+            int number_of_effective_tests_in_C_nolambda = [&C_nolambda]() {
+                int number_of_tags = C_nolambda.size();
+                vector<double> eigenvalues;
+
+                mvn:: VecCol eig_vals (number_of_tags);
+                // compute the eigenvalues of C. TODO: C_lambda or C_nolambda?
+                gsl_eigen_symm_workspace * w = gsl_eigen_symm_alloc(number_of_tags);
+                auto A = C_nolambda; // copy the matrix, so that it can be destroyed by gsl_eigen_symm
+                int ret = gsl_eigen_symm (A.get(), eig_vals.get(), w);
+                assert(ret==0);
+                gsl_eigen_symm_free(w);
+                for(int i = 0; i< utils::ssize(eig_vals); ++i)
+                    eigenvalues.push_back( eig_vals(i) );
+
+                sort(eigenvalues.rbegin(), eigenvalues.rend());
+                //using utils:: operator<<;
+                //PPe(eigenvalues);
+                auto sum_of_eigvals = std:: accumulate(eigenvalues.begin(), eigenvalues.end(), 0.0);
+                assert( std::abs(sum_of_eigvals-number_of_tags) < 1e-5 );
+                double running_total_of_eigenvalues = 0.0;
+
+                for(int i = 0; i< utils::ssize(eigenvalues); ++i) {
+                    running_total_of_eigenvalues += eigenvalues.at(i);
+                    //PPe(running_total_of_eigenvalues);
+                    if( running_total_of_eigenvalues >= 0.995 * sum_of_eigvals ) {
+                        return i+1;
+                    }
+                }
+                assert(0);
+                return -1; // never going to get here
+            }();
+            //PPe(number_of_effective_tests_in_C_nolambda);
 
             // Finally, print out the imputations
             assert(number_of_all_targets == ssize(unk2_its));
@@ -699,12 +741,14 @@ void impute_all_the_regions(   string                                   filename
                                             // the diagonal of the imputation quality matrix.
                                             // This should be quicker than fully computing
                                             // c' * inv(C) * c
-                        auto lhs = gsl_matrix_const_submatrix(     c.get(), i, 0, 1, number_of_tags);
-                        auto rhs = gsl_matrix_const_submatrix(Cinv_c.get(), 0, i, number_of_tags, 1);
+                        auto lhs = gsl_matrix_const_submatrix(     c_0Lambda.get(), i, 0, 1, number_of_tags);
+                        auto rhs = gsl_matrix_const_submatrix( C1e8inv_czero.get(), 0, i, number_of_tags, 1);
                         // TODO: Maybe move the next line into mvn.{hh,cc}?
                         const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
                         assert(res_0 == 0);
-                        return to_store_one_imputation_quality(0,0);
+                        auto simple_imp_qual = to_store_one_imputation_quality(0,0);
+                        //PPe(N_ref, simple_imp_qual);
+                        return 1.0 - (1.0-simple_imp_qual)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
                     }();
 
                     (*out_stream_ptr)
