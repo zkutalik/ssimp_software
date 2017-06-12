@@ -668,7 +668,7 @@ void impute_all_the_regions(   string                                   filename
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
              */
             mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
-            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0);
+            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0); // used only for the effective number of tests
             mvn:: SquareMatrix  C_1e8lambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
             //PP(__LINE__, utils:: ELAPSED());
             mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
@@ -679,11 +679,11 @@ void impute_all_the_regions(   string                                   filename
                                                          , unk2_its
                                                          , options:: opt_lambda
                                                          );
-            mvn:: Matrix        c_0Lambda   = make_c_unkn_tags_matrix( genotypes_for_the_tags
+            mvn:: Matrix        c_1e8lambda   = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
                                                          , tag_its_
                                                          , unk2_its
-                                                         , 0.0
+                                                         , 1e-8
                                                          );
             //PP(__LINE__, utils:: ELAPSED());
 
@@ -691,7 +691,7 @@ void impute_all_the_regions(   string                                   filename
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
             auto   Cinv    =                 invert_a_matrix ( C        );
             auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans( Cinv  , c);
-            auto   C1e8inv_czero  =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_0Lambda);
+            auto   C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
 
             assert( (int)Cinv_c.size1() == number_of_tags );
             assert( (int)Cinv_c.size2() == number_of_all_targets );
@@ -741,8 +741,8 @@ void impute_all_the_regions(   string                                   filename
                                             // the diagonal of the imputation quality matrix.
                                             // This should be quicker than fully computing
                                             // c' * inv(C) * c
-                        auto lhs = gsl_matrix_const_submatrix(     c_0Lambda.get(), i, 0, 1, number_of_tags);
-                        auto rhs = gsl_matrix_const_submatrix( C1e8inv_czero.get(), 0, i, number_of_tags, 1);
+                        auto lhs = gsl_matrix_const_submatrix(   c_1e8lambda.get(), i, 0, 1, number_of_tags);
+                        auto rhs = gsl_matrix_const_submatrix( C1e8inv_c1e8 .get(), 0, i, number_of_tags, 1);
                         // TODO: Maybe move the next line into mvn.{hh,cc}?
                         const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
                         assert(res_0 == 0);
