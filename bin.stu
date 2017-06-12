@@ -158,4 +158,6 @@ src/libStatGen/libStatGen.a {
     rm bin/o/CXX_WITH_FLAGS      || :
     rm bin/LIST_OF_HH_FILES      || :
     find bin/o -name '*.o' -exec rm {} \;
+    cd src/libStatGen
+    make clean
 }
