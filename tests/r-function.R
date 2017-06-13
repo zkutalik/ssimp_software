@@ -354,8 +354,9 @@ f.impqual.r2 <- function(C, rho, target.snps, tag.snps, lambda = 1e-8)
   ## rho: matrix with tag snps as rows and target snps as columns
   ## targets.snps, tag.snps: respective char vectors
   ## lambda: for C matrix
-
+  rho <- rho * (1-lambda) 
   C <- C * (1-lambda) + diag(nrow(C)) * lambda
+
   C.inv <- solve(C)
   r2 <-  diag(t(rho) %*% C.inv %*% rho)
   
