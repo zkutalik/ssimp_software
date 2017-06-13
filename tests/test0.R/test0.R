@@ -33,8 +33,8 @@ ssimp(path.gwas = paste0("../../gwas/", "small.UKBB.both.csv"),
 ## compare with aarons results
 ## -----------------------------
 out.aaron <- read_tsv("../test0/imputations.txt", skip = 1, n_max = 3, col_names = FALSE)
-out.aaron
 
 out.sina.R <- read_tsv("imputations.txt")
+out.aaron
 out.sina.R
 

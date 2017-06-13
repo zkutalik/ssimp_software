@@ -9,7 +9,7 @@ path.outdir = Sys.getenv('outdir')
 ## -------------------
 source("tests/r-function.R")
 
-
+setwd("/Users/admin/Documents/Work/Projects/tagging/ssimp_software/")
 
 ## run ssimp function
 ## ---------------
