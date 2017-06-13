@@ -1,7 +1,7 @@
 "$SSIMP"                                                                            \
     --ref ref/sub1KG-18M/chr{CHRM}.vcf.gz                                           \
     --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
-    --gwas "$GWAS"/fixup.UKBB.both.smry..fdr                                        \
+    --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     --wind 250000                                                                   \
     --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
