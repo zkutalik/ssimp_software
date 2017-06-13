@@ -1,5 +1,5 @@
 "$SSIMP"                                                                            \
-    --ref ref/sub1KG-18M/chr19.vcf.gz                                               \
+    --ref ref/sub1KG-18M/chr{CHRM}.vcf.gz                                           \
     --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel.EUR.samplenames    \
     --gwas "$GWAS"/fixup.UKBB.both.smry..fdr                                        \
     --wind 250000                                                                   \

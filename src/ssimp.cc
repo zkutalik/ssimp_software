@@ -356,18 +356,19 @@ void impute_all_the_regions(   string                                   filename
     auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, &options:: opt_impute_snps_as_a_uset, options:: opt_impute_maf);
     auto skipper_tags   = make_skipper_for_targets(options:: opt_tags_range  , &options:: opt_tags_snps_as_a_uset  , options:: opt_tags_maf);
 
-    tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
-
     auto const trg_clb = skipper_target->conservative_lower_bound();
     auto const trg_cub = skipper_target->conservative_upper_bound();
     auto const tag_clb = skipper_tags  ->conservative_lower_bound();
     auto const tag_cub = skipper_tags  ->conservative_upper_bound();
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
+
         if  ( chrm < trg_clb.chr ) { continue; }
         if  ( chrm > trg_cub.chr ) { continue; }
         if  ( chrm < tag_clb.chr ) { continue; }
         if  ( chrm > tag_cub.chr ) { continue; }
+
+        tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
