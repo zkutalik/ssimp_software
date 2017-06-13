@@ -123,7 +123,6 @@ header_details   parse_header( string      const & header_line );
 static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) ;
 static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
-static
 char   decide_delimiter( string      const & header_line );
 
 struct GwasLineSummary {
@@ -237,7 +236,6 @@ static bool is_in_this_list(string const & s, std:: initializer_list<char const 
 }
 
 
-static
 char   decide_delimiter( string      const & header_line ) {
     // Which is comma, tab, or space, are most common here?
 

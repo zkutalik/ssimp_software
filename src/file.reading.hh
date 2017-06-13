@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 namespace file_reading {
+char   decide_delimiter( std:: string      const & header_line ); // also useful while parsing --sample.names
 
 struct chrpos {
     int chr;
