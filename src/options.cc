@@ -31,6 +31,7 @@ namespace options {
         bool                    opt_reimpute_tags = false;
 
         std:: string            opt_sample_names;
+        std:: string            temporary_filename_to_delete_at_exit;
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed

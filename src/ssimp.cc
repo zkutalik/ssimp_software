@@ -1,4 +1,4 @@
-#include <unistd.h> // for 'chdir'
+#include <unistd.h> // for 'chdir' and 'unlink'
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -139,8 +139,12 @@ void    set_appropriate_locale(ostream & stream) {
 }
 
 int main(int argc, char **argv) {
-    struct change_dir_at_the_last_minute {
+    struct change_dir_at_the_last_minute_and_delete_tempfile {
         static void go(void) {
+            if(!options:: temporary_filename_to_delete_at_exit.empty()) {
+                int ret = unlink(options:: temporary_filename_to_delete_at_exit.c_str());
+                ret == 0 || DIE("Couldn't delete temporary filename [" << options:: temporary_filename_to_delete_at_exit << "]");
+            }
             auto PROF_CHANGE_DIR_AT_THE_LAST_MINUTE = getenv("PROF_CHANGE_DIR_AT_THE_LAST_MINUTE");
             if(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE) {
                 int ret = chdir(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE);
@@ -148,7 +152,7 @@ int main(int argc, char **argv) {
             }
         }
     };
-    atexit( change_dir_at_the_last_minute:: go  );
+    atexit( change_dir_at_the_last_minute_and_delete_tempfile:: go  );
 
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
