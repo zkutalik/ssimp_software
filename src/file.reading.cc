@@ -213,10 +213,10 @@ header_details   parse_header( string      const & header_line ) {
                                                 })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"P-value","PVALUE"})) {
+        else if(is_in_this_list(one_field_name, {"p","P-value","PVALUE"})) {
             hd.effect_p = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"beta","ALT_EFFSIZE"})) {
+        else if(is_in_this_list(one_field_name, {"b","beta","ALT_EFFSIZE"})) {
             // Note: this is only for the direction. We use this with effect_p, if effect_z isn't known
             hd.effect_beta = header_details:: offset_and_name(field_counter, one_field_name);
         }
