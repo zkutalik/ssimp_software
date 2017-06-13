@@ -1,14 +1,16 @@
 "$SSIMP"                                                                            \
-    --ref "$REF"/link.to.1kg.data/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+    --ref ref/sub1KG-18M/chr19.vcf.gz                                               \
     --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel.EUR.samplenames    \
-    --wind 300000                                                                   \
-    --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
+    --gwas "$GWAS"/fixup.UKBB.both.smry..fdr                                        \
+    --wind 250000                                                                   \
+    --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
-    --tags.range    chr22:18000000-chr22:18500000                                    \
-    > "$OUTPUT"
+    | tee "$OUTPUT"
     #--ref "$REF"/tbi/small.vcf.sample.vcf.gz                                        \
-    #--ref "$REF"/link.to.1kg.data/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+    #--ref "$REF"/link.to.1kg.data/ALL.chr19.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
     #--impute.snps   "${COMMANDDIR}"/all.IDs.in.thevcf                                \
     #--tags.snp      "${COMMANDDIR}"/all.IDs.in.thevcf                                \
-    #--ref ref/sub1KG-18M/chr22.vcf.gz
+    #--ref ref/sub1KG-18M/chr19.vcf.gz
+    #--gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
+    #--gwas "$GWAS"/ALL-HDL_INV-HRC-chr19.MetaScore.assoc.gz.bak                     \

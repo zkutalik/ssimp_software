@@ -1,17 +1,12 @@
-file_name:gwas/UKB.parental.lifespan.every100thSNP.txt
-options:: opt_window_width,options:: opt_flanking_width:	300'000 , 250'000
+file_name:gwas/fixup.UKBB.both.smry..fdr
+options:: opt_window_width,options:: opt_flanking_width:	250'000 , 250'000
 
-chrm22	   18'000'000-18'300'000
-       5 # GWAS     SNPs in this window (with 250'000 flanking)
-       1 # SNPs in both (i.e. useful as tags)
-   3'134 # target SNPs (anything in narrow window, will include some tags)
+chrm19	   18'000'000-18'250'000
+     176 # GWAS     SNPs in this window (with 250'000 flanking)
+     160 # SNPs in both (i.e. useful as tags)
+   2'411 # target SNPs (anything in narrow window, will include some tags)
 
-chrm22	   18'300'000-18'600'000
-       3 # GWAS     SNPs in this window (with 250'000 flanking)
-       1 # SNPs in both (i.e. useful as tags)
-   3'120 # target SNPs (anything in narrow window, will include some tags)
-
-chrm22	   18'600'000-18'900'000
-       5 # GWAS     SNPs in this window (with 250'000 flanking)
-       1 # SNPs in both (i.e. useful as tags)
-   1'663 # target SNPs (anything in narrow window, will include some tags)
+chrm19	   18'250'000-18'500'000
+     176 # GWAS     SNPs in this window (with 250'000 flanking)
+     160 # SNPs in both (i.e. useful as tags)
+   2'336 # target SNPs (anything in narrow window, will include some tags)
