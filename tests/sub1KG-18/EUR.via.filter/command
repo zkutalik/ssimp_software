@@ -1,6 +1,6 @@
 "$SSIMP"                                                                            \
     --ref ref/sub1KG-18M/chr{CHRM}.vcf.gz                                           \
-    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel.EUR.samplenames    \
+    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
     --gwas "$GWAS"/fixup.UKBB.both.smry..fdr                                        \
     --wind 250000                                                                   \
     --flan 250000                                                                   \
@@ -16,3 +16,5 @@
     #--gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
     #--gwas "$GWAS"/ALL-HDL_INV-HRC-chr19.MetaScore.assoc.gz.bak                     \
     #--impute.maf 0.25                                                               \
+    #--sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel.EUR.samplename     \
+    #--sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \

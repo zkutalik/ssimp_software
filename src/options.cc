@@ -2,11 +2,21 @@
 
 #include <getopt.h>
 #include <iostream>
+#include <fstream>
 
 #include "bits.and.pieces/DIE.hh"
+#include "bits.and.pieces/PP.hh"
 #include "bits.and.pieces/utils.hh"
 
+#include "file.reading.hh"
+#include "range/range_view.hh"
+#include "range/range_action.hh"
+#include "format/format.hh"
+
 using std:: string;
+
+namespace view   = range :: view;
+namespace action = range :: action;
 
 namespace options {
 
@@ -123,6 +133,77 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_sample_names.empty() || DIE("--sample.names specified twice?");
             assert(string("sample.names") == long_options[long_option_index].name);
             options::  opt_sample_names = optarg;
+            { // check the filename exists. If not, treat it as a magical filename
+                std:: ifstream test_if_file_exists(options::  opt_sample_names.c_str());
+                if(!test_if_file_exists) {
+                    // maybe everything after the second-last '/' is a filter?
+                    size_t lastslash = options::  opt_sample_names.find_last_of('/');
+                    if(lastslash != string::npos) {
+                        size_t secondlastslash = options::  opt_sample_names.find_last_of('/', lastslash-1);
+                        if(secondlastslash != string:: npos) {
+                            string underlying_filename = options::  opt_sample_names.substr(0,secondlastslash);
+                            string sample_field        = options::  opt_sample_names.substr(secondlastslash+1, lastslash-secondlastslash-1);
+                            string filter              = options::  opt_sample_names.substr(lastslash+1);
+                            auto   filter_field_pair   = utils:: tokenize(filter, '=');
+                            filter_field_pair.size() == 2 || DIE("Should be just one '=' in [" << filter << "]");
+                            string filter_field        = filter_field_pair.at(0);
+                            string filter_value        = filter_field_pair.at(1);
+                            std:: ifstream full_panel (underlying_filename);
+                            full_panel || DIE("Can't find the full panel file [" << underlying_filename << "]");
+
+                            string header;
+                            getline(full_panel, header);
+                            full_panel || DIE("Couldn't read in a header line from [" << underlying_filename << "]");
+
+                            char delimiter = file_reading:: decide_delimiter(header);
+                            auto header_fields = utils:: tokenize( header, delimiter);
+
+                            int offset_of_sample_field = -1;
+                            int offset_of_filter_field = -1;
+
+                            using utils:: operator<<;
+
+                            view:: enumerate_vector(header_fields)
+                            |action:: unzip_foreach|
+                            [&](int i, string const & s) {
+                                if( s == sample_field) {
+                                    offset_of_sample_field == -1 || DIE("double field name in [" << header_fields << "]?");
+                                    offset_of_sample_field = i;
+                                }
+                                if( s == filter_field) {
+                                    offset_of_filter_field == -1 || DIE("double field name in [" << header_fields << "]?");
+                                    offset_of_filter_field = i;
+                                }
+                            };
+
+                            offset_of_sample_field != -1 || DIE("Couldn't find ["<<sample_field<<"] field in [" << header_fields << "]?");
+                            offset_of_filter_field != -1 || DIE("Couldn't find ["<<filter_field<<"] field in [" << header_fields << "]?");
+
+                            std:: vector<string> filtered_samples_to_use;
+                            string dataline;
+                            while(getline(full_panel, dataline)) {
+                                auto dataline_split = utils:: tokenize(dataline, delimiter);
+                                if(dataline_split.at(offset_of_filter_field) != filter_value)
+                                    continue;
+                                filtered_samples_to_use.push_back(dataline_split.at(offset_of_sample_field));
+                            }
+
+                            char * temporary_filename = tempnam(NULL, "ssimp");
+                            temporary_filename || DIE("Couldn't create temporary filename for use with --sample_names");
+                            std:: ofstream file_of_filtered_samples_to_use(temporary_filename);
+                            options:: temporary_filename_to_delete_at_exit = temporary_filename;
+
+                            for(auto && one_sample : filtered_samples_to_use) {
+                                file_of_filtered_samples_to_use << one_sample << '\n';
+                            }
+                            file_of_filtered_samples_to_use.close();
+                            options::  opt_sample_names = temporary_filename;
+                        }
+                    }
+                } else {
+                    DIE("--sample.names [" << options::  opt_sample_names << "] doesn't exist");
+                }
+            }
         }
     }
 }
