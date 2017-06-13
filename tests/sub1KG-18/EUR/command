@@ -6,6 +6,7 @@
     --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
+    --tags.range chr3-chr5                                                          \
     >     "$OUTPUT"
     #--ref "$REF"/tbi/small.vcf.sample.vcf.gz                                        \
     #--ref "$REF"/link.to.1kg.data/ALL.chr19.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
@@ -14,3 +15,4 @@
     #--ref ref/sub1KG-18M/chr19.vcf.gz
     #--gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
     #--gwas "$GWAS"/ALL-HDL_INV-HRC-chr19.MetaScore.assoc.gz.bak                     \
+    #--impute.maf 0.25                                                               \
