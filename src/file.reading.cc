@@ -214,10 +214,10 @@ header_details   parse_header( string      const & header_line ) {
                                                 })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"P-value"})) {
+        else if(is_in_this_list(one_field_name, {"P-value","PVALUE"})) {
             hd.effect_p = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"beta"})) {
+        else if(is_in_this_list(one_field_name, {"beta","ALT_EFFSIZE"})) {
             // Note: this is only for the direction. We use this with effect_p, if effect_z isn't known
             hd.effect_beta = header_details:: offset_and_name(field_counter, one_field_name);
         }
@@ -346,7 +346,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
         }
         auto all_split_up = tokenize(current_line, hd.m_delimiter);
         try {
-            gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up);
+            gls.m_SNPname    =                           LOOKUP(hd, SNPname, all_split_up); // TODO: This should be optional
             gls.m_allele_alt =                           LOOKUP(hd, allele_alt, all_split_up);
             gls.m_allele_ref =                           LOOKUP(hd, allele_ref, all_split_up);
             gls.m_z          = [&](){
