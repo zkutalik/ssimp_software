@@ -19,9 +19,12 @@
     tests/swapping/swap.some.alleles/imputations.txt
     tests/swapping/swap.some.alleles.and.their.zs/imputations.txt
 
+    tests/test.wood/imputations.txt
     tests/test.wood.R/imputations.txt
 
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
+
+    tests/wood.compare.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
 ;
 
     tests/${testname}/imputations.txt
@@ -51,6 +54,7 @@
 > tests/wood.compare.txt :
 tests/test.wood/imputations.txt
 tests/test.wood.R/imputations.txt
+-t @mkdir..tests
 {
     # load up both, and print the correlations between the results
     Rscript <(cat<<"EOF"
