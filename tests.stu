@@ -68,24 +68,6 @@ EOF
 }
 
 
-                    ref/compressed/${path}.vcfGTz
-:   -p bin/vcfGTz
-{
-    export  target="ref/compressed/${path}".vcfGTz
-    mkdir -p "$(dirname "$target")"
-    export              input="ref/${path}".vcf.gz
-    ls -l "$input"
-    bin/vcfGTz "$input" "$target".tmp
-    mv                  "$target".tmp "$target"
-}
-                    ref/${path}.vcf
-{
-    export  target="ref/${path}".vcf
-    export              input="ref/${path}".vcf.gz
-    ls -l "$input"
-    gunzip -k "$input"
-}
-
 ref/sub1KG-18M/chr${chrm}.vcf.gz
 ref/sub1KG-18M/chr${chrm}.vcf.gz.tbi
 : -t @mkdirfile..ref/sub1KG-18M/chr${chrm}.vcf.gz
