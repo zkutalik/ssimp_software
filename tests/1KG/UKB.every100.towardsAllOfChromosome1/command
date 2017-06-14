@@ -1,8 +1,0 @@
-"$SSIMP"                                                                \
-    --ref "$REF"/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz      \
-    --wind 300000                                                       \
-    --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt              \
-    --out "${OUT_IMPUTATIONS}"                                          \
-    --lambda 0.01                                                       \
-    --impute.snps "${COMMANDDIR}"/every100th.rs.txt                     \
-    > "$OUTPUT"
