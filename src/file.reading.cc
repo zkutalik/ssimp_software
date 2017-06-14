@@ -183,6 +183,7 @@ header_details   parse_header( string      const & header_line ) {
                         ,"a1"
                         ,"A1"
                         ,"Allele1"
+                        ,"effect_allele"
                     })) {
             hd.allele_ref = header_details:: offset_and_name(field_counter, one_field_name);
         }
@@ -191,6 +192,7 @@ header_details   parse_header( string      const & header_line ) {
                         ,"a2"
                         ,"A2"
                         ,"Allele2"
+                        ,"other_allele"
                         })) {
             hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
         }
