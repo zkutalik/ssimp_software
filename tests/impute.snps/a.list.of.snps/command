@@ -5,4 +5,5 @@
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
     --impute.snps   "${COMMANDDIR}"/a.list.of.snps.txt                              \
+    --tags.range  chr1-chr2                                                         \
     > "$OUTPUT"
