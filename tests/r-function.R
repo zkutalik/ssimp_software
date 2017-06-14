@@ -119,10 +119,12 @@ ssimp <- function(path.gwas,
   ## translate each snp into a dosage
   library(parallel)
   
-  tmp <- mclapply(1:nrow(G.raw), function(i)
+  tmp <- lapply(1:nrow(G.raw), function(i)
   {
     sapply(G.raw[i,], function(k) f.translate(k))
-  }, mc.cores = 4) ## each list entry is a SNP
+  }
+  #, mc.cores = 4
+  ) ## each list entry is a SNP
   
   G <- do.call(cbind.data.frame, tmp)
   names(G) <- sm$SNP
