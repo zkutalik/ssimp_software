@@ -22,6 +22,8 @@
     tests/test.wood/imputations.txt
     tests/test.wood.R/imputations.txt
 
+    tests/test0.R/imputations.txt
+
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
 
     tests/wood.compare.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
