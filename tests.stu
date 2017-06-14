@@ -27,8 +27,8 @@
 
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
 
-    #tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
-    #tests.compare/COMP0.txt
+    tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
+    tests.compare/COMP0.txt
 ;
 
     tests/${testname}/imputations.txt
@@ -64,22 +64,11 @@ tests/test0.R/imputations.txt {
 > tests.compare/COMP${testname}.txt :
 tests/test${testname}/imputations.txt
 tests/test${testname}.R/imputations.txt
+-p tests.compare
 {
     mkdir -p tests.compare
     # load up both, and print the correlations between the results
-    Rscript <(cat<<"EOF"
-        testname = Sys.getenv('testname')
-        readDT(paste0('tests/test',testname, '.R/imputations.txt'),'\t',T)  -> fromR
-        readDT(paste0('tests/test',testname,   '/imputations.txt'),'\t',T) [,.(SNP=SNPname,z.CXX=z_imp,iq.CXX=impqual)]    -> fromCXX
-        stopifnot(nrow(fromR) == nrow(fromCXX))
-        join = fromR[fromCXX,on='SNP']
-        z.cor  = join[,abs(Z.imp-z.CXX)]
-        iq.cor = join[,abs(impqual- iq.CXX)]
-        stopifnot(min( z.cor ) < 1e-5)
-        stopifnot(min(iq.cor ) < 1e-5)
-        catn('OK, both correlations are close to 1.0')
-EOF
-)
+    Rscript tests.compare.R
 }
 
 
@@ -133,6 +122,7 @@ EOF
         mv /tmp/chr${chrm}.vcf.gz.tbi   ref/sub1KG-tiny/chr${chrm}.vcf.gz.tbi
 }
 
+tests.compare       { mkdir -p tests.compare }
 @mkdirfile..${path} {
     mkdir -p "$(dirname "${path}")"
 }
