@@ -1,7 +1,7 @@
 @all.tests
 :
     tests/lambda1.0/imputations.txt
-    tests/test0.whatever/imputations.txt
+    tests/test.whatever/imputations.txt
     tests/3.chromosomes/UKB.every100/imputations.txt
     tests/impute.range/chr1_1000000-chr1_2000000/imputations.txt
     tests/impute.range/chr2-3/imputations.txt
@@ -27,8 +27,8 @@
 
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
 
-    tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
-    tests.compare/COMP0.txt
+    #tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
+    #tests.compare/COMP0.txt
 ;
 
     tests/${testname}/imputations.txt
@@ -64,8 +64,8 @@ tests/test0.R/imputations.txt {
 > tests.compare/COMP${testname}.txt :
 tests/test${testname}/imputations.txt
 tests/test${testname}.R/imputations.txt
--t @mkdir..tests.compare
 {
+    mkdir -p tests.compare
     # load up both, and print the correlations between the results
     Rscript <(cat<<"EOF"
         testname = Sys.getenv('testname')
