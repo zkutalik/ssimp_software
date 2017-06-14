@@ -1,1 +1,0 @@
-bin/ssimp --raw.ref ref/1000genomes_90snps_100samples.vcf —gwas gwas/gwas_example.txt
