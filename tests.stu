@@ -1,7 +1,7 @@
 @all.tests
 :
     tests/lambda1.0/imputations.txt
-    tests/test0/gz/imputations.txt
+    tests/test0/imputations.txt
     tests/3.chromosomes/UKB.every100/imputations.txt
     tests/impute.range/chr1_1000000-chr1_2000000/imputations.txt
     tests/impute.range/chr2-3/imputations.txt
