@@ -60,21 +60,22 @@ tests/test0.R/imputations.txt {
     Rscript --vanilla tests/test0.R/test0.R
 }
 
-> tests.compare/COMP.wood.txt :
-tests/test.wood/imputations.txt
-tests/test.wood.R/imputations.txt
+> tests.compare/COMP${testname}.txt :
+tests/test${testname}/imputations.txt
+tests/test${testname}.R/imputations.txt
 -t @mkdir..tests.compare
 {
     # load up both, and print the correlations between the results
     Rscript <(cat<<"EOF"
-        readDT('tests/test.wood.R/imputations.txt','\t',T)  -> fromR
-        readDT('tests/test.wood/imputations.txt','\t',T) [,.(SNP=SNPname,z.CXX=z_imp,iq.CXX=impqual)]    -> fromCXX
+        testname = Sys.getenv('testname')
+        readDT(paste0('tests/test',testname, '.R/imputations.txt'),'\t',T)  -> fromR
+        readDT(paste0('tests/test',testname,   '/imputations.txt'),'\t',T) [,.(SNP=SNPname,z.CXX=z_imp,iq.CXX=impqual)]    -> fromCXX
         stopifnot(nrow(fromR) == nrow(fromCXX))
         join = fromR[fromCXX,on='SNP']
-        z.cor = join[,cor(Z.imp,z.CXX)]
-        iq.cor = join[,cor(impqual, iq.CXX)]
-        stopifnot(abs( z.cor - 1) < 1e-5)
-        stopifnot(abs(iq.cor - 1) < 1e-5)
+        z.cor  = join[,abs(Z.imp-z.CXX)]
+        iq.cor = join[,abs(impqual- iq.CXX)]
+        stopifnot(min( z.cor ) < 1e-5)
+        stopifnot(min(iq.cor ) < 1e-5)
         catn('OK, both correlations are close to 1.0')
 EOF
 )
