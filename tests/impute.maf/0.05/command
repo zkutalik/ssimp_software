@@ -1,7 +1,7 @@
 "$SSIMP"                                                                            \
-    --ref "$REF"/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz                  \
+    --ref ref/sub1KG-tiny/chr{CHRM}.vcf.gz                                          \
     --wind 300000                                                                   \
-    --gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
+    --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
     --impute.maf    0.05                                                            \
