@@ -1,30 +1,30 @@
 @all.tests
 :
-    tests/lambda1.0/output.actual
-    tests/test0/gz/output.actual
-    tests/3.chromosomes/UKB.every100/output.actual
-    tests/impute.range/chr1_1000000-chr1_2000000/output.actual
-    tests/impute.range/chr2-3/output.actual
-    tests/impute.range/chr2/output.actual
-    tests/impute.snps/a.list.of.snps/output.actual
-    tests/impute.maf/0.05/output.actual
-    tests/tags.maf/tags.maf.0.01/output.actual
+    tests/lambda1.0/imputations.txt
+    tests/test0/gz/imputations.txt
+    tests/3.chromosomes/UKB.every100/imputations.txt
+    tests/impute.range/chr1_1000000-chr1_2000000/imputations.txt
+    tests/impute.range/chr2-3/imputations.txt
+    tests/impute.range/chr2/imputations.txt
+    tests/impute.snps/a.list.of.snps/imputations.txt
+    tests/impute.maf/0.05/imputations.txt
+    tests/tags.maf/tags.maf.0.01/imputations.txt
 
-    tests/tags.range/chr1_1000000-chr1_2000000/output.actual
-    tests/tags.range/chr2-3/output.actual
-    tests/tags.range/chr2/output.actual
-    tests/tags.snps/a.list.of.snps/output.actual
+    tests/tags.range/chr1_1000000-chr1_2000000/imputations.txt
+    tests/tags.range/chr2-3/imputations.txt
+    tests/tags.range/chr2/imputations.txt
+    tests/tags.snps/a.list.of.snps/imputations.txt
 
-    tests/swapping/swap.just.the.allele.headers/output.actual
-    tests/swapping/swap.some.alleles/output.actual
-    tests/swapping/swap.some.alleles.and.their.zs/output.actual
+    tests/swapping/swap.just.the.allele.headers/imputations.txt
+    tests/swapping/swap.some.alleles/imputations.txt
+    tests/swapping/swap.some.alleles.and.their.zs/imputations.txt
 
     tests/test.wood.R/imputations.txt
 
-    tests/sub1KG-tiny/EUR.via.filter.chr4.5/output.actual
+    tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
 ;
 
-    tests/${testname}/output.actual
+    tests/${testname}/imputations.txt
 :       bin/ssimp
     tests/${testname}/command
 {
