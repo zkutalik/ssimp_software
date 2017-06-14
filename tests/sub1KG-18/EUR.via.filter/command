@@ -7,7 +7,7 @@
     --out "${OUT_IMPUTATIONS}"                                                      \
     --tags.used.output "${COMMANDDIR}"/tag.data.used.here                       \
     --lambda 0.01                                                                   \
-    --tags.range chr3-chr5                                                          \
+    --tags.range chr5                                                          \
     --impute.maf 0.05                                                               \
     >     "$OUTPUT"
     #--ref "$REF"/tbi/small.vcf.sample.vcf.gz                                        \
