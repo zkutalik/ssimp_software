@@ -51,6 +51,12 @@
     mv "tests/${testname}"/output.actual.tmp "tests/${testname}"/output.actual
 }
 
+tests/test0.R/imputations.txt {
+    export COMMANDDIR=tests/test0.R
+    ls -l tests/test0.R/test0.R
+    Rscript --vanilla tests/test0.R/test0.R
+}
+
 > tests/wood.compare.txt :
 tests/test.wood/imputations.txt
 tests/test.wood.R/imputations.txt
