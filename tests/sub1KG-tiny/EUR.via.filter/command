@@ -1,5 +1,5 @@
 "$SSIMP"                                                                            \
-    --ref ref/sub1KG-18M/chr{CHRM}.vcf.gz                                           \
+    --ref ref/sub1KG-tiny/chr{CHRM}.vcf.gz                                           \
     --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
     --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
@@ -14,7 +14,6 @@
     #--ref "$REF"/link.to.1kg.data/ALL.chr19.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
     #--impute.snps   "${COMMANDDIR}"/all.IDs.in.thevcf                                \
     #--tags.snp      "${COMMANDDIR}"/all.IDs.in.thevcf                                \
-    #--ref ref/sub1KG-18M/chr19.vcf.gz
     #--gwas "$GWAS"/UKB.parental.lifespan.every100thSNP.txt                          \
     #--gwas "$GWAS"/ALL-HDL_INV-HRC-chr19.MetaScore.assoc.gz.bak                     \
     #--impute.maf 0.25                                                               \
