@@ -1,5 +1,5 @@
 GWAS:
-[1] "gwas/small.UKBB.both.csv"
+[1] "gwas/small.random.csv"
 
 reference panel used:
 [1] "ref/small.vcf.sample.vcf"
