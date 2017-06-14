@@ -2,16 +2,11 @@ file_name:gwas/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt
 options:: opt_window_width,options:: opt_flanking_width:	250'000 , 250'000
 
 chrm22	   30'750'000-31'000'000
-     621 # GWAS     SNPs in this window (with 250'000 flanking)
+      17 # GWAS     SNPs in this window (with 250'000 flanking)
        3 # SNPs in both (i.e. useful as tags)
-     219 # target SNPs (anything in narrow window, will include some tags)
+       1 # target SNPs (anything in narrow window, will include some tags)
 
 chrm22	   31'000'000-31'250'000
-     578 # GWAS     SNPs in this window (with 250'000 flanking)
+      17 # GWAS     SNPs in this window (with 250'000 flanking)
        3 # SNPs in both (i.e. useful as tags)
-     208 # target SNPs (anything in narrow window, will include some tags)
-
-chrm22	   31'250'000-31'500'000
-     453 # GWAS     SNPs in this window (with 250'000 flanking)
-       3 # SNPs in both (i.e. useful as tags)
-     174 # target SNPs (anything in narrow window, will include some tags)
+      13 # target SNPs (anything in narrow window, will include some tags)
