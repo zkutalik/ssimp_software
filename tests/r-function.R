@@ -200,6 +200,7 @@ ssimp <- function(path.gwas,
   #f.impqual.r2(C, rho, target.snps, tag.snps, lambda  = 1e-8)
   
   out <- data.frame(SNP = target.snps, Z.imp = estim$imp, impqual = r2$r2.penal.b)
+  out <- merge(out, sm[,-3], by = "SNP", sort = FALSE)
   write_tsv(out, path = paste0(path.outdir, "imputations.txt"))
   
   ## print log file
