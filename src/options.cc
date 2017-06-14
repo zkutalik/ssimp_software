@@ -65,6 +65,8 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
+        if (c == '?')
+            DIE("problem with options");
         if (c == -1)
             break;
         if (c == 1) { // non-option
