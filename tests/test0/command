@@ -1,8 +1,0 @@
-"$SSIMP"                                                                        \
-    --ref "$REF"/tbi/small.vcf.sample.vcf.gz                                    \
-    --wind 300000                                                               \
-    --gwas "$GWAS"/small.UKBB.both.csv                                          \
-    --out "${OUT_IMPUTATIONS}"                                                  \
-    --lambda 0.03996804                                                         \
-    --impute.snps <(echo rs587697622 rs587755077 rs587654921 | tr ' ' '\n')     \
-    > "$OUTPUT"

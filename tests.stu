@@ -1,7 +1,6 @@
 @all.tests
 :
     tests/lambda1.0/output.actual
-    tests/test0/output.actual
     tests/test0/gz/output.actual
     tests/3.chromosomes/UKB.every100/output.actual
     tests/impute.range/chr1_1000000-chr1_2000000/output.actual
