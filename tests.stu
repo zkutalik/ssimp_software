@@ -24,15 +24,9 @@
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/output.actual
 ;
 
-@test.data.to.be.made.by.stu :
-    ref/tbi/small.vcf.sample.vcf.gz.tbi
-    ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz.tbi
-;
-
     tests/${testname}/output.actual
 :       bin/ssimp
     tests/${testname}/command
-   @test.data.to.be.made.by.stu
 {
     export SSIMP=bin/ssimp
     export   REF=ref
@@ -71,21 +65,6 @@
     export              input="ref/${path}".vcf.gz
     ls -l "$input"
     gunzip -k "$input"
-}
-
-    ref/tbi/${path}.vcf.gz.tbi
-:   ref/tbi/${path}.vcf.gz
-{
-    tabix ref/tbi/${path}.vcf.gz
-}
-                ref/tbi/${path}.vcf.gz
-{
-export  target="ref/tbi/${path}.vcf.gz"
-    ls -l "ref/${path}".vcf.gz
-    mkdir -p "$(dirname "$target")"
-    zcat "ref/${path}".vcf.gz | bgzip > "${target}".tmp
-    mv "${target}".tmp \
-       "${target}"
 }
 
         tests/test.wood.R/imputations.txt
