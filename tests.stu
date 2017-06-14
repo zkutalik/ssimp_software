@@ -27,7 +27,7 @@
 
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
 
-    tests/wood.compare.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
+    tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
 ;
 
     tests/${testname}/imputations.txt
@@ -60,10 +60,10 @@ tests/test0.R/imputations.txt {
     Rscript --vanilla tests/test0.R/test0.R
 }
 
-> tests/wood.compare.txt :
+> tests.compare/COMP.wood.txt :
 tests/test.wood/imputations.txt
 tests/test.wood.R/imputations.txt
--t @mkdir..tests
+-t @mkdir..tests.compare
 {
     # load up both, and print the correlations between the results
     Rscript <(cat<<"EOF"
