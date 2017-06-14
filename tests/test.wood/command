@@ -1,0 +1,10 @@
+"$SSIMP"                                                                            \
+    --ref "$REF"/1000genomes_somechr22snps_EURsamples.vcf.gz                        \
+    --gwas "$GWAS"/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt            \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 250000                                                                   \
+    --flan 250000                                                                   \
+    --out "${OUT_IMPUTATIONS}"                                                      \
+    --lambda 0.08917559                                                             \
+    --tags.snp <(echo rs136382 rs136383 rs136389 | tr ' ' '\n')                     \
+    >     "$OUTPUT"
