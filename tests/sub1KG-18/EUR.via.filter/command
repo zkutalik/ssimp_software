@@ -5,6 +5,7 @@
     --wind 250000                                                                   \
     --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here                       \
     --lambda 0.01                                                                   \
     --tags.range chr3-chr5                                                          \
     --impute.maf 0.05                                                               \

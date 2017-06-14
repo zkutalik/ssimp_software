@@ -39,6 +39,7 @@ namespace options {
         double                  opt_tags_maf =0.0; // target not imputed unless maf (in reference) is at least this.
 
         bool                    opt_reimpute_tags = false;
+        std:: string            opt_tags_used_output;
 
         std:: string            opt_sample_names;
         std:: string            temporary_filename_to_delete_at_exit;
@@ -61,7 +62,8 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"tags.snps"          ,  required_argument, 0, 12 },
             {"tags.maf"           ,  required_argument, 0, 13 },
             {"reimpute.tags"      ,        no_argument, 0, 14 }, // one-by-one, reimpute each tag by masking it
-            {"sample.names"       ,  required_argument, 0, 15 }, // one-by-one, reimpute each tag by masking it
+            {"sample.names"       ,  required_argument, 0, 15 },
+            {"tags.used.output"   ,  required_argument, 0, 16 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -204,6 +206,11 @@ void read_in_all_command_line_options(int argc, char **argv) {
                     }
                 }
             }
+        }
+        if (c == 16) {
+            options:: opt_tags_used_output.empty() || DIE("--tags.used.output specified twice?");
+            assert(string("tags.used.output") == long_options[long_option_index].name);
+            options::  opt_tags_used_output = optarg;
         }
     }
 }

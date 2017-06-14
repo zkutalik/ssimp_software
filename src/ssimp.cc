@@ -352,6 +352,11 @@ void impute_all_the_regions(   string                                   filename
                         << endl;
     }
 
+    ofstream opts_tags_used_output_file; // to store the tags used, if requested by --opt_tags_used_output
+    if(!options:: opt_tags_used_output.empty()) {
+        opts_tags_used_output_file.open(options:: opt_tags_used_output);
+        opts_tags_used_output_file || DIE("Couldn't create --tags.used.output [" << options:: opt_tags_used_output << "] for output");
+    }
 
     PP(options:: opt_window_width
       ,options:: opt_flanking_width

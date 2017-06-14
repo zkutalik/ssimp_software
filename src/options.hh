@@ -22,6 +22,7 @@ extern  std::unordered_set<std::string>    opt_tags_snps_as_a_uset;
 extern  double                  opt_tags_maf/* =0.0*/;
 
 extern  bool                    opt_reimpute_tags;
+extern  std:: string            opt_tags_used_output;
 
 extern  std:: string            opt_sample_names;
 extern  std:: string            temporary_filename_to_delete_at_exit;
