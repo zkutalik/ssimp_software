@@ -22,6 +22,7 @@
     tests/test.wood/imputations.txt
     tests/test.wood.R/imputations.txt
 
+    tests/test0/imputations.txt
     tests/test0.R/imputations.txt
 
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
