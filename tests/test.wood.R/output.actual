@@ -1,0 +1,20 @@
+Parsed with column specification:
+cols(
+  MarkerName = col_character(),
+  Allele1 = col_character(),
+  Allele2 = col_character(),
+  Freq.Allele1.HapMapCEU = col_double(),
+  b = col_double(),
+  SE = col_double(),
+  p = col_double(),
+  N = col_integer(),
+  Z = col_double()
+)
+Parsed with column specification:
+cols(
+  .default = col_character(),
+  `#CHROM` = col_integer(),
+  POS = col_integer(),
+  QUAL = col_integer()
+)
+See spec(...) for full column specifications.

@@ -67,12 +67,6 @@
     gunzip -k "$input"
 }
 
-        tests/test.wood.R/imputations.txt
-{
-    export COMMANDDIR="tests/test.wood.R"
-    Rscript --vanilla tests/test.wood.R/test.wood.R
-}
-
 ref/sub1KG-18M/chr${chrm}.vcf.gz
 ref/sub1KG-18M/chr${chrm}.vcf.gz.tbi
 : -t @mkdirfile..ref/sub1KG-18M/chr${chrm}.vcf.gz
