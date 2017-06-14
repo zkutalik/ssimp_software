@@ -60,6 +60,8 @@ ssimp <- function(path.gwas,
   dat[is.na(Z) & !is.na(b) & !is.na(SE), Z := b/SE]
   dat[is.na(Z) & !is.na(b) & !is.na(p) , Z := sign(b) * abs(qnorm(p/2))]
 
+  dat = data.frame(dat) # back to a data.frame, because some of the latter code assumes it's a data.frame
+
   ## only for giant
   stopifnot(mean(is.na(dat$Z)) < 0.5)
 
