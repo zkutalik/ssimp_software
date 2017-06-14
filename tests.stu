@@ -29,7 +29,6 @@
     tests/test.wood.R/imputations.txt
     tests/test0.R/imputations.txt
 
-    tests/sub1KG-18/EUR/output.actual
 ;
 
 @test.data.to.be.made.by.stu :
