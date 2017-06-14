@@ -130,15 +130,32 @@ ref/sub1KG-tiny/chr${chrm}.vcf.gz
 ref/sub1KG-tiny/chr${chrm}.vcf.gz.tbi
 : -t @mkdirfile..ref/sub1KG-tiny/chr${chrm}.vcf.gz
 {
-    #test -f ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
-    #zcat    ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz |
-    test -f ref/sub1KG-18M/chr${chrm}.vcf.gz
+    # This will take a subrange of the full 1kg data, but give preference
+    # to tag SNPs (i.e. those in GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     zcat    ref/sub1KG-18M/chr${chrm}.vcf.gz |
-        egrep -v '^##' | {
-            IFS='' read -r JUST1LIINE
-            printf "%s\n" "$JUST1LIINE"
-            awk '$2 >= 18005000{exit} ; $2>=18000000'
-        } | bgzip > /tmp/chr${chrm}.vcf.gz
+        python <(cat<<"EOF"
+# python script starts here
+
+import sys
+def main():
+    tags = set( l.strip() for l in open(sys.argv[2]) if l != 'MarkerName\n' )
+    #print tags
+    vcf = open(sys.argv[1])
+    print vcf.next(),
+    for v in vcf:
+        v_rs = v.split('\t')[2]
+        if v_rs in tags:
+            if v_rs[-1:] == '1': # 10% of the tags
+                print v,
+        else:
+            if v_rs[-2:] == '00': # 1% of the non-tags
+                print v,
+
+
+main()
+EOF
+) <(zcat ref/sub1KG-18M/chr${chrm}.vcf.gz) <(zcat gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz | cut -f1) |
+        bgzip > /tmp/chr${chrm}.vcf.gz
         tabix       /tmp/chr${chrm}.vcf.gz
         mv /tmp/chr${chrm}.vcf.gz       ref/sub1KG-tiny/chr${chrm}.vcf.gz
         mv /tmp/chr${chrm}.vcf.gz.tbi   ref/sub1KG-tiny/chr${chrm}.vcf.gz.tbi
