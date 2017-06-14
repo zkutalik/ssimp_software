@@ -3,7 +3,7 @@ rm(list = ls())
 
 ## set paths
 ## -------------------
-path.outdir = Sys.getenv('outdir')
+path.outdir = Sys.getenv('COMMANDDIR')
 
 ## load function
 ## -------------------
@@ -15,7 +15,7 @@ source("tests/r-function.R")
 ## ---------------
 ssimp(path.gwas = "gwas/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt",
       path.ref  = "ref/1000genomes_somechr22snps_EURsamples.vcf",
-      path.outdir = 'tests/test.wood.R/',
+      path.outdir = paste0(path.outdir , '/'),
       lambda = "sqrt",
       what.to.impute = "Z",
       gwas.names = c("MarkerName", NA, NA, "Allele1","Allele2",NA,NA, 'Z', "N"),

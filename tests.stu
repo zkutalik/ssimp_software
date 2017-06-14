@@ -68,10 +68,8 @@
 }
 
         tests/test.wood.R/imputations.txt
-    :   tests/test.wood.R/test.wood.R
-        tests/r-function.R
 {
-    export outdir="tests/test.wood.R"
+    export COMMANDDIR="tests/test.wood.R"
     Rscript --vanilla tests/test.wood.R/test.wood.R
 }
 
