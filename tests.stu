@@ -126,6 +126,23 @@ ref/sub1KG-18M/chr${chrm}.vcf.gz.tbi
         mv /tmp/chr${chrm}.vcf.gz       ref/sub1KG-18M/chr${chrm}.vcf.gz
         mv /tmp/chr${chrm}.vcf.gz.tbi   ref/sub1KG-18M/chr${chrm}.vcf.gz.tbi
 }
+ref/sub1KG-tiny/chr${chrm}.vcf.gz
+ref/sub1KG-tiny/chr${chrm}.vcf.gz.tbi
+: -t @mkdirfile..ref/sub1KG-tiny/chr${chrm}.vcf.gz
+{
+    #test -f ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
+    #zcat    ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz |
+    test -f ref/sub1KG-18M/chr${chrm}.vcf.gz
+    zcat    ref/sub1KG-18M/chr${chrm}.vcf.gz |
+        egrep -v '^##' | {
+            IFS='' read -r JUST1LIINE
+            printf "%s\n" "$JUST1LIINE"
+            awk '$2 >= 18005000{exit} ; $2>=18000000'
+        } | bgzip > /tmp/chr${chrm}.vcf.gz
+        tabix       /tmp/chr${chrm}.vcf.gz
+        mv /tmp/chr${chrm}.vcf.gz       ref/sub1KG-tiny/chr${chrm}.vcf.gz
+        mv /tmp/chr${chrm}.vcf.gz.tbi   ref/sub1KG-tiny/chr${chrm}.vcf.gz.tbi
+}
 
 @mkdirfile..${path} {
     mkdir -p "$(dirname "${path}")"
