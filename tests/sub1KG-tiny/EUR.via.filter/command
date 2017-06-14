@@ -1,5 +1,5 @@
 "$SSIMP"                                                                            \
-    --ref ref/sub1KG-tiny/chr{CHRM}.vcf.gz                                          \
+    --ref "$REF"/sub1KG-tiny/chr{CHRM}.vcf.gz                                          \
     --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
     --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
