@@ -20,7 +20,6 @@
     tests/swapping/swap.some.alleles.and.their.zs/output.actual
 
     tests/test.wood.R/imputations.txt
-    tests/test0.R/imputations.txt
 
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/output.actual
 ;
@@ -95,13 +94,6 @@ export  target="ref/tbi/${path}.vcf.gz"
 {
     export outdir="tests/test.wood.R"
     Rscript --vanilla tests/test.wood.R/test.wood.R
-}
-        tests/test0.R/imputations.txt
-    :   tests/test0.R/test0.R
-        tests/r-function.R
-{
-    cd tests/test0.R
-    Rscript --vanilla test0.R
 }
 
 ref/sub1KG-18M/chr${chrm}.vcf.gz
