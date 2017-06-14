@@ -200,8 +200,6 @@ void read_in_all_command_line_options(int argc, char **argv) {
                             options::  opt_sample_names = temporary_filename;
                         }
                     }
-                } else {
-                    DIE("--sample.names [" << options::  opt_sample_names << "] doesn't exist");
                 }
             }
         }
