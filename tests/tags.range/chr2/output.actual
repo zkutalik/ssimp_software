@@ -2,11 +2,11 @@ file_name:gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
 options:: opt_window_width,options:: opt_flanking_width:	300'000 , 250'000
 
 chrm2	   18'000'000-18'300'000
-      73 # GWAS     SNPs in this window (with 250'000 flanking)
+      61 # GWAS     SNPs in this window (with 250'000 flanking)
       61 # SNPs in both (i.e. useful as tags)
      144 # target SNPs (anything in narrow window, will include some tags)
 
 chrm2	   18'300'000-18'600'000
-      68 # GWAS     SNPs in this window (with 250'000 flanking)
+      57 # GWAS     SNPs in this window (with 250'000 flanking)
       57 # SNPs in both (i.e. useful as tags)
      104 # target SNPs (anything in narrow window, will include some tags)
