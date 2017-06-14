@@ -4,7 +4,7 @@
 ## and are now used to test aarons functions
 ## =================================================
 
-library(data.table) # for 'rbindlist'
+library(data.table) # for 'rbindlist' and 'data.table'
 
 
 ## top level function to impute
@@ -54,12 +54,14 @@ ssimp <- function(path.gwas,
   })) -> dat
   # ... Second step: override the column names
   names(dat) <- c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N", 'p')
+  dat = data.table(dat)
+  dat[,Z := as.numeric(Z)]
+
+  dat[is.na(Z) & !is.na(b) & !is.na(SE), Z := b/SE]
+  dat[is.na(Z) & !is.na(b) & !is.na(p) , Z := sign(b) * abs(qnorm(p/2))]
 
   ## only for giant
-  if(all(!(names(dat) %in% "Z")) & what.to.impute == "Z")
-  {
-    dat$Z <- dat$b/dat$SE
-  }
+  stopifnot(mean(is.na(dat$Z)) < 0.5)
 
   ## load vcf
   ## ------
