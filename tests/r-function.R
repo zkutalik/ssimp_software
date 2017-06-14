@@ -15,7 +15,7 @@ ssimp <- function(path.gwas,
                   path.outdir,
                   lambda = "sqrt", 
                   what.to.impute = "Z", 
-                  gwas.names = c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N"),
+                  gwas.names = c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N", 'p'),
                   tag.snps = NULL,
                   target.snps = NULL,
                   impute.tags = FALSE
@@ -53,7 +53,7 @@ ssimp <- function(path.gwas,
       if(is.na(col.name)) NA else dat[,col.name]
   })) -> dat
   # ... Second step: override the column names
-  names(dat) <- c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N")
+  names(dat) <- c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N", 'p')
 
   ## only for giant
   if(all(!(names(dat) %in% "Z")) & what.to.impute == "Z")
