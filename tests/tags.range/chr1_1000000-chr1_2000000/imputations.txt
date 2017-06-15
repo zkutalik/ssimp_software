@@ -1,1 +1,1 @@
-chr	pos	z_imp	SNP	Allele1	Allele2	maf	r2.pred
+chr	pos	z_imp	source	SNP	Allele1	Allele2	maf	r2.pred	lambda

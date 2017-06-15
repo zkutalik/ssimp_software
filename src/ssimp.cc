@@ -346,11 +346,13 @@ void impute_all_the_regions(   string                                   filename
                         << "chr"
                         << '\t' << "pos"
                         << '\t' << "z_imp"
+                        << '\t' << "source"
                         << '\t' << "SNP"
                         << '\t' << gwas->get_column_name_allele_ref() // copy column name from the GWAS input
                         << '\t' << gwas->get_column_name_allele_alt() // copy column name from the GWAS input
                         << '\t' << "maf"
                         << '\t' << "r2.pred"
+                        << '\t' << "lambda"
                         << endl;
     }
 
@@ -788,11 +790,13 @@ void impute_all_the_regions(   string                                   filename
                                 << chrm
                         << '\t' << pos
                         << '\t' << c_Cinv_zs(i)
+                        << '\t' << "SSIMP"
                         << '\t' << SNPname
                         << '\t' << target->ref
                         << '\t' << target->alt
                         << '\t' << target->maf
                         << '\t' << imp_qual
+                        << '\t' << options:: opt_lambda
                         << endl;
             }
 
