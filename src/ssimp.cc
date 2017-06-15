@@ -360,7 +360,7 @@ void impute_all_the_regions(   string                                   filename
         string      m_all_alt;
         double      m_z;
 
-        bool operator< (one_tag_data const & other) {
+        bool operator< (one_tag_data const & other) const {
             if(m_chrpos     != other.m_chrpos   ) return m_chrpos   < other.m_chrpos    ;
             if(m_all_ref    != other.m_all_ref  ) return m_all_ref  < other.m_all_ref   ;
             if(m_all_alt    != other.m_all_alt  ) return m_all_alt  < other.m_all_alt   ;
@@ -368,7 +368,7 @@ void impute_all_the_regions(   string                                   filename
             if(m_ID         != other.m_ID       ) return m_ID       < other.m_ID        ;
             return false;
         }
-        bool operator==(one_tag_data const & other) {
+        bool operator==(one_tag_data const & other) const {
             return(
               (m_chrpos     == other.m_chrpos   )
             &&(m_all_ref    == other.m_all_ref  )
