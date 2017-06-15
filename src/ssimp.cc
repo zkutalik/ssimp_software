@@ -207,6 +207,14 @@ int main(int argc, char **argv) {
         options:: opt_tags_snps_as_a_uset.empty() && DIE("Nothing in --tags.snps file? [" << options:: opt_tags_snps << "]");
     }
 
+    if( options:: opt_out .empty()) { // --out wasn't specified - default to ${gwas}.ssimp.txt
+        options:: opt_out = AMD_FORMATTED_STRING("{0}.ssimp.txt", options:: opt_gwas_filename);
+    }
+
+    // Finished adjusting the command line options
+
+    // Now, do the imputation!
+
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
 
