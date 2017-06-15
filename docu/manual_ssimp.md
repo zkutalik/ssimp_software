@@ -26,13 +26,13 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file).
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). `Aaron, please check`
 
-`--out [gwasfilename.ssimp.txt]` string. If not define will be the gwas filename (without extension ) + `.ssimp.txt`. Filename in which to store the imputation results. 
+`--out [gwasfilename.ssimp.txt]` string. Filename in which to store the imputation results. If not defined, it will be the gwas filename + `.ssimp.txt`. 
 
-`--log [gwasfilename.log]` string. If not define will be the gwas filename (without extension ) + `.log`. If set to `FALSE`, then no log file is produced. Filename in which to store the log file.
+`--log [gwasfilename.log]` string. Filename in which to store the log file. If not defined it will be the gwas filename + `.log`. If set to `FALSE`, then no log file is produced. 
 
-`--impute.range [no default]` Should have the form of `chrCHR:pos.start-chrCHR:pos.end`. If `chrCHR`, then the whole chromosome `CHR` is imputed. For `chr1-chr5` chromosome 1 to chromosome 5 are imputed. 
+`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used. 
 
 `--tag.snp [no default]` filename with list of tags (no header). For magic `Note` see below.
 
