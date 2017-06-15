@@ -55,12 +55,6 @@
     mv "tests/${testname}"/output.actual.tmp "tests/${testname}"/output.actual
 }
 
-tests/test0.R/imputations.txt {
-    export COMMANDDIR=tests/test0.R
-    ls -l tests/test0.R/test0.R
-    Rscript --vanilla tests/test0.R/test0.R
-}
-
 > tests.compare/COMP${testname}.txt :
 tests/test${testname}/imputations.txt
 tests/test${testname}.R/imputations.txt

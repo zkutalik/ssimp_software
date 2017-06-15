@@ -1,0 +1,8 @@
+Parsed with column specification:
+cols(
+  .default = col_character(),
+  `#CHROM` = col_integer(),
+  POS = col_integer(),
+  QUAL = col_integer()
+)
+See spec(...) for full column specifications.
