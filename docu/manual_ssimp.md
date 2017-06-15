@@ -3,14 +3,15 @@
 [//]: ==================================
 
 This command line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
-<sub>Details to the method can be found in *us (2017)*. (+ *Pasaniuc et al. (2014)*, or more recently in a review on the use of summary statistics by *Pasaniuc & Price (2016)*). </sub>
+
+<sup>Details to the method can be found in *us (2017)*. (+ *Pasaniuc et al. (2014)*, or more recently in a review on the use of summary statistics by *Pasaniuc & Price (2016)*). </sup>
 
 	
 
 
 ## Minimal example
 [//]: -------------------------------
-The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP id, Z-statistic, reference allele and risk allele and at least one row, and (2) the path to the reference panel. All other arguments have defaults defined (see below).
+The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP id, Z-statistic, reference allele and risk allele and at least one row, and (2) the path to the reference panel. <sup>All other arguments have defaults defined (see below).</sup>
 
 `bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `imputation.txt`, containing the imputation, and a log file called `output.actual`.
 
