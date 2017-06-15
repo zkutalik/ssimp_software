@@ -27,18 +27,19 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 `--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
 
 `--ref [no default]` path to vcf file (same folder should contain the `tbi` file). `Aaron, please check`
+`--sample.names` is defaulted to `super_pop=EUR`.
 
 `--out [gwasfilename.ssimp.txt]` string. Filename in which to store the imputation results. If not defined, it will be the gwas filename + `.ssimp.txt`. 
 
-`--log [gwasfilename.log]` string. Filename in which to store the log file. If not defined it will be the gwas filename + `.log`. If set to `FALSE`, then no log file is produced. 
+`--log [gwasfilename.log]` string. Filename in which to store the log file. If not defined it will be the gwas filename + `.log`. If set to `FALSE`, then no log file is produced. **(TBD)**
 
-`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used. 
+`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. **(TBD:)** For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used.  
 
 `--tag.snp [no default]` filename with list of tags (no header). For magic in bash see `Note` below.
 
 `--impute.snp [NULL]` filename to define SNPs to impute (no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimize`), n are the number of individuals in the reference panel. `optimize` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimize`), n are the number of individuals in the reference panel. `optimize` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). **(TBD: string)**
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
