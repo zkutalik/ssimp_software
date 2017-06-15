@@ -70,7 +70,7 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 [//]: -------------------------------
 `Aaron, please fill`
 
-## Imputation
+## Technical aspects of summary statistics imputation
 [//]: -------------------------------
 For more details on the summary statistics imputation method, please see our paper (2017). 
 
@@ -79,7 +79,7 @@ For more details on the summary statistics imputation method, please see our pap
 - If SNP-ID are present in the GWAS, then pos copied from reference panel. 
 - If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
 - Because either SNP-ID or Chr:Pos:A1:A2 are used as identifier, it is also possible to impute indels.
-- Z-statistics are imputed, along with `N.imp` (an estimate for the sample size) and `r2.pred` (adjusted imputation quality).
+- Z-statistics are imputed, along with `N_imp` (an estimate for the sample size) and `r2_pred` (adjusted imputation quality).
 - To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 
 ## Output
@@ -95,17 +95,17 @@ The `.imp.out` file has the following columns:
 
 - `SNP` SNP-ID
 - `Chr` Chromosome (only 1 to 22 right now)
-- `Pos` Position (hg19, or same as in reference panel)
-- `Z_imp` Imputed Z statistics
+- `Pos` Position (same build as reference panel)
+- `Z_imp` Imputed Z statistics (see below)
 - `N_imp` Estimation of N (only if missingness was set to `TRUE`)
 - `r2_pred` Imputation quality (adjusted as in ...)
-- Reference allele (same name as in the GWAS file)
-- Effect allele (same name as in the GWAS file)
+- Reference allele (same column name as in the GWAS file)
+- Effect allele (same column name as in the GWAS file)
 - `lambda` lambda used to impute
 - `origin` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 
 - `Z_reimputed` for the first window, all tag SNPs will be re-imputed (sanity check).
 
-`Z_imp` reports the imputed Z-statistics for SNPs that were imputed, as well as the GWAS Z-statistics for tag SNPs. 
+`Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
 
 ## References
 [//]: -------
