@@ -17,14 +17,14 @@ The minimal requirements are: (1) GWAS summary statistics stored in a text file 
 
 `bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `my_gwas.txt.ssimp.txt`, containing the imputation results, and a log file called `my_gwas.log`.
 
-<sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistics, and therefore needs a negative sign if the effect size is negative too). </sup>
+<sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistics, and therefore needs a negative sign if the effect size is negative). </sup>
 	
 
 ## Arguments
 [//]: -------------------------------
 Here are all parameters listed. Each argument has: a default value defined (in `[brackets]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`
 
-`--gwas [no default]`, path to GWAS dataset, in quotes, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA`. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see `Note` below.
+`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
 
 `--ref [no default]` path to vcf file (same folder should contain the `tbi` file).
 
@@ -34,9 +34,9 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--impute.range [no default]` Should have the form of `chrCHR:pos.start-chrCHR:pos.end`. If `chrCHR`, then the whole chromosome `CHR` is imputed. For `chr1-chr5` chromosome 1 to chromosome 5 are imputed. 
 
-`--tag.snp [no default]` filename with list of tags (no header). For magic see below.
+`--tag.snp [no default]` filename with list of tags (no header). For magic `Note` see below.
 
-`--impute.snp [NULL]` filename to define SNPs to impute. For magic see below.
+`--impute.snp [NULL]` filename to define SNPs to impute. For magic see `Note` below.
 
 `--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimize`), n are the number of individuals in the reference panel. `optimize` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
@@ -53,24 +53,18 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the refpanel are imputed that are not provided as tag SNPs.
-- If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
 - The option `missingness` is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
-- The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
-- SNP names can be either rsid's or `chr:pos` (no quotes). 
+- Magic tipp: `--impute.snp <(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')`
 
-
-<(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')                
-
-## Format of GWAS dataset
+## GWAS dataset
 [//]: -------------------------------
-Column names are automatically recognized using commonly used names (see `../header_translation.md`. Missing values should be marked as `NA` or left empty. 
-
-The `log` file will indicate which columns are used and recognized. 
-
-Positions should match the positions in the reference panel (e.g. both hg19). 
-
-It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
+- Column names are automatically recognized using commonly used names (see `../header_translation.md`. Missing values should be marked as `NA` or left empty. 
+- The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
+- Positions should match the positions in the reference panel (e.g. both hg19). 
+- It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
+- SNP names should be named so they match the SNP-id in the reference panel. 
+- If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
 
 ## Reference panel
 [//]: -------------------------------
