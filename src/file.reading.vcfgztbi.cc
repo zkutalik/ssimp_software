@@ -60,7 +60,7 @@ namespace tbi {
         rr.ID       =   record.getIDStr();
         rr.ref      =   record.getRefStr();
         rr.alt      =   record.getAltStr();
-        //assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
+        assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
         //assert(record.hasAllGenotypeAlleles());
         int const N = record.getNumSamples(); // TODO: verify this is the same in every SNP?
         rr.z12.reserve(N);
@@ -89,6 +89,11 @@ namespace tbi {
     bool    read_vcf_with_tbi:: read_record_into_a_RefRecord(RefRecord &rr) {
                 VcfRecord record;
                 bool b = reader.readRecord(record);
+                if(b && record.getNumAlts() != 1) {
+                    // On some machines, DISCARD_MULTIPLE_ALTS doesn't work,
+                    // so I'll manually do it here
+                    return read_record_into_a_RefRecord(rr);
+                }
                 if(b) {
                     rr = tbi:: convert_VcfRecord_to_RefRecord(record);
                 }
