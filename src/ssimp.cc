@@ -355,6 +355,8 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << "maf"
                         << '\t' << "r2.pred"
                         << '\t' << "lambda"
+                        << '\t' << "Z_reimputed"
+                        << '\t' << "r2_reimputed"
                         << endl;
     }
 
@@ -811,7 +813,12 @@ void impute_all_the_regions(   string                                   filename
                     }();
 
                     auto z_imp = c_Cinv_zs(i);
+                    double Z_reimputed = std::nan("");
+                    double r2_reimputed = std::nan("");
+
+                    // Is this target actually a tag SNP?
                     bool const was_in_the_GWAS = map_of_ref_records_of_tags.count(target);
+
                     if(was_in_the_GWAS) {
                         auto GWAS_z = map_of_ref_records_of_tags.at(target);
 
@@ -824,8 +831,8 @@ void impute_all_the_regions(   string                                   filename
                     }
                     if(was_in_the_GWAS && reimputed_tags_in_this_window.size() > 0) {
                         assert(reimputed_tags_in_this_window.count(target) == 1);
-                        using utils:: operator<<;
-                        PPe(reimputed_tags_in_this_window.at(target));
+                        Z_reimputed  = reimputed_tags_in_this_window.at(target).first;
+                        r2_reimputed = reimputed_tags_in_this_window.at(target).second;
                     }
 
                     (*out_stream_ptr)
@@ -839,6 +846,8 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << target->maf
                         << '\t' << imp_qual
                         << '\t' << options:: opt_lambda
+                        << '\t' << (std::isnan( Z_reimputed) ? "" : AMD_FORMATTED_STRING("{0}",  Z_reimputed))
+                        << '\t' << (std::isnan(r2_reimputed) ? "" : AMD_FORMATTED_STRING("{0}", r2_reimputed))
                         << endl;
             }
 
