@@ -1,2 +1,3 @@
 # COMMANDDIR will already have been defined as the location of the test script
-Rscript --vanilla tests/test0.R/test0.R |& cat > "${COMMANDDIR}"/output.actual.tmp
+# The '2>&1' on the end is important, to ensure the standard error is captured also
+Rscript --vanilla tests/test0.R/test0.R > "${COMMANDDIR}"/output.actual.tmp 2>&1
