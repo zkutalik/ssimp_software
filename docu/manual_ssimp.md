@@ -15,7 +15,7 @@ The minimal requirements are: (1) GWAS summary statistics stored in a text file 
 
 <sup>All other arguments have defaults defined (see below).</sup>
 
-`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `my_gwas.txt.ssimp.txt`, containing the imputation, and a log file called `my_gwas.log`.
+`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `my_gwas.txt.ssimp.txt`, containing the imputation results, and a log file called `my_gwas.log`.
 
 <sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistics, and therefore needs a negative sign if the effect size is negative too). </sup>
 	
