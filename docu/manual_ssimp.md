@@ -32,11 +32,11 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--log [gwasfilename.log]` string. Filename in which to store the log file. If not defined it will be the gwas filename + `.log`. If set to `FALSE`, then no log file is produced. 
 
-`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used. 
+`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used. 
 
-`--tag.snp [no default]` filename with list of tags (no header). For magic `Note` see below.
+`--tag.snp [no default]` filename with list of tags (no header). For magic in bash see `Note` below.
 
-`--impute.snp [NULL]` filename to define SNPs to impute. For magic see `Note` below.
+`--impute.snp [NULL]` filename to define SNPs to impute (no header). For magic in bash see `Note` below.
 
 `--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimize`), n are the number of individuals in the reference panel. `optimize` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
