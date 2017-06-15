@@ -766,6 +766,17 @@ void impute_all_the_regions(   string                                   filename
 
             // Finally, print out the imputations
             assert(number_of_all_targets == ssize(unk2_its));
+
+            std:: unordered_map<RefRecord const *, double> map_of_ref_records_of_tags;
+            range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
+            |action::unzip_foreach|
+            [&](auto && tag_refrecord, auto && z) {
+                (void)z;
+                map_of_ref_records_of_tags[tag_refrecord] = z;
+            };
+
+            assert(map_of_ref_records_of_tags.size() == tag_its_.size());
+
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
             for(int i=0; i<number_of_all_targets; ++i) {
                     auto && target = unk2_its.at(i);
@@ -786,11 +797,23 @@ void impute_all_the_regions(   string                                   filename
                         return 1.0 - (1.0-simple_imp_qual)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
                     }();
 
+                    auto z_imp = c_Cinv_zs(i);
+                    bool const was_in_the_GWAS = map_of_ref_records_of_tags.count(target);
+                    if(was_in_the_GWAS) {
+                        auto GWAS_z = map_of_ref_records_of_tags[target];
+
+                        assert(std::abs(imp_qual-1.0) < 1e-5);
+                        assert(std::abs(GWAS_z-z_imp) < 1e-5);
+
+                        imp_qual = 1.0;
+                        z_imp = GWAS_z;
+                    }
+
                     (*out_stream_ptr)
                                 << chrm
                         << '\t' << pos
-                        << '\t' << c_Cinv_zs(i)
-                        << '\t' << "SSIMP"
+                        << '\t' << z_imp
+                        << '\t' << (was_in_the_GWAS ? "GWAS" : "SSIMP")
                         << '\t' << SNPname
                         << '\t' << target->ref
                         << '\t' << target->alt
