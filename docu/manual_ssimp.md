@@ -105,7 +105,7 @@ if `Z.imp NA` and `r2.pred 0` means that there was not tag SNP.
 
 ## References
 [//]: -------
-** Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics.* bioRxiv, 18(2):117–127.
+**Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics.* bioRxiv, 18(2):117–127.
 
-** Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014). ** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment.* Bioinformatics, 30(20).
+**Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014). ** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment.* Bioinformatics, 30(20).
 
