@@ -202,7 +202,6 @@ void read_in_all_command_line_options(int argc, char **argv) {
 
                             options:: list_of_tasks_to_run_at_exit.push_back( // ensure this little task is executed at program exit
                                 [temporary_dirname, temporary_filename](void) -> void{
-                                    PPe("to delete...", temporary_dirname, temporary_filename);
                                     int ret1 = unlink(temporary_filename.c_str());
                                     ret1 == 0 || DIE("Couldn't delete temporary filename [" << temporary_filename << "]");
                                     int ret2 =  rmdir(temporary_dirname);
