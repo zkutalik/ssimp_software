@@ -15,7 +15,7 @@ The minimal requirements are: (1) GWAS summary statistics stored in a text file 
 
 <sup>All other arguments have defaults defined (see below).</sup>
 
-`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `imputation.txt`, containing the imputation, and a log file called `output.actual`.
+`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `my_gwas.txt.ssimp.txt`, containing the imputation, and a log file called `my_gwas.log`.
 
 <sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistics, and therefore needs a negative sign if the effect size is negative too). </sup>
 	
@@ -26,11 +26,11 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--gwas [no default]`, path to GWAS dataset, in quotes, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA`. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see `Note` below.
 
-`--ref [no default]` path to vcf file, in quotes (same folder should contain the `tbi` file).
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file).
 
-`--out [gwasfilename]` string, in quotes. If not define will be the gwas filename (without extension ) + `.imp`. Path and name of the imputation results.
+`--out [gwasfilename.ssimp.txt]` string. If not define will be the gwas filename (without extension ) + `.ssimp.txt`. Path and name of the imputation results.
 
-`--log [gwasfilename]` string, in quotes. If not define will be the gwas filename (without extension ) + `.log`. If set to `FALSE`, then no log file is produced. Path and name of the log file.
+`--log [gwasfilename.log]` string, in quotes. If not define will be the gwas filename (without extension ) + `.log`. If set to `FALSE`, then no log file is produced. Path and name of the log file.
 
 `--impute.range [no default]` text. Should have the form of `chrCHR:pos.start-chrCHR:pos.end`. If `chrCHR`, then the whole chromosome `CHR` is imputed. For `chr1-chr5` chromosome 1 to chromosome 5 are imputed. 
 
