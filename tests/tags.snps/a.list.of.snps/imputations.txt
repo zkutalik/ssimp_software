@@ -1,1 +1,1 @@
-chr:pos	z_imp	SNPname	Allele1	Allele2	maf	impqual
+chr	pos	z_imp	SNP	Allele1	Allele2	maf	r2.pred

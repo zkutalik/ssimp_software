@@ -343,13 +343,14 @@ void impute_all_the_regions(   string                                   filename
     assert(out_stream_ptr);
     {   // print the header line
                     (*out_stream_ptr)
-                        << "chr:pos"
+                        << "chr"
+                        << '\t' << "pos"
                         << '\t' << "z_imp"
-                        << '\t' << "SNPname"
+                        << '\t' << "SNP"
                         << '\t' << gwas->get_column_name_allele_ref() // copy column name from the GWAS input
                         << '\t' << gwas->get_column_name_allele_alt() // copy column name from the GWAS input
                         << '\t' << "maf"
-                        << '\t' << "impqual"
+                        << '\t' << "r2.pred"
                         << endl;
     }
 
@@ -784,7 +785,8 @@ void impute_all_the_regions(   string                                   filename
                     }();
 
                     (*out_stream_ptr)
-                        << "chr" << chrm << ':' << pos
+                                << chrm
+                        << '\t' << pos
                         << '\t' << c_Cinv_zs(i)
                         << '\t' << SNPname
                         << '\t' << target->ref

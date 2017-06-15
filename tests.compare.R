@@ -1,6 +1,6 @@
 testname = Sys.getenv('testname')
 readDT(paste0('tests/test',testname, '.R/imputations.txt'),'\t',T)  -> fromR
-readDT(paste0('tests/test',testname,   '/imputations.txt'),'\t',T) [,.(SNP=SNPname,z.CXX=z_imp,iq.CXX=impqual)]    -> fromCXX
+readDT(paste0('tests/test',testname,   '/imputations.txt'),'\t',T) [,.(SNP=SNP,z.CXX=z_imp,iq.CXX=r2.pred)]    -> fromCXX
 stopifnot(nrow(fromR) == nrow(fromCXX))
 join = fromR[fromCXX,on='SNP']
 z.cor  = join[,abs(Z.imp-z.CXX)]
