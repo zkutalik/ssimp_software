@@ -1,8 +1,11 @@
-"$SSIMP"                                                                        \
-    --ref "$REF"/tbi/small.vcf.sample.vcf.gz                                    \
-    --wind 300000                                                               \
-    --gwas "$GWAS"/small.UKBB.both.csv                                          \
-    --out "${OUT_IMPUTATIONS}"                                                  \
-    --lambda 0.03996804                                                         \
-    --impute.snps <(echo rs587697622 rs587755077 rs587654921 | tr ' ' '\n')     \
-    > "$OUTPUT"
+"$SSIMP"                                                                            \
+    --ref "$REF"/small.vcf.sample.vcf.gz                                            \
+    --gwas "$GWAS"/small.random.csv                                                 \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 250000                                                                   \
+    --flan 250000                                                                   \
+    --out "${OUT_IMPUTATIONS}"                                                      \
+    --lambda 0.03996804                                                             \
+    --tags.snp <(echo  rs62224618 rs138257042                   | tr ' ' '\n')      \
+    --impute.snp <(echo rs587697622 rs587755077 rs587654921     | tr ' ' '\n')      \
+    >     "$OUTPUT"

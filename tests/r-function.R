@@ -4,7 +4,7 @@
 ## and are now used to test aarons functions
 ## =================================================
 
-library(data.table) # for 'rbindlist'
+library(data.table) # for 'rbindlist' and 'data.table'
 library(readr) # for 'data_tsv'
 library(parallel) # for 'mclapply'
 Sys.setenv(LANG = "en")
@@ -17,7 +17,7 @@ ssimp <- function(path.gwas,
                   path.outdir,
                   lambda = "sqrt", 
                   what.to.impute = "Z", 
-                  gwas.names = c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N"),
+                  gwas.names = c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N", 'p'),
                   tag.snps = NULL,
                   target.snps = NULL,
                   impute.tags = FALSE
@@ -55,13 +55,17 @@ ssimp <- function(path.gwas,
       if(is.na(col.name)) NA else dat[,col.name]
   })) -> dat
   # ... Second step: override the column names
-  names(dat) <- c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N")
+  names(dat) <- c("SNP", "Chr", "Pos", "ref.allele", "effect.allele", "b", "SE", "Z", "N", 'p')
+  dat = data.table(dat)
+  dat[,Z := as.numeric(Z)]
+
+  dat[is.na(Z) & !is.na(b) & !is.na(SE), Z := b/SE]
+  dat[is.na(Z) & !is.na(b) & !is.na(p) , Z := sign(b) * abs(qnorm(p/2))]
+
+  dat = data.frame(dat) # back to a data.frame, because some of the latter code assumes it's a data.frame
 
   ## only for giant
-  if(all(!(names(dat) %in% "Z")) & what.to.impute == "Z")
-  {
-    dat$Z <- dat$b/dat$SE
-  }
+  stopifnot(mean(is.na(dat$Z)) < 0.5)
 
   ## load vcf
   ## ------
@@ -119,10 +123,12 @@ ssimp <- function(path.gwas,
   ## translate each snp into a dosage
   library(parallel)
   
-  tmp <- mclapply(1:nrow(G.raw), function(i)
+  tmp <- lapply(1:nrow(G.raw), function(i)
   {
     sapply(G.raw[i,], function(k) f.translate(k))
-  }, mc.cores = 4) ## each list entry is a SNP
+  }
+  #, mc.cores = 4
+  ) ## each list entry is a SNP
   
   G <- do.call(cbind.data.frame, tmp)
   names(G) <- sm$SNP

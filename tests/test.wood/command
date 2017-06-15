@@ -1,10 +1,11 @@
-"$SSIMP"                                                                        \
-    --ref "$REF"/1000genomes_somechr22snps_EURsamples.vcf                       \
-    --wind 300000                                                               \
-    --gwas "$GWAS"/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt"       \
-    --out "${OUT_IMPUTATIONS}"                                                  \
-    --lambda 0.03996804                                                         \
-    —tags.snps <(echo rs136382 rs136383 rs136389 | tr ' ' '\n')     \
-
-    --impute.snps <(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')     \
-    > "$OUTPUT"
+"$SSIMP"                                                                            \
+    --ref "$REF"/1000genomes_somechr22snps_EURsamples.vcf.gz                        \
+    --gwas "$GWAS"/GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt            \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 250000                                                                   \
+    --flan 250000                                                                   \
+    --out "${OUT_IMPUTATIONS}"                                                      \
+    --lambda 0.08917559                                                             \
+    --tags.snp <(echo rs136382 rs136383 rs136389 | tr ' ' '\n')                     \
+    --impute.snp <(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')                     \
+    >     "$OUTPUT"

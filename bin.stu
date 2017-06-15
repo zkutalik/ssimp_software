@@ -27,7 +27,7 @@
 }
 
 >   bin/LIST_OF_HH_FILES
-:      @mkdir..bin/o
+:   -p bin/o
     @unconditional
 {
     find src -name '*.hh'
@@ -54,7 +54,7 @@
 }
 
 >       bin/o/GCC_OR_CLANG
-:      @mkdir..bin/o
+:   -p bin/o
        @all.stu.files
 {
     which g++ g++ c++ clang | head -n1 # find one of these compilers
@@ -96,13 +96,16 @@
     cat bin/local/gsl_cflags
 }
 
+bin/local { mkdir -p bin/local }
+bin/o     { mkdir -p bin/o     }
+
 >       bin/local/gsl_cflags
-:      @mkdir..bin/local
+:   -p  bin/local
 {
     gsl-config --cflags # For example: "-I/usr/include"
 }
 >       bin/local/gsl_libs
-:      @mkdir..bin/local
+:   -p  bin/local
 {
     gsl-config --libs # For example: "-lgsl -lgslcblas -lm"
 }
@@ -111,14 +114,6 @@
 :       main.stu
         bin.stu
 ;
-
-
-                         deps.empty/mkdir..${path} : @unconditional {
-    mkdir -p "$(dirname "deps.empty/mkdir..${path}")"
-    mkdir -p "${path}"
-    touch               "deps.empty/mkdir..${path}"
-}
-@mkdir..${path} : [deps.empty/mkdir..${path}];
 
 src/libStatGen/libStatGen.a
 src/libStatGen/include/VcfFileReader.h

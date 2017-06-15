@@ -8,8 +8,21 @@
 #include "options.hh"
 
 #include <numeric>
+#include <fstream>
 namespace tbi {
-        read_vcf_with_tbi :: read_vcf_with_tbi(std:: string filename) {
+        read_vcf_with_tbi :: read_vcf_with_tbi(std:: string filename, int chromosome) {
+            // First, test if 'filename' exists. If not, replace any embedded '{CHRM}' with the chromosome number
+            {
+                std:: ifstream test_if_file_exists(filename.c_str());
+                if(!test_if_file_exists) {
+                    auto CHRM = filename.find("{CHRM}");
+                    std:: ostringstream filename_for_this_chromosome;
+                    filename_for_this_chromosome << filename.substr(0, CHRM);
+                    filename_for_this_chromosome << chromosome;
+                    filename_for_this_chromosome << filename.substr(CHRM+6); // 6, to skip over {CHRM}
+                    filename = filename_for_this_chromosome.str();
+                }
+            }
             auto ret = [&](){
                 if(options:: opt_sample_names.empty()) {
                     return reader.open( filename.c_str() , header );

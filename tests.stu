@@ -1,47 +1,39 @@
 @all.tests
 :
-    tests/lambda1.0/output.actual
-    tests/test0/output.actual
-    tests/test0/gz/output.actual
-    tests/3.chromosomes/UKB.every100/output.actual
-    tests/impute.range/chr1_1000000-chr1_2000000/output.actual
-    tests/impute.range/chr2-3/output.actual
-    tests/impute.range/chr2/output.actual
-    tests/impute.snps/a.list.of.snps/output.actual
-    tests/impute.maf/0.05/output.actual
-    tests/tags.maf/tags.maf.0.01/output.actual
+    tests/lambda1.0/imputations.txt
+    tests/test.whatever/imputations.txt
+    tests/3.chromosomes/UKB.every100/imputations.txt
+    tests/impute.range/chr1_1000000-chr1_2000000/imputations.txt
+    tests/impute.range/chr2-3/imputations.txt
+    tests/impute.range/chr2/imputations.txt
+    tests/impute.snps/a.list.of.snps/imputations.txt
+    tests/impute.maf/0.05/imputations.txt
+    tests/tags.maf/tags.maf.0.01/imputations.txt
 
-    tests/tags.range/chr1_1000000-chr1_2000000/output.actual
-    tests/tags.range/chr2-3/output.actual
-    tests/tags.range/chr2/output.actual
-    tests/tags.snps/a.list.of.snps/output.actual
+    tests/tags.range/chr1_1000000-chr1_2000000/imputations.txt
+    tests/tags.range/chr2-3/imputations.txt
+    tests/tags.range/chr2/imputations.txt
+    tests/tags.snps/a.list.of.snps/imputations.txt
 
-    tests/1KG/towards.really.1KG.data/output.actual
-    tests/1KG/towards.really.1KG.data.limit.the.tags/output.actual
-    tests/1KG/towards.really.1KG.data.a.bit.more/output.actual
+    tests/swapping/swap.just.the.allele.headers/imputations.txt
+    tests/swapping/swap.some.alleles/imputations.txt
+    tests/swapping/swap.some.alleles.and.their.zs/imputations.txt
 
-    tests/1KG/EUR/output.actual
-
-    tests/swapping/swap.just.the.allele.headers/output.actual
-    tests/swapping/swap.some.alleles/output.actual
-    tests/swapping/swap.some.alleles.and.their.zs/output.actual
-
-    tests/test.wood/output.actual
-    
+    tests/test.wood/imputations.txt
     tests/test.wood.R/imputations.txt
+
+    tests/test0/imputations.txt
     tests/test0.R/imputations.txt
 
+    tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
+
+    tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
+    tests.compare/COMP0.txt
 ;
 
-@test.data.to.be.made.by.stu :
-    ref/tbi/small.vcf.sample.vcf.gz.tbi
-    ref/tbi/TWINSUK.every100thRS.chrm123.100people.vcf.gz.tbi
-;
-
-    tests/${testname}/output.actual
+    tests/${testname}/imputations.txt
 :       bin/ssimp
     tests/${testname}/command
-   @test.data.to.be.made.by.stu
 {
     export SSIMP=bin/ssimp
     export   REF=ref
@@ -63,51 +55,74 @@
     mv "tests/${testname}"/output.actual.tmp "tests/${testname}"/output.actual
 }
 
-
-                    ref/compressed/${path}.vcfGTz
-:   -p bin/vcfGTz
-{
-    export  target="ref/compressed/${path}".vcfGTz
-    mkdir -p "$(dirname "$target")"
-    export              input="ref/${path}".vcf.gz
-    ls -l "$input"
-    bin/vcfGTz "$input" "$target".tmp
-    mv                  "$target".tmp "$target"
-}
-                    ref/${path}.vcf
-{
-    export  target="ref/${path}".vcf
-    export              input="ref/${path}".vcf.gz
-    ls -l "$input"
-    gunzip -k "$input"
+tests/test0.R/imputations.txt {
+    export COMMANDDIR=tests/test0.R
+    ls -l tests/test0.R/test0.R
+    Rscript --vanilla tests/test0.R/test0.R
 }
 
-    ref/tbi/${path}.vcf.gz.tbi
-:   ref/tbi/${path}.vcf.gz
+> tests.compare/COMP${testname}.txt :
+tests/test${testname}/imputations.txt
+tests/test${testname}.R/imputations.txt
+-p tests.compare
 {
-    tabix ref/tbi/${path}.vcf.gz
-}
-                ref/tbi/${path}.vcf.gz
-{
-export  target="ref/tbi/${path}.vcf.gz"
-    ls -l "ref/${path}".vcf.gz
-    mkdir -p "$(dirname "$target")"
-    zcat "ref/${path}".vcf.gz | bgzip > "${target}".tmp
-    mv "${target}".tmp \
-       "${target}"
+    mkdir -p tests.compare
+    # load up both, and print the correlations between the results
+    Rscript tests.compare.R
 }
 
-        tests/test.wood.R/imputations.txt
-    :   tests/test.wood.R/test.wood.R
-        tests/r-function.R
+
+ref/sub1KG-18M/chr${chrm}.vcf.gz
+ref/sub1KG-18M/chr${chrm}.vcf.gz.tbi
+: -t @mkdirfile..ref/sub1KG-18M/chr${chrm}.vcf.gz
 {
-    export outdir="tests/test.wood.R"
-    Rscript --vanilla tests/test.wood.R/test.wood.R
+    test -f ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
+    zcat ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz |
+        egrep -v '^##' | {
+            IFS='' read -r JUST1LIINE
+            printf "%s\n" "$JUST1LIINE"
+            awk '$2 >= 18500000{exit} ; $2>=18000000'
+        } | bgzip > /tmp/chr${chrm}.vcf.gz
+        tabix       /tmp/chr${chrm}.vcf.gz
+        mv /tmp/chr${chrm}.vcf.gz       ref/sub1KG-18M/chr${chrm}.vcf.gz
+        mv /tmp/chr${chrm}.vcf.gz.tbi   ref/sub1KG-18M/chr${chrm}.vcf.gz.tbi
 }
-        tests/test0.R/imputations.txt
-    :   tests/test0.R/test0.R
-        tests/r-function.R
+ref/sub1KG-tiny/chr${chrm}.vcf.gz
+ref/sub1KG-tiny/chr${chrm}.vcf.gz.tbi
+: -t @mkdirfile..ref/sub1KG-tiny/chr${chrm}.vcf.gz
 {
-    cd tests/test0.R
-    Rscript --vanilla test0.R
+    # This will take a subrange of the full 1kg data, but give preference
+    # to tag SNPs (i.e. those in GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
+    zcat    ref/sub1KG-18M/chr${chrm}.vcf.gz |
+        python <(cat<<"EOF"
+# python script starts here
+
+import sys
+def main():
+    tags = set( l.strip() for l in open(sys.argv[2]) if l != 'MarkerName\n' )
+    #print tags
+    vcf = open(sys.argv[1])
+    print vcf.next(),
+    for v in vcf:
+        v_rs = v.split('\t')[2]
+        if v_rs in tags:
+            if v_rs[-1:] == '1': # 10% of the tags
+                print v,
+        else:
+            if v_rs[-2:] == '00': # 1% of the non-tags
+                print v,
+
+
+main()
+EOF
+) <(zcat ref/sub1KG-18M/chr${chrm}.vcf.gz) <(zcat gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz | cut -f1) |
+        bgzip > /tmp/chr${chrm}.vcf.gz
+        tabix       /tmp/chr${chrm}.vcf.gz
+        mv /tmp/chr${chrm}.vcf.gz       ref/sub1KG-tiny/chr${chrm}.vcf.gz
+        mv /tmp/chr${chrm}.vcf.gz.tbi   ref/sub1KG-tiny/chr${chrm}.vcf.gz.tbi
+}
+
+tests.compare       { mkdir -p tests.compare }
+@mkdirfile..${path} {
+    mkdir -p "$(dirname "${path}")"
 }

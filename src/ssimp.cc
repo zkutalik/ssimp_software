@@ -1,4 +1,4 @@
-#include <unistd.h> // for 'chdir'
+#include <unistd.h> // for 'chdir' and 'unlink'
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -139,8 +139,12 @@ void    set_appropriate_locale(ostream & stream) {
 }
 
 int main(int argc, char **argv) {
-    struct change_dir_at_the_last_minute {
+    struct change_dir_at_the_last_minute_and_delete_tempfile {
         static void go(void) {
+            if(!options:: temporary_filename_to_delete_at_exit.empty()) {
+                int ret = unlink(options:: temporary_filename_to_delete_at_exit.c_str());
+                ret == 0 || DIE("Couldn't delete temporary filename [" << options:: temporary_filename_to_delete_at_exit << "]");
+            }
             auto PROF_CHANGE_DIR_AT_THE_LAST_MINUTE = getenv("PROF_CHANGE_DIR_AT_THE_LAST_MINUTE");
             if(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE) {
                 int ret = chdir(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE);
@@ -148,7 +152,7 @@ int main(int argc, char **argv) {
             }
         }
     };
-    atexit( change_dir_at_the_last_minute:: go  );
+    atexit( change_dir_at_the_last_minute_and_delete_tempfile:: go  );
 
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
@@ -348,6 +352,32 @@ void impute_all_the_regions(   string                                   filename
                         << endl;
     }
 
+    struct one_tag_data {   /* This is just to store data for --opt_tags_used_output for printing at the end,
+                             * this is *not* used for actual imputation. */
+        string      m_ID; // might be blank
+        chrpos      m_chrpos;
+        string      m_all_ref; // effect allele
+        string      m_all_alt;
+        double      m_z;
+
+        bool operator< (one_tag_data const & other) {
+            if(m_chrpos     != other.m_chrpos   ) return m_chrpos   < other.m_chrpos    ;
+            if(m_all_ref    != other.m_all_ref  ) return m_all_ref  < other.m_all_ref   ;
+            if(m_all_alt    != other.m_all_alt  ) return m_all_alt  < other.m_all_alt   ;
+            // The above three should be sufficient I think
+            if(m_ID         != other.m_ID       ) return m_ID       < other.m_ID        ;
+            return false;
+        }
+        bool operator==(one_tag_data const & other) {
+            return(
+              (m_chrpos     == other.m_chrpos   )
+            &&(m_all_ref    == other.m_all_ref  )
+            &&(m_all_alt    == other.m_all_alt  )
+            &&(m_ID         == other.m_ID       )
+            );
+        }
+    };
+    std:: vector<one_tag_data> tag_data_used;
 
     PP(options:: opt_window_width
       ,options:: opt_flanking_width
@@ -356,18 +386,19 @@ void impute_all_the_regions(   string                                   filename
     auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, &options:: opt_impute_snps_as_a_uset, options:: opt_impute_maf);
     auto skipper_tags   = make_skipper_for_targets(options:: opt_tags_range  , &options:: opt_tags_snps_as_a_uset  , options:: opt_tags_maf);
 
-    tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf };
-
     auto const trg_clb = skipper_target->conservative_lower_bound();
     auto const trg_cub = skipper_target->conservative_upper_bound();
     auto const tag_clb = skipper_tags  ->conservative_lower_bound();
     auto const tag_cub = skipper_tags  ->conservative_upper_bound();
 
     for(int chrm =  1; chrm <= 22; ++chrm) {
+
         if  ( chrm < trg_clb.chr ) { continue; }
         if  ( chrm > trg_cub.chr ) { continue; }
         if  ( chrm < tag_clb.chr ) { continue; }
         if  ( chrm > tag_cub.chr ) { continue; }
+
+        tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
         for(int w = 0; ; ++w ) {
             int current_window_start = w     * options:: opt_window_width;
@@ -762,11 +793,60 @@ void impute_all_the_regions(   string                                   filename
                         << endl;
             }
 
+            if(!options:: opt_tags_used_output.empty()) {
+                assert(tag_its_.size() == tag_zs_.size());
+                range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
+                |action::unzip_foreach|
+                [&](auto && tag_refrecord, auto && z) {
+                    one_tag_data otd {
+                        tag_refrecord->ID
+                            , {chrm, tag_refrecord->pos}
+                        , tag_refrecord->ref
+                        , tag_refrecord->alt
+                        , z
+                    };
+                    tag_data_used.push_back(otd);
+                };
+            }
+
             if(options:: opt_reimpute_tags) {
                 reimpute_tags_one_by_one(C, Cinv, tag_zs_, tag_its_);
             }
         } // loop over windows
     } // loop over chromosomes
+
+    if(!options:: opt_tags_used_output.empty()) {
+        ofstream opts_tags_used_output_file(options:: opt_tags_used_output); // to store the tags used, if requested by --opt_tags_used_output
+        opts_tags_used_output_file || DIE("Couldn't create --tags.used.output [" << options:: opt_tags_used_output << "] for output");
+
+        // Remove duplicates from the 'tag_data_used' structure, as a tag can be a tag
+        // in multiple windows.
+        sort(tag_data_used.begin(), tag_data_used.end());
+        tag_data_used.erase(
+                unique(tag_data_used.begin(), tag_data_used.end())
+            ,   tag_data_used.end());
+
+        opts_tags_used_output_file << std::setprecision(53);
+        opts_tags_used_output_file
+                    << "ID"
+            << '\t' << "Chr"
+            << '\t' << "Pos"
+            << '\t' << "effect_allele"
+            << '\t' << "other_allele"
+            << '\t' << "z"
+            << '\n'
+            ;
+        for(auto && otd : tag_data_used) {
+            opts_tags_used_output_file
+                    << otd.m_ID
+            << '\t' << otd.m_chrpos.chr
+            << '\t' << otd.m_chrpos.pos
+            << '\t' << otd.m_all_ref
+            << '\t' << otd.m_all_alt
+            << '\t' << otd.m_z
+            << '\n';
+        }
+    }
 }
 
 static

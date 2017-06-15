@@ -12,7 +12,7 @@ namespace tbi {
         VcfFileReader reader;
         VcfHeader header;
 
-        read_vcf_with_tbi(std:: string filename);
+        read_vcf_with_tbi(std:: string filename, int chromosome); // 'chromosome' to take the place of '{CHRM}' in the filename
 
         void set_region(file_reading:: chrpos b, file_reading:: chrpos e);
         bool    read_record_into_a_RefRecord(RefRecord &rr);
