@@ -28,19 +28,19 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--ref [no default]` path to vcf file (same folder should contain the `tbi` file).
 
-`--out [gwasfilename.ssimp.txt]` string. If not define will be the gwas filename (without extension ) + `.ssimp.txt`. Path and name of the imputation results.
+`--out [gwasfilename.ssimp.txt]` string. If not define will be the gwas filename (without extension ) + `.ssimp.txt`. Filename in which to store the imputation results. 
 
-`--log [gwasfilename.log]` string, in quotes. If not define will be the gwas filename (without extension ) + `.log`. If set to `FALSE`, then no log file is produced. Path and name of the log file.
+`--log [gwasfilename.log]` string. If not define will be the gwas filename (without extension ) + `.log`. If set to `FALSE`, then no log file is produced. Filename in which to store the log file.
 
-`--impute.range [no default]` text. Should have the form of `chrCHR:pos.start-chrCHR:pos.end`. If `chrCHR`, then the whole chromosome `CHR` is imputed. For `chr1-chr5` chromosome 1 to chromosome 5 are imputed. 
+`--impute.range [no default]` Should have the form of `chrCHR:pos.start-chrCHR:pos.end`. If `chrCHR`, then the whole chromosome `CHR` is imputed. For `chr1-chr5` chromosome 1 to chromosome 5 are imputed. 
 
-`--impute.snp [no default]` text. E.g. `(rs1, rs2)`. List of tag SNPs. 
+`--tag.snp [no default]` filename with list of tags (no header). For magic see below.
 
-`--impute.snps [NULL]` text. To define the SNPs to impute there are two options: (1) provide a text file (e.g. `snps2impute.txt`) with a set of SNP names (no header), give a list of SNP names, e.g. `(rs3, rs4)`. SNP names can be either rsid's or `chr:pos.hg19` (no quotes). 
+`--impute.snp [NULL]` filename to define SNPs to impute. For magic see below.
 
 `--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimize`), n are the number of individuals in the reference panel. `optimize` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
-`--impute.maf [0]` numeric value. Lower MAF limit for variants to be imputed: everything above and equal this threshold will be imputed.
+`--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
 `--tag.maf [0]` numeric value. Lower MAF limit for tag SNPs: everything above and equal this threshold will be used as tag SNPs. 
 
@@ -48,7 +48,7 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--flanking.width [250e3]` numeric value. Flanking space left and right side of the core window.
 		
-`--missingness [TRUE]` logical. Enables variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
+`--missingness [TRUE]` logical. Enables variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`. **(TBD)**
 
 ### Note	
 [//]: -------
@@ -57,34 +57,43 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 - The option `missingness` is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
+- SNP names can be either rsid's or `chr:pos` (no quotes). 
+
+
+<(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')                
 
 ## Format of GWAS dataset
 [//]: -------------------------------
-Column names are automatically recognized using commonly used names. The `log` file will indicate which columns are used and recognized. Positions should match the positions in the reference panel (e.g. both hg19). It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
+Column names are automatically recognized using commonly used names (see `../header_translation.md`. Missing values should be marked as `NA` or left empty. 
+
+The `log` file will indicate which columns are used and recognized. 
+
+Positions should match the positions in the reference panel (e.g. both hg19). 
+
+It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
 
 ## Reference panel
 [//]: -------------------------------
-
+`Aaron, please fill`
 
 ## Imputation
 [//]: -------------------------------
-For more details on the summary statistics imputation method, please see our-paper (2017). 
+For more details on the summary statistics imputation method, please see our paper (2017). 
 
 `insert here a brief recap of the method`
 
 - If SNP-ID are present in the GWAS, then pos copied from reference panel. 
 - If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
 - Because either SNP-ID or Chr:Pos:A1:A2 are used as identifier, it is also possible to impute indels.
-- Z statistics are imputed, along with `N.imp` (an estimate for the sample size) and `r2.pred` (adjusted imputation quality).
-- To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window. The window number is reported in the `.imp.out` file. 
+- Z-statistics are imputed, along with `N.imp` (an estimate for the sample size) and `r2.pred` (adjusted imputation quality).
+- To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 
- 
 ## Output
 [//]: -------------------------------
 
 ### log file
 [//]: -------
-The `.imp.log` file provides a summary of the imputation done and the sanity check results. 
+The `.log` file is a copy of what is printed to the console. 
 
 ### out file
 [//]: -------
@@ -93,15 +102,16 @@ The `.imp.out` file has the following columns:
 - `SNP` SNP-ID
 - `Chr` Chromosome (only 1 to 22 right now)
 - `Pos` Position (hg19, or same as in reference panel)
-- `Z.imp` Imputed Z statistics
-- `N.imp` Estimation of N (only if missingness was set to `TRUE`)
-- `r2.pred` Imputation quality (adjusted as in ...)
-- `A1` Reference allele
-- `A2` Effect allele
-- `window.nbr` in which window imputed
+- `Z_imp` Imputed Z statistics
+- `N_imp` Estimation of N (only if missingness was set to `TRUE`)
+- `r2_pred` Imputation quality (adjusted as in ...)
+- Reference allele (same name as in the GWAS file)
+- Effect allele (same name as in the GWAS file)
 - `lambda` lambda used to impute
+- `origin` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 
+- `Z_reimputed` for the first window, all tag SNPs will be re-imputed (sanity check).
 
-if `Z.imp NA` and `r2.pred 0` means that there was not tag SNP.
+`Z_imp` reports the imputed Z-statistics for SNPs that were imputed, as well as the GWAS Z-statistics for tag SNPs. 
 
 ## References
 [//]: -------
