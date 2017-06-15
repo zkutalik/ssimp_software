@@ -356,6 +356,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
                 else { // no 'z' field. Must infer it from 'p' and 'beta', with 'beta' used only for 'direction'
                     auto beta   = utils:: lexical_cast<double> (LOOKUP( hd, effect_beta, all_split_up));
                     auto p      = utils:: lexical_cast<double> (LOOKUP( hd, effect_p   , all_split_up));
+                    (p >= 0 && p <= 1)    || DIE("Your p should be between 0 and 1 [" << p << "]");
                     auto z_undir = gsl_cdf_gaussian_Pinv( p / 2.0 ,1);
                     assert(z_undir <= 0.0);
                     double z;
