@@ -12,7 +12,7 @@ Details to the method can be found in us (2017). (+ Pasaniuc et al. (2014), or m
 [//]: -------------------------------
 The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP id, Z-statistic, reference allele and risk allele and at least one row, and (2) the path to the reference panel. 
 
-`../bin/ssimp --gwas ../data/my_gwas.txt --ref ../ref/my_reference_panel.vcf` will generate a file `imputation.txt`, containing the imputation, and a log file called `output.actual`.
+`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `imputation.txt`, containing the imputation, and a log file called `output.actual`.
 
 If instead of Z-statistics a P is provided, it needs go be accompagnied by an effect size (the P-value will be turned into a Z-statistics, and therefore needs a negative sign if the effect size is negative too). 
 	
