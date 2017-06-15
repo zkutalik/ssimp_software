@@ -1,5 +1,6 @@
 #include "options.hh"
 
+#include <unistd.h> // for 'unlink'
 #include <getopt.h>
 #include <iostream>
 #include <fstream>
@@ -44,6 +45,7 @@ namespace options {
         std:: string            opt_sample_names;
         std:: string            temporary_filename_to_delete_at_exit;
         std:: string            temporary_dirname_to_delete_at_exit;
+        std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
@@ -194,15 +196,20 @@ void read_in_all_command_line_options(int argc, char **argv) {
                             }
 
                             char temporary_dirname[] = "/tmp/ssimp_XXXXXX";
-                            mkdtemp(temporary_dirname) || DIE("Couldn't create temporary filename for use with --sample_names");
+                            mkdtemp(temporary_dirname) || DIE("Couldn't create temporary filename for use with --sample_names [" << temporary_dirname << "]" );
                             auto temporary_filename = AMD_FORMATTED_STRING("{0}/sample.names", temporary_dirname);
                             PPe(temporary_dirname, temporary_filename);
                             std:: ofstream file_of_filtered_samples_to_use(temporary_filename);
                             file_of_filtered_samples_to_use || DIE("Couldn't create temporary filename for use with --sample_names");
 
-                            // Delete the file at exit. TODO: I should delete the directory too.
-                            options:: temporary_filename_to_delete_at_exit = temporary_filename;
-                            options:: temporary_dirname_to_delete_at_exit = temporary_dirname;
+                            options:: list_of_tasks_to_run_at_exit.push_back( // ensure this little task is executed at program exit
+                                [temporary_dirname, temporary_filename](void) -> void{
+                                    PPe("to delete...", temporary_dirname, temporary_filename);
+                                    int ret1 = unlink(temporary_filename.c_str());
+                                    ret1 == 0 || DIE("Couldn't delete temporary filename [" << options:: temporary_filename_to_delete_at_exit << "]");
+                                    int ret2 =  rmdir(temporary_dirname);
+                                    ret2 == 0 || DIE("Couldn't delete temporary dirname [" << options:: temporary_dirname_to_delete_at_exit << "]");
+                                });
 
                             for(auto && one_sample : filtered_samples_to_use) {
                                 file_of_filtered_samples_to_use << one_sample << '\n';

@@ -1,5 +1,7 @@
 #include <string>
 #include <unordered_set>
+#include <functional>
+#include <vector>
 
 namespace options {
 
@@ -27,6 +29,7 @@ extern  std:: string            opt_tags_used_output;
 extern  std:: string            opt_sample_names;
 extern  std:: string            temporary_filename_to_delete_at_exit;
 extern  std:: string            temporary_dirname_to_delete_at_exit;
+extern  std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
         void                    read_in_all_command_line_options(int argc, char **argv);
 

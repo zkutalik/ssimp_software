@@ -141,6 +141,12 @@ void    set_appropriate_locale(ostream & stream) {
 int main(int argc, char **argv) {
     struct change_dir_at_the_last_minute_and_delete_tempfile {
         static void go(void) {
+            for (   auto lifo = options:: list_of_tasks_to_run_at_exit.rbegin()
+                ;        lifo != options:: list_of_tasks_to_run_at_exit.rend()
+                ;      ++lifo) {
+                (*lifo)();
+            }
+
             if(!options:: temporary_filename_to_delete_at_exit.empty()) {
                 int ret = unlink(options:: temporary_filename_to_delete_at_exit.c_str());
                 ret == 0 || DIE("Couldn't delete temporary filename [" << options:: temporary_filename_to_delete_at_exit << "]");
