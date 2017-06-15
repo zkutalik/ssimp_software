@@ -419,6 +419,7 @@ void impute_all_the_regions(   string                                   filename
     auto const tag_clb = skipper_tags  ->conservative_lower_bound();
     auto const tag_cub = skipper_tags  ->conservative_upper_bound();
 
+    int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
     bool already_reimputed_the_first_non_empty_window = false;
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
@@ -478,6 +479,10 @@ void impute_all_the_regions(   string                                   filename
                 //PP(__LINE__, utils:: ELAPSED());
                 RefRecord rr;
                 while(ref_vcf.read_record_into_a_RefRecord(rr)) {
+                    if(N_reference == -1) {
+                        N_reference = rr.z12.size();
+                        PP(N_reference);
+                    }
 
                     /*
                      * if the position is beyond the current wide window, it means
@@ -721,6 +726,7 @@ void impute_all_the_regions(   string                                   filename
 
             int const N_ref = genotypes_for_the_tags.at(0)->size(); // the number of individuals
             assert(N_ref > 0);
+            assert(N_ref == N_reference); // TODO: redundant to have two variables like this
 
             //PP(__LINE__, utils:: ELAPSED());
 

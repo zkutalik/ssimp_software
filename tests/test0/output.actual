@@ -1,5 +1,6 @@
 file_name:gwas/small.random.csv
 options:: opt_window_width,options:: opt_flanking_width:	250'000 , 250'000
+N_reference:2'504
 
 chrm22	   16'000'000-16'250'000
        2 # GWAS     SNPs in this window (with 250'000 flanking)
