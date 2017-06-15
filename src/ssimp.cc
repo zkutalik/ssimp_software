@@ -74,8 +74,10 @@ mvn:: Matrix make_c_unkn_tags_matrix
         , vector<RefRecord const *              > const & unk_its
         , double                                          lambda
         );
+using reimputed_tags_in_this_window_t = std:: unordered_map< RefRecord const * , std::pair<double,double> >;
 static
-void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
+reimputed_tags_in_this_window_t
+reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
                                 ,   mvn:: SquareMatrix const & C_inv
                                 , std:: vector<double> const & tag_zs_
                                 , std:: vector<RefRecord const *> const & rrs
@@ -395,6 +397,7 @@ void impute_all_the_regions(   string                                   filename
     auto const tag_clb = skipper_tags  ->conservative_lower_bound();
     auto const tag_cub = skipper_tags  ->conservative_upper_bound();
 
+    bool already_reimputed_the_first_non_empty_window = false;
     for(int chrm =  1; chrm <= 22; ++chrm) {
 
         if  ( chrm < trg_clb.chr ) { continue; }
@@ -777,6 +780,16 @@ void impute_all_the_regions(   string                                   filename
 
             assert(map_of_ref_records_of_tags.size() == tag_its_.size());
 
+            // if necessary, do reimputation
+            reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
+            if(number_of_tags > 1 && !already_reimputed_the_first_non_empty_window) {
+                already_reimputed_the_first_non_empty_window = true;
+                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C, Cinv, tag_zs_, tag_its_);
+            }
+            assert(ssize(reimputed_tags_in_this_window) == 0
+                || ssize(reimputed_tags_in_this_window) == number_of_tags);
+
+
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
             for(int i=0; i<number_of_all_targets; ++i) {
                     auto && target = unk2_its.at(i);
@@ -800,13 +813,19 @@ void impute_all_the_regions(   string                                   filename
                     auto z_imp = c_Cinv_zs(i);
                     bool const was_in_the_GWAS = map_of_ref_records_of_tags.count(target);
                     if(was_in_the_GWAS) {
-                        auto GWAS_z = map_of_ref_records_of_tags[target];
+                        auto GWAS_z = map_of_ref_records_of_tags.at(target);
 
                         assert(std::abs(imp_qual-1.0) < 1e-5);
                         assert(std::abs(GWAS_z-z_imp) < 1e-5);
 
                         imp_qual = 1.0;
                         z_imp = GWAS_z;
+
+                    }
+                    if(was_in_the_GWAS && reimputed_tags_in_this_window.size() > 0) {
+                        assert(reimputed_tags_in_this_window.count(target) == 1);
+                        using utils:: operator<<;
+                        PPe(reimputed_tags_in_this_window.at(target));
                     }
 
                     (*out_stream_ptr)
@@ -837,10 +856,6 @@ void impute_all_the_regions(   string                                   filename
                     };
                     tag_data_used.push_back(otd);
                 };
-            }
-
-            if(options:: opt_reimpute_tags) {
-                reimpute_tags_one_by_one(C, Cinv, tag_zs_, tag_its_);
             }
         } // loop over windows
     } // loop over chromosomes
@@ -1038,7 +1053,8 @@ static
     }
 
 static
-void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
+reimputed_tags_in_this_window_t
+reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
                                 ,   mvn:: SquareMatrix const & C_inv
                                 , std:: vector<double> const & zs
                                 , std:: vector<RefRecord const *> const & rrs
@@ -1047,13 +1063,12 @@ void reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
     assert(C.size() == C_inv.size());
     assert(C.size() == rrs.size());
     int const M = C.size();
-    if(M==1)
-        return;
     assert(M>1);
-    PPe(M, rrs.front()->pos, rrs.back()->pos);
-if(M>=1) // for now, just use the first time when there are five tags
-{
+
     mvn:: VecCol vec(M);
+    std:: vector<double> reimputed_tags_z;
+    std:: vector<double> reimputed_tags_r2;
+    reimputed_tags_in_this_window_t map_of_ref_records_of_reimputation_results;
     for(int m=0; m<M; ++m) {
         auto z_real = zs.at(m);
         auto * rrp = rrs.at(m);
@@ -1067,14 +1082,18 @@ if(M>=1) // for now, just use the first time when there are five tags
             auto y =C_inv(m,m);
             return std:: make_pair(- x / y, C(m,m)-1.0/y);
         }();
-        PP(M, m, z_real, z_fast.first, z_fast.second
+        reimputed_tags_z .push_back(z_fast.first);
+        reimputed_tags_r2.push_back(z_fast.second);
+        map_of_ref_records_of_reimputation_results[ rrp ] = z_fast;
+        (void)z_real;
+#if 0
+        PPe(M, m, z_real, z_fast.first, z_fast.second
                 , rrp->maf
                 , rrp->ID
                 , rrp->pos
                 , rrp->ref
                 , rrp->alt
                 );
-#if 0
         auto z_slow = [&]() {
             // I'll simply set the correlations to zero
             auto C_zeroed = C;
@@ -1115,8 +1134,7 @@ if(M>=1) // for now, just use the first time when there are five tags
         assert(std:: fabs(z_slow.second- z_fast.second)< 1e-5);
 #endif
     }
-    //exit(0);
-}
+    return map_of_ref_records_of_reimputation_results;
 }
 
 } // namespace ssimp
