@@ -164,6 +164,26 @@ int main(int argc, char **argv) {
 
     cout << std::setprecision(20);
 
+    // hack for hpc1. If --ref isn't specified, default it to 1kg
+    if( options:: opt_raw_ref.empty() ) {
+        options:: opt_raw_ref="/data/sgg/aaron/shared/ref_panels/1kg/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz";
+        cout << '\n';
+        cout
+            << "Note: as you didn't specify --ref, it is defaulted to 1KG '" << options:: opt_raw_ref << "'.\n"
+            ;
+        // Also, in this case, default the sample names to 'super_pop=EUR'
+        if( options:: opt_sample_names.empty()) {
+            options:: opt_sample_names = "/data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR";
+            options:: adjust_sample_names_if_it_is_magical();
+            cout
+            << "      Also, as you didn't specify --sample.names, it has been defaulted to [" << options:: opt_sample_names << "].\n"
+            << "      You can adjust that for other populations, e.g. \n"
+            << "          --sample.names /data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/pop=TSI\n"
+            ;
+        }
+        cout << '\n';
+    }
+
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {
         DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
     }
