@@ -30,6 +30,7 @@ extern  std:: string            opt_sample_names;
 extern  std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
         void                    read_in_all_command_line_options(int argc, char **argv);
+        void                    adjust_sample_names_if_it_is_magical();
 
 
 } // namespace options
