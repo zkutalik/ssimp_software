@@ -22,7 +22,7 @@ The minimal requirements are: (1) GWAS summary statistics stored in a text file 
 
 ## Arguments
 [//]: -------------------------------
-Here are all arguments listed, with a defined default in brackets, and some formal... . Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`
+Here are all parameters listed. Each argument has: a default value defined (in `[brackets]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`
 
 `--gwas [no default]`, path to GWAS dataset, in quotes, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA`. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see `Note` below.
 
