@@ -43,6 +43,7 @@ namespace options {
 
         std:: string            opt_sample_names;
         std:: string            temporary_filename_to_delete_at_exit;
+        std:: string            temporary_dirname_to_delete_at_exit;
 
 void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
@@ -192,10 +193,16 @@ void read_in_all_command_line_options(int argc, char **argv) {
                                 filtered_samples_to_use.push_back(dataline_split.at(offset_of_sample_field));
                             }
 
-                            char * temporary_filename = tempnam(NULL, "ssimp");
-                            temporary_filename || DIE("Couldn't create temporary filename for use with --sample_names");
+                            char temporary_dirname[] = "/tmp/ssimp_XXXXXX";
+                            mkdtemp(temporary_dirname) || DIE("Couldn't create temporary filename for use with --sample_names");
+                            auto temporary_filename = AMD_FORMATTED_STRING("{0}/sample.names", temporary_dirname);
+                            PPe(temporary_dirname, temporary_filename);
                             std:: ofstream file_of_filtered_samples_to_use(temporary_filename);
+                            file_of_filtered_samples_to_use || DIE("Couldn't create temporary filename for use with --sample_names");
+
+                            // Delete the file at exit. TODO: I should delete the directory too.
                             options:: temporary_filename_to_delete_at_exit = temporary_filename;
+                            options:: temporary_dirname_to_delete_at_exit = temporary_dirname;
 
                             for(auto && one_sample : filtered_samples_to_use) {
                                 file_of_filtered_samples_to_use << one_sample << '\n';

@@ -145,6 +145,10 @@ int main(int argc, char **argv) {
                 int ret = unlink(options:: temporary_filename_to_delete_at_exit.c_str());
                 ret == 0 || DIE("Couldn't delete temporary filename [" << options:: temporary_filename_to_delete_at_exit << "]");
             }
+            if(!options:: temporary_dirname_to_delete_at_exit.empty()) {
+                int ret = rmdir(options:: temporary_dirname_to_delete_at_exit.c_str());
+                ret == 0 || DIE("Couldn't delete temporary dirname [" << options:: temporary_dirname_to_delete_at_exit << "]");
+            }
             auto PROF_CHANGE_DIR_AT_THE_LAST_MINUTE = getenv("PROF_CHANGE_DIR_AT_THE_LAST_MINUTE");
             if(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE) {
                 int ret = chdir(PROF_CHANGE_DIR_AT_THE_LAST_MINUTE);
