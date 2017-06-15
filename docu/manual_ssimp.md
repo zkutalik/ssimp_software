@@ -55,11 +55,11 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 - If `impute.range` and `impute.snps` are not defined, then all variants in the refpanel are imputed that are not provided as tag SNPs.
 - The option `missingness` is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
-- Magic tipp: `--impute.snp <(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')`
+- Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')`
 
 ## GWAS dataset
 [//]: -------------------------------
-- Column names are automatically recognized using commonly used names (see `../header_translation.md`. Missing values should be marked as `NA` or left empty. 
+- Column names are automatically recognized using commonly used names (see `../header_translation.md`). Missing values should be marked as `NA` or left empty. 
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
