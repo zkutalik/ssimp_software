@@ -3,7 +3,7 @@
 [//]: ==================================
 
 This command line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
-Details to the method can be found in *us (2017)*. (+ *Pasaniuc et al. (2014)*, or more recently in a review on the use of summary statistics by *Pasaniuc & Price (2016)*). 
+<sub>Details to the method can be found in *us (2017)*. (+ *Pasaniuc et al. (2014)*, or more recently in a review on the use of summary statistics by *Pasaniuc & Price (2016)*). </sub>
 
 	
 
