@@ -18,3 +18,44 @@ cols(
   QUAL = col_integer()
 )
 See spec(...) for full column specifications.
+Parsed with column specification:
+cols(
+  SNP = col_character(),
+  Z.imp = col_double(),
+  impqual = col_double(),
+  `#CHROM` = col_integer(),
+  POS = col_integer(),
+  REF = col_character(),
+  ALT = col_character()
+)
+# A tibble: 14 × 7
+         SNP        Z.imp    impqual `#CHROM`      POS   REF   ALT
+       <chr>        <dbl>      <dbl>    <int>    <int> <chr> <chr>
+1  rs5753220 -0.125376368 0.21726869       22 30986350     T     C
+2  rs5753231 -0.119500380 0.19298746       22 31003069     C     T
+3  rs5753236  0.239901103 0.11196113       22 31009820     G     C
+4  rs5753259  0.129186672 0.11754459       22 31030528     T     C
+5  rs5753260  0.259432308 0.15594625       22 31030592     G     A
+6  rs5753263  0.282504629 0.05926760       22 31052568     G     T
+7  rs5753268  0.227967569 0.02334647       22 31060982     A     G
+8  rs5753271  0.055571392 0.65852677       22 31070493     C     T
+9  rs5753272  0.051976453 0.65069453       22 31071045     A     C
+10 rs5753281 -0.043841296 0.59809877       22 31105269     A     C
+11 rs5753284 -0.879316744 0.71425088       22 31116394     A     G
+12 rs5753285  0.029831497 0.74085356       22 31116693     G     A
+13 rs5753290  0.003390621 0.65273787       22 31121646     G     A
+14 rs5753298 -0.265986531 0.35782339       22 31128763     A     G
+Parsed with column specification:
+cols(
+  SNP = col_character(),
+  imp = col_double(),
+  lambda = col_double(),
+  r2.classic = col_double(),
+  Z.real = col_double()
+)
+# A tibble: 3 × 5
+       SNP        imp     lambda r2.classic    Z.real
+     <chr>      <dbl>      <dbl>      <dbl>     <dbl>
+1 rs136382 -0.7257615 0.08917559  0.4796571 -1.487179
+2 rs136389 -0.7130664 0.08917559  0.4410161 -1.068966
+3 rs136383 -1.1321758 0.08917559  0.6368977 -1.127273
