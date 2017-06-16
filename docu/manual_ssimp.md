@@ -41,7 +41,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--impute.snp [NULL]` filename to define SNPs to impute (no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimize`), n are the number of individuals in the reference panel. `optimize` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). (**TBD** >> string not implemented yet, so if you want to have 2/sqrt(2) you have to compute it yourself)
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimise`), n are the number of individuals in the reference panel. `optimise` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). (**TBD** >> string not implemented yet, so if you want to have 2/sqrt(2) you have to compute it yourself)
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
@@ -55,14 +55,14 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 ### Note	
 [//]: -------
-- If `impute.range` and `impute.snps` are not defined, then all variants in the refpanel are imputed that are not provided as tag SNPs.
+- If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed that are not provided as tag SNPs.
 - The option `missingness` is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
 - Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')`
 
 ## GWAS dataset
 [//]: -------------------------------
-- Column names are automatically recognized using commonly used names (see `../header_translation.md`). Missing values should be marked as `NA` or left empty. 
+- Column names are automatically recognised using commonly used names (see `../header_translation.md`). Missing values should be marked as `NA` or left empty. 
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
@@ -71,7 +71,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 ## Reference panel
 [//]: -------------------------------
-Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the palceholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s). **@Aaron** is this correct?
+Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s). **@Aaron** is this correct?
 
 ## Run-time
 [//]: -------------------------------
