@@ -26,8 +26,10 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). `Aaron, please check`
-`--sample.names` is defaulted to `super_pop=EUR`.
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). **important** currently, there is a default to use the uk10k on HPC1.
+
+`--sample.names [no default]`  The argument can be used in two ways: (1) providing a text file (no header) with sample id's separated by new lines `--sample.names filename.samples.txt` or (2) providing a file with at least a sample id column and a column to constrain on: `--sample.names  x/f/e=v` does a lookup in file 'x' (which has a header), but filters on field 'e' being equal to value 'v', and then
+use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`. **important** currently this argument is defaulted to `super_pop=EUR`. 
 
 `--out [gwasfilename.ssimp.txt]` string. Filename in which to store the imputation results. If not defined, it will be the gwas filename + `.ssimp.txt`. 
 
