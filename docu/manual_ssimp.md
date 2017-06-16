@@ -47,9 +47,9 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--tag.maf [0]` numeric value. Lower MAF limit for tag SNPs: everything above and equal this threshold will be used as tag SNPs. 
 
-`--window.width [1e6]` numeric value. Core window length.
+`--window.width [1000000]` numeric value. Core window length.
 
-`--flanking.width [250e3]` numeric value. Flanking space left and right side of the core window.
+`--flanking.width [250000]` numeric value. Flanking space left and right side of the core window.
 		
 `--missingness [TRUE]` logical. Enables variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`. (**TBD** >> missingness is not implemented it)
 
