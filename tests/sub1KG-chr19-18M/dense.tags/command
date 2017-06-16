@@ -1,0 +1,11 @@
+"$SSIMP"                                                                            \
+    --ref ref/sub1KG-chr19/chr19.vcf.gz                                             \
+    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
+    --gwas "$GWAS"/too.big/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 250000                                                                   \
+    --flan 250000                                                                   \
+    --out "${OUT_IMPUTATIONS}"                                                      \
+    --lambda 0.01                                                                   \
+    --impute.range 19                                                               \
+    >     "$OUTPUT"
