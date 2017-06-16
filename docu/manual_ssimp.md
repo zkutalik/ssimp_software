@@ -24,7 +24,7 @@ The minimal requirements are: (1) GWAS summary statistics stored in a text file 
 [//]: -------------------------------
 Here are all parameters listed. Each argument has: a default value defined (in `[brackets]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`
 
-`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
+`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md` **@Aaron: is this done already?**). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
 
 `--ref [no default]` path to vcf file (same folder should contain the `tbi` file). **important** currently, there is a default to use the uk10k on HPC1.
 
