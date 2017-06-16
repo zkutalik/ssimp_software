@@ -1,4 +1,4 @@
-chr	pos	z_imp	source	SNP	Allele1	Allele2	maf	r2.pred	lambda	Z_reimputed	r2_reimputed
+chr	pos	z_imp	source	SNP	effect_allele	other_allele	maf	r2.pred	lambda	Z_reimputed	r2_reimputed
 19	15000922	-0.176374	GWAS	rs16980096	A	G	0.0487078	1	0.01	-0.53987	0.251329
 19	15001089	-0.0407733	SSIMP	rs571468032	G	A	0.000994036	-0.00806975	0.01		
 19	15001097	1.64485	GWAS	rs11085919	G	A	0.00596421	1	0.01	1.96161	0.980224
