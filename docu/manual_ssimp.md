@@ -71,7 +71,11 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 ## Reference panel
 [//]: -------------------------------
-`Aaron, please fill`
+Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the palceholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s). **@Aaron** is this correct?
+
+## Run-time
+[//]: -------------------------------
+**TBD**
 
 ## Technical aspects of summary statistics imputation
 [//]: -------------------------------
