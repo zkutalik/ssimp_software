@@ -818,7 +818,11 @@ void impute_all_the_regions(   string                                   filename
 
             // if necessary, do reimputation
             reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
-            if(number_of_tags > 1 && !already_reimputed_the_first_non_empty_window) {
+            if  (   number_of_tags > 1
+                 && (   !already_reimputed_the_first_non_empty_window
+                     ||  options:: opt_reimpute_tags
+                    )
+                ) {
                 already_reimputed_the_first_non_empty_window = true;
                 reimputed_tags_in_this_window = reimpute_tags_one_by_one(C, Cinv, tag_zs_, tag_its_);
             }
