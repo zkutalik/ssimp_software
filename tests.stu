@@ -1,5 +1,8 @@
 @all.tests
 :
+    tests/sub1KG-tiny/EUR.via.filter.all22.reimputeall/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22/imputations.txt
+
     tests/lambda1.0/imputations.txt
     tests/test.whatever/imputations.txt
     tests/3.chromosomes/UKB.every100/imputations.txt
