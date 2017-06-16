@@ -3,7 +3,7 @@
     --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
     --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_JUSTPARTOFCHR19.tsv.gz                      \
     --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
-    --wind 250000                                                                   \
+    --wind 1000000                                                                  \
     --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \

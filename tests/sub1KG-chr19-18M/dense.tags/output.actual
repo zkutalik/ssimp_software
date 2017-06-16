@@ -1,83 +1,23 @@
-file_name:gwas/GIANT_HEIGHT_Wood_et_al_JUSTPARTOFCHR19.tsv
-options:: opt_window_width,options:: opt_flanking_width:	250'000 , 250'000
+file_name:gwas/GIANT_HEIGHT_Wood_et_al_JUSTPARTOFCHR19.tsv.gz
+options:: opt_window_width,options:: opt_flanking_width:	1'000'000 , 250'000
 N_reference:503
 
-chrm19	   15'000'000-15'250'000
-     252 # GWAS     SNPs in this window (with 250'000 flanking)
-     252 # SNPs in both (i.e. useful as tags)
-     693 # target SNPs (anything in narrow window, will include some tags)
+chrm19	   15'000'000-16'000'000
+     925 # GWAS     SNPs in this window (with 250'000 flanking)
+     925 # SNPs in both (i.e. useful as tags)
+   2'643 # target SNPs (anything in narrow window, will include some tags)
 
-chrm19	   15'250'000-15'500'000
-     409 # GWAS     SNPs in this window (with 250'000 flanking)
-     409 # SNPs in both (i.e. useful as tags)
-     450 # target SNPs (anything in narrow window, will include some tags)
+chrm19	   16'000'000-17'000'000
+   1'011 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'011 # SNPs in both (i.e. useful as tags)
+   2'375 # target SNPs (anything in narrow window, will include some tags)
 
-chrm19	   15'500'000-15'750'000
-     567 # GWAS     SNPs in this window (with 250'000 flanking)
-     567 # SNPs in both (i.e. useful as tags)
-     577 # target SNPs (anything in narrow window, will include some tags)
+chrm19	   17'000'000-18'000'000
+     764 # GWAS     SNPs in this window (with 250'000 flanking)
+     764 # SNPs in both (i.e. useful as tags)
+   2'523 # target SNPs (anything in narrow window, will include some tags)
 
-chrm19	   15'750'000-16'000'000
-     673 # GWAS     SNPs in this window (with 250'000 flanking)
-     673 # SNPs in both (i.e. useful as tags)
-     923 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   16'000'000-16'250'000
-     642 # GWAS     SNPs in this window (with 250'000 flanking)
-     642 # SNPs in both (i.e. useful as tags)
-     775 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   16'250'000-16'500'000
-     431 # GWAS     SNPs in this window (with 250'000 flanking)
-     431 # SNPs in both (i.e. useful as tags)
-     526 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   16'500'000-16'750'000
-     336 # GWAS     SNPs in this window (with 250'000 flanking)
-     336 # SNPs in both (i.e. useful as tags)
-     502 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   16'750'000-17'000'000
-     369 # GWAS     SNPs in this window (with 250'000 flanking)
-     369 # SNPs in both (i.e. useful as tags)
-     572 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   17'000'000-17'250'000
-     384 # GWAS     SNPs in this window (with 250'000 flanking)
-     384 # SNPs in both (i.e. useful as tags)
-     653 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   17'250'000-17'500'000
-     377 # GWAS     SNPs in this window (with 250'000 flanking)
-     377 # SNPs in both (i.e. useful as tags)
-     610 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   17'500'000-17'750'000
-     373 # GWAS     SNPs in this window (with 250'000 flanking)
-     373 # SNPs in both (i.e. useful as tags)
-     576 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   17'750'000-18'000'000
-     380 # GWAS     SNPs in this window (with 250'000 flanking)
-     380 # SNPs in both (i.e. useful as tags)
-     684 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   18'000'000-18'250'000
-     409 # GWAS     SNPs in this window (with 250'000 flanking)
-     409 # SNPs in both (i.e. useful as tags)
-     570 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   18'250'000-18'500'000
-     346 # GWAS     SNPs in this window (with 250'000 flanking)
-     346 # SNPs in both (i.e. useful as tags)
-     552 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   18'500'000-18'750'000
-     287 # GWAS     SNPs in this window (with 250'000 flanking)
-     287 # SNPs in both (i.e. useful as tags)
-     515 # target SNPs (anything in narrow window, will include some tags)
-
-chrm19	   18'750'000-19'000'000
-     160 # GWAS     SNPs in this window (with 250'000 flanking)
-     160 # SNPs in both (i.e. useful as tags)
-     468 # target SNPs (anything in narrow window, will include some tags)
+chrm19	   18'000'000-19'000'000
+     569 # GWAS     SNPs in this window (with 250'000 flanking)
+     569 # SNPs in both (i.e. useful as tags)
+   2'105 # target SNPs (anything in narrow window, will include some tags)
