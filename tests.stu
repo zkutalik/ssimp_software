@@ -128,7 +128,7 @@ ref/sub1KG-chr19/chr${chrm}.vcf.gz.tbi
         egrep -v '^##' | {
             IFS='' read -r JUST1LIINE
             printf "%s\n" "$JUST1LIINE"
-            awk '$2 >= 19000000{exit} ; $2>=18000000'
+            awk '$2 >= 19000000{exit} ; $2>=15000000'
         } | python <(cat<<"EOF"
 # python script starts here
 
