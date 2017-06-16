@@ -7,4 +7,5 @@
     --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
+    --reimpute                                                                      \
     >     "$OUTPUT"
