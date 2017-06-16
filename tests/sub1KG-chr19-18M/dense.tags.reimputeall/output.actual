@@ -1,0 +1,23 @@
+file_name:gwas/GIANT_HEIGHT_Wood_et_al_JUSTPARTOFCHR19.tsv.gz
+options:: opt_window_width,options:: opt_flanking_width:	250'000 , 250'000
+N_reference:503
+
+chrm19	   18'000'000-18'250'000
+     254 # GWAS     SNPs in this window (with 250'000 flanking)
+     254 # SNPs in both (i.e. useful as tags)
+     570 # target SNPs (anything in narrow window, will include some tags)
+
+chrm19	   18'250'000-18'500'000
+     346 # GWAS     SNPs in this window (with 250'000 flanking)
+     346 # SNPs in both (i.e. useful as tags)
+     552 # target SNPs (anything in narrow window, will include some tags)
+
+chrm19	   18'500'000-18'750'000
+     287 # GWAS     SNPs in this window (with 250'000 flanking)
+     287 # SNPs in both (i.e. useful as tags)
+     515 # target SNPs (anything in narrow window, will include some tags)
+
+chrm19	   18'750'000-19'000'000
+     160 # GWAS     SNPs in this window (with 250'000 flanking)
+     160 # SNPs in both (i.e. useful as tags)
+     468 # target SNPs (anything in narrow window, will include some tags)
