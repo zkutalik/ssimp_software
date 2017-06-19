@@ -170,13 +170,16 @@ header_details   parse_header( string      const & header_line ) {
                         ,"snpid"
                         ,"rsid"
                         ,"MarkerName"
+                        ,"snp"
+                        ,"id1"
+                        ,"marker"
                     })) {
             hd.SNPname = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"#CHROM","chr"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"#CHROM","chr","chromosome","chrm"})) {
             hd.chromosome = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"POS"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"POS","position","BP"})) {
             hd.position = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
@@ -184,6 +187,7 @@ header_details   parse_header( string      const & header_line ) {
                         ,"a1"
                         ,"A1"
                         ,"Allele1"
+                        ,"AlleleA"
                         ,"other_allele"
                     })) {
             hd.allele_ref = header_details:: offset_and_name(field_counter, one_field_name);
@@ -193,6 +197,7 @@ header_details   parse_header( string      const & header_line ) {
                         ,"a2"
                         ,"A2"
                         ,"Allele2"
+                        ,"AlleleB"
                         ,"effect_allele"
                         })) {
             hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
@@ -212,14 +217,25 @@ header_details   parse_header( string      const & header_line ) {
         }
         else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"z.from.peff"
                                                 ,"z"
-                                                ,"Z"
+                                                ,"stat"
+                                                ,"zscore"
+                                                ,"z.score"
                                                 })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"p","P-value","PVALUE"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"p"
+                            ,"P-value"
+                            ,"P.value"
+                            ,"PVALUE"
+                            ,"frequentist_add_pvalue"
+                            ,"normal.score.p"
+                            })) {
             hd.effect_p = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"b","beta","ALT_EFFSIZE"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"b","beta","ALT_EFFSIZE"
+                    ,"frequentist_add_beta_1"
+                    ,"normal.score.beta"
+                    })) {
             // Note: this is only for the direction. We use this with effect_p, if effect_z isn't known
             hd.effect_beta = header_details:: offset_and_name(field_counter, one_field_name);
         }
@@ -257,8 +273,6 @@ static bool is_in_this_list_CASEINSENSITIVE(string const & s, std:: initializer_
     }
     return false;
 }
-
-
 
 char   decide_delimiter( string      const & header_line ) {
     // Which is comma, tab, or space, are most common here?
