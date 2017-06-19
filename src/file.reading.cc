@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <cstring>
 
 #include <gzstream.h>
 
@@ -120,7 +121,7 @@ string          lookup( header_details:: offset_and_name const &on
 static
 file_reading::
 header_details   parse_header( string      const & header_line );
-static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) ;
+static bool is_in_this_list_CASEINSENSITIVE(string const & s, std:: initializer_list<char const *> candidates) ;
 static
 GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 char   decide_delimiter( string      const & header_line );
@@ -163,7 +164,7 @@ header_details   parse_header( string      const & header_line ) {
         ++field_counter;
         // go through each field name in turn and try to account for it
         if(false) {}
-        else if(is_in_this_list(one_field_name, {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
                          "ID"
                         ,"rnpid"
                         ,"snpid"
@@ -172,13 +173,13 @@ header_details   parse_header( string      const & header_line ) {
                     })) {
             hd.SNPname = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"#CHROM","chr"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"#CHROM","chr"})) {
             hd.chromosome = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"POS"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"POS"})) {
             hd.position = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
                          "REF"
                         ,"a1"
                         ,"A1"
@@ -187,7 +188,7 @@ header_details   parse_header( string      const & header_line ) {
                     })) {
             hd.allele_ref = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
                          "ALT"
                         ,"a2"
                         ,"A2"
@@ -196,29 +197,29 @@ header_details   parse_header( string      const & header_line ) {
                         })) {
             hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"QUAL"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"QUAL"})) {
             hd.qual = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"FILTER"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"FILTER"})) {
             hd.filter = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"INFO"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"INFO"})) {
             // actually, ignore this big field
             //hd.info = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"FORMAT"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"FORMAT"})) {
             hd.format = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"z.from.peff"
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"z.from.peff"
                                                 ,"z"
                                                 ,"Z"
                                                 })) {
             hd.effect_z = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"p","P-value","PVALUE"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"p","P-value","PVALUE"})) {
             hd.effect_p = header_details:: offset_and_name(field_counter, one_field_name);
         }
-        else if(is_in_this_list(one_field_name, {"b","beta","ALT_EFFSIZE"})) {
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"b","beta","ALT_EFFSIZE"})) {
             // Note: this is only for the direction. We use this with effect_p, if effect_z isn't known
             hd.effect_beta = header_details:: offset_and_name(field_counter, one_field_name);
         }
@@ -229,6 +230,7 @@ header_details   parse_header( string      const & header_line ) {
     return hd;
 }
 
+/* The old case-sensitive version
 static bool is_in_this_list(string const & s, std:: initializer_list<char const *> candidates) {
     for(auto cand : candidates) {
         if(s==cand)
@@ -236,6 +238,26 @@ static bool is_in_this_list(string const & s, std:: initializer_list<char const 
     }
     return false;
 }
+*/
+static bool is_in_this_list_CASEINSENSITIVE(string const & s, std:: initializer_list<char const *> candidates) {
+    for(auto cand : candidates) {
+        if(std:: strlen(cand) != s.length())
+            continue;
+        bool same = true;
+        for(size_t i = 0; i< s.length(); ++i) {
+            if( std:: toupper(s.at(i))
+             != std:: toupper(cand[i]) ){
+                same=false;
+                break;
+            }
+        }
+        if(same)
+            return true;
+        //if(s==cand) return true;
+    }
+    return false;
+}
+
 
 
 char   decide_delimiter( string      const & header_line ) {
