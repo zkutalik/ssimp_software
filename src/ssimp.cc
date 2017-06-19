@@ -210,6 +210,9 @@ int main(int argc, char **argv) {
     if( options:: opt_out .empty()) { // --out wasn't specified - default to ${gwas}.ssimp.txt
         options:: opt_out = AMD_FORMATTED_STRING("{0}.ssimp.txt", options:: opt_gwas_filename);
     }
+    if( options:: opt_log .empty()) { // --log wasn't specified - default to ${gwas}.log
+        options:: opt_log = AMD_FORMATTED_STRING("{0}.log", options:: opt_gwas_filename);
+    }
 
     // Finished adjusting the command line options
 

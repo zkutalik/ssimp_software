@@ -31,7 +31,7 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 `--out [gwasfilename.ssimp.txt]` string. Filename in which to store the imputation results. If not defined, it will be the gwas filename + `.ssimp.txt`. 
 
-`--log [gwasfilename.log]` string. Filename in which to store the log file. If not defined it will be the gwas filename + `.log`. If set to `FALSE`, then no log file is produced. **(TBD)**
+`--log [gwasfilename.log]` string. Filename in which to store the log file - this is simply a copy of whatever is printed to the console. If not defined it will be the gwas filename + `.log`. If set to `/dev/null`, then no log file is produced. **(TBD)**
 
 `--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. **(TBD:)** For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used.  
 

@@ -24,6 +24,7 @@ namespace options {
         std:: string            opt_raw_ref;
         std:: string            opt_gwas_filename;
         std:: string            opt_out;
+        std:: string            opt_log; // copy of whatever is sent to the console.
         int                     opt_window_width = 1'000'000;
         int                     opt_flanking_width = 250'000;
         double                  opt_lambda  = 0.0;
@@ -65,6 +66,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"reimpute.tags"      ,        no_argument, 0, 14 }, // one-by-one, reimpute each tag by masking it
             {"sample.names"       ,  required_argument, 0, 15 },
             {"tags.used.output"   ,  required_argument, 0, 16 },
+            {"log"                ,  required_argument, 0, 17 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -144,6 +146,11 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_tags_used_output.empty() || DIE("--tags.used.output specified twice?");
             assert(string("tags.used.output") == long_options[long_option_index].name);
             options::  opt_tags_used_output = optarg;
+        }
+        if (c == 17) {
+            options:: opt_log.empty() || DIE("--log specified twice?");
+            assert(string("log") == long_options[long_option_index].name);
+            options::  opt_log = optarg;
         }
     }
 }
