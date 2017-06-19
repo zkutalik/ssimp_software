@@ -100,14 +100,11 @@ struct header_details {
     offset_and_name    position;
     offset_and_name    allele_ref;
     offset_and_name    allele_alt;
-    offset_and_name    qual;
-    offset_and_name    filter;
-    offset_and_name    info;
-    offset_and_name    format;
     offset_and_name    effect_z;
     offset_and_name    effect_beta; // just for direction - we'll use this with 'p', if 'z' isn't present
+    offset_and_name    effect_se;
     offset_and_name    effect_p;
-    vector<offset_and_name> unaccounted;
+    offset_and_name    effect_N;
 };
 
 
@@ -185,7 +182,6 @@ header_details   parse_header( string      const & header_line ) {
         else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
                          "REF"
                         ,"a1"
-                        ,"A1"
                         ,"Allele1"
                         ,"AlleleA"
                         ,"other_allele"
@@ -195,25 +191,11 @@ header_details   parse_header( string      const & header_line ) {
         else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
                          "ALT"
                         ,"a2"
-                        ,"A2"
                         ,"Allele2"
                         ,"AlleleB"
                         ,"effect_allele"
                         })) {
             hd.allele_alt = header_details:: offset_and_name(field_counter, one_field_name);
-        }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"QUAL"})) {
-            hd.qual = header_details:: offset_and_name(field_counter, one_field_name);
-        }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"FILTER"})) {
-            hd.filter = header_details:: offset_and_name(field_counter, one_field_name);
-        }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"INFO"})) {
-            // actually, ignore this big field
-            //hd.info = header_details:: offset_and_name(field_counter, one_field_name);
-        }
-        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"FORMAT"})) {
-            hd.format = header_details:: offset_and_name(field_counter, one_field_name);
         }
         else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {"z.from.peff"
                                                 ,"z"
@@ -239,8 +221,21 @@ header_details   parse_header( string      const & header_line ) {
             // Note: this is only for the direction. We use this with effect_p, if effect_z isn't known
             hd.effect_beta = header_details:: offset_and_name(field_counter, one_field_name);
         }
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
+                                                 "se"
+                                                ,"frequentist_add_se_1"
+                                                ,"normal.score.se"
+                                                })) {
+            hd.effect_se = header_details:: offset_and_name(field_counter, one_field_name);
+        }
+        else if(is_in_this_list_CASEINSENSITIVE(one_field_name, {
+                             "n"
+                            ,"NMISS"
+                            ,"all_total"
+                            })) {
+            hd.effect_N = header_details:: offset_and_name(field_counter, one_field_name);
+        }
         else {
-            hd.unaccounted.push_back( header_details:: offset_and_name(field_counter, one_field_name) );
         }
     }
     return hd;
