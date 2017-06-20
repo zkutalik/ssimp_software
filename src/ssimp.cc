@@ -143,13 +143,13 @@ void    set_appropriate_locale(ostream & stream) {
 }
 
 int main(int argc, char **argv) {
-    atexit( [](void){
-            for (   auto lifo = options:: list_of_tasks_to_run_at_exit.rbegin()
-                ;        lifo != options:: list_of_tasks_to_run_at_exit.rend()
-                ;      ++lifo) {
-                (*lifo)();
-            }
-        });
+
+    options:: read_in_all_command_line_options(argc, argv);
+
+    if(!options:: opt_log.empty()) {
+        logging:: setup_the_console_logging();
+    }
+
     options:: list_of_tasks_to_run_at_exit.push_back(
         [](){
             auto PROF_CHANGE_DIR_AT_THE_LAST_MINUTE = getenv("PROF_CHANGE_DIR_AT_THE_LAST_MINUTE"); // to control where 'gmon.out' goes
@@ -158,13 +158,15 @@ int main(int argc, char **argv) {
                 (void)ret; // we don't care about this. But we need it anyway regarding a `warn_unused_result` attribute
             }
         });
-
-    // all options now read. Start checking they are all present
-    options:: read_in_all_command_line_options(argc, argv);
-
-    if(!options:: opt_log.empty()) {
-        logging:: setup_the_console_logging();
-    }
+    // This call to 'atexit' must come after 'setup_the_console_logging', in order to avoid
+    // trying to delete the temporary file twice.
+    atexit( [](void){
+            for (   auto lifo = options:: list_of_tasks_to_run_at_exit.rbegin()
+                ;        lifo != options:: list_of_tasks_to_run_at_exit.rend()
+                ;      ++lifo) {
+                (*lifo)();
+            }
+        });
 
     set_appropriate_locale(cout);
 
