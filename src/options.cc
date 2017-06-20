@@ -27,7 +27,7 @@ namespace options {
         std:: string            opt_log; // copy of whatever is sent to the console.
         int                     opt_window_width = 1'000'000;
         int                     opt_flanking_width = 250'000;
-        std:: string            opt_lambda  = "0.0";
+        std:: string            opt_lambda  = "2/sqrt(n)";
 
         std:: string            opt_impute_range;
         std:: string            opt_impute_snps;

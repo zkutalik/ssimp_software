@@ -12,6 +12,7 @@
     tests/lambda/0.0891756/imputations.txt
     tests/lambda/2sqrtn/imputations.txt
     tests/lambda/0.999/imputations.txt
+    tests/lambda/default/imputations.txt
 
     tests/lambda1.0/imputations.txt
     tests/test.whatever/imputations.txt
