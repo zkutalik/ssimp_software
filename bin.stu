@@ -6,6 +6,7 @@
 
     bin/o/ssimp.o
     bin/o/options.o
+    bin/o/logging.o
     bin/o/file.reading.o
     bin/o/file.reading.vcfgztbi.o
     bin/o/mvn/mvn.o
@@ -17,6 +18,7 @@
     ${LINKER} \
         bin/o/options.o \
         bin/o/ssimp.o \
+        bin/o/logging.o \
         bin/o/file.reading.o \
         bin/o/file.reading.vcfgztbi.o \
         bin/o/mvn/mvn.o \

@@ -28,6 +28,8 @@
 
 #include "file.reading.vcfgztbi.hh"
 
+#include "logging.hh"
+
 namespace view = range:: view;
 namespace from = range:: from;
 namespace action = range:: action;
@@ -159,6 +161,10 @@ int main(int argc, char **argv) {
 
     // all options now read. Start checking they are all present
     options:: read_in_all_command_line_options(argc, argv);
+
+    if(!options:: opt_log.empty()) {
+        logging:: setup_the_console_logging();
+    }
 
     set_appropriate_locale(cout);
 
