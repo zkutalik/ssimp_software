@@ -11,56 +11,58 @@ This command line software enables summary statistics imputation (SSimp) for GWA
 
 ## Minimal example
 [//]: -------------------------------
-The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id, Z-statistic, reference allele and risk allele and at least one row, and (2) the path to the reference panel. 
+The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (`MarkerName`), Z-statistic (`Z`), reference allele (`a1`) and risk allele (`a2`) and at least one row, and (2) the path to the reference panel. 
 
 <sup>All other arguments have defaults defined (see below).</sup>
 
-`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `my_gwas.txt.ssimp.txt`, containing the imputation results, and a log file called `my_gwas.log`.
+`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `data/my_gwas.txt.ssimp.txt`, containing the imputation results, and a log file called `data/my_gwas.log` (**TBD**).
 
-<sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistics, and therefore needs a negative sign if the effect size is negative). </sup>
+<sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistic, and therefore needs a negative sign if the effect size is negative). </sup>
 	
 
 ## Arguments
 [//]: -------------------------------
-Here are all parameters listed. Each argument has: a default value defined (in `[brackets]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`
+Here are all parameters listed. Each argument has: a default value defined (in `[brackets]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
 
-`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md`). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
+`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md` **@Aaron: is this done already?**). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele (currently, generic names for these columns are `MarkerName`, `Z`, `a1`, `a2`). For more info on possible sets of columns, see section `GWAS dataset` below.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). `Aaron, please check`
-`--sample.names` is defaulted to `super_pop=EUR`.
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). **Important** >> currently, there is a default to use the uk10k on HPC1. For more info see section `reference panel` below.
+
+`--sample.names [no default]`  The argument can be used in two ways: (1) providing a text file (no header) with sample id's separated by new lines `--sample.names filename.samples.txt` or (2) providing a file with at least a sample id column and a column to constrain on: `--sample.names  x/f/e=v` does a lookup in file 'x' (which has a header), but filters on field 'e' being equal to value 'v', and then
+use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`. **Important** >> currently this argument is defaulted to `super_pop=EUR`. 
 
 `--out [gwasfilename.ssimp.txt]` string. Filename in which to store the imputation results. If not defined, it will be the gwas filename + `.ssimp.txt`. 
 
-`--log [gwasfilename.log]` string. Filename in which to store the log file - this is simply a copy of whatever is printed to the console. If not defined it will be the gwas filename + `.log`. If set to `/dev/null`, then no log file is produced. **(TBD)**
+`--log [no default]` string. Filename in which to store the log file - this is simply a copy of whatever is printed to the console.
 
-`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. **(TBD:)** For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used.  
+`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. (**TBD** >> For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used.)
 
 `--tag.snp [no default]` filename with list of tags (no header). For magic in bash see `Note` below.
 
 `--impute.snp [NULL]` filename to define SNPs to impute (no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimize`), n are the number of individuals in the reference panel. `optimize` not yet implemented. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). **(TBD: string)**
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimise`), n are the number of individuals in the reference panel. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). (**TBD** >> string not implemented yet, so if you want to have 2/sqrt(2) you have to compute it yourself. Also  `optimise` not yet implemented. )
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
 `--tag.maf [0]` numeric value. Lower MAF limit for tag SNPs: everything above and equal this threshold will be used as tag SNPs. 
 
-`--window.width [1e6]` numeric value. Core window length.
+`--window.width [1000000]` numeric value. Core window length.
 
-`--flanking.width [250e3]` numeric value. Flanking space left and right side of the core window.
+`--flanking.width [250000]` numeric value. Flanking space left and right side of the core window.
 		
-`--missingness [TRUE]` logical. Enables variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`. **(TBD)**
+`--missingness [TRUE]` logical. Enables variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`. (**TBD** >> missingness is not implemented it)
 
 ### Note	
 [//]: -------
-- If `impute.range` and `impute.snps` are not defined, then all variants in the refpanel are imputed that are not provided as tag SNPs.
+- If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs, see section `output` below).
 - The option `missingness` is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
-- Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 rs5753236 rs5753259 rs5753260 rs5753263 rs5753268 rs5753271 rs5753272 rs5753281 rs5753284 rs5753285 rs5753290 rs5753298 | tr ' ' '\n')`
+- Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`
 
 ## GWAS dataset
 [//]: -------------------------------
-- Column names are automatically recognized using commonly used names (see `../header_translation.md`). Missing values should be marked as `NA` or left empty. 
+- Column names are automatically recognised using commonly used names (see `../header_translation.md`). Missing values should be marked as `NA` or left empty. 
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
@@ -69,7 +71,11 @@ Here are all parameters listed. Each argument has: a default value defined (in `
 
 ## Reference panel
 [//]: -------------------------------
-`Aaron, please fill`
+Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s). **@Aaron** is this correct?
+
+## Run-time
+[//]: -------------------------------
+**TBD** compute run-time for a genome-wide imputation.
 
 ## Technical aspects of summary statistics imputation
 [//]: -------------------------------
@@ -77,7 +83,7 @@ For more details on the summary statistics imputation method, please see our pap
 
 `insert here a brief recap of the method`
 
-- If SNP-ID are present in the GWAS, then pos copied from reference panel. 
+- If SNP-ID are present in the GWAS, then positions (bp) are copied from reference panel. 
 - If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
 - Because either SNP-ID or Chr:Pos:A1:A2 are used as identifier, it is also possible to impute indels.
 - Z-statistics are imputed, along with `N_imp` (an estimate for the sample size) and `r2_pred` (adjusted imputation quality).
@@ -88,11 +94,11 @@ For more details on the summary statistics imputation method, please see our pap
 
 ### log file
 [//]: -------
-The `.log` file is a copy of what is printed to the console. 
+The `.log` file is a copy of what is printed to the console. (not supported yet)
 
 ### out file
 [//]: -------
-The `.imp.out` file has the following columns:
+The `.ssimp.txt` file has the following columns:
 
 - `SNP` SNP-ID
 - `Chr` Chromosome (only 1 to 22 right now)
