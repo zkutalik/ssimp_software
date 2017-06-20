@@ -11,7 +11,7 @@ extern  std:: string            opt_out;
 extern  std:: string            opt_log; // copy of whatever is sent to the console.
 extern  int                     opt_window_width;
 extern  int                     opt_flanking_width;
-extern  double                  opt_lambda;
+extern  std:: string            opt_lambda;
 
 extern  std:: string            opt_impute_range;
 extern  std:: string            opt_impute_snps;

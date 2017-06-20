@@ -755,7 +755,8 @@ void impute_all_the_regions(   string                                   filename
             /*
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
              */
-            mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, options:: opt_lambda);
+            double const lambda = utils:: lexical_cast<double>(options:: opt_lambda);
+            mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, lambda);
             mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0); // used only for the effective number of tests
             mvn:: SquareMatrix  C_1e8lambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
             //PP(__LINE__, utils:: ELAPSED());
@@ -765,7 +766,7 @@ void impute_all_the_regions(   string                                   filename
                                                          , genotypes_for_the_unks
                                                          , tag_its_
                                                          , unk2_its
-                                                         , options:: opt_lambda
+                                                         , lambda
                                                          );
             mvn:: Matrix        c_1e8lambda   = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
@@ -897,7 +898,7 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << target->alt
                         << '\t' << target->maf
                         << '\t' << imp_qual
-                        << '\t' << options:: opt_lambda
+                        << '\t' << lambda
                         << '\t' << (std::isnan( Z_reimputed) ? "" : AMD_FORMATTED_STRING("{0}",  Z_reimputed))
                         << '\t' << (std::isnan(r2_reimputed) ? "" : AMD_FORMATTED_STRING("{0}", r2_reimputed))
                         << endl;

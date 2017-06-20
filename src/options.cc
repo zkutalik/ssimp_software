@@ -27,7 +27,7 @@ namespace options {
         std:: string            opt_log; // copy of whatever is sent to the console.
         int                     opt_window_width = 1'000'000;
         int                     opt_flanking_width = 250'000;
-        double                  opt_lambda  = 0.0;
+        std:: string            opt_lambda  = "0.0";
 
         std:: string            opt_impute_range;
         std:: string            opt_impute_snps;
@@ -96,7 +96,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
         }
         if (c == 6) {
             assert(string("lambda") == long_options[long_option_index].name);
-            options::  opt_lambda  = utils:: lexical_cast<double>(optarg);
+            options::  opt_lambda  = optarg;
         }
         if (c == 7) {
             assert(string("out") == long_options[long_option_index].name);
