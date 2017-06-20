@@ -24,9 +24,9 @@ The minimal requirements are: (1) GWAS summary statistics stored in a text file 
 [//]: -------------------------------
 Here are all parameters listed. Each argument has: a default value defined (in `[brackets]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
 
-`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter, nor does text separator (e.g. `\t`).  Columns need to be named after common conventions (see file `../header_translation.md` **@Aaron: is this done already?**). Missings have to be marked as `NA` or left empty. QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele (currently, generic names for these columns are `MarkerName`, `Z`, `a1`, `a2`). For more info on possible sets of columns, see section `GWAS dataset` below.
+`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognized automatically (see file `../header_translation.md` ). Missings have to be marked as `NA` or left empty. Column names in QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). **Important** >> currently, there is a default to use the uk10k on HPC1. For more info see section `reference panel` below.
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). **Important** >> currently, there is a default to use the 1KG reference panel (503 EUR) on HPC1. For more info see section `reference panel` below.
 
 `--sample.names [no default]`  The argument can be used in two ways: (1) providing a text file (no header) with sample id's separated by new lines `--sample.names filename.samples.txt` or (2) providing a file with at least a sample id column and a column to constrain on: `--sample.names  x/f/e=v` does a lookup in file 'x' (which has a header), but filters on field 'e' being equal to value 'v', and then
 use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`. **Important** >> currently this argument is defaulted to `super_pop=EUR`. 
@@ -41,7 +41,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--impute.snp [NULL]` filename to define SNPs to impute (no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimise`), n are the number of individuals in the reference panel. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). (**TBD** >> string not implemented yet, so if you want to have 2/sqrt(2) you have to compute it yourself. Also  `optimise` not yet implemented. )
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimise`), n are the number of individuals in the reference panel. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). (`optimise` not yet implemented. )
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
