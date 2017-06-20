@@ -70,9 +70,9 @@
            -o "$(whoami)" = 'aaron'
     then
            echo ' -Werror'
+           echo " -pg -ggdb                  " # For profiling
     fi
 
-    echo " -pg -ggdb                  " # For profiling
 }
 
 >       bin/o/LINKER
