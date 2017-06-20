@@ -433,6 +433,7 @@ void impute_all_the_regions(   string                                   filename
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
     bool already_reimputed_the_first_non_empty_window = false;
     for(int chrm =  1; chrm <= 22; ++chrm) {
+        cout.flush(); std::cerr.flush(); // helps with --log
 
         if  ( chrm < trg_clb.chr ) { continue; }
         if  ( chrm > trg_cub.chr ) { continue; }
@@ -442,6 +443,8 @@ void impute_all_the_regions(   string                                   filename
         tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
         for(int w = 0; ; ++w ) {
+            cout.flush(); std::cerr.flush(); // helps with --log
+
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
             //PPe(chrm, w, current_window_start, current_window_end, utils::ELAPSED());
