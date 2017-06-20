@@ -65,7 +65,6 @@ void setup_the_console_logging() {
                     if(chars_read > 0) {
                         keep_going = true;
                         {int ret=write(2, buf, chars_read);(void)ret;}
-                        {int ret=write(2, buf, chars_read);(void)ret;}
                         log.write(buf, chars_read);
                         log.flush();
                     }
