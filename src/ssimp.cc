@@ -755,7 +755,11 @@ void impute_all_the_regions(   string                                   filename
             /*
              * Next few lines do a lot. The compute correlation, applying lambda regularization, and do imputation:
              */
-            double const lambda = utils:: lexical_cast<double>(options:: opt_lambda);
+            double const lambda = [&]() {
+                if(options:: opt_lambda == "2/sqrt(n)")
+                    return 2.0 / sqrt(N_reference);
+                return utils:: lexical_cast<double>(options:: opt_lambda);
+            }();
             mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, lambda);
             mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0); // used only for the effective number of tests
             mvn:: SquareMatrix  C_1e8lambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
