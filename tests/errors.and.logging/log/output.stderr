@@ -1,3 +1,2 @@
-file_name:/nonexistent/../..
 
 Exiting: src/file.reading.cc:354	Error: Can't find file [/nonexistent/../..]

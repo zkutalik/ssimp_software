@@ -1,7 +1,9 @@
+# This is an unusual test, as the binary will fail, due to the non-existent gwas
+# The purpose is to ensure that the stdout and stderr are both recorded to the --log file
 "$SSIMP"                                                                            \
     --ref "$REF"/sub1KG-tiny/chr{CHRM}.vcf.gz                                          \
     --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
-    --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
+    --gwas /nonexistent/../..                                                        \
     --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
     --wind 250000                                                                   \
     --flan 250000                                                                   \
@@ -9,4 +11,5 @@
     --log "${COMMANDDIR}"/log.txt                                                   \
     --lambda 0.01                                                                   \
     --tags.range chr4-chr5                                                          \
-    >     "$OUTPUT"
+    >     "$OUTPUT" 2> "${COMMANDDIR}"/output.stderr
+    touch "$OUT_IMPUTATIONS"
