@@ -101,7 +101,6 @@ mvn:: Matrix make_c_unkn_tags_matrix
         , vector<vector<int> const *>      const & genotypes_for_the_unks
         , vector<RefRecord const *              > const & tag_its
         , vector<RefRecord const *              > const & unk_its
-        , double                                          lambda
         );
 using reimputed_tags_in_this_window_t = std:: unordered_map< RefRecord const * , std::pair<double,double> >;
 static
@@ -800,18 +799,21 @@ void impute_all_the_regions(   string                                   filename
             };
             assert(map_of_ref_records_of_tags.size() == tag_its_.size());
 
+            // Compute the correlation matrices
             mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags);
-            auto                C_lambda    = apply_lambda(C_nolambda, lambda);
-            auto                C_1e8lambda = apply_lambda(C_nolambda, 1e-8);
             mvn:: Matrix        c_nolambda  = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
                                                          , tag_its_
                                                          , unk2_its
-                                                         , 0.0
                                                          );
-            auto c              = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, lambda);
-            auto c_1e8lambda    = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, 1e-8);
 
+            // Apply lambda
+            auto                C_lambda        = apply_lambda(C_nolambda, lambda);
+            auto                C_1e8lambda     = apply_lambda(C_nolambda, 1e-8);
+            auto                c               = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, lambda);
+            auto                c_1e8lambda     = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, 1e-8);
+
+            // Compute number of effective tests
             int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
 
             mvn:: VecCol        C_inv_zs    = solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_));
@@ -988,7 +990,6 @@ mvn:: Matrix make_c_unkn_tags_matrix
         , vector<vector<int> const *>      const & genotypes_for_the_unks
         , vector<RefRecord const *              > const & tag_its
         , vector<RefRecord const *              > const & unk_its
-        , double                                          lambda
         ) {
     int const number_of_tags = genotypes_for_the_tags.size();
     int const number_of_all_targets = genotypes_for_the_unks.size();
@@ -1044,13 +1045,12 @@ mvn:: Matrix make_c_unkn_tags_matrix
 
                 if(tag_its_k == unk_its_u) { // identical pointer value, i.e. same reference entry
                     assert(c_ku ==  1.0);
-                    c.set(u,k,c_ku);
                 }
                 else {
                     assert(c_ku >= -1.0);
                     assert(c_ku <=  1.0);
-                    c.set(u,k,c_ku * (1.0-lambda));
                 }
+                c.set(u,k,c_ku);
          };
     }
     return c;
