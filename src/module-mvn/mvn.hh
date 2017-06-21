@@ -147,7 +147,8 @@ template<typename  SquareMatrix= SquareMatrix>
 auto    operator==(SquareMatrix const& lhs, SquareMatrix const &rhs)
     -> decltype(gsl_matrix_equal(lhs.get(), rhs.get()))
 {
-    assert(lhs.size() == rhs.size());
+    assert(lhs.size1() == rhs.size1());
+    assert(lhs.size2() == rhs.size2());
     return gsl_matrix_equal(lhs.get(), rhs.get());
 }
 template<typename  VecCol= VecCol>
