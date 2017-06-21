@@ -763,40 +763,10 @@ void impute_all_the_regions(   string                                   filename
                     return 2.0 / sqrt(N_reference);
                 return utils:: lexical_cast<double>(options:: opt_lambda);
             }();
-            mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, lambda);
-            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0); // used only for the effective number of tests
-            mvn:: SquareMatrix  C_1e8lambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
-            //PP(__LINE__, utils:: ELAPSED());
-            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
-            //PP(__LINE__, utils:: ELAPSED());
-            mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
-                                                         , genotypes_for_the_unks
-                                                         , tag_its_
-                                                         , unk2_its
-                                                         , lambda
-                                                         );
-            mvn:: Matrix        c_1e8lambda   = make_c_unkn_tags_matrix( genotypes_for_the_tags
-                                                         , genotypes_for_the_unks
-                                                         , tag_its_
-                                                         , unk2_its
-                                                         , 1e-8
-                                                         );
-            //PP(__LINE__, utils:: ELAPSED());
 
-            // Next two lines are the imputation, and its quality.
-            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
-            auto   Cinv    =                 invert_a_matrix ( C        );
-            auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans( Cinv  , c);
-            auto   C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
-
-            assert( (int)Cinv_c.size1() == number_of_tags );
-            assert( (int)Cinv_c.size2() == number_of_all_targets );
-
-            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_nolambda);
-
-            // Finally, print out the imputations
             assert(number_of_all_targets == ssize(unk2_its));
 
+            // Next, record the real z of the tags. Just so we can print it in the output instead of trying to impute it
             std:: unordered_map<RefRecord const *, double> map_of_ref_records_of_tags;
             range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
             |action::unzip_foreach|
@@ -804,8 +774,30 @@ void impute_all_the_regions(   string                                   filename
                 (void)z;
                 map_of_ref_records_of_tags[tag_refrecord] = z;
             };
-
             assert(map_of_ref_records_of_tags.size() == tag_its_.size());
+
+            mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, lambda);
+            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0); // used only for the effective number of tests
+            mvn:: SquareMatrix  C_1e8lambda = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
+            mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
+                                                         , genotypes_for_the_unks
+                                                         , tag_its_
+                                                         , unk2_its
+                                                         , lambda
+                                                         );
+            mvn:: Matrix        c_1e8lambda = make_c_unkn_tags_matrix( genotypes_for_the_tags
+                                                         , genotypes_for_the_unks
+                                                         , tag_its_
+                                                         , unk2_its
+                                                         , 1e-8
+                                                         );
+
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_nolambda);
+
+            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
+            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
+            auto   C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
+
 
             // if necessary, do reimputation
             reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
@@ -815,13 +807,14 @@ void impute_all_the_regions(   string                                   filename
                     )
                 ) {
                 already_reimputed_the_first_non_empty_window = true;
-                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C, Cinv, tag_zs_, tag_its_);
+                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C, invert_a_matrix(C), tag_zs_, tag_its_);
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
 
-
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
+
+            // Finally, print out the imputations
             for(int i=0; i<number_of_all_targets; ++i) {
                     auto && target = unk2_its.at(i);
                     auto pos  = target->pos;
