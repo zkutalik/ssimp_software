@@ -634,6 +634,7 @@ void impute_all_the_regions(   string                                   filename
             // Next, find tags
             vector<double>                          tag_zs_;
             vector<RefRecord const *              > tag_its_;
+            vector<double>                          tag_Ns;
             {   // Look for tags in the broad window.
                 // This means moving monotonically through 'all_nearby_ref_data' and
                 // the gwas data in parallel, and identifying suitable 'pairs'
@@ -649,6 +650,7 @@ void impute_all_the_regions(   string                                   filename
                             );
                     vector<double> one_tag_zs;
                     vector<RefRecord const *> one_tag_its;
+                    vector<int              > one_tag_Ns;
                     for(; ! ref_candidates.empty(); ref_candidates.advance()) {
                         auto & current_ref = ref_candidates.front_ref();
                         assert( current_ref.pos == crps.pos );
@@ -663,9 +665,11 @@ void impute_all_the_regions(   string                                   filename
                             break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED:
                                 one_tag_zs.push_back( -tag_candidate.current_it().get_z() );
                                 one_tag_its.push_back( &current_ref        );
+                                one_tag_Ns.push_back(  tag_candidate.current_it().get_N() );
                             break; case which_direction_t:: DIRECTION_AS_IS             :
                                 one_tag_zs.push_back(  tag_candidate.current_it().get_z() );
                                 one_tag_its.push_back( &current_ref        );
+                                one_tag_Ns.push_back(  tag_candidate.current_it().get_N() );
                             break; case which_direction_t:: NO_ALLELE_MATCH             : ;
                         }
                     }
@@ -678,6 +682,8 @@ void impute_all_the_regions(   string                                   filename
                             tag_zs_.push_back(z);
                         for(auto it : one_tag_its)
                             tag_its_.push_back(it);
+                        for(auto it : one_tag_Ns)
+                            tag_Ns.push_back(it);
                     }
                 }
             }
@@ -816,6 +822,12 @@ void impute_all_the_regions(   string                                   filename
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
+
+            if(options:: opt_missingness) {
+                using utils:: operator<<;
+                PP(tag_Ns);
+            }
+
 
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
 

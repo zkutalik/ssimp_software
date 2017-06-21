@@ -28,6 +28,9 @@ extern  bool                    opt_reimpute_tags;
 extern  std:: string            opt_tags_used_output;
 
 extern  std:: string            opt_sample_names;
+extern  bool                    opt_missingness;
+
+
 extern  std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
         void                    read_in_all_command_line_options(int argc, char **argv);
