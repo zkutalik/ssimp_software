@@ -62,32 +62,13 @@ static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              );
-auto apply_lambda = [](mvn:: SquareMatrix copy, double lambda) {
-    int s = copy.size();
-    for(int i=0; i<s; ++i) {
-        for(int j=0; j<s; ++j) {
-            if(i!=j)
-                copy.set(i,j,  copy(i,j)*(1.0-lambda));
-        }
-    }
-    return copy;
-};
-            auto apply_lambda_mat = [](mvn:: Matrix copy, auto const & unk2_its, auto const & tag_its_, double lambda) {
-                int number_of_all_targets = unk2_its.size();
-                int number_of_tags        = tag_its_.size();
-                assert(copy.size1() == (size_t)number_of_all_targets);
-                assert(copy.size2() == (size_t)number_of_tags);
-                for(int i=0; i<number_of_all_targets; ++i) {
-                    for(int j=0; j<number_of_tags; ++j) {
-                        if(tag_its_.at(j) == unk2_its.at(i))
-                            assert(copy(i,j) == 1.0);
-                        else {
-                            copy.set(i,j, copy(i,j)*(1.0-lambda));
-                        }
-                    }
-                }
-                return copy;
-            };
+static
+mvn::SquareMatrix apply_lambda_square (mvn:: SquareMatrix copy, double lambda);
+static
+mvn:: Matrix apply_lambda_rect   (   mvn:: Matrix copy
+                        ,   vector<RefRecord const *> const & unk2_its
+                        ,   vector<RefRecord const *> const & tag_its_
+                        , double lambda);
 
 static
 int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda);
@@ -808,10 +789,10 @@ void impute_all_the_regions(   string                                   filename
                                                          );
 
             // Apply lambda
-            auto                C_lambda        = apply_lambda(C_nolambda, lambda);
-            auto                C_1e8lambda     = apply_lambda(C_nolambda, 1e-8);
-            auto                c               = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, lambda);
-            auto                c_1e8lambda     = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, 1e-8);
+            auto                C_lambda        = apply_lambda_square(C_nolambda, lambda);
+            auto                C_1e8lambda     = apply_lambda_square(C_nolambda, 1e-8);
+            auto                c               = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
+            auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, 1e-8);
 
             // Compute number of effective tests
             int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
@@ -1055,6 +1036,37 @@ mvn:: Matrix make_c_unkn_tags_matrix
     }
     return c;
 };
+static
+mvn::SquareMatrix apply_lambda_square (mvn:: SquareMatrix copy, double lambda) {
+    int s = copy.size();
+    for(int i=0; i<s; ++i) {
+        for(int j=0; j<s; ++j) {
+            if(i!=j)
+                copy.set(i,j,  copy(i,j)*(1.0-lambda));
+        }
+    }
+    return copy;
+}
+static
+mvn:: Matrix apply_lambda_rect   (   mvn:: Matrix copy
+                        ,   vector<RefRecord const *> const & unk2_its
+                        ,   vector<RefRecord const *> const & tag_its_
+                        , double lambda) {
+    int number_of_all_targets = unk2_its.size();
+    int number_of_tags        = tag_its_.size();
+    assert(copy.size1() == (size_t)number_of_all_targets);
+    assert(copy.size2() == (size_t)number_of_tags);
+    for(int i=0; i<number_of_all_targets; ++i) {
+        for(int j=0; j<number_of_tags; ++j) {
+            if(tag_its_.at(j) == unk2_its.at(i))
+                assert(copy(i,j) == 1.0);
+            else {
+                copy.set(i,j, copy(i,j)*(1.0-lambda));
+            }
+        }
+    }
+    return copy;
+}
 static
 int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda) {
     int number_of_tags = C_smalllambda.size();
