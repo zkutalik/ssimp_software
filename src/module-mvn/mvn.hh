@@ -145,13 +145,15 @@ double norm_2(const VecCol       &x);
 // I should check they still work elsewhere
 template<typename  SquareMatrix= SquareMatrix>
 auto    operator==(SquareMatrix const& lhs, SquareMatrix const &rhs)
-->decltype(gsl_matrix_equal(lhs.get(), rhs.get()))
+    -> decltype(gsl_matrix_equal(lhs.get(), rhs.get()))
 {
     assert(lhs.size() == rhs.size());
     return gsl_matrix_equal(lhs.get(), rhs.get());
 }
 template<typename  VecCol= VecCol>
-auto    operator==(VecCol const& lhs, VecCol const &rhs) {
+auto    operator==(VecCol const& lhs, VecCol const &rhs)
+    -> decltype( gsl_vector_equal(lhs.get(), rhs.get()) )
+{
     assert(lhs.size() == rhs.size());
     return gsl_vector_equal(lhs.get(), rhs.get());
 }
