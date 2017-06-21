@@ -445,6 +445,11 @@ void impute_all_the_regions(   string                                   filename
     auto const tag_clb = skipper_tags  ->conservative_lower_bound();
     auto const tag_cub = skipper_tags  ->conservative_upper_bound();
 
+    double N_max = -1;
+    for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+        N_max = std::max(N_max, gwas->get_N(i));
+    }
+
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
     bool already_reimputed_the_first_non_empty_window = false;
     for(int chrm =  1; chrm <= 22; ++chrm) {
