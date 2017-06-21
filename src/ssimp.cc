@@ -794,11 +794,13 @@ void impute_all_the_regions(   string                                   filename
             auto                c               = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
             auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, 1e-8);
 
-            // Compute number of effective tests
-            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
 
+            // Compute the imputations
             mvn:: VecCol        C_inv_zs    = solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_));
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
+
+            // Next two lines are for the imputation quality
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
             auto   C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
 
 
@@ -817,7 +819,7 @@ void impute_all_the_regions(   string                                   filename
 
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
 
-            // Finally, print out the imputations
+            // Finally, print out everything to the --out file
             for(int i=0; i<number_of_all_targets; ++i) {
                     auto && target = unk2_its.at(i);
                     auto pos  = target->pos;
@@ -875,6 +877,9 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << (std::isnan(r2_reimputed) ? "" : AMD_FORMATTED_STRING("{0}", r2_reimputed))
                         << endl;
             }
+
+            // Finally, store every tag used. We will print it all at the end to
+            // another file (--tags.used.output)
 
             if(!options:: opt_tags_used_output.empty()) {
                 assert(tag_its_.size() == tag_zs_.size());
