@@ -406,10 +406,10 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
             }();
             gls.m_N          = [&](){
                 if(hd.effect_N.m_offset != -1) {
-                    return utils:: lexical_cast<int> (LOOKUP( hd, effect_N, all_split_up));
+                    return utils:: lexical_cast<double> (LOOKUP( hd, effect_N, all_split_up));
                 }
                 else {
-                    return -1;
+                    return -1.0;
                 }
             }();
 
