@@ -1,7 +1,7 @@
 @all.tests
 :
-    # tests/sub1KG-chr19-18M/dense.tags.reimputeall/output.actual # 4 minutes
-    # tests/sub1KG-chr19-18M/dense.tags/output.actual # 4 minutes
+    # tests/sub1KG-chr19-18M/dense.tags.reimputeall/imputations.txt # 4 minutes
+    # tests/sub1KG-chr19-18M/dense.tags/imputations.txt # 4 minutes
 
     tests/sub1KG-tiny/EUR.via.filter.all22.reimputeall/imputations.txt
     tests/sub1KG-tiny/EUR.via.filter.all22/imputations.txt
