@@ -62,15 +62,22 @@ static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              );
+auto apply_lambda = [](mvn:: SquareMatrix copy, double lambda) {
+    int s = copy.size();
+    for(int i=0; i<s; ++i) {
+        for(int j=0; j<s; ++j) {
+            if(i!=j)
+                copy.set(i,j,  copy(i,j)*(1.0-lambda));
+        }
+    }
+    return copy;
+};
 static
 int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda);
 
 static
 mvn:: SquareMatrix
-make_C_tag_tag_matrix(
-                    vector<vector<int> const *>      const & genotypes_for_the_tags
-                    , double lambda
-                    );
+make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags);
 static
 mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int> const *>      const & genotypes_for_the_tags
@@ -776,8 +783,9 @@ void impute_all_the_regions(   string                                   filename
             };
             assert(map_of_ref_records_of_tags.size() == tag_its_.size());
 
-            mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, lambda);
-            mvn:: SquareMatrix  C_1e8lambda = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
+            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags);
+            auto                C_lambda    = apply_lambda(C_nolambda, lambda);
+            auto                C_1e8lambda = apply_lambda(C_nolambda, 1e-8);
             mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
                                                          , tag_its_
@@ -793,7 +801,7 @@ void impute_all_the_regions(   string                                   filename
 
             int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
 
-            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
+            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_));
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
             auto   C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
 
@@ -806,7 +814,7 @@ void impute_all_the_regions(   string                                   filename
                     )
                 ) {
                 already_reimputed_the_first_non_empty_window = true;
-                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C, invert_a_matrix(C), tag_zs_, tag_its_);
+                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), tag_zs_, tag_its_);
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
@@ -926,9 +934,7 @@ void impute_all_the_regions(   string                                   filename
 
 static
 mvn:: SquareMatrix
-make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags
-                     , double                                   lambda
-                     ) {
+make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags) {
     int const number_of_tags = genotypes_for_the_tags.size();
     int const N_ref = genotypes_for_the_tags.at(0)->size();
     assert(N_ref > 0);
@@ -955,11 +961,10 @@ make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_th
             assert(c_kl <=  1.0);
             if(k==l) {
                 assert(c_kl == 1.0);
-                C.set(k,l,c_kl);
             }
             else {
-                C.set(k,l,c_kl * (1.0-lambda));
             }
+            C.set(k,l,c_kl);
         }
     }
     return C;
