@@ -72,6 +72,23 @@ auto apply_lambda = [](mvn:: SquareMatrix copy, double lambda) {
     }
     return copy;
 };
+            auto apply_lambda_mat = [](mvn:: Matrix copy, auto const & unk2_its, auto const & tag_its_, double lambda) {
+                int number_of_all_targets = unk2_its.size();
+                int number_of_tags        = tag_its_.size();
+                assert(copy.size1() == (size_t)number_of_all_targets);
+                assert(copy.size2() == (size_t)number_of_tags);
+                for(int i=0; i<number_of_all_targets; ++i) {
+                    for(int j=0; j<number_of_tags; ++j) {
+                        if(tag_its_.at(j) == unk2_its.at(i))
+                            assert(copy(i,j) == 1.0);
+                        else {
+                            copy.set(i,j, copy(i,j)*(1.0-lambda));
+                        }
+                    }
+                }
+                return copy;
+            };
+
 static
 int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda);
 
@@ -786,18 +803,14 @@ void impute_all_the_regions(   string                                   filename
             mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags);
             auto                C_lambda    = apply_lambda(C_nolambda, lambda);
             auto                C_1e8lambda = apply_lambda(C_nolambda, 1e-8);
-            mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
+            mvn:: Matrix        c_nolambda  = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
                                                          , tag_its_
                                                          , unk2_its
-                                                         , lambda
+                                                         , 0.0
                                                          );
-            mvn:: Matrix        c_1e8lambda = make_c_unkn_tags_matrix( genotypes_for_the_tags
-                                                         , genotypes_for_the_unks
-                                                         , tag_its_
-                                                         , unk2_its
-                                                         , 1e-8
-                                                         );
+            auto c              = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, lambda);
+            auto c_1e8lambda    = apply_lambda_mat(c_nolambda, unk2_its, tag_its_, 1e-8);
 
             int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
 
