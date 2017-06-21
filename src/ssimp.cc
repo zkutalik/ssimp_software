@@ -63,7 +63,7 @@ void impute_all_the_regions(   string                                   filename
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              );
 static
-int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_nolambda);
+int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda);
 
 static
 mvn:: SquareMatrix
@@ -777,7 +777,6 @@ void impute_all_the_regions(   string                                   filename
             assert(map_of_ref_records_of_tags.size() == tag_its_.size());
 
             mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, lambda);
-            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0); // used only for the effective number of tests
             mvn:: SquareMatrix  C_1e8lambda = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
             mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
                                                          , genotypes_for_the_unks
@@ -792,7 +791,7 @@ void impute_all_the_regions(   string                                   filename
                                                          , 1e-8
                                                          );
 
-            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_nolambda);
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
 
             mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
@@ -1039,14 +1038,14 @@ mvn:: Matrix make_c_unkn_tags_matrix
     return c;
 };
 static
-int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_nolambda) {
-    int number_of_tags = C_nolambda.size();
+int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda) {
+    int number_of_tags = C_smalllambda.size();
     vector<double> eigenvalues;
 
     mvn:: VecCol eig_vals (number_of_tags);
-    // compute the eigenvalues of C. TODO: C_lambda or C_nolambda?
+    // compute the eigenvalues of C. TODO: C_lambda or C_smalllambda?
     gsl_eigen_symm_workspace * w = gsl_eigen_symm_alloc(number_of_tags);
-    auto A = C_nolambda; // copy the matrix, so that it can be destroyed by gsl_eigen_symm
+    auto A = C_smalllambda; // copy the matrix, so that it can be destroyed by gsl_eigen_symm
     int ret = gsl_eigen_symm (A.get(), eig_vals.get(), w);
     assert(ret==0);
     gsl_eigen_symm_free(w);
