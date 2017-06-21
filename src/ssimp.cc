@@ -63,6 +63,9 @@ void impute_all_the_regions(   string                                   filename
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              );
 static
+int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_nolambda);
+
+static
 mvn:: SquareMatrix
 make_C_tag_tag_matrix(
                     vector<vector<int> const *>      const & genotypes_for_the_tags
@@ -789,38 +792,7 @@ void impute_all_the_regions(   string                                   filename
             assert( (int)Cinv_c.size1() == number_of_tags );
             assert( (int)Cinv_c.size2() == number_of_all_targets );
 
-            int number_of_effective_tests_in_C_nolambda = [&C_nolambda]() {
-                int number_of_tags = C_nolambda.size();
-                vector<double> eigenvalues;
-
-                mvn:: VecCol eig_vals (number_of_tags);
-                // compute the eigenvalues of C. TODO: C_lambda or C_nolambda?
-                gsl_eigen_symm_workspace * w = gsl_eigen_symm_alloc(number_of_tags);
-                auto A = C_nolambda; // copy the matrix, so that it can be destroyed by gsl_eigen_symm
-                int ret = gsl_eigen_symm (A.get(), eig_vals.get(), w);
-                assert(ret==0);
-                gsl_eigen_symm_free(w);
-                for(int i = 0; i< utils::ssize(eig_vals); ++i)
-                    eigenvalues.push_back( eig_vals(i) );
-
-                sort(eigenvalues.rbegin(), eigenvalues.rend());
-                //using utils:: operator<<;
-                //PPe(eigenvalues);
-                auto sum_of_eigvals = std:: accumulate(eigenvalues.begin(), eigenvalues.end(), 0.0);
-                assert( std::abs(sum_of_eigvals-number_of_tags) < 1e-5 );
-                double running_total_of_eigenvalues = 0.0;
-
-                for(int i = 0; i< utils::ssize(eigenvalues); ++i) {
-                    running_total_of_eigenvalues += eigenvalues.at(i);
-                    //PPe(running_total_of_eigenvalues);
-                    if( running_total_of_eigenvalues >= 0.995 * sum_of_eigvals ) {
-                        return i+1;
-                    }
-                }
-                assert(0);
-                return -1; // never going to get here
-            }();
-            //PPe(number_of_effective_tests_in_C_nolambda);
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_nolambda);
 
             // Finally, print out the imputations
             assert(number_of_all_targets == ssize(unk2_its));
@@ -1073,6 +1045,38 @@ mvn:: Matrix make_c_unkn_tags_matrix
     }
     return c;
 };
+static
+int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_nolambda) {
+    int number_of_tags = C_nolambda.size();
+    vector<double> eigenvalues;
+
+    mvn:: VecCol eig_vals (number_of_tags);
+    // compute the eigenvalues of C. TODO: C_lambda or C_nolambda?
+    gsl_eigen_symm_workspace * w = gsl_eigen_symm_alloc(number_of_tags);
+    auto A = C_nolambda; // copy the matrix, so that it can be destroyed by gsl_eigen_symm
+    int ret = gsl_eigen_symm (A.get(), eig_vals.get(), w);
+    assert(ret==0);
+    gsl_eigen_symm_free(w);
+    for(int i = 0; i< utils::ssize(eig_vals); ++i)
+        eigenvalues.push_back( eig_vals(i) );
+
+    sort(eigenvalues.rbegin(), eigenvalues.rend());
+    //using utils:: operator<<;
+    //PPe(eigenvalues);
+    auto sum_of_eigvals = std:: accumulate(eigenvalues.begin(), eigenvalues.end(), 0.0);
+    assert( std::abs(sum_of_eigvals-number_of_tags) < 1e-5 );
+    double running_total_of_eigenvalues = 0.0;
+
+    for(int i = 0; i< utils::ssize(eigenvalues); ++i) {
+        running_total_of_eigenvalues += eigenvalues.at(i);
+        //PPe(running_total_of_eigenvalues);
+        if( running_total_of_eigenvalues >= 0.995 * sum_of_eigvals ) {
+            return i+1;
+        }
+    }
+    assert(0);
+    return -1; // never going to get here
+}
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & r
