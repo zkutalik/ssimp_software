@@ -51,6 +51,9 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 		
 `--missingness [TRUE]` logical. Enables variable sample size approach. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`. (**TBD** >> missingness is not implemented it)
 
+`--n.cores [1]` Number of cores to use.**TBD** 
+
+
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs, see section `output` below).
