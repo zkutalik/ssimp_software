@@ -880,13 +880,12 @@ void impute_all_the_regions(   string                                   filename
                 for(int j=0; j<number_of_tags; ++j) {
                     auto Nj = tag_Ns.at(j);
                     assert( Nj <= N_max );
-                    if(i!=j) {
-                        auto delta_ij = delta_function_for_missingness_policy(N_max, Nj, N_max); // *always* pass the big one in first
-                        assert(delta_ij > 0.0);
-                        assert(delta_ij <= 1.0);
-                        c_lambda.set   (i,j,  c_lambda   (i,j) * delta_ij);
-                        c_1e8lambda.set(i,j,  c_1e8lambda(i,j) * delta_ij);
-                    }
+
+                    auto delta_ij = delta_function_for_missingness_policy(N_max, Nj, N_max); // *always* pass the big one in first
+                    assert(delta_ij > 0.0);
+                    assert(delta_ij <= 1.0);
+                    c_lambda.set   (i,j,  c_lambda   (i,j) * delta_ij);
+                    c_1e8lambda.set(i,j,  c_1e8lambda(i,j) * delta_ij);
                 }
             }
             // missingness has now been applied.
