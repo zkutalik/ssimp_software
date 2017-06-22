@@ -42,8 +42,8 @@
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
 
     tests/missingness1/none/imputations.txt
-    tests/missingness1/dep/imputations.txt
-    tests/missingness1/ind/imputations.txt
+    #tests/missingness1/dep/imputations.txt
+    #tests/missingness1/ind/imputations.txt
 
     tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
     tests.compare/COMP0.txt
