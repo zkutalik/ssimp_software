@@ -1,0 +1,19 @@
+ssimp GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
+
+    GWASFILE    path to an input file .....
+    IMPUTATIONOUTPUT output file, the results ...
+    REFPANEL    If not specified, defaults to the 503 EUR individuals in 1KG
+
+See below for more details on how to download a reference panel. At least one reference panel,
+with a population structure similar to your GWAS sample, must be downloaded by you.
+
+Options:
+
+    --lambda        X
+    --log           F       Create a file F, with a copy of all the console output (stdout and stderr)
+
+
+Reference panel:
+
+
+
