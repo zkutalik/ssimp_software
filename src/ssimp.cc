@@ -813,16 +813,39 @@ void impute_all_the_regions(   string                                   filename
                 }
             }
 
-            // Compute the imputations
-            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
+            // Prepare the 'output' variables which will store all the imputations and qualities
+            mvn:: VecCol                    c_Cinv_zs(1);
+            int                             number_of_effective_tests_in_C_nolambda;
+            mvn::Matrix                     C1e8inv_c1e8(1,1);
+            reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
+            vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
 
-            // Next two lines are for the imputation quality
-            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
-            auto   C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
+            auto do_various_imp_stuff_under_one_missingness_policy = [](
+                        auto       &    c_Cinv_zs
+                    ,   int        &    number_of_effective_tests_in_C_nolambda
+                    ,   auto       &    C1e8inv_c1e8
+                    ,   auto       &    reimputed_tags_in_this_window
+                    ,   auto       &    imp_quals_corrected
+
+                    ,   auto &&         already_reimputed_the_first_non_empty_window
+
+                    ,   int const       number_of_tags
+                    ,   int const       number_of_all_targets
+                    ,   auto const &    c_lambda
+                    ,   auto const &    C_lambda
+                    ,   auto const &    c_1e8lambda
+                    ,   auto const &    C_1e8lambda
+                    ,   auto const &    tag_zs_
+                    ,   auto const &    tag_its_
+                    ,   int const N_ref
+                    ) -> void { // just 'naive' at first
+
+            // Compute the imputations
+            c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
 
 
             // if necessary, do reimputation
-            reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
+            // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
             if  (   number_of_tags > 1
                  && (   !already_reimputed_the_first_non_empty_window
                      ||  options:: opt_reimpute_tags
@@ -835,7 +858,10 @@ void impute_all_the_regions(   string                                   filename
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
 
 
-            vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
+            // Next few lines are for the imputation quality
+            number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
+            C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
+
             for(int i=0; i<number_of_all_targets; ++i) {
                 mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
                 auto imp_qual = [&](){ // multiply one vector by another, to directly get
@@ -855,6 +881,26 @@ void impute_all_the_regions(   string                                   filename
             }
             assert(number_of_all_targets == ssize(imp_quals_corrected));
 
+            };
+            do_various_imp_stuff_under_one_missingness_policy(
+                        c_Cinv_zs
+                    ,   number_of_effective_tests_in_C_nolambda
+                    ,   C1e8inv_c1e8
+                    ,   reimputed_tags_in_this_window
+                    ,   imp_quals_corrected
+
+                    ,   already_reimputed_the_first_non_empty_window
+
+                    ,   number_of_tags
+                    ,   number_of_all_targets
+                    ,   c_lambda
+                    ,   C_lambda
+                    ,   c_1e8lambda
+                    ,   C_1e8lambda
+                    ,   tag_zs_
+                    ,   tag_its_
+                    ,   N_ref
+                    );
 
             // Finally, print out everything to the --out file
             for(int i=0; i<number_of_all_targets; ++i) {
@@ -871,7 +917,7 @@ void impute_all_the_regions(   string                                   filename
                     // Is this target actually a tag SNP?
                     bool const was_in_the_GWAS = map_of_ref_records_of_tags.count(target);
 
-                    if(was_in_the_GWAS) {
+                    if(was_in_the_GWAS) { // don't print the imputation, just copy straight from the GWAS
                         auto GWAS_z = map_of_ref_records_of_tags.at(target);
                         // assert(std::abs(imp_qual-1.0) < 1e-5);
                         // assert(std::abs(GWAS_z-z_imp) < 1e-5); // TODO: breaks with 1KG/EUR + UKB-both - I should investigate this further
