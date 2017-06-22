@@ -832,22 +832,26 @@ void impute_all_the_regions(   string                                   filename
                 do_reimputation_in_this_window = true;
             }
 
-            auto do_various_imp_stuff_under_one_missingness_policy = [do_reimputation_in_this_window](
+            auto do_various_imp_stuff_under_one_missingness_policy = [](
                         auto       &    c_Cinv_zs
                     ,   int        &    number_of_effective_tests_in_C_nolambda
                     ,   auto       &    C1e8inv_c1e8
                     ,   auto       &    reimputed_tags_in_this_window
                     ,   auto       &    imp_quals_corrected
 
+                    // these next four are *copied* in, as they may be adjusted in
+                    // here in accordance with the missingness policy
+                    ,   auto const      c_lambda
+                    ,   auto const      C_lambda
+                    ,   auto const      c_1e8lambda
+                    ,   auto const      C_1e8lambda
+
                     ,   int const       number_of_tags
                     ,   int const       number_of_all_targets
-                    ,   auto const &    c_lambda
-                    ,   auto const &    C_lambda
-                    ,   auto const &    c_1e8lambda
-                    ,   auto const &    C_1e8lambda
                     ,   auto const &    tag_zs_
                     ,   auto const &    tag_its_
                     ,   int const N_ref
+                    ,   bool    const   do_reimputation_in_this_window
                     ) -> void { // just 'naive' at first
 
             // Compute the imputations
@@ -888,21 +892,27 @@ void impute_all_the_regions(   string                                   filename
 
             };
             do_various_imp_stuff_under_one_missingness_policy(
+                    // the five 'output' parameters - into which the imputations (and so on) will be stored.
                         c_Cinv_zs
                     ,   number_of_effective_tests_in_C_nolambda
                     ,   C1e8inv_c1e8
                     ,   reimputed_tags_in_this_window
                     ,   imp_quals_corrected
 
-                    ,   number_of_tags
-                    ,   number_of_all_targets
+                    // these next four wil be copied in, in order that they
+                    // can be adjusted according to the missingness policy
                     ,   c_lambda
                     ,   C_lambda
                     ,   c_1e8lambda
                     ,   C_1e8lambda
+
+                    // last few args are const ref - pure input parameters
+                    ,   number_of_tags
+                    ,   number_of_all_targets
                     ,   tag_zs_
                     ,   tag_its_
                     ,   N_ref
+                    ,   do_reimputation_in_this_window
                     );
 
             // Finally, print out everything to the --out file
