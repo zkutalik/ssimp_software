@@ -451,7 +451,7 @@ void impute_all_the_regions(   string                                   filename
     }
 
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
-    bool already_reimputed_the_first_non_empty_window = false;
+    int number_of_windows_seen_so_far_with_at_least_two_tags = 0; // useful to help decide when to do reimputation
     for(int chrm =  1; chrm <= 22; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
@@ -739,6 +739,9 @@ void impute_all_the_regions(   string                                   filename
 
             // We now have at least one tag, and at least one target, so we can proceed
 
+            if  (number_of_tags > 1)
+                ++number_of_windows_seen_so_far_with_at_least_two_tags;
+
             // TODO: I still am including all the tags among the targets - change this?
 
             cout
@@ -820,14 +823,21 @@ void impute_all_the_regions(   string                                   filename
             reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
             vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
 
-            auto do_various_imp_stuff_under_one_missingness_policy = [](
+            bool do_reimputation_in_this_window = false;
+            if  (   number_of_tags > 1
+                 && (   number_of_windows_seen_so_far_with_at_least_two_tags == 1 // this is the first such window
+                     ||  options:: opt_reimpute_tags // if true, do reimputation in all such windows, not just the first one
+                    )
+                ) {
+                do_reimputation_in_this_window = true;
+            }
+
+            auto do_various_imp_stuff_under_one_missingness_policy = [do_reimputation_in_this_window](
                         auto       &    c_Cinv_zs
                     ,   int        &    number_of_effective_tests_in_C_nolambda
                     ,   auto       &    C1e8inv_c1e8
                     ,   auto       &    reimputed_tags_in_this_window
                     ,   auto       &    imp_quals_corrected
-
-                    ,   auto &&         already_reimputed_the_first_non_empty_window
 
                     ,   int const       number_of_tags
                     ,   int const       number_of_all_targets
@@ -846,12 +856,7 @@ void impute_all_the_regions(   string                                   filename
 
             // if necessary, do reimputation
             // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
-            if  (   number_of_tags > 1
-                 && (   !already_reimputed_the_first_non_empty_window
-                     ||  options:: opt_reimpute_tags
-                    )
-                ) {
-                already_reimputed_the_first_non_empty_window = true;
+            if  (do_reimputation_in_this_window) {
                 reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), tag_zs_, tag_its_);
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
@@ -888,8 +893,6 @@ void impute_all_the_regions(   string                                   filename
                     ,   C1e8inv_c1e8
                     ,   reimputed_tags_in_this_window
                     ,   imp_quals_corrected
-
-                    ,   already_reimputed_the_first_non_empty_window
 
                     ,   number_of_tags
                     ,   number_of_all_targets
