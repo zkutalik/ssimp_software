@@ -413,6 +413,7 @@ void impute_all_the_regions(   string                                   filename
         string      m_all_ref; // effect allele
         string      m_all_alt;
         double      m_z;
+        double      m_N;
 
         bool operator< (one_tag_data const & other) const {
             if(m_chrpos     != other.m_chrpos   ) return m_chrpos   < other.m_chrpos    ;
@@ -1017,15 +1018,19 @@ void impute_all_the_regions(   string                                   filename
 
             if(!options:: opt_tags_used_output.empty()) {
                 assert(tag_its_.size() == tag_zs_.size());
-                range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
+                range:: zip_val ( from:: vector(tag_its_)
+                                , from:: vector(tag_zs_)
+                                , from:: vector(tag_Ns)
+                                )
                 |action::unzip_foreach|
-                [&](auto && tag_refrecord, auto && z) {
+                [&](auto && tag_refrecord, auto z, auto N) {
                     one_tag_data otd {
                         tag_refrecord->ID
                             , {chrm, tag_refrecord->pos}
                         , tag_refrecord->ref
                         , tag_refrecord->alt
                         , z
+                        , N
                     };
                     tag_data_used.push_back(otd);
                 };
@@ -1052,6 +1057,7 @@ void impute_all_the_regions(   string                                   filename
             << '\t' << "effect_allele"
             << '\t' << "other_allele"
             << '\t' << "z"
+            << '\t' << "N"
             << '\n'
             ;
         for(auto && otd : tag_data_used) {
@@ -1062,6 +1068,7 @@ void impute_all_the_regions(   string                                   filename
             << '\t' << otd.m_all_ref
             << '\t' << otd.m_all_alt
             << '\t' << otd.m_z
+            << '\t' << otd.m_N
             << '\n';
         }
     }
