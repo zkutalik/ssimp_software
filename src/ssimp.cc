@@ -802,13 +802,19 @@ void impute_all_the_regions(   string                                   filename
             // Apply lambda
             auto                C_lambda        = apply_lambda_square(C_nolambda, lambda);
             auto                C_1e8lambda     = apply_lambda_square(C_nolambda, 1e-8);
-            auto                c               = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
+            auto                c_lambda        = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
             auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, 1e-8);
 
 
+            if(options:: opt_missingness) {
+                for(double n : tag_Ns) {
+                    n > 1 || DIE("--missingness requires n>1. [" << n << "]");
+                    assert( n <= N_max );
+                }
+            }
+
             // Compute the imputations
-            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_));
-            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
+            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
 
             // Next two lines are for the imputation quality
             int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
@@ -827,11 +833,6 @@ void impute_all_the_regions(   string                                   filename
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
-
-            if(options:: opt_missingness) {
-                using utils:: operator<<;
-                PP(tag_Ns);
-            }
 
 
             mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
