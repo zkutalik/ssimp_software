@@ -839,20 +839,56 @@ void impute_all_the_regions(   string                                   filename
                     ,   auto       &    reimputed_tags_in_this_window
                     ,   auto       &    imp_quals_corrected
 
+                    ,   std:: function<double(double Nbig,double Nsml,double Nmax)>     delta_function_for_missingness_policy
+
                     // these next four are *copied* in, as they may be adjusted in
                     // here in accordance with the missingness policy
-                    ,   auto const      c_lambda
-                    ,   auto const      C_lambda
-                    ,   auto const      c_1e8lambda
-                    ,   auto const      C_1e8lambda
+                    ,   auto            c_lambda
+                    ,   auto            C_lambda
+                    ,   auto            c_1e8lambda
+                    ,   auto            C_1e8lambda
 
                     ,   int const       number_of_tags
                     ,   int const       number_of_all_targets
                     ,   auto const &    tag_zs_
                     ,   auto const &    tag_its_
+                    ,   auto const &    tag_Ns
                     ,   int const N_ref
                     ,   bool    const   do_reimputation_in_this_window
+                    ,   int const N_max
                     ) -> void { // just 'naive' at first
+                        (void)N_max;
+
+            // First, apply the missingness policy. Two matrices must be looped over
+            for(int i=0; i<number_of_tags; ++i) {
+                for(int j=0; j<number_of_tags; ++j) {
+                    auto Ni = tag_Ns.at(i);
+                    auto Nj = tag_Ns.at(j);
+                    auto Nbig = std::max(Ni,Nj);
+                    auto Nsml = std::min(Ni,Nj);
+                    if(i!=j) {
+                        auto delta_ij = delta_function_for_missingness_policy(Nbig, Nsml, N_max); // *always* pass the big one in first
+                        C_lambda.set   (i,j,  C_lambda   (i,j) * delta_ij);
+                        C_1e8lambda.set(i,j,  C_1e8lambda(i,j) * delta_ij);
+                    }
+                }
+            }
+            assert(c_lambda.size1() == (size_t)number_of_all_targets); // number of rows
+            assert(c_lambda.size2() == (size_t)number_of_tags); // number of columns
+            for(int i=0; i<number_of_all_targets; ++i) {
+                for(int j=0; j<number_of_tags; ++j) {
+                    auto Nj = tag_Ns.at(j);
+                    assert( Nj <= N_max );
+                    if(i!=j) {
+                        auto delta_ij = delta_function_for_missingness_policy(N_max, Nj, N_max); // *always* pass the big one in first
+                        assert(delta_ij > 0.0);
+                        assert(delta_ij <= 1.0);
+                        c_lambda.set   (i,j,  c_lambda   (i,j) * delta_ij);
+                        c_1e8lambda.set(i,j,  c_1e8lambda(i,j) * delta_ij);
+                    }
+                }
+            }
+            // missingness has now been applied.
 
             // Compute the imputations
             c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
@@ -899,6 +935,10 @@ void impute_all_the_regions(   string                                   filename
                     ,   reimputed_tags_in_this_window
                     ,   imp_quals_corrected
 
+                    // missingness policy
+                    ,   [](double , double , double) -> double { return  1.0; } // don't adjust C - just ignoring missingness for now
+                    //,   [](double Nbig, double Nsml, doule /*Nmax*/) -> double { assert(Nbig >= Nsml); return  std::sqrt(Nsml/Nbig); } // assume maximum correlation in missingness
+
                     // these next four wil be copied in, in order that they
                     // can be adjusted according to the missingness policy
                     ,   c_lambda
@@ -911,8 +951,10 @@ void impute_all_the_regions(   string                                   filename
                     ,   number_of_all_targets
                     ,   tag_zs_
                     ,   tag_its_
+                    ,   tag_Ns
                     ,   N_ref
                     ,   do_reimputation_in_this_window
+                    ,   N_max
                     );
 
             // Finally, print out everything to the --out file
