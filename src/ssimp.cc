@@ -809,7 +809,7 @@ void impute_all_the_regions(   string                                   filename
             auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, 1e-8);
 
 
-            if(options:: opt_missingness) {
+            if(options:: opt_missingness != options:: opt_missingness_t:: NAIVE) {
                 for(double n : tag_Ns) {
                     n > 1 || DIE("--missingness requires n>1. [" << n << "]");
                     assert( n <= N_max );
@@ -927,6 +927,16 @@ void impute_all_the_regions(   string                                   filename
             assert(number_of_all_targets == ssize(imp_quals_corrected));
 
             };
+
+            std:: function<double(double,double,double)> current_missingness_policy;
+            switch(options:: opt_missingness) {
+                break;  case options:: opt_missingness_t:: NAIVE:
+                    current_missingness_policy = [](double , double , double) -> double { return  1.0; }; // don't adjust C - just ignoring missingness for now
+                break;  case options:: opt_missingness_t:: DEPENDENCY_MAXIMUM:
+                    current_missingness_policy = [](double Nbig, double Nsml, double /*Nmax*/) -> double { assert(Nbig >= Nsml); return  std::sqrt(Nsml/Nbig); }; // assume maximum correlation in missingness
+                break;  case options:: opt_missingness_t:: INDEPENDENCE:
+                    current_missingness_policy = [](double Nbig, double Nsml, double Nmax) -> double { return  std::sqrt(Nsml)*std::sqrt(Nbig)/Nmax; };
+            }
             do_various_imp_stuff_under_one_missingness_policy(
                     // the five 'output' parameters - into which the imputations (and so on) will be stored.
                         c_Cinv_zs
@@ -936,8 +946,8 @@ void impute_all_the_regions(   string                                   filename
                     ,   imp_quals_corrected
 
                     // missingness policy
-                    ,   [](double , double , double) -> double { return  1.0; } // don't adjust C - just ignoring missingness for now
-                    //,   [](double Nbig, double Nsml, doule /*Nmax*/) -> double { assert(Nbig >= Nsml); return  std::sqrt(Nsml/Nbig); } // assume maximum correlation in missingness
+                    ,   current_missingness_policy
+
 
                     // these next four wil be copied in, in order that they
                     // can be adjusted according to the missingness policy

@@ -28,7 +28,8 @@ extern  bool                    opt_reimpute_tags;
 extern  std:: string            opt_tags_used_output;
 
 extern  std:: string            opt_sample_names;
-extern  bool                    opt_missingness;
+enum class opt_missingness_t { NAIVE, DEPENDENCY_MAXIMUM, INDEPENDENCE };
+extern  opt_missingness_t       opt_missingness;
 
 
 extern  std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;

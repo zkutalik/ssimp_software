@@ -44,7 +44,7 @@ namespace options {
         std:: string            opt_tags_used_output;
 
         std:: string            opt_sample_names;
-        bool                    opt_missingness;
+        opt_missingness_t       opt_missingness;
 
 
         std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
@@ -70,7 +70,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"sample.names"       ,  required_argument, 0, 15 },
             {"tags.used.output"   ,  required_argument, 0, 16 },
             {"log"                ,  required_argument, 0, 17 },
-            {"missingness"        ,        no_argument, 0, 18 },
+            {"missingness"        ,  required_argument, 0, 18 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -158,7 +158,19 @@ void read_in_all_command_line_options(int argc, char **argv) {
         }
         if (c == 18) {
             assert(string("missingness") == long_options[long_option_index].name);
-            options::  opt_missingness = true;
+            if(false) {}
+            else if(string("none") == optarg) {
+                options::  opt_missingness = opt_missingness_t:: NAIVE;
+            }
+            else if(string("dep") == optarg) {
+                options::  opt_missingness = opt_missingness_t:: DEPENDENCY_MAXIMUM;
+            }
+            else if(string("ind") == optarg) {
+                options::  opt_missingness = opt_missingness_t:: INDEPENDENCE;
+            }
+            else {
+                DIE("--missingness argument ([" << optarg << "]) not understood. Valid values: dep,ind,none");
+            }
         }
     }
 }
