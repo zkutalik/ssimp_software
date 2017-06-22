@@ -1,14 +1,16 @@
 list(rm = ls())
 
 ## chromosome to impute
-chr <- 22
+args <- commandArgs(trailingOnly = TRUE)
+chr <- as.numeric(as.character(args[1])) ## counter
+
 
 ## record start time
 ## ---------------
 start.time <- Sys.time()
 
 ## print log file
-sink(paste0("log_start_chr",chr,".txt"))
+sink(paste0("tmp_runtime_chr",chr,".txt"))
 cat("starting time:\n")
 print(start.time)
 sink()
@@ -28,16 +30,18 @@ sink()
 ##system("../bin/ssimp --gwas /data/sgg/sina/public.data/meta.summaries/meta.giant/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt --impute.snp impute.snp2 --wind 250000 --flan 250000 --out test.ssimp.txt")
 
 ## impute wood with 1KG, but only chr 22
-system(paste0("../bin/ssimp --gwas /data/sgg/sina/public.data/meta.summaries/meta.giant/wood.txt --impute.range ",chr))
+path.data <- "/data/sgg/sina/data/project.imputation/ssimp.runtime/"
+system(paste0("../bin/ssimp --gwas ", path.data, "wood.txt --out ", path.data, "wood_ssimp_chr",chr,".txt --impute.range ",chr))
 
 ## record end time
 ## ---------------
 end.time <- Sys.time()
 
 ## print log file
-sink(paste0("log_chr",chr,".txt"))
-cat("starting:\n")
-print(start.time)
-cat("ending:\n")
-print(end.time)
-sink()
+library(readr)
+out <- data.frame(chr =chr,start.time = as.character(start.time), end.time =as.character(end.time))
+write_tsv(out, path=paste0("runtime_chr",chr,".txt"))
+
+
+
+system(paste0("rm tmp_runtime_chr",chr,".txt"))

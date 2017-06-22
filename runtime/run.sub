@@ -1,13 +1,18 @@
 #!/bin/bash
 
-#$ -N r.ukbb.imputation
+#$ -N runtime
 #$ -S /bin/bash
 #$ -cwd
 #$ -j y
 #$ -m eas
 #$ -v DISPLAY
 
-nice -n20 ionice -c 3 /data/sgg/sina/software/R-compiled/bin/Rscript runtime_fullgenome.R
-echo "finished imputation"
+
+for i in {2..22}
+do
+    nice -n20 ionice -c 3 /data/sgg/sina/software/R-compiled/bin/Rscript runtime_fullgenome.R $i
+echo "finished imputation chr $1"
+
+done
 
 
