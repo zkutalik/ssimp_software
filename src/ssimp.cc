@@ -410,8 +410,8 @@ void impute_all_the_regions(   string                                   filename
                              * this is *not* used for actual imputation. */
         string      m_ID; // might be blank
         chrpos      m_chrpos;
-        string      m_all_ref; // effect allele
-        string      m_all_alt;
+        string      m_all_ref; // a1, other_allele , ...
+        string      m_all_alt; // a2, effect_allele , ...
         double      m_z;
         double      m_N;
 
@@ -1054,8 +1054,8 @@ void impute_all_the_regions(   string                                   filename
                     << "ID"
             << '\t' << "Chr"
             << '\t' << "Pos"
-            << '\t' << "effect_allele"
-            << '\t' << "other_allele"
+            << '\t' << gwas->get_column_name_allele_ref() // copy column name from the GWAS input
+            << '\t' << gwas->get_column_name_allele_alt() // copy column name from the GWAS input
             << '\t' << "z"
             << '\t' << "N"
             << '\n'
