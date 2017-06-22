@@ -835,7 +835,26 @@ void impute_all_the_regions(   string                                   filename
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
 
 
-            mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
+            vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
+            for(int i=0; i<number_of_all_targets; ++i) {
+                mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
+                auto imp_qual = [&](){ // multiply one vector by another, to directly get
+                                        // the diagonal of the imputation quality matrix.
+                                        // This should be quicker than fully computing
+                                        // c' * inv(C) * c
+                    auto lhs = gsl_matrix_const_submatrix(   c_1e8lambda.get(), i, 0, 1, number_of_tags);
+                    auto rhs = gsl_matrix_const_submatrix( C1e8inv_c1e8 .get(), 0, i, number_of_tags, 1);
+                    // TODO: Maybe move the next line into mvn.{hh,cc}?
+                    const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
+                    assert(res_0 == 0);
+                    auto simple_imp_qual = to_store_one_imputation_quality(0,0);
+                    //PPe(N_ref, simple_imp_qual);
+                    return 1.0 - (1.0-simple_imp_qual)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
+                }();
+                imp_quals_corrected.push_back(imp_qual);
+            }
+            assert(number_of_all_targets == ssize(imp_quals_corrected));
+
 
             // Finally, print out everything to the --out file
             for(int i=0; i<number_of_all_targets; ++i) {
@@ -843,19 +862,7 @@ void impute_all_the_regions(   string                                   filename
                     auto pos  = target->pos;
                     auto SNPname = target->ID;
 
-                    auto imp_qual = [&](){ // multiply one vector by another, to directly get
-                                            // the diagonal of the imputation quality matrix.
-                                            // This should be quicker than fully computing
-                                            // c' * inv(C) * c
-                        auto lhs = gsl_matrix_const_submatrix(   c_1e8lambda.get(), i, 0, 1, number_of_tags);
-                        auto rhs = gsl_matrix_const_submatrix( C1e8inv_c1e8 .get(), 0, i, number_of_tags, 1);
-                        // TODO: Maybe move the next line into mvn.{hh,cc}?
-                        const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
-                        assert(res_0 == 0);
-                        auto simple_imp_qual = to_store_one_imputation_quality(0,0);
-                        //PPe(N_ref, simple_imp_qual);
-                        return 1.0 - (1.0-simple_imp_qual)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
-                    }();
+                    auto imp_qual = imp_quals_corrected.at(i);
 
                     auto z_imp = c_Cinv_zs(i);
                     double Z_reimputed = std::nan("");
@@ -866,10 +873,8 @@ void impute_all_the_regions(   string                                   filename
 
                     if(was_in_the_GWAS) {
                         auto GWAS_z = map_of_ref_records_of_tags.at(target);
-
                         // assert(std::abs(imp_qual-1.0) < 1e-5);
                         // assert(std::abs(GWAS_z-z_imp) < 1e-5); // TODO: breaks with 1KG/EUR + UKB-both - I should investigate this further
-
                         imp_qual = 1.0;
                         z_imp = GWAS_z;
 
