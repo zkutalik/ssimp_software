@@ -23,7 +23,7 @@ extern  double                  opt_impute_maf/* =0.0*/; // target not imputed u
 extern  std:: string            opt_tags_range;
 extern  std:: string            opt_tag_snps;
 extern  std::unique_ptr<std::unordered_set<std::string>>    opt_tag_snps_as_a_uset;
-extern  double                  opt_tags_maf/* =0.0*/;
+extern  double                  opt_tag_maf/* =0.0*/;
 
 extern  bool                    opt_reimpute_tags;
 extern  std:: string            opt_tags_used_output;

@@ -275,8 +275,9 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
 enum class enum_tag_or_impute_t { TAG, IMPUTE };
 static
 bool    test_if_skip(enum_tag_or_impute_t toi, RefRecord const &rr, int chrm) {
-    auto & up_snps = toi == enum_tag_or_impute_t::TAG ? options:: opt_tag_snps_as_a_uset : options:: opt_impute_snps_as_a_uset;
 
+    // First, deal with --impute.snps or --tag.snps
+    auto & up_snps = toi == enum_tag_or_impute_t::TAG ? options:: opt_tag_snps_as_a_uset : options:: opt_impute_snps_as_a_uset;
     if  (       up_snps ) {
         if (    up_snps->count( rr.ID ) == 0
              && up_snps->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rr.pos)) == 0
@@ -284,6 +285,15 @@ bool    test_if_skip(enum_tag_or_impute_t toi, RefRecord const &rr, int chrm) {
             return true;
         }
     }
+
+    // Next, deal with --impute.maf or --tag.maf
+    auto & up_maf   = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_maf
+                    : options:: opt_impute_maf;
+    if  ( rr.maf < up_maf ) {
+            return true;
+    }
+
     return false;
 }
 
