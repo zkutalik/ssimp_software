@@ -171,6 +171,53 @@ EOF
         mv /tmp/chr${chrm}.vcf.gz.tbi   ref/sub1KG-chr19/chr${chrm}.vcf.gz.tbi
 }
 
+#ref/1kg.just.EUR/chr22.17750K.19250K.vcf.gz
+                ref/1kg.just.${pop}/chr${chrm}.${posf}.${post}.vcf.gz
+{
+export  target="ref/1kg.just.${pop}/chr${chrm}.${posf}.${post}.vcf.gz"
+    ls -l ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
+
+    mkdir -p "$(dirname "$target")"
+
+    egrep ${pop} ref/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel | cut -f1 > "$target".sample_ids
+    wc -l "$target".sample_ids
+    zcat ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz |
+        egrep '^#CHROM' -m1 | tr '\t' '\n' |
+        egrep -n -f "$target".sample_ids   |
+        cut -d: -f1   >  "$target".sample_cols
+    { echo -n 'cut -f 1-9,'; < "$target".sample_cols tr '\n' , | sed -re 's/,$//' ; }  >  "$target".sample_cut_script
+    {
+        echo -n "awk '(NR>1 && \$2>="
+        echo $post | sed -re 's/K/000/' | tr -d '\n'
+        echo -n "){exit};  (NR==1 || \$2 >= "
+        echo $posf | sed -re 's/K/000/' | tr -d '\n'
+        echo -n ")'"
+    } > "$target".sample_awk_script
+    echo
+    cat "$target".sample_cut_script
+    echo
+    cat "$target".sample_awk_script
+    echo
+    echo --
+    zcat ref/link.to.1kg.data/ALL.chr${chrm}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz |
+        egrep -v '^##' |
+        bash "$target".sample_awk_script |
+        bash "$target".sample_cut_script |
+        tawk 'NR>1 {$8="."} ; 1'         |
+        1head egrep -v 'GT((.0\|0)+|(.1\|1)+)$' |
+        bgzip > "$target".tmp
+
+    rm "$target".sample_awk_script
+    rm "$target".sample_cut_script
+    rm "$target".sample_cols
+    rm "$target".sample_ids
+
+    tabix -p vcf    "$target".tmp
+    mv              "$target".tmp       "$target"
+    mv              "$target".tmp.tbi   "$target".tbi
+    ls -l           "$target"*
+}
+
 tests.compare       { mkdir -p tests.compare }
 @mkdirfile..${path} {
     mkdir -p "$(dirname "${path}")"
