@@ -466,7 +466,8 @@ void impute_all_the_regions(   string                                   filename
                         break;
                     }
 
-                    if  (   false // TODO skip
+                    if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE, rr , chrm)
+                         && test_if_skip( enum_tag_or_impute_t:: TAG   , rr , chrm)
                         )
                     { /* skip this entirely as it's neither useful as a tag nor a target */ }
                     else {
