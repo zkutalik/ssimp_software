@@ -1,6 +1,15 @@
-none    = readDT('none/imputations.txt', '\t', T)[source=='GWAS']
-dep     = readDT('dep/imputations.txt' , '\t', T)[source=='GWAS']
-ind     = readDT('ind/imputations.txt' , '\t', T)[source=='GWAS']
+none    =           readDT('none/imputations.txt', '\t', T
+                           , col_types = readr::cols( Z_reimputed = 'd', r2_reimputed = 'd' )
+                           )[source=='GWAS']
+dep     %just.once% readDT('dep/imputations.txt' , '\t', T)[source=='GWAS']
+ind     %just.once% readDT('ind/imputations.txt' , '\t', T)[source=='GWAS']
+
+pp(do.call("cbind",sapply(none,class)))
+lkj
+
+na.fail(none)
+na.fail(dep)
+na.fail(ind)
 
 stopifnot(none[,.(chr,pos,Allele1,Allele2,z_imp)] == dep[,.(chr,pos,Allele1,Allele2,z_imp)])
 stopifnot(none[,.(chr,pos,Allele1,Allele2,z_imp)] == ind[,.(chr,pos,Allele1,Allele2,z_imp)])
