@@ -26,14 +26,12 @@
     tests/impute.range/chr1_1000000-chr1_2000000/imputations.txt
     tests/impute.range/chr2-3/imputations.txt
     tests/impute.range/chr2/imputations.txt
-    tests/impute.snps/a.list.of.snps/imputations.txt
     tests/impute.maf/0.05/imputations.txt
     tests/tags.maf/tags.maf.0.01/imputations.txt
 
     tests/tags.range/chr1_1000000-chr1_2000000/imputations.txt
     tests/tags.range/chr2-3/imputations.txt
     tests/tags.range/chr2/imputations.txt
-    tests/tags.snps/a.list.of.snps/imputations.txt
 
     tests/sub1KG-tiny/EUR.via.filter.all22..impute.snps/imputations.txt
     tests/sub1KG-tiny/EUR.via.filter.all22..tag.snps/imputations.txt
