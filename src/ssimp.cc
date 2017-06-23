@@ -272,11 +272,14 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
 }
 #endif
 
+enum class enum_tag_or_impute_t { TAG, IMPUTE };
 static
-bool    test_if_skip_tag(RefRecord const &rr, int chrm) { // return true if this should be skipped as a tag
-    if  ( options:: opt_tag_snps_as_a_uset ) {
-        if (    options:: opt_tag_snps_as_a_uset->count( rr.ID ) == 0
-             && options:: opt_tag_snps_as_a_uset->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rr.pos)) == 0
+bool    test_if_skip(enum_tag_or_impute_t toi, RefRecord const &rr, int chrm) {
+    auto & up_snps = toi == enum_tag_or_impute_t::TAG ? options:: opt_tag_snps_as_a_uset : options:: opt_impute_snps_as_a_uset;
+
+    if  (       up_snps ) {
+        if (    up_snps->count( rr.ID ) == 0
+             && up_snps->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rr.pos)) == 0
              ) {
             return true;
         }
@@ -550,7 +553,7 @@ void impute_all_the_regions(   string                                   filename
                         assert( current_ref.pos == crps.pos );
 
                         // apply --tag.snps
-                        if( test_if_skip_tag( current_ref , chrm) ) {
+                        if( test_if_skip( enum_tag_or_impute_t:: TAG, current_ref , chrm) ) {
                             continue;
                         }
                         if(false) { // TODO skip --tag.maf
@@ -604,10 +607,9 @@ void impute_all_the_regions(   string                                   filename
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
 
                     // apply --impute.snps
-                    if  (   options:: opt_impute_snps_as_a_uset
-                         && options:: opt_impute_snps_as_a_uset->count( it->ID ) == 0
-                        )
+                    if( test_if_skip( enum_tag_or_impute_t:: IMPUTE, *it , chrm) ) {
                         continue;
+                    }
                     // TODO skip --impute.maf
                     // TODO skip --impute.range
 
