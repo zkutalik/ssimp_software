@@ -7,5 +7,5 @@
     --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
-    --impute.range 1:18016492-22:18482599                                           \
+    --impute.range chr1:18016492-CHR22:18482599                                           \
     >     "$OUTPUT"
