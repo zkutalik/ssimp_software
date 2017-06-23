@@ -230,3 +230,12 @@ tests.compare       { mkdir -p tests.compare }
 @mkdirfile..${path} {
     mkdir -p "$(dirname "${path}")"
 }
+
+                tests/full1KG.EUR.Wood/chr${CHRM}/command : tests.stu tests/full1KG.EUR.Wood/command.template {
+    mkdir -p    tests/full1KG.EUR.Wood/chr${CHRM}
+    sleep 1
+    {
+        echo   CHRM="${CHRM}"
+        cat     tests/full1KG.EUR.Wood/command.template
+    } >         tests/full1KG.EUR.Wood/chr${CHRM}/command
+}
