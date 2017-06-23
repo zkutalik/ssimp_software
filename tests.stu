@@ -35,6 +35,14 @@
     tests/tags.range/chr2/imputations.txt
     tests/tags.snps/a.list.of.snps/imputations.txt
 
+    tests/sub1KG-tiny/EUR.via.filter.all22..impute.snps/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..tag.snps/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..impute.maf/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..tag.maf/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..impute.range/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..tag.range/imputations.txt
+
+
     tests/swapping/swap.just.the.allele.headers/imputations.txt
     tests/swapping/swap.some.alleles/imputations.txt
     tests/swapping/swap.some.alleles.and.their.zs/imputations.txt
