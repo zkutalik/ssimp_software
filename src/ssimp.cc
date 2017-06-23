@@ -332,6 +332,26 @@ bool    test_if_skip(enum_tag_or_impute_t toi, RefRecord const &rr, int chrm) {
 
     return false;
 }
+static
+bool    test_if_skip(enum_tag_or_impute_t toi, chrpos l, chrpos u) {
+    // 'l' and 'u' represent a window, or an entire chromosome.
+    // We check here if --{impute,tag}.range is willing to skip
+    // everything between l and u
+
+    auto & up_range = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_range
+                    : options:: opt_impute_range;
+    if(!up_range.empty()) {
+        auto up_range_parsed =  parse_range_as_pair_of_chrpos(up_range);
+        using utils:: operator<<;
+        if( u < up_range_parsed.first )
+            return true;
+        if( l > up_range_parsed.second )
+            return true;
+    }
+
+    return false;
+}
 
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
@@ -408,7 +428,20 @@ void impute_all_the_regions(   string                                   filename
     for(int chrm =  1; chrm <= 22; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
-        // TODO skip. Skip entire chromosome?
+        { // *optional* checks to help efficiency. Not necessary for correctness
+
+        /* Skip entire chromosome? if --tags.range *or* --impute.range want
+         * to skip this entire chromosome, then do it.
+         */
+            auto lowest_in_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::lowest() };
+            auto    max_in_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::max()    };
+            if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE
+                        , lowest_in_this_chromosome, max_in_this_chromosome)
+                 || test_if_skip( enum_tag_or_impute_t:: TAG
+                        , lowest_in_this_chromosome, max_in_this_chromosome)
+                )
+                continue;
+        }
 
         tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
@@ -599,13 +632,9 @@ void impute_all_the_regions(   string                                   filename
                         auto & current_ref = ref_candidates.front_ref();
                         assert( current_ref.pos == crps.pos );
 
-                        // apply --tag.snps
+                        // apply --tag.{snps,maf,range}
                         if( test_if_skip( enum_tag_or_impute_t:: TAG, current_ref , chrm) ) {
                             continue;
-                        }
-                        if(false) { // TODO skip --tag.maf
-                                    // TODO skip --tag.range
-                            //continue; // this tag skipped due to --tags.maf or --tags.range or --tags.snps
                         }
 
                         auto dir = decide_on_a_direction( current_ref
@@ -653,12 +682,10 @@ void impute_all_the_regions(   string                                   filename
                                                             ,   chrpos{chrm,current_window_end});
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
 
-                    // apply --impute.snps
+                    // apply --impute.{snps,maf,range}
                     if( test_if_skip( enum_tag_or_impute_t:: IMPUTE, *it , chrm) ) {
                         continue;
                     }
-                    // TODO skip --impute.maf
-                    // TODO skip --impute.range
 
                     auto const & z12_for_this_SNP = it->z12;
                     auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
