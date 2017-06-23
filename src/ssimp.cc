@@ -87,9 +87,12 @@ using reimputed_tags_in_this_window_t = std:: unordered_map< RefRecord const * ,
 static
 reimputed_tags_in_this_window_t
 reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
-                                ,   mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C1e8_inv
                                 , std:: vector<double> const & tag_zs_
                                 , std:: vector<RefRecord const *> const & rrs
+                                , int const N_ref
+                                , int const number_of_effective_tests_in_C_nolambda
                                 );
 
 enum class which_direction_t { DIRECTION_SHOULD_BE_REVERSED
@@ -898,7 +901,7 @@ void impute_all_the_regions(   string                                   filename
             // if necessary, do reimputation
             // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
             if  (do_reimputation_in_this_window) {
-                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), tag_zs_, tag_its_);
+                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_1e8lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
@@ -1292,9 +1295,12 @@ static
 static
 reimputed_tags_in_this_window_t
 reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
-                                ,   mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C1e8_inv
                                 , std:: vector<double> const & zs
                                 , std:: vector<RefRecord const *> const & rrs
+                                , int const N_ref
+                                , int const number_of_effective_tests_in_C_nolambda
                                 ) {
     assert(C.size() == zs.size());
     assert(C.size() == C_inv.size());
@@ -1317,7 +1323,26 @@ reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
 
             auto x = multiply_rowvec_by_colvec_giving_scalar( vec, mvn:: make_VecCol(zs) )(0) ;
             auto y =C_inv(m,m);
-            return std:: make_pair(- x / y, C(m,m)-1.0/y);
+
+            auto reimp = -x/y;
+            auto iq_lambda_simple = C(m,m)-1.0/y; // we won't actually report this any more
+
+            // to do the '#effective tests' calculation of IQ, we need to start with the
+            // simple IQ, *but* with negligible lamdba
+
+            assert(C(m,m) == 1);
+            auto y_1e8 =C1e8_inv(m,m);
+            auto iq_1e8_simple = 1-1.0/y_1e8; // we won't actually report this any more
+
+            auto iq_1e8_effective = 1.0 - (1.0-iq_1e8_simple)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
+
+            (void)iq_lambda_simple;
+            (void)iq_1e8_effective;
+
+            return std:: make_pair(reimp
+                    //, iq_lambda_simple
+                    , iq_1e8_effective
+                    );
         }();
         reimputed_tags_z .push_back(z_fast.first);
         reimputed_tags_r2.push_back(z_fast.second);
