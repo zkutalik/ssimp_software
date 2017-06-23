@@ -1,0 +1,183 @@
+file_name:gwas/too.big/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
+options:: opt_window_width,options:: opt_flanking_width:	1'000'000 , 250'000
+N_reference:503
+
+chrm22	   16'000'000-17'000'000
+      93 # GWAS     SNPs in this window (with 250'000 flanking)
+      75 # SNPs in both (i.e. useful as tags)
+   4'503 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   17'000'000-18'000'000
+   1'092 # GWAS     SNPs in this window (with 250'000 flanking)
+     929 # SNPs in both (i.e. useful as tags)
+   9'332 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   18'000'000-19'000'000
+   1'291 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'118 # SNPs in both (i.e. useful as tags)
+   9'066 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   19'000'000-20'000'000
+   1'393 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'189 # SNPs in both (i.e. useful as tags)
+   9'552 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   20'000'000-21'000'000
+     918 # GWAS     SNPs in this window (with 250'000 flanking)
+     802 # SNPs in both (i.e. useful as tags)
+   6'593 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   21'000'000-22'000'000
+     843 # GWAS     SNPs in this window (with 250'000 flanking)
+     733 # SNPs in both (i.e. useful as tags)
+   6'210 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   22'000'000-23'000'000
+   1'000 # GWAS     SNPs in this window (with 250'000 flanking)
+     856 # SNPs in both (i.e. useful as tags)
+  11'132 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   23'000'000-24'000'000
+   1'122 # GWAS     SNPs in this window (with 250'000 flanking)
+     958 # SNPs in both (i.e. useful as tags)
+  12'079 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   24'000'000-25'000'000
+   1'067 # GWAS     SNPs in this window (with 250'000 flanking)
+     930 # SNPs in both (i.e. useful as tags)
+   8'815 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   25'000'000-26'000'000
+   1'230 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'084 # SNPs in both (i.e. useful as tags)
+  10'309 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   26'000'000-27'000'000
+   1'844 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'602 # SNPs in both (i.e. useful as tags)
+   9'068 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   27'000'000-28'000'000
+   2'422 # GWAS     SNPs in this window (with 250'000 flanking)
+   2'090 # SNPs in both (i.e. useful as tags)
+  10'325 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   28'000'000-29'000'000
+   1'351 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'147 # SNPs in both (i.e. useful as tags)
+   6'899 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   29'000'000-30'000'000
+   1'032 # GWAS     SNPs in this window (with 250'000 flanking)
+     870 # SNPs in both (i.e. useful as tags)
+   8'151 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   30'000'000-31'000'000
+   1'218 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'028 # SNPs in both (i.e. useful as tags)
+   7'813 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   31'000'000-32'000'000
+     999 # GWAS     SNPs in this window (with 250'000 flanking)
+     852 # SNPs in both (i.e. useful as tags)
+   8'227 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   32'000'000-33'000'000
+   1'522 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'308 # SNPs in both (i.e. useful as tags)
+  10'393 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   33'000'000-34'000'000
+   2'130 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'812 # SNPs in both (i.e. useful as tags)
+   9'466 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   34'000'000-35'000'000
+   2'220 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'873 # SNPs in both (i.e. useful as tags)
+  10'148 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   35'000'000-36'000'000
+   2'011 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'691 # SNPs in both (i.e. useful as tags)
+   9'740 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   36'000'000-37'000'000
+   1'460 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'250 # SNPs in both (i.e. useful as tags)
+   9'932 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   37'000'000-38'000'000
+   1'494 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'301 # SNPs in both (i.e. useful as tags)
+   9'992 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   38'000'000-39'000'000
+     929 # GWAS     SNPs in this window (with 250'000 flanking)
+     800 # SNPs in both (i.e. useful as tags)
+   8'316 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   39'000'000-40'000'000
+     982 # GWAS     SNPs in this window (with 250'000 flanking)
+     828 # SNPs in both (i.e. useful as tags)
+   8'997 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   40'000'000-41'000'000
+     827 # GWAS     SNPs in this window (with 250'000 flanking)
+     708 # SNPs in both (i.e. useful as tags)
+   6'902 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   41'000'000-42'000'000
+     784 # GWAS     SNPs in this window (with 250'000 flanking)
+     665 # SNPs in both (i.e. useful as tags)
+   7'866 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   42'000'000-43'000'000
+   1'048 # GWAS     SNPs in this window (with 250'000 flanking)
+     903 # SNPs in both (i.e. useful as tags)
+   9'175 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   43'000'000-44'000'000
+   1'546 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'327 # SNPs in both (i.e. useful as tags)
+  10'184 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   44'000'000-45'000'000
+   1'968 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'704 # SNPs in both (i.e. useful as tags)
+  10'273 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   45'000'000-46'000'000
+   1'958 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'654 # SNPs in both (i.e. useful as tags)
+  11'201 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   46'000'000-47'000'000
+   1'342 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'138 # SNPs in both (i.e. useful as tags)
+  10'120 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   47'000'000-48'000'000
+   1'883 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'629 # SNPs in both (i.e. useful as tags)
+  10'667 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   48'000'000-49'000'000
+   2'402 # GWAS     SNPs in this window (with 250'000 flanking)
+   2'084 # SNPs in both (i.e. useful as tags)
+  11'573 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   49'000'000-50'000'000
+   2'399 # GWAS     SNPs in this window (with 250'000 flanking)
+   2'092 # SNPs in both (i.e. useful as tags)
+  14'495 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   50'000'000-51'000'000
+   1'204 # GWAS     SNPs in this window (with 250'000 flanking)
+   1'038 # SNPs in both (i.e. useful as tags)
+  11'223 # target SNPs (anything in narrow window, will include some tags)
+
+chrm22	   51'000'000-52'000'000
+     220 # GWAS     SNPs in this window (with 250'000 flanking)
+     187 # SNPs in both (i.e. useful as tags)
+   2'200 # target SNPs (anything in narrow window, will include some tags)
