@@ -32,6 +32,7 @@
 :   -p bin/o
     @unconditional
 {
+    sleep 1 # for a timestamp problem on our NFS
     find src -name '*.hh'
 }
 
@@ -60,6 +61,7 @@
        @all.stu.files
 {
     which g++ g++ c++ clang | head -n1 # find one of these compilers
+    sleep 1 # for a timestamp problem on our NFS
 
     # Also, include some general args we want to always pass,
     # regardless of whether we're compiling or linking
@@ -104,11 +106,13 @@ bin/o     { mkdir -p bin/o     }
 >       bin/local/gsl_cflags
 :   -p  bin/local
 {
+    sleep 1 # for a timestamp problem on our NFS
     gsl-config --cflags # For example: "-I/usr/include"
 }
 >       bin/local/gsl_libs
 :   -p  bin/local
 {
+    sleep 1 # for a timestamp problem on our NFS
     gsl-config --libs # For example: "-lgsl -lgslcblas -lm"
 }
 
