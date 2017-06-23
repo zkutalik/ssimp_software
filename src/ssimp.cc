@@ -467,13 +467,15 @@ void impute_all_the_regions(   string                                   filename
 
             }
 
-            //PPe(chrm, w, current_window_start, current_window_end, utils::ELAPSED());
-            //PP(__LINE__, utils:: ELAPSED());
-
-            // TODO skip. Break out if gone too far
-            // applying the lower bound is a little trickier. Must only be applied on the correct
-            // chromosome, or else we get an infinite loop.
-            // TODO skip. Continue if early in a *valid* chromosome
+            // Next, check if we can skip the entire window due to --impute.range or --tag.range
+            if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE
+                        , chrpos{chrm,current_window_start - options:: opt_flanking_width}
+                        , chrpos{chrm,current_window_end   + options:: opt_flanking_width} )
+                 || test_if_skip( enum_tag_or_impute_t:: TAG
+                        , chrpos{chrm,current_window_start}
+                        , chrpos{chrm,current_window_end  } )
+                )
+                continue;
 
             /*
              * For a given window, there are three "ranges" to consider:
@@ -491,7 +493,6 @@ void impute_all_the_regions(   string                                   filename
              */
 
             // First, load up all the reference data in the broad window.
-            // If this is empty, and it's the last window, then we can finish with this chromosome.
 
             vector<RefRecord>   all_nearby_ref_data;
             {   // Read in all the reference panel data in this broad window, only bi-allelic SNPs.
