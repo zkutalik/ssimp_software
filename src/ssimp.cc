@@ -251,9 +251,8 @@ int main(int argc, char **argv) {
 
 namespace ssimp{
 
-#if 0
 static
-chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_chromosome) {
+chrpos  parse_chrpos_text_to_object     (string const &as_text, bool to_end_of_chromosome) {
     auto separated_by_colon = utils:: tokenize(as_text,':');
     chrpos position;
     switch(separated_by_colon.size()) {
@@ -270,7 +269,26 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
     }
     return position;
 }
-#endif
+static
+std:: pair<chrpos,chrpos> parse_range_as_pair_of_chrpos(string const &as_text) {
+    auto separated_by_hyphen = utils:: tokenize(as_text, '-');
+    switch(separated_by_hyphen.size()) {
+        break; case 1: { // no hyphen. Just one position, or one entire chromosom
+                auto lower = parse_chrpos_text_to_object(separated_by_hyphen.at(0), false);
+                auto upper = parse_chrpos_text_to_object(separated_by_hyphen.at(0), true);
+                return {lower,upper};
+        }
+        break; case 2: {
+                auto lower = parse_chrpos_text_to_object(separated_by_hyphen.at(0), false);
+                auto upper = parse_chrpos_text_to_object(separated_by_hyphen.at(1), true);
+                return {lower,upper};
+        }
+        break; default:
+                DIE("too many hyphens in [" << as_text << "]");
+    }
+    assert(0); // won't get here
+    return { {-100,-100}, {100,1000} };
+}
 
 enum class enum_tag_or_impute_t { TAG, IMPUTE };
 static
@@ -291,6 +309,19 @@ bool    test_if_skip(enum_tag_or_impute_t toi, RefRecord const &rr, int chrm) {
                     ? options:: opt_tag_maf
                     : options:: opt_impute_maf;
     if  ( rr.maf < up_maf ) {
+            return true;
+    }
+
+    // --{impute,tag}.range
+    auto & up_range = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_range
+                    : options:: opt_impute_range;
+    if(!up_range.empty()) {
+        auto up_range_parsed =  parse_range_as_pair_of_chrpos(up_range);
+        using utils:: operator<<;
+        if( chrpos{chrm, rr.pos} < up_range_parsed.first )
+            return true;
+        if( chrpos{chrm, rr.pos} > up_range_parsed.second )
             return true;
     }
 

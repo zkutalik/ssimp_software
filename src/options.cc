@@ -35,7 +35,7 @@ namespace options {
         double                  opt_impute_maf =0.0;
 
         // The next few are like the --impute.* above, but applying to tags instead
-        std:: string            opt_tags_range;
+        std:: string            opt_tag_range;
         std:: string            opt_tag_snps;
         std::unique_ptr<std::unordered_set<std::string>>    opt_tag_snps_as_a_uset;
         double                  opt_tag_maf =0.0; // target not imputed unless maf (in reference) is at least this.
@@ -63,7 +63,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"impute.range"       ,  required_argument, 0,  8 },
             {"impute.snps"        ,  required_argument, 0,  9 },
             {"impute.maf"         ,  required_argument, 0, 10 },
-            {"tags.range"         ,  required_argument, 0, 11 },
+            {"tag.range"          ,  required_argument, 0, 11 },
             {"tag.snps"           ,  required_argument, 0, 12 },
             {"tag.maf"            ,  required_argument, 0, 13 },
             {"reimpute.tags"      ,        no_argument, 0, 14 }, // one-by-one, reimpute each tag by masking it
@@ -122,9 +122,9 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options::  opt_impute_maf = utils:: lexical_cast<double>(optarg);
         }
         if (c == 11) {
-            options:: opt_tags_range.empty() || DIE("--tags.range specified twice?");
-            assert(string("tags.range") == long_options[long_option_index].name);
-            options::  opt_tags_range = optarg;
+            options:: opt_tag_range.empty() || DIE("--tag.range specified twice?");
+            assert(string("tag.range") == long_options[long_option_index].name);
+            options::  opt_tag_range = optarg;
         }
         if (c == 12) {
             options:: opt_tag_snps.empty() || DIE("--tag.snps specified twice?");

@@ -20,7 +20,7 @@ extern  std::unique_ptr<std::unordered_set<std::string>>    opt_impute_snps_as_a
 extern  double                  opt_impute_maf/* =0.0*/; // target not imputed unless maf (in reference) is at least this.
 
         // The next few are like the --impute.* above, but applying to tags instead
-extern  std:: string            opt_tags_range;
+extern  std:: string            opt_tag_range;
 extern  std:: string            opt_tag_snps;
 extern  std::unique_ptr<std::unordered_set<std::string>>    opt_tag_snps_as_a_uset;
 extern  double                  opt_tag_maf/* =0.0*/;
