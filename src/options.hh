@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <functional>
 #include <vector>
+#include <memory> // for unique_ptr
 
 namespace options {
 
@@ -15,7 +16,7 @@ extern  std:: string            opt_lambda;
 
 extern  std:: string            opt_impute_range;
 extern  std:: string            opt_impute_snps;
-extern  std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
+extern  std::unique_ptr<std::unordered_set<std::string>>    opt_impute_snps_as_a_uset;
 extern  double                  opt_impute_maf/* =0.0*/; // target not imputed unless maf (in reference) is at least this.
 
         // The next few are like the --impute.* above, but applying to tags instead

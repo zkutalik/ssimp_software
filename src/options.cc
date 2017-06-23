@@ -31,7 +31,7 @@ namespace options {
 
         std:: string            opt_impute_range;
         std:: string            opt_impute_snps;
-        std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
+        std::unique_ptr<std::unordered_set<std::string>>    opt_impute_snps_as_a_uset;
         double                  opt_impute_maf =0.0;
 
         // The next few are like the --impute.* above, but applying to tags instead
