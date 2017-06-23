@@ -893,6 +893,7 @@ void impute_all_the_regions(   string                                   filename
             // Compute the imputations
             c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
 
+            number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
 
             // if necessary, do reimputation
             // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
@@ -904,7 +905,6 @@ void impute_all_the_regions(   string                                   filename
 
 
             // Next few lines are for the imputation quality
-            number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
             C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
 
             for(int i=0; i<number_of_all_targets; ++i) {
