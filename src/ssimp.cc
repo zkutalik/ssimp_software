@@ -252,7 +252,12 @@ int main(int argc, char **argv) {
 namespace ssimp{
 
 static
-chrpos  parse_chrpos_text_to_object     (string const &as_text, bool to_end_of_chromosome) {
+chrpos  parse_chrpos_text_to_object     (string as_text, bool to_end_of_chromosome) {
+    if  (   as_text.substr(0, 3) == "chr"
+         || as_text.substr(0, 3) == "Chr"
+         || as_text.substr(0, 3) == "CHR"
+        )
+        as_text = as_text.substr(3, string::npos);
     auto separated_by_colon = utils:: tokenize(as_text,':');
     chrpos position;
     switch(separated_by_colon.size()) {
