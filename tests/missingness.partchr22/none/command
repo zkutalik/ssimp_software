@@ -1,0 +1,14 @@
+time \
+"$SSIMP"                                                                            \
+    --ref "$REF"/1kg.just.EUR/chr22.17750K.19250K.vcf.gz                            \
+    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
+    --gwas "$GWAS"/GIANT_HEIGHT_Wood_oneWindowOnChr22.tsv.gz                        \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 1000000                                                                  \
+    --flan 250000                                                                   \
+    --out "${OUT_IMPUTATIONS}"                                                      \
+    --lambda 0.01                                                                   \
+    --reimpute.tags                                                                 \
+    --missingness none                                                              \
+    --impute.range 22:18000000-22:19000000                                          \
+    >     "$OUTPUT"
