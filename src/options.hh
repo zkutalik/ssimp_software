@@ -21,8 +21,8 @@ extern  double                  opt_impute_maf/* =0.0*/; // target not imputed u
 
         // The next few are like the --impute.* above, but applying to tags instead
 extern  std:: string            opt_tags_range;
-extern  std:: string            opt_tags_snps;
-extern  std::unordered_set<std::string>    opt_tags_snps_as_a_uset;
+extern  std:: string            opt_tag_snps;
+extern  std::unique_ptr<std::unordered_set<std::string>>    opt_tag_snps_as_a_uset;
 extern  double                  opt_tags_maf/* =0.0*/;
 
 extern  bool                    opt_reimpute_tags;

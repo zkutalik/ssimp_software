@@ -217,15 +217,16 @@ int main(int argc, char **argv) {
         }
         options:: opt_impute_snps_as_a_uset->empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
     }
-    if( !options:: opt_tags_snps.empty() ) {
-        gz:: igzstream f(options:: opt_tags_snps.c_str());
-        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_tags_snps << ']');
+    if( !options:: opt_tag_snps.empty() ) {
+        gz:: igzstream f(options:: opt_tag_snps.c_str());
+        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_tag_snps << ']');
         string one_SNPname_or_chrpos;
+        options:: opt_tag_snps_as_a_uset  && DIE("multiple --tag.snps files not yet supported");
+        options:: opt_tag_snps_as_a_uset = std::make_unique< std::unordered_set<std::string> >();
         while(getline( f, one_SNPname_or_chrpos)) {
-            options:: opt_tags_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+            options:: opt_tag_snps_as_a_uset->insert(one_SNPname_or_chrpos);
         }
-        options:: opt_tags_snps_as_a_uset.empty() && DIE("Nothing in --tags.snps file? [" << options:: opt_tags_snps << "]");
-        PPe(options:: opt_tags_snps_as_a_uset.size());
+        options:: opt_tag_snps_as_a_uset->empty() && DIE("Nothing in --tag.snps file? [" << options:: opt_tag_snps << "]");
     }
 
     if( options:: opt_out .empty()) { // --out wasn't specified - default to ${gwas}.ssimp.txt
@@ -536,7 +537,13 @@ void impute_all_the_regions(   string                                   filename
                         auto & current_ref = ref_candidates.front_ref();
                         assert( current_ref.pos == crps.pos );
 
-                        if(false) { // TODO skip tag?
+                        // apply --tag.snps
+                        if  (   options:: opt_tag_snps_as_a_uset
+                             && options:: opt_tag_snps_as_a_uset->count( current_ref.ID ) == 0) {
+                            continue;
+                        }
+                        if(false) { // TODO skip --tag.maf
+                                    // TODO skip --tag.range
                             //continue; // this tag skipped due to --tags.maf or --tags.range or --tags.snps
                         }
 
@@ -590,6 +597,8 @@ void impute_all_the_regions(   string                                   filename
                          && options:: opt_impute_snps_as_a_uset->count( it->ID ) == 0
                         )
                         continue;
+                    // TODO skip --impute.maf
+                    // TODO skip --impute.range
 
                     auto const & z12_for_this_SNP = it->z12;
                     auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
