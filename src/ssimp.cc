@@ -273,6 +273,18 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
 #endif
 
 static
+bool    test_if_skip_tag(RefRecord const &rr, int chrm) { // return true if this should be skipped as a tag
+    if  ( options:: opt_tag_snps_as_a_uset ) {
+        if (    options:: opt_tag_snps_as_a_uset->count( rr.ID ) == 0
+             && options:: opt_tag_snps_as_a_uset->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rr.pos)) == 0
+             ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              ) {
@@ -538,8 +550,7 @@ void impute_all_the_regions(   string                                   filename
                         assert( current_ref.pos == crps.pos );
 
                         // apply --tag.snps
-                        if  (   options:: opt_tag_snps_as_a_uset
-                             && options:: opt_tag_snps_as_a_uset->count( current_ref.ID ) == 0) {
+                        if( test_if_skip_tag( current_ref , chrm) ) {
                             continue;
                         }
                         if(false) { // TODO skip --tag.maf
