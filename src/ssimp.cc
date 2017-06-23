@@ -820,13 +820,6 @@ void impute_all_the_regions(   string                                   filename
                 }
             }
 
-            // Prepare the 'output' variables which will store all the imputations and qualities
-            mvn:: VecCol                    c_Cinv_zs(1);
-            int                             number_of_effective_tests_in_C_nolambda;
-            mvn::Matrix                     C1e8inv_c1e8(1,1);
-            reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
-            vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
-
             bool do_reimputation_in_this_window = false;
             if  (   number_of_tags > 1
                  && (   number_of_windows_seen_so_far_with_at_least_two_tags == 1 // this is the first such window
@@ -836,34 +829,16 @@ void impute_all_the_regions(   string                                   filename
                 do_reimputation_in_this_window = true;
             }
 
-            auto do_various_imp_stuff_under_one_missingness_policy = [](
-                        auto       &    c_Cinv_zs
-                    ,   int        &    number_of_effective_tests_in_C_nolambda
-                    ,   auto       &    C1e8inv_c1e8
-                    ,   auto       &    reimputed_tags_in_this_window
-                    ,   auto       &    imp_quals_corrected
-
-                    ,   std:: function<double(double Nbig,double Nsml,double Nmax)>     delta_function_for_missingness_policy
-
-                    // these next four are *copied* in, as they may be adjusted in
-                    // here in accordance with the missingness policy
-                    ,   auto            c_lambda
-                    ,   auto            C_lambda
-                    ,   auto            c_1e8lambda
-                    ,   auto            C_1e8lambda
-
-                    ,   int const       number_of_tags
-                    ,   int const       number_of_all_targets
-                    ,   auto const &    tag_zs_
-                    ,   auto const &    tag_its_
-                    ,   auto const &    tag_Ns
-                    ,   int const N_ref
-                    ,   bool    const   do_reimputation_in_this_window
-                    ,   int const N_max
-                    ) -> void { // just 'naive' at first
-                        (void)N_max;
-
             // First, apply the missingness policy. Two matrices must be looped over
+            std:: function<double(double,double,double)> current_missingness_policy;
+            switch(options:: opt_missingness) {
+                break;  case options:: opt_missingness_t:: NAIVE:
+                    current_missingness_policy = [](double , double , double) -> double { return  1.0; }; // don't adjust C - just ignoring missingness for now
+                break;  case options:: opt_missingness_t:: DEPENDENCY_MAXIMUM:
+                    current_missingness_policy = [](double Nbig, double Nsml, double /*Nmax*/) -> double { assert(Nbig >= Nsml); return  std::sqrt(Nsml/Nbig); }; // assume maximum correlation in missingness
+                break;  case options:: opt_missingness_t:: INDEPENDENCE:
+                    current_missingness_policy = [](double Nbig, double Nsml, double Nmax) -> double { return  std::sqrt(Nsml)*std::sqrt(Nbig)/Nmax; };
+            }
             for(int i=0; i<number_of_tags; ++i) {
                 for(int j=0; j<number_of_tags; ++j) {
                     auto Ni = tag_Ns.at(i);
@@ -871,7 +846,7 @@ void impute_all_the_regions(   string                                   filename
                     auto Nbig = std::max(Ni,Nj);
                     auto Nsml = std::min(Ni,Nj);
                     if(i!=j) {
-                        auto delta_ij = delta_function_for_missingness_policy(Nbig, Nsml, N_max); // *always* pass the big one in first
+                        auto delta_ij = current_missingness_policy(Nbig, Nsml, N_max); // *always* pass the big one in first
                         C_lambda.set   (i,j,  C_lambda   (i,j) * delta_ij);
                         C_1e8lambda.set(i,j,  C_1e8lambda(i,j) * delta_ij);
                     }
@@ -884,7 +859,7 @@ void impute_all_the_regions(   string                                   filename
                     auto Nj = tag_Ns.at(j);
                     assert( Nj <= N_max );
 
-                    auto delta_ij = delta_function_for_missingness_policy(N_max, Nj, N_max); // *always* pass the big one in first
+                    auto delta_ij = current_missingness_policy(N_max, Nj, N_max); // *always* pass the big one in first
                     assert(delta_ij > 0.0);
                     assert(delta_ij <= 1.0);
                     c_lambda.set   (i,j,  c_lambda   (i,j) * delta_ij);
@@ -894,12 +869,13 @@ void impute_all_the_regions(   string                                   filename
             // missingness has now been applied.
 
             // Compute the imputations
-            c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
+            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
 
-            number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
 
             // if necessary, do reimputation
             // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
+            reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
             if  (do_reimputation_in_this_window) {
                 reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_1e8lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
             }
@@ -908,7 +884,8 @@ void impute_all_the_regions(   string                                   filename
 
 
             // Next few lines are for the imputation quality
-            C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
+            auto C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
+            vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
 
             for(int i=0; i<number_of_all_targets; ++i) {
                 mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
@@ -928,47 +905,6 @@ void impute_all_the_regions(   string                                   filename
                 imp_quals_corrected.push_back(imp_qual);
             }
             assert(number_of_all_targets == ssize(imp_quals_corrected));
-
-            };
-
-            std:: function<double(double,double,double)> current_missingness_policy;
-            switch(options:: opt_missingness) {
-                break;  case options:: opt_missingness_t:: NAIVE:
-                    current_missingness_policy = [](double , double , double) -> double { return  1.0; }; // don't adjust C - just ignoring missingness for now
-                break;  case options:: opt_missingness_t:: DEPENDENCY_MAXIMUM:
-                    current_missingness_policy = [](double Nbig, double Nsml, double /*Nmax*/) -> double { assert(Nbig >= Nsml); return  std::sqrt(Nsml/Nbig); }; // assume maximum correlation in missingness
-                break;  case options:: opt_missingness_t:: INDEPENDENCE:
-                    current_missingness_policy = [](double Nbig, double Nsml, double Nmax) -> double { return  std::sqrt(Nsml)*std::sqrt(Nbig)/Nmax; };
-            }
-            do_various_imp_stuff_under_one_missingness_policy(
-                    // the five 'output' parameters - into which the imputations (and so on) will be stored.
-                        c_Cinv_zs
-                    ,   number_of_effective_tests_in_C_nolambda
-                    ,   C1e8inv_c1e8
-                    ,   reimputed_tags_in_this_window
-                    ,   imp_quals_corrected
-
-                    // missingness policy
-                    ,   current_missingness_policy
-
-
-                    // these next four wil be copied in, in order that they
-                    // can be adjusted according to the missingness policy
-                    ,   c_lambda
-                    ,   C_lambda
-                    ,   c_1e8lambda
-                    ,   C_1e8lambda
-
-                    // last few args are const ref - pure input parameters
-                    ,   number_of_tags
-                    ,   number_of_all_targets
-                    ,   tag_zs_
-                    ,   tag_its_
-                    ,   tag_Ns
-                    ,   N_ref
-                    ,   do_reimputation_in_this_window
-                    ,   N_max
-                    );
 
             // Finally, print out everything to the --out file
             for(int i=0; i<number_of_all_targets; ++i) {
