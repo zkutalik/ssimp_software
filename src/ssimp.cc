@@ -450,6 +450,23 @@ void impute_all_the_regions(   string                                   filename
 
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
+
+            /* Crucially, first we check if we have already gone past
+             * the end of the current chromosome
+             */
+            {
+                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
+                                    ,   chrpos{chrm,std::numeric_limits<int>::max()                    }
+                                    );
+                RefRecord rr;
+                if(!ref_vcf.read_record_into_a_RefRecord(rr) ){
+                    break; /* There is nothing in this window, *nor* later windows, hence
+                            * we can break out of this chromosome
+                            */
+                }
+
+            }
+
             //PPe(chrm, w, current_window_start, current_window_end, utils::ELAPSED());
             //PP(__LINE__, utils:: ELAPSED());
 
@@ -477,47 +494,38 @@ void impute_all_the_regions(   string                                   filename
             // If this is empty, and it's the last window, then we can finish with this chromosome.
 
             vector<RefRecord>   all_nearby_ref_data;
-            bool not_the_last_window = false;
             {   // Read in all the reference panel data in this broad window, only bi-allelic SNPs.
-                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
-                                    ,   chrpos{chrm,std::numeric_limits<int>::max()                    } // in theory, to the end of the chromosome. See a few lines below
+                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width} // inclusive
+                                    ,   chrpos{chrm,current_window_end   + options:: opt_flanking_width} // exclusive
                                     );
-                //PP(__LINE__, utils:: ELAPSED());
                 RefRecord rr;
                 while(ref_vcf.read_record_into_a_RefRecord(rr)) {
                     if(N_reference == -1) {
                         N_reference = rr.z12.size();
                         PP(N_reference);
                     }
-
-                    /*
-                     * if the position is beyond the current wide window, it means
-                     * this is *not* the last window
-                     */
-                    if(rr.pos   >= current_window_end   + options:: opt_flanking_width) {
-                        not_the_last_window = true;
-                        break;
+                    else {
+                        N_reference == ssize(rr.z12) || DIE("Varying size of reference panel? "
+                                << N_reference
+                                << " vs "
+                                << rr.z12.size()
+                                );
                     }
 
                     if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE, rr , chrm)
                          && test_if_skip( enum_tag_or_impute_t:: TAG   , rr , chrm)
                         )
-                    { /* skip this entirely as it's neither useful as a tag nor a target */ }
-                    else {
-                        all_nearby_ref_data.push_back(rr);
+                    {
+                        /* skip this SNP as it's neither useful as a tag nor a target */
+                        continue;
                     }
+                    all_nearby_ref_data.push_back(rr);
 
                 }
-                //PP(__LINE__, utils:: ELAPSED(), all_nearby_ref_data.size());
 
                 for(int o=0; o+1 < ssize(all_nearby_ref_data); ++o) { // check position is monotonic
                     assert(all_nearby_ref_data.at(o).pos <= all_nearby_ref_data.at(o+1).pos);
                 }
-            }
-
-            if(all_nearby_ref_data.empty() && !not_the_last_window) {
-                // No more reference panel data, therefore no tags, therefore end of chromosome
-                break;
             }
 
             if(all_nearby_ref_data.empty()) {
