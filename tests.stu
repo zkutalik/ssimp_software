@@ -231,11 +231,12 @@ tests.compare       { mkdir -p tests.compare }
     mkdir -p "$(dirname "${path}")"
 }
 
-                tests/full1KG.EUR.Wood/chr${CHRM}/command : tests.stu tests/full1KG.EUR.Wood/command.template {
-    mkdir -p    tests/full1KG.EUR.Wood/chr${CHRM}
+                tests/full1KG.EUR.Wood/chr${CHRM}.MISS${MISS}/command : tests.stu tests/full1KG.EUR.Wood/command.template {
+    mkdir -p    tests/full1KG.EUR.Wood/chr${CHRM}.MISS${MISS}
     sleep 1
     {
         echo   CHRM="${CHRM}"
+        echo   MISS="${MISS}"
         cat     tests/full1KG.EUR.Wood/command.template
-    } >         tests/full1KG.EUR.Wood/chr${CHRM}/command
+    } >         tests/full1KG.EUR.Wood/chr${CHRM}.MISS${MISS}/command
 }
