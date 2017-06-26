@@ -1,16 +1,36 @@
-ssimp GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
+ssimp   GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
 
-    GWASFILE    path to an input file .....
-    IMPUTATIONOUTPUT output file, the results ...
-    REFPANEL    If not specified, defaults to the 503 EUR individuals in 1KG
+    GWASFILE                Path to an input file.
+    IMPUTATIONOUTPUT        Output file, to store the imputation results.
+    REFPANEL                If not specified, defaults to the 503 EUR
+                            individuals in 1KG
 
-See below for more details on how to download a reference panel. At least one reference panel,
-with a population structure similar to your GWAS sample, must be downloaded by you.
+See below for more details on how to download a reference panel. At least one
+reference panel, with a population structure similar to your GWAS sample, must
+be downloaded by you.
 
 Options:
+    None of these options are necessary.  If an option isn't specified, a
+    default value (inside []) is used in it place.  For example, if --lambda X
+    is not specified, it is equivalent to specifying --lambda "2/sqrt(n)".
 
-    --lambda        X
-    --log           F       Create a file F, with a copy of all the console output (stdout and stderr)
+    --sample.names  [use all]   Sample IDs of individuals to use in the
+                                reference panel.
+    --log           [none]      Store a copy of all console output to this file
+    --impute.range  [use all]   ...
+    --impute.maf    [0]         ...
+    --impute.snp    [use all]   ...
+    --tag.range     [use all]   (same as impute.range, but applied to tag SNPs)
+    --tag.maf       [0]         (same as impute.maf,   but applied to tag SNPs)
+    --tag.snp       [use all]   (same as impute.snp,   but applied to tag SNPs)
+    --lambda        [2/sqrt(n)] The lambda correction applied to the estimated
+                                correlation matrix. Numeric value, or the
+                                special string "2/sqrt(n)" where n is the
+                                number of individuals in the reference panel.
+    --window.width  [1000000]   ...
+    --flanking.width [1000000]  ...
+    --missingness   [none]      'none' (the default), or 'dep' or 'ind'
+--------------------------------------------------------------------------------
 
 
 Reference panel:

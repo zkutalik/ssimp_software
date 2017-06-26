@@ -17,6 +17,8 @@
 #include "options.hh"
 #include "file.reading.hh"
 
+#include "usage_special.hh"
+
 #include "bits.and.pieces/utils.hh"
 #include "mvn/mvn.hh"
 #include "bits.and.pieces/DIE.hh"
@@ -152,7 +154,15 @@ void    set_appropriate_locale(ostream & stream) {
     }
 }
 
+void exitWithUsage() {
+    std:: cerr << usage_text;
+    exit(1);
+}
+
 int main(int argc, char **argv) {
+    if(argc==1) {
+        exitWithUsage();
+    }
 
     options:: read_in_all_command_line_options(argc, argv);
 
@@ -218,7 +228,8 @@ int main(int argc, char **argv) {
     }
 
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {
-        DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
+        exitWithUsage();
+        //DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
     }
 
     if( !options:: opt_impute_snps.empty() ) {
