@@ -21,6 +21,7 @@ namespace action = range :: action;
 
 namespace options {
 
+        std::vector<std:: string>           opt_non_options; // if there are two or three of these, copy them into opt_gwas_filename, opt_out, and opt_raw_ref
         std:: string            opt_raw_ref;
         std:: string            opt_gwas_filename;
         std:: string            opt_out;
@@ -79,7 +80,8 @@ void read_in_all_command_line_options(int argc, char **argv) {
         if (c == -1)
             break;
         if (c == 1) { // non-option
-            DIE("There shouldn't be any non-options args to this program: ["<<optarg<<"]");
+            opt_non_options.push_back(optarg);
+            // Save all the non-option arguments. There should be two or three of them
         }
         if (c == 2) {
             assert(string("ref") == long_options[long_option_index].name);

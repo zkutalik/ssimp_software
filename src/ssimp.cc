@@ -160,6 +160,21 @@ int main(int argc, char **argv) {
         logging:: setup_the_console_logging();
     }
 
+    // There should be two or three non-options arguments. In the coming
+    // lines, these are recognized and stored in the appropriate place.
+    if(options:: opt_non_options.size() >= 2) {
+        options:: opt_non_options.size() <= 3 || DIE("Usage: ");
+        options:: opt_gwas_filename.empty() || DIE("Usage:");
+        options:: opt_out          .empty() || DIE("Usage:");
+
+        options:: opt_gwas_filename = options:: opt_non_options.at(0);
+        options:: opt_out           = options:: opt_non_options.at(1);
+        if(options:: opt_non_options.size()==3) {
+            options:: opt_raw_ref      .empty() || DIE("Usage:");
+            options:: opt_raw_ref       = options:: opt_non_options.at(2);
+        }
+    }
+
     options:: list_of_tasks_to_run_at_exit.push_back(
         [](){
             auto PROF_CHANGE_DIR_AT_THE_LAST_MINUTE = getenv("PROF_CHANGE_DIR_AT_THE_LAST_MINUTE"); // to control where 'gmon.out' goes
