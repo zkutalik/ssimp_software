@@ -1,1 +1,0 @@
-OK, both correlations are close to 1.0
