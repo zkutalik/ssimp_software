@@ -91,6 +91,7 @@
 >       bin/o/LINKER
 :       bin/o/GCC_OR_CLANG
 {
+    sleep 1 # for a timestamp problem on our NFS
     cat bin/o/GCC_OR_CLANG
     echo  " -lstdc++"
 }
