@@ -42,9 +42,9 @@ Reference panel:
 
 
 You must download a reference panel to use this software. We suggest the
-1000genomes dataset as it is publicly available and includes many world
-populations. If you use the 1000genomes dataset, then it is sufficient
-to read 'Reference panel (simple instructions)'. If you with to use another
+1000genomes dataset as it is publicly available and includes many populations. 
+If you use the 1000genomes dataset, then it is sufficient
+to read 'Reference panel (simple instructions)'. If you want to use another
 reference panel, see 'Reference panel (complex instructions)' below
 for more details.
 
@@ -68,11 +68,11 @@ the European individuals should be used:
 
 'super_pop=EUR' can be replaced with other (super-)populations if necessary. E.g.
 
-    super_pop=EAS        ?East Asia?
-    pop=TSI              ???
+    super_pop=EAS        East Asian
+    pop=TSI              Toscani in Italia
 
 (This uses the 'integrated_call_samples_v3.20130502.ALL.panel' file provided
-with 1000genomes to find the sample names in the requested population
+with 1000genomes to find the sample names in the requested population. For more details on super_pop and pop, see http://www.internationalgenome.org/category/population/.
 
 
 Reference panel (complex instructions):
@@ -87,7 +87,7 @@ direct ssimp to replace that string with the chromosome number. For example:
             --sample.names ~/ref_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
 
 If the '--sample.names' option is not specified, all individuals in the
-.vcf.gz file will be used. This is inappropriate in many cases (for example
+.vcf.gz file will be used. This is inappropriate in some cases (for example
 with the 1000genomes data), as you should direct ssimp to use only the
 individuals that match the ancestry of your GWAS. You can use '--sample.names'
 in two ways. First, it can simply be a file with the sample IDs that you
