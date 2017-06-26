@@ -10,6 +10,6 @@
     --out "${OUT_IMPUTATIONS}"                                                      \
     --log "${COMMANDDIR}"/log.txt                                                   \
     --lambda 0.01                                                                   \
-    --tags.range chr4-chr5                                                          \
+    --tag.range chr4-chr5                                                          \
     >     "$OUTPUT" 2> "${COMMANDDIR}"/output.stderr
     touch "$OUT_IMPUTATIONS"

@@ -26,14 +26,20 @@
     tests/impute.range/chr1_1000000-chr1_2000000/imputations.txt
     tests/impute.range/chr2-3/imputations.txt
     tests/impute.range/chr2/imputations.txt
-    tests/impute.snps/a.list.of.snps/imputations.txt
     tests/impute.maf/0.05/imputations.txt
     tests/tags.maf/tags.maf.0.01/imputations.txt
 
     tests/tags.range/chr1_1000000-chr1_2000000/imputations.txt
     tests/tags.range/chr2-3/imputations.txt
     tests/tags.range/chr2/imputations.txt
-    tests/tags.snps/a.list.of.snps/imputations.txt
+
+    tests/sub1KG-tiny/EUR.via.filter.all22..impute.snps/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..tag.snps/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..impute.maf/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..tag.maf/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..impute.range/imputations.txt
+    tests/sub1KG-tiny/EUR.via.filter.all22..tag.range/imputations.txt
+
 
     tests/swapping/swap.just.the.allele.headers/imputations.txt
     tests/swapping/swap.some.alleles/imputations.txt
@@ -223,4 +229,14 @@ export  target="ref/1kg.just.${pop}/chr${chrm}.${posf}.${post}.vcf.gz"
 tests.compare       { mkdir -p tests.compare }
 @mkdirfile..${path} {
     mkdir -p "$(dirname "${path}")"
+}
+
+                tests/full1KG.EUR.Wood/chr${CHRM}.MISS${MISS}/command : tests.stu tests/full1KG.EUR.Wood/command.template {
+    mkdir -p    tests/full1KG.EUR.Wood/chr${CHRM}.MISS${MISS}
+    sleep 1
+    {
+        echo   CHRM="${CHRM}"
+        echo   MISS="${MISS}"
+        cat     tests/full1KG.EUR.Wood/command.template
+    } >         tests/full1KG.EUR.Wood/chr${CHRM}.MISS${MISS}/command
 }

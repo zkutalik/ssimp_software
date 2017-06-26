@@ -1,19 +1,111 @@
-ssimp GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
+ssimp   GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
 
-    GWASFILE    path to an input file .....
-    IMPUTATIONOUTPUT output file, the results ...
-    REFPANEL    If not specified, defaults to the 503 EUR individuals in 1KG
+    GWASFILE                Path to an input file.
+    IMPUTATIONOUTPUT        Output file, to store the imputation results.
+    REFPANEL                If not specified, defaults to the 503 EUR
+                            individuals in 1KG
 
-See below for more details on how to download a reference panel. At least one reference panel,
-with a population structure similar to your GWAS sample, must be downloaded by you.
+See below for more details on how to download a reference panel. At least one
+reference panel, with a population structure similar to your GWAS sample, must
+be downloaded by you.
+
+If you have already downloaded the 1000genomes reference panel (see below for
+more details) to '~/ref_panels/1000genomes', then you can run this:
+
+    ssimp  gwas.txt  output.txt  ~/ref_panels/1000genomes  --sample.names super_pop=EUR
+
 
 Options:
+    None of these options are necessary.  If an option isn't specified, a
+    default value (inside []) is used in it place.  For example, if --lambda X
+    is not specified, it is equivalent to specifying --lambda "2/sqrt(n)".
 
-    --lambda        X
-    --log           F       Create a file F, with a copy of all the console output (stdout and stderr)
+    --sample.names  [use all]   Sample IDs of individuals to use in the
+                                reference panel.
+    --log           [none]      Store a copy of all console output to this file
+    --impute.range  [use all]   ...
+    --impute.maf    [0]         ...
+    --impute.snp    [use all]   ...
+    --tag.range     [use all]   (same as impute.range, but applied to tag SNPs)
+    --tag.maf       [0]         (same as impute.maf,   but applied to tag SNPs)
+    --tag.snp       [use all]   (same as impute.snp,   but applied to tag SNPs)
+    --lambda        [2/sqrt(n)] The lambda correction applied to the estimated
+                                correlation matrix. Numeric value, or the
+                                special string "2/sqrt(n)" where n is the
+                                number of individuals in the reference panel.
+    --window.width  [1000000]   ...
+    --flanking.width [1000000]  ...
+    --missingness   [none]      'none' (the default), or 'dep' or 'ind'
 
 
 Reference panel:
 
 
+You must download a reference panel to use this software. We suggest the
+1000genomes dataset as it is publicly available and includes many world
+populations. If you use the 1000genomes dataset, then it is sufficient
+to read 'Reference panel (simple instructions)'. If you with to use another
+reference panel, see 'Reference panel (complex instructions)' below
+for more details.
 
+Reference panel (simple instructions):
+
+If you have not already downloaded 1000genomes to your computer, first download
+all the files in 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
+to a directory on your computer. You can download each file individually from
+your web browser, but it is more convenient to use 'wget' on the command line
+if it is available on your machine:
+
+    cd ~                # to your home directory
+    mkdir -p ref_panels/1000genomes
+    cd       ref_panels/1000genomes
+    wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
+
+You can then pass this directory name to 'ssimp', and specify that only
+the European individuals should be used:
+
+    ssimp  gwas.txt  output.txt  ~/ref_panels/1000genomes  --sample.names super_pop=EUR
+
+'super_pop=EUR' can be replaced with other (super-)populations if necessary. E.g.
+
+    super_pop=EAS        ?East Asia?
+    pop=TSI              ???
+
+(This uses the 'integrated_call_samples_v3.20130502.ALL.panel' file provided
+with 1000genomes to find the sample names in the requested population
+
+
+Reference panel (complex instructions):
+
+If you wish to use a different reference panel other than 1000genomes, you must
+specify the filename of the .vcf.gz files. If you have 22 separate .vcf.gz files
+(one for each chromosome), then replace the chromosome number with  {CHRM}  to
+direct ssimp to replace that string with the chromosome number. For example:
+
+    ssimp  gwas.txt output.txt              \
+            ~/ref_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+            --sample.names ~/ref_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
+
+If the '--sample.names' option is not specified, all individuals in the
+.vcf.gz file will be used. This is inappropriate in many cases (for example
+with the 1000genomes data), as you should direct ssimp to use only the
+individuals that match the ancestry of your GWAS. You can use '--sample.names'
+in two ways. First, it can simply be a file with the sample IDs that you
+wish to use. The sample IDs are the column names in the .vcf.gz file.
+The second way is demonstrated in the example command line above, where you
+can append the basic filename ('~/ref_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel')
+with a special extra string ('/sample/super_pop=EUR') which directs ssimp to use
+the sample IDs from the 'sample' column of that basic filename and only
+for the individuals with 'EUR' in the 'super_pop' field. This is a convenient
+way to use any file (delimited by comma, space, or tab) which lists the
+sample IDs and their population.
+
+
+You can change 'super_pop=EUR' at the end of that command if you want to
+use a different subpopulation, for example 'pop=TSI' or 'super_pop=EAS'.
+
+
+If you use this software in your scientific research, please consider citing
+....
+Copyright 2017.
+(Author names, website link)

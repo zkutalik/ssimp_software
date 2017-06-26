@@ -17,6 +17,8 @@
 #include "options.hh"
 #include "file.reading.hh"
 
+#include "usage_special.hh"
+
 #include "bits.and.pieces/utils.hh"
 #include "mvn/mvn.hh"
 #include "bits.and.pieces/DIE.hh"
@@ -152,12 +154,35 @@ void    set_appropriate_locale(ostream & stream) {
     }
 }
 
+void exitWithUsage() {
+    std:: cerr << usage_text;
+    exit(1);
+}
+
 int main(int argc, char **argv) {
+    if(argc==1) {
+        exitWithUsage();
+    }
 
     options:: read_in_all_command_line_options(argc, argv);
 
     if(!options:: opt_log.empty()) {
         logging:: setup_the_console_logging();
+    }
+
+    // There should be two or three non-options arguments. In the coming
+    // lines, these are recognized and stored in the appropriate place.
+    if(options:: opt_non_options.size() >= 2) {
+        options:: opt_non_options.size() <= 3 || DIE("Usage: ");
+        options:: opt_gwas_filename.empty() || DIE("Usage:");
+        options:: opt_out          .empty() || DIE("Usage:");
+
+        options:: opt_gwas_filename = options:: opt_non_options.at(0);
+        options:: opt_out           = options:: opt_non_options.at(1);
+        if(options:: opt_non_options.size()==3) {
+            options:: opt_raw_ref      .empty() || DIE("Usage:");
+            options:: opt_raw_ref       = options:: opt_non_options.at(2);
+        }
     }
 
     options:: list_of_tasks_to_run_at_exit.push_back(
@@ -203,26 +228,31 @@ int main(int argc, char **argv) {
     }
 
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {
-        DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
+        exitWithUsage();
+        //DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
     }
 
     if( !options:: opt_impute_snps.empty() ) {
         gz:: igzstream f(options:: opt_impute_snps.c_str());
         (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_impute_snps << ']');
         string one_SNPname_or_chrpos;
+        options:: opt_impute_snps_as_a_uset  && DIE("multiple --impute.snps files not yet supported");
+        options:: opt_impute_snps_as_a_uset = std::make_unique< std::unordered_set<std::string> >();
         while(getline( f, one_SNPname_or_chrpos)) {
-            options:: opt_impute_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+            options:: opt_impute_snps_as_a_uset->insert(one_SNPname_or_chrpos);
         }
-        options:: opt_impute_snps_as_a_uset.empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
+        options:: opt_impute_snps_as_a_uset->empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
     }
-    if( !options:: opt_tags_snps.empty() ) {
-        gz:: igzstream f(options:: opt_tags_snps.c_str());
-        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_tags_snps << ']');
+    if( !options:: opt_tag_snps.empty() ) {
+        gz:: igzstream f(options:: opt_tag_snps.c_str());
+        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_tag_snps << ']');
         string one_SNPname_or_chrpos;
+        options:: opt_tag_snps_as_a_uset  && DIE("multiple --tag.snps files not yet supported");
+        options:: opt_tag_snps_as_a_uset = std::make_unique< std::unordered_set<std::string> >();
         while(getline( f, one_SNPname_or_chrpos)) {
-            options:: opt_tags_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+            options:: opt_tag_snps_as_a_uset->insert(one_SNPname_or_chrpos);
         }
-        options:: opt_tags_snps_as_a_uset.empty() && DIE("Nothing in --tags.snps file? [" << options:: opt_tags_snps << "]");
+        options:: opt_tag_snps_as_a_uset->empty() && DIE("Nothing in --tag.snps file? [" << options:: opt_tag_snps << "]");
     }
 
     if( options:: opt_out .empty()) { // --out wasn't specified - default to ${gwas}.ssimp.txt
@@ -247,14 +277,13 @@ int main(int argc, char **argv) {
 
 namespace ssimp{
 
-struct skipper_target_I {
-    virtual bool    skip_me(int chrm, RefRecord const * rrp)    =0;
-    virtual chrpos  conservative_upper_bound()                  { return chrpos{std::numeric_limits<int>::max()   , std::numeric_limits<int>::max()   }; }
-    virtual chrpos  conservative_lower_bound()                  { return chrpos{std::numeric_limits<int>::lowest(), std::numeric_limits<int>::lowest()}; }
-};
-
 static
-chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_chromosome) {
+chrpos  parse_chrpos_text_to_object     (string as_text, bool to_end_of_chromosome) {
+    if  (   as_text.substr(0, 3) == "chr"
+         || as_text.substr(0, 3) == "Chr"
+         || as_text.substr(0, 3) == "CHR"
+        )
+        as_text = as_text.substr(3, string::npos);
     auto separated_by_colon = utils:: tokenize(as_text,':');
     chrpos position;
     switch(separated_by_colon.size()) {
@@ -271,109 +300,83 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
     }
     return position;
 }
-
-unique_ptr<skipper_target_I> make_skipper_for_targets
-        (   std:: string                                    range_as_string
-        ,   std::unordered_set<std::string>     const *     uset_of_strings
-        ,   double                                          minmaf
-        ) {
-    assert(uset_of_strings); // always a non-null pointer, even if the pointee is empty
-
-    if(minmaf != 0.0) {
-        assert( range_as_string.empty() );
-        assert( uset_of_strings->empty());
-
-        struct local : skipper_target_I {
-            double m_minmaf;
-            local(double minmaf) : m_minmaf(minmaf) {
-                assert(minmaf >= 0   ); // I should check this first in options.cc, in a more user friendly way
-                assert(minmaf <= 0.5 ); // I should check this first in options.cc, in a more user friendly way
-            }
-
-            bool    skip_me(int     , RefRecord const * rrp)   override {
-                assert(rrp);
-                return rrp->maf < m_minmaf;
-            }
-        };
-        return make_unique<local>(minmaf);
-    }
-
-    if( range_as_string.empty() && uset_of_strings->empty())
-    {
-        struct local : skipper_target_I {
-            bool    skip_me(int     , RefRecord const *    )   override { return false; }
-        };
-        return make_unique<local>();
-    }
-    if( range_as_string.empty() && !uset_of_strings->empty())
-    {   // --impute.snps was specified
-        // We check if either the ID, or the chr:pos is in the --impute.snps file
-        struct local : skipper_target_I {
-            decltype(uset_of_strings) m_uset_of_strings;
-            local(decltype(m_uset_of_strings) p) : m_uset_of_strings(p) { assert(m_uset_of_strings); }
-
-            bool    skip_me(int chrm, RefRecord const * rrp)   override {
-                assert(!m_uset_of_strings->empty());
-                return  (   m_uset_of_strings->count( rrp->ID )
-                        +   m_uset_of_strings->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rrp->pos ) )
-                        ) == 0;
-            }
-        };
-        return make_unique<local>(uset_of_strings);
-    }
-    if( !range_as_string.empty() && uset_of_strings->empty())
-    {   // --impute.range was specified
-        // --impute.range will either be an entire chromosome,
-        // or two locations in one chromosome separated by a '-'
-
-        auto separated_by_hyphen = utils:: tokenize(range_as_string, '-');
-
-        // remove any leading 'chr' or 'Chr'
-        for(auto &s : separated_by_hyphen) {
-            if(     s.substr(0,3) == "chr"
-                 || s.substr(0,3) == "Chr")
-                s = s.substr(3);
-        };
-
-        struct local : skipper_target_I {
-            chrpos  lower_allowed;
-            chrpos  upper_allowed;
-            virtual chrpos  conservative_upper_bound()         override { return upper_allowed; }
-            virtual chrpos  conservative_lower_bound()         override { return lower_allowed; }
-            bool    skip_me(int chrm, RefRecord const * rrp)   override {
-                bool b = !(  chrpos{chrm, rrp->pos} >= lower_allowed && chrpos{chrm, rrp->pos} <= upper_allowed    );
-                return b;
-            }
-        };
-        auto up = make_unique<local>();
-
-        switch(separated_by_hyphen.size()) {
-            break; case 1:
-            {
-                up->lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
-                up->upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), true);
-            }
-            break; case 2:
-            {
-                up->lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
-                up->upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
-            }
-           break; default:
-                        DIE("too many hyphens in [" << range_as_string << "]");
+static
+std:: pair<chrpos,chrpos> parse_range_as_pair_of_chrpos(string const &as_text) {
+    auto separated_by_hyphen = utils:: tokenize(as_text, '-');
+    switch(separated_by_hyphen.size()) {
+        break; case 1: { // no hyphen. Just one position, or one entire chromosom
+                auto lower = parse_chrpos_text_to_object(separated_by_hyphen.at(0), false);
+                auto upper = parse_chrpos_text_to_object(separated_by_hyphen.at(0), true);
+                return {lower,upper};
         }
-        return std::move(up);
+        break; case 2: {
+                auto lower = parse_chrpos_text_to_object(separated_by_hyphen.at(0), false);
+                auto upper = parse_chrpos_text_to_object(separated_by_hyphen.at(1), true);
+                return {lower,upper};
+        }
+        break; default:
+                DIE("too many hyphens in [" << as_text << "]");
+    }
+    assert(0); // won't get here
+    return { {-100,-100}, {100,1000} };
+}
+
+enum class enum_tag_or_impute_t { TAG, IMPUTE };
+static
+bool    test_if_skip(enum_tag_or_impute_t toi, RefRecord const &rr, int chrm) {
+
+    // First, deal with --impute.snps or --tag.snps
+    auto & up_snps = toi == enum_tag_or_impute_t::TAG ? options:: opt_tag_snps_as_a_uset : options:: opt_impute_snps_as_a_uset;
+    if  (       up_snps ) {
+        if (    up_snps->count( rr.ID ) == 0
+             && up_snps->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rr.pos)) == 0
+             ) {
+            return true;
+        }
     }
 
-    assert  (   range_as_string.empty()
-             && uset_of_strings->empty());
-    DIE("--impute.range and --impute.snps can't be used together. (I thought I had already checked for this)");
-    return nullptr;
-    // TODO: clean up the end of this function
-    assert(0);
-        struct local : skipper_target_I {
-            bool    skip_me(int     , RefRecord const *    )   override { return false; }
-        };
-        return make_unique<local>();
+    // Next, deal with --impute.maf or --tag.maf
+    auto & up_maf   = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_maf
+                    : options:: opt_impute_maf;
+    if  ( rr.maf < up_maf ) {
+            return true;
+    }
+
+    // --{impute,tag}.range
+    auto & up_range = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_range
+                    : options:: opt_impute_range;
+    if(!up_range.empty()) {
+        auto up_range_parsed =  parse_range_as_pair_of_chrpos(up_range);
+        using utils:: operator<<;
+        if( chrpos{chrm, rr.pos} < up_range_parsed.first )
+            return true;
+        if( chrpos{chrm, rr.pos} > up_range_parsed.second )
+            return true;
+    }
+
+    return false;
+}
+static
+bool    test_if_skip(enum_tag_or_impute_t toi, chrpos l, chrpos u) {
+    // 'l' and 'u' represent a window, or an entire chromosome.
+    // We check here if --{impute,tag}.range is willing to skip
+    // everything between l and u
+
+    auto & up_range = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_range
+                    : options:: opt_impute_range;
+    if(!up_range.empty()) {
+        auto up_range_parsed =  parse_range_as_pair_of_chrpos(up_range);
+        using utils:: operator<<;
+        if( u < up_range_parsed.first )
+            return true;
+        if( l > up_range_parsed.second )
+            return true;
+    }
+
+    return false;
 }
 
 static
@@ -441,14 +444,6 @@ void impute_all_the_regions(   string                                   filename
       ,options:: opt_flanking_width
             );
 
-    auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, &options:: opt_impute_snps_as_a_uset, options:: opt_impute_maf);
-    auto skipper_tags   = make_skipper_for_targets(options:: opt_tags_range  , &options:: opt_tags_snps_as_a_uset  , options:: opt_tags_maf);
-
-    auto const trg_clb = skipper_target->conservative_lower_bound();
-    auto const trg_cub = skipper_target->conservative_upper_bound();
-    auto const tag_clb = skipper_tags  ->conservative_lower_bound();
-    auto const tag_cub = skipper_tags  ->conservative_upper_bound();
-
     double N_max = -1;
     for(int i = 0; i<gwas->number_of_snps(); ++i ) {
         N_max = std::max(N_max, gwas->get_N(i));
@@ -459,10 +454,20 @@ void impute_all_the_regions(   string                                   filename
     for(int chrm =  1; chrm <= 22; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
-        if  ( chrm < trg_clb.chr ) { continue; }
-        if  ( chrm > trg_cub.chr ) { continue; }
-        if  ( chrm < tag_clb.chr ) { continue; }
-        if  ( chrm > tag_cub.chr ) { continue; }
+        { // *optional* checks to help efficiency. Not necessary for correctness
+
+        /* Skip entire chromosome? if --tags.range *or* --impute.range want
+         * to skip this entire chromosome, then do it.
+         */
+            auto lowest_in_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::lowest() };
+            auto    max_in_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::max()    };
+            if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE
+                        , lowest_in_this_chromosome, max_in_this_chromosome)
+                 || test_if_skip( enum_tag_or_impute_t:: TAG
+                        , lowest_in_this_chromosome, max_in_this_chromosome)
+                )
+                continue;
+        }
 
         tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
@@ -471,24 +476,32 @@ void impute_all_the_regions(   string                                   filename
 
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
-            //PPe(chrm, w, current_window_start, current_window_end, utils::ELAPSED());
-            //PP(__LINE__, utils:: ELAPSED());
 
-            if(chrm == trg_cub.chr) {
-                if(chrpos{chrm,current_window_start                               } > trg_cub) { break; }
-            }
-            if(chrm == tag_cub.chr) {
-                if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > tag_cub) { break; }
+            /* Crucially, first we check if we have already gone past
+             * the end of the current chromosome
+             */
+            {
+                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
+                                    ,   chrpos{chrm,std::numeric_limits<int>::max()                    }
+                                    );
+                RefRecord rr;
+                if(!ref_vcf.read_record_into_a_RefRecord(rr) ){
+                    break; /* There is nothing in this window, *nor* later windows, hence
+                            * we can break out of this chromosome
+                            */
+                }
+
             }
 
-            // applying the lower bound is a little trickier. Must only be applied on the correct
-            // chromosome, or else we get an infinite loop.
-            if(chrm == trg_clb.chr) {
-                if(chrpos{chrm,current_window_end                                 } < trg_clb) { continue; }
-            }
-            if(chrm == tag_clb.chr) {
-                if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < tag_clb) { continue; }
-            }
+            // Next, check if we can skip the entire window due to --impute.range or --tag.range
+            if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE
+                        , chrpos{chrm,current_window_start - options:: opt_flanking_width}
+                        , chrpos{chrm,current_window_end   + options:: opt_flanking_width} )
+                 || test_if_skip( enum_tag_or_impute_t:: TAG
+                        , chrpos{chrm,current_window_start}
+                        , chrpos{chrm,current_window_end  } )
+                )
+                continue;
 
             /*
              * For a given window, there are three "ranges" to consider:
@@ -506,50 +519,40 @@ void impute_all_the_regions(   string                                   filename
              */
 
             // First, load up all the reference data in the broad window.
-            // If this is empty, and it's the last window, then we can finish with this chromosome.
 
             vector<RefRecord>   all_nearby_ref_data;
-            bool not_the_last_window = false;
             {   // Read in all the reference panel data in this broad window, only bi-allelic SNPs.
-                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
-                                    ,   chrpos{chrm,std::numeric_limits<int>::max()                    } // in theory, to the end of the chromosome. See a few lines below
+                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width} // inclusive
+                                    ,   chrpos{chrm,current_window_end   + options:: opt_flanking_width} // exclusive
                                     );
-                //PP(__LINE__, utils:: ELAPSED());
                 RefRecord rr;
                 while(ref_vcf.read_record_into_a_RefRecord(rr)) {
                     if(N_reference == -1) {
                         N_reference = rr.z12.size();
                         PP(N_reference);
                     }
-
-                    /*
-                     * if the position is beyond the current wide window, it means
-                     * this is *not* the last window
-                     */
-                    if(rr.pos   >= current_window_end   + options:: opt_flanking_width) {
-                        not_the_last_window = true;
-                        break;
-                    }
-
-                    if  (   skipper_tags  ->skip_me(chrm, &rr)
-                         && skipper_target->skip_me(chrm, &rr)
-                        )
-                    { /* skip this entirely as it's neither useful as a tag nor a target */ }
                     else {
-                        all_nearby_ref_data.push_back(rr);
+                        N_reference == ssize(rr.z12) || DIE("Varying size of reference panel? "
+                                << N_reference
+                                << " vs "
+                                << rr.z12.size()
+                                );
                     }
+
+                    if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE, rr , chrm)
+                         && test_if_skip( enum_tag_or_impute_t:: TAG   , rr , chrm)
+                        )
+                    {
+                        /* skip this SNP as it's neither useful as a tag nor a target */
+                        continue;
+                    }
+                    all_nearby_ref_data.push_back(rr);
 
                 }
-                //PP(__LINE__, utils:: ELAPSED(), all_nearby_ref_data.size());
 
                 for(int o=0; o+1 < ssize(all_nearby_ref_data); ++o) { // check position is monotonic
                     assert(all_nearby_ref_data.at(o).pos <= all_nearby_ref_data.at(o+1).pos);
                 }
-            }
-
-            if(all_nearby_ref_data.empty() && !not_the_last_window) {
-                // No more reference panel data, therefore no tags, therefore end of chromosome
-                break;
             }
 
             if(all_nearby_ref_data.empty()) {
@@ -664,8 +667,9 @@ void impute_all_the_regions(   string                                   filename
                         auto & current_ref = ref_candidates.front_ref();
                         assert( current_ref.pos == crps.pos );
 
-                        if(skipper_tags->skip_me(chrm, &current_ref)) {
-                            continue; // this tag skipped due to --tags.maf or --tags.range or --tags.snps
+                        // apply --tag.{snps,maf,range}
+                        if( test_if_skip( enum_tag_or_impute_t:: TAG, current_ref , chrm) ) {
+                            continue;
                         }
 
                         auto dir = decide_on_a_direction( current_ref
@@ -713,9 +717,10 @@ void impute_all_the_regions(   string                                   filename
                                                             ,   chrpos{chrm,current_window_end});
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
 
-                    bool skip_this_target = skipper_target->skip_me(chrm, &*it);
-                    if(skip_this_target)
+                    // apply --impute.{snps,maf,range}
+                    if( test_if_skip( enum_tag_or_impute_t:: IMPUTE, *it , chrm) ) {
                         continue;
+                    }
 
                     auto const & z12_for_this_SNP = it->z12;
                     auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
