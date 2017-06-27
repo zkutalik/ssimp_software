@@ -73,7 +73,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
-![Caption for the picture.](visualisation_width.jpeg)
+![Caption for the picture.](visuals/visualisation_width.jpeg)
 
 ## Reference panel
 [//]: -------------------------------
@@ -89,13 +89,13 @@ Briefly, by combining summary statistics for a set of variants and the fine-scal
 
 ### Main equation 
 
-![Summary statistics equation](eq_main.jpg)
+![Summary statistics equation](visuals/eq_main.jpg)
 
 Here we aim to impute the Z-statistic of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*, the pairwise correlations among the tag SNPs *C*, and the Z-statistics of a set of tag SNPs *M*. Both, *c* and *C* are regularised using the option `--lambda`. *M* includes SNPs among `--window.width` + left and right `--flanking.region`, whereas the core window (`--window.width`) only covers SNPs to impute. 
 
 ### Imputation quality
 We use an adjusted imputation quality that corrects for the effective number of tag SNVs
-![Imputation quality](eq_impqual.jpg)
+![Imputation quality](visuals/eq_impqual.jpg)
 
 To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the *C* and *c* matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
 
