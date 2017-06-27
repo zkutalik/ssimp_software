@@ -87,16 +87,17 @@ To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are nee
 [//]: -------------------------------
 Briefly, by combining summary statistics for a set of variants and the fine-scale LD structure in the same region, we can estimate summary statistics of new, untyped variants at the same locus. We can formally write this using the conditional expectation of a multivariate normal distribution. 
 
-### Main equation 
+### Impute Z-statistic 
 
 ![Summary statistics equation](visuals/eq_main.jpg)
 
-Here we aim to impute the Z-statistic of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*, the pairwise correlations among the tag SNPs *C*, and the Z-statistics of a set of tag SNPs *M*. Both, *c* and *C* are regularised using the option `--lambda`. *M* includes SNPs among `--window.width` + left and right `--flanking.region`, whereas the core window (`--window.width`) only covers SNPs to impute. 
+Here we aim to impute the Z-statistic of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), *C* (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, *c* and *C* are regularised using the option `--lambda`. *u* can be extended to a vector. *M* includes SNPs among `--window.width` + left and right `--flanking.region`, whereas the core window (`--window.width`) only covers SNPs to impute. 
 
 ### Imputation quality
-We use an adjusted imputation quality that corrects for the effective number of tag SNVs
+We use an adjusted imputation quality that corrects for the effective number of tag SNVs *p.eff*.
 ![Imputation quality](visuals/eq_impqual.jpg)
 
+### Variable missingness
 To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the *C* and *c* matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
 
 ### More details
