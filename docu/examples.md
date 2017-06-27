@@ -14,12 +14,12 @@ The minimal requirements are: (1) GWAS summary statistics stored in a text file 
 
 ### Store a log file
 
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt --log my_ssimp_logfile`
+`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--log my_ssimp_logfile`**
 
 
 ### use 16 cores
 
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt --n.cores 16`
+`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt **--n.cores 16**`
 
 
 ### Point to your own reference panel
