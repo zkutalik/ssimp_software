@@ -11,9 +11,11 @@ This command line software enables summary statistics imputation (SSimp) for GWA
 
 ## Minimal example
 [//]: -------------------------------
-The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (`MarkerName`), Z-statistic (`Z`), reference allele (`a1`) and risk allele (`a2`) and at least one row, and (2) the path to the reference panel. 
+The minimal requirements are for `ssimp` to run are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (`MarkerName`), Z-statistic (`Z`), reference allele (`a1`) and risk allele (`a2`) and at least one row, and (2) the path to the reference panel. 
 
-`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `data/my_gwas.txt.ssimp.txt`, containing the imputation results.
+`ssimp my_gwas.txt ~/.refpanel/my_reference_panel.vcf output.txt` will generate a file `output.txt`, containing the imputation results. This is identical to 
+
+`ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
 
 <sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistic, and therefore needs a negative sign if the effect size is negative). </sup>
 	
@@ -53,8 +55,6 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--n.cores [1]` Number of cores to use.**TBD** 
 
-![Caption for the picture.](visualisation_width.jpeg)
-
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs, see section `output` below).
@@ -71,19 +71,24 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - SNP names should be named so they match the SNP-id in the reference panel. 
 - If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
 
+## --window.width and --flanking.width
+[//]: -------------------------------
+![Caption for the picture.](visualisation_width.jpeg)
+
 ## Reference panel
 [//]: -------------------------------
-Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s). **@Aaron** is this correct?
+Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s).
 
 ## Run-time
 [//]: -------------------------------
-**TBD** compute run-time for a genome-wide imputation.
+To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are needed **(@sina check).**
 
 ## Technical aspects of summary statistics imputation
 [//]: -------------------------------
-For more details on the summary statistics imputation method, please see our paper (2017). 
+Briefly, 
 
-`insert here a brief recap of the method`
+
+For more details on the summary statistics imputation method, please see our paper (2017). 
 
 - If SNP-ID are present in the GWAS, then positions (bp) are copied from reference panel. 
 - If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
