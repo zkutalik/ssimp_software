@@ -53,8 +53,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--n.cores [1]` Number of cores to use.**TBD** 
 
-
-[embed]https://github.com/sinarueeger/ssimp_software/blob/master/docu/visualisation_width.pdf[/embed]
+![Caption for the picture.](visualisation_width.pdf)
 
 ### Note	
 [//]: -------
