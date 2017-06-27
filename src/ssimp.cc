@@ -183,9 +183,12 @@ int main(int argc, char **argv) {
     }
     else {
         options:: opt_non_options.size() == 3 || exitWithUsage();
+        ( options:: opt_gwas_filename.empty()) || exitWithUsage();
+        ( options:: opt_raw_ref      .empty()) || exitWithUsage();
+        ( options:: opt_out          .empty()) || exitWithUsage();
         options:: opt_gwas_filename = options:: opt_non_options.at(0);
-        options:: opt_raw_ref       = options:: opt_non_options.at(2);
-        options:: opt_out           = options:: opt_non_options.at(1);
+        options:: opt_raw_ref       = options:: opt_non_options.at(1);
+        options:: opt_out           = options:: opt_non_options.at(2);
     }
 
 
