@@ -146,7 +146,6 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_sample_names.empty() || DIE("--sample.names specified twice?");
             assert(string("sample.names") == long_options[long_option_index].name);
             options::  opt_sample_names = optarg;
-            adjust_sample_names_if_it_is_magical();
         }
         if (c == 16) {
             options:: opt_tags_used_output.empty() || DIE("--tags.used.output specified twice?");

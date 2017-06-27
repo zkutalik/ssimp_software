@@ -191,6 +191,10 @@ int main(int argc, char **argv) {
         options:: opt_out           = options:: opt_non_options.at(2);
     }
 
+    if(!options:: opt_sample_names.empty()) {
+        options:: adjust_sample_names_if_it_is_magical();
+    }
+
 
     if(!options:: opt_log.empty()) {
         logging:: setup_the_console_logging();
