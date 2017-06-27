@@ -191,8 +191,27 @@ int main(int argc, char **argv) {
         options:: opt_out           = options:: opt_non_options.at(2);
     }
 
+    // Next we deal with the fact that the ref panel argument is
+    // very special. If it begins with '1KG/', then we take the following
+    // steps:
+    //     1) Either the string is *exactly* '1KG' and the user must
+    //        specify a --sample.names filename containing the list of
+    //        sample IDS
+    //     2) or, the user must *not* specify --sample.names and instead
+    //        the sample IDs are inferred from the refpanel string:
+    //            1KG/EUR
+    //            1KG/TSI,EAS
+    //            1KG/male
+    //        The list of strings after the '/', separated by commas,
+    //        is looked up in the 1kg panel file. If any of those
+    //        strings appears in any of the columns, then that
+    //        sample is used.
+    if(options:: opt_raw_ref == "1KG") {
+        !options:: opt_sample_names.empty() || DIE("If refpanel is exactly '1KG', then you must specify a --sample.names filename specifying the individuals to use");
+    }
+
     if(!options:: opt_sample_names.empty()) {
-        options:: adjust_sample_names_if_it_is_magical();
+        options:: adjust_sample_names_if_it_is_magical(); // "panelfile.txt/fieldname/filterfield=filtervalue"
     }
 
 
