@@ -39,7 +39,7 @@ in this case `filename.samples.txt` contains sample id's (`sample`) along with a
 
 
 ### impute range of SNPs on a specific chromosome
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt --impute.range 1:1000-1:300000`
+`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt --impute.range 11:1000-11:300000`
 
 
 ### impute chromosome 6
