@@ -53,8 +53,9 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--n.cores [1]` Number of cores to use.**TBD** 
 
-<img src="visualisation_width.pdf" alt="some text"  width="4200">
-
+\begin{center} <br>
+\includegraphics[width=8in]{visualisation_width.pdf} <br>
+\end{center}
 
 ### Note	
 [//]: -------
