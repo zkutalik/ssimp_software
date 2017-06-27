@@ -1,9 +1,14 @@
 ssimp   GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
+ssimp   --gwas GWASFILE —out IMPUTATIONOUTPUT --ref REFPANEL
 
     GWASFILE                Path to an input file.
     IMPUTATIONOUTPUT        Output file, to store the imputation results.
     REFPANEL                If not specified, defaults to the 503 EUR
                             individuals in 1KG
+
+For examples, visit https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md
+
+For more details of the method and usage, visit https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md
 
 See below for more details on how to download a reference panel. At least one
 reference panel, with a population structure similar to your GWAS sample, must
@@ -14,6 +19,7 @@ more details) to '~/ref_panels/1000genomes', then you can run this:
 
     ssimp  gwas.txt  output.txt  ~/ref_panels/1000genomes  --sample.names super_pop=EUR
 
+    ssimp  gwas.txt  ~/ref_panels/1000genomes --out output.txt --sample.names super_pop=EUR
 
 Options:
     None of these options are necessary.  If an option isn't specified, a
