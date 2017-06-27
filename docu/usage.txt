@@ -1,5 +1,5 @@
-ssimp   GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
-ssimp   --gwas GWASFILE —out IMPUTATIONOUTPUT --ref REFPANEL
+ssimp   GWASFILE [REFPANEL] IMPUTATIONOUTPUT  [OPTIONS]
+ssimp   --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT 
 
     GWASFILE                Path to an input file.
     IMPUTATIONOUTPUT        Output file, to store the imputation results.
@@ -17,7 +17,7 @@ be downloaded by you.
 If you have already downloaded the 1000genomes reference panel (see below for
 more details) to '~/ref_panels/1000genomes', then you can run this:
 
-    ssimp  gwas.txt  output.txt  ~/ref_panels/1000genomes  --sample.names super_pop=EUR
+    ssimp  gwas.txt  ~/ref_panels/1000genomes output.txt --sample.names super_pop=EUR
 
     ssimp  gwas.txt  ~/ref_panels/1000genomes --out output.txt --sample.names super_pop=EUR
 
