@@ -83,12 +83,28 @@ Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if 
 [//]: -------------------------------
 To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are needed **(@sina check).**
 
-## Technical aspects of summary statistics imputation
+## Method
 [//]: -------------------------------
-Briefly, 
+Briefly, by combining summary statistics for a set of variants and the fine-scale LD structure in the same region, we can estimate summary statistics of new, untyped variants at the same locus. We can formally write this using the conditional expectation of a multivariate normal distribution. 
 
+### Main equation 
 
-For more details on the summary statistics imputation method, please see our paper (2017). 
+![Summary statistics equation](eq_main.jpg)
+
+Here we aim to impute the Z-statistic of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*, the pairwise correlations among the tag SNPs *C*, and the Z-statistics of a set of tag SNPs *M*. Both, *c* and *C* are regularised using the option `--lambda`. *M* includes SNPs among `--window.width` + left and right `--flanking.region`, whereas the core window (`--window.width`) only covers SNPs to impute. 
+
+### Imputation quality
+We use an adjusted imputation quality that corrects for the effective number of tag SNVs
+![Imputation quality](eq_impqual.jpg)
+
+To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the *C* and *c* matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
+
+### More details
+
+For more details on the summary statistics imputation method, please see our paper (2017) or (for a shortened method version) our application paper (2017). 
+
+## Technical aspects
+[//]: -------------------------------
 
 - If SNP-ID are present in the GWAS, then positions (bp) are copied from reference panel. 
 - If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
