@@ -154,9 +154,10 @@ void    set_appropriate_locale(ostream & stream) {
     }
 }
 
-void exitWithUsage() {
+bool exitWithUsage() {
     std:: cerr << usage_text;
     exit(1);
+    return false;
 }
 
 int main(int argc, char **argv) {
@@ -166,23 +167,30 @@ int main(int argc, char **argv) {
 
     options:: read_in_all_command_line_options(argc, argv);
 
-    if(!options:: opt_log.empty()) {
-        logging:: setup_the_console_logging();
+    // There should be exactly zero, or three, non-option arguments:
+    //     ssimp:  --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT
+    // or
+    //     ssimp:  GWASFILE REFPANEL IMPUTATIONOUTPUT
+    // In the next few lines, we check this and ensure the three values
+    // are stored in the appropriate variables.
+
+    if( options:: opt_non_options.size() == 0 ) {
+        // the three should already have been initialized via
+        // --gwas, --ref, and --out:
+        (!options:: opt_gwas_filename.empty()) || exitWithUsage();
+        (!options:: opt_raw_ref      .empty()) || exitWithUsage();
+        (!options:: opt_out          .empty()) || exitWithUsage();
+    }
+    else {
+        options:: opt_non_options.size() == 3 || exitWithUsage();
+        options:: opt_gwas_filename = options:: opt_non_options.at(0);
+        options:: opt_raw_ref       = options:: opt_non_options.at(2);
+        options:: opt_out           = options:: opt_non_options.at(1);
     }
 
-    // There should be two or three non-options arguments. In the coming
-    // lines, these are recognized and stored in the appropriate place.
-    if(options:: opt_non_options.size() >= 2) {
-        options:: opt_non_options.size() <= 3 || DIE("Usage: ");
-        options:: opt_gwas_filename.empty() || DIE("Usage:");
-        options:: opt_out          .empty() || DIE("Usage:");
 
-        options:: opt_gwas_filename = options:: opt_non_options.at(0);
-        options:: opt_out           = options:: opt_non_options.at(1);
-        if(options:: opt_non_options.size()==3) {
-            options:: opt_raw_ref      .empty() || DIE("Usage:");
-            options:: opt_raw_ref       = options:: opt_non_options.at(2);
-        }
+    if(!options:: opt_log.empty()) {
+        logging:: setup_the_console_logging();
     }
 
     options:: list_of_tasks_to_run_at_exit.push_back(
