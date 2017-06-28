@@ -185,10 +185,11 @@ void download_1KG_ifneeded() {
     assert(!directory_already_exists); // here because it doesn't exist and is needed. Need to help the user download it
 
     std:: cerr
-        << "You have requested the 1000genomes reference panel be used [" << options:: opt_raw_ref << "]."
-        << "It must be downloaded and available at [" << directory<< "]."
+        << "You have requested the 1000genomes reference panel be used [" << options:: opt_raw_ref << "]. "
+        << "It must be downloaded and available at [" << directory<< "]. "
         << "If you have already downloaded it to another location, you can set up a suitable symbolic link from to your data with:"
         << R"(
+
     mkdir -p ~/reference_panels
     ln -s YOUR_DOWNLOAD_OF_1000GENOMES ~/reference_panels/1KG
 
@@ -205,9 +206,27 @@ This takes up nearly 15 gigabytes of disk space.
     if(ret == 0) {
         std:: cerr
         << R"(
-It appears that 'wget' exists on your system. Would you like me to run the above commands for you automatically?
-[NOT YET IMPLEMENTED]
-)";
+It appears that 'wget' exists on your system. Would you like me to run the above commands for you automatically? Type 'yes':
+> )";
+        string response;
+        std:: cin >> response;
+        if(response == "yes") {
+            for(auto && cmd : {
+                 "mkdir -p ~/reference_panels/1KG"
+                ,"cd       ~/reference_panels/1KG && wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'"
+                    }) {
+                std:: cerr << "Running [" << cmd << "]:\n";
+                int ret = system(cmd);
+                if(ret != 0) {
+                    DIE("Error running [" << cmd << "]");
+                }
+            }
+            std:: cerr << "You should be able to rerun 'ssimp' now\n";
+            exit(0);
+        }
+        else {
+            DIE("You typed [" << response << "] not [yes] and therefore I won't download it for you.");
+        }
     }
     else {
         std:: cerr
