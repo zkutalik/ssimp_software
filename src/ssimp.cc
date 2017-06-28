@@ -211,6 +211,12 @@ int main(int argc, char **argv) {
     if(options:: opt_raw_ref == "1KG") {
         !options:: opt_sample_names.empty() || DIE("If refpanel is exactly '1KG', then you must specify a --sample.names filename specifying the individuals to use");
     }
+    if(options:: opt_raw_ref.substr(0, 4) == "1KG/") {
+         options:: opt_sample_names.empty() || DIE("If refpanel begins with '1KG/', e.g. '1KG/EUR', then you must *not* specify --sample.names");
+         options:: opt_raw_ref == "1KG/EUR" || DIE("Currently, only '1KG/EUR' is supported in this context");
+         options:: opt_raw_ref      = "/home/amcdaid/reference_panels/1KG/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz";
+         options:: opt_sample_names = "/home/amcdaid/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR";
+    }
 
     if(!options:: opt_sample_names.empty()) {
         options:: adjust_sample_names_if_it_is_magical(); // "panelfile.txt/fieldname/filterfield=filtervalue"
@@ -243,6 +249,7 @@ int main(int argc, char **argv) {
 
     cout << std::setprecision(20);
 
+#if 0
     // hack for hpc1. If --ref isn't specified, default it to 1kg
     if( options:: opt_raw_ref.empty() ) {
         options:: opt_raw_ref="/data/sgg/aaron/shared/ref_panels/1kg/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz";
@@ -262,6 +269,7 @@ int main(int argc, char **argv) {
         }
         cout << '\n';
     }
+#endif
 
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {
         exitWithUsage();
