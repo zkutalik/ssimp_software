@@ -11,9 +11,11 @@ This command line software enables summary statistics imputation (SSimp) for GWA
 
 ## Minimal example
 [//]: -------------------------------
-The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (`MarkerName`), Z-statistic (`Z`), reference allele (`a1`) and risk allele (`a2`) and at least one row, and (2) the path to the reference panel. 
+The minimal requirements are for `ssimp` to run are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (`MarkerName`), Z-statistic (`Z`), reference allele (`a1`) and risk allele (`a2`) and at least one row, and (2) the path to the reference panel. 
 
-`bin/ssimp --gwas data/my_gwas.txt --ref ref/my_reference_panel.vcf` will generate a file `data/my_gwas.txt.ssimp.txt`, containing the imputation results.
+`ssimp my_gwas.txt ~/.refpanel/my_reference_panel.vcf output.txt` will generate a file `output.txt`, containing the imputation results. This is identical to 
+
+`ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
 
 <sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistic, and therefore needs a negative sign if the effect size is negative). </sup>
 	
@@ -47,12 +49,11 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--window.width [1000000]` numeric value. Core window length.
 
-`--flanking.width [250000]` numeric value. Flanking space left and right side of the core window.
+`--flanking.width [250000]` numeric value. Flanking space left and right of the core window.
 		
 `--missingness [none]` string, ind, dep. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. We recommend `ind` (as its... ). This is automatically set to `ind` if `N` is not provided or `N` is set to `NA`.
 
 `--n.cores [1]` Number of cores to use.**TBD** 
-
 
 ### Note	
 [//]: -------
@@ -70,19 +71,41 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - SNP names should be named so they match the SNP-id in the reference panel. 
 - If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
 
+## --window.width and --flanking.width
+[//]: -------------------------------
+![Caption for the picture.](visuals/visualisation_width.jpeg)
+
 ## Reference panel
 [//]: -------------------------------
-Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s). **@Aaron** is this correct?
+Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s).
 
 ## Run-time
 [//]: -------------------------------
-**TBD** compute run-time for a genome-wide imputation.
+To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are needed **(@sina check).**
 
-## Technical aspects of summary statistics imputation
+## Method
 [//]: -------------------------------
-For more details on the summary statistics imputation method, please see our paper (2017). 
+Briefly, by combining summary statistics for a set of variants and the fine-scale LD structure in the same region, we can estimate summary statistics of new, untyped variants at the same locus. We can formally write this using the conditional expectation of a multivariate normal distribution. 
 
-`insert here a brief recap of the method`
+### Impute Z-statistic 
+
+![Summary statistics equation](visuals/eq_main.jpg)
+
+Here we aim to impute the Z-statistic of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), *C* (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, *c* and *C* are regularised using the option `--lambda`. *u* can be extended to a vector. *M* includes SNPs among `--window.width` + left and right `--flanking.region`, whereas the core window (`--window.width`) only covers SNPs to impute. 
+
+### Imputation quality
+We use an adjusted imputation quality that corrects for the effective number of tag SNVs *p.eff*.
+![Imputation quality](visuals/eq_impqual.jpg)
+
+### Variable missingness
+To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the *C* and *c* matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
+
+### More details
+
+For more details on the summary statistics imputation method, please see our paper (2017) or (for a shortened method version) our application paper (2017). 
+
+## Technical aspects
+[//]: -------------------------------
 
 - If SNP-ID are present in the GWAS, then positions (bp) are copied from reference panel. 
 - If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier

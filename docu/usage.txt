@@ -1,5 +1,5 @@
-ssimp   GWASFILE IMPUTATIONOUTPUT [REFPANEL]  [OPTIONS]
-ssimp   --gwas GWASFILE —out IMPUTATIONOUTPUT --ref REFPANEL
+ssimp   GWASFILE [REFPANEL] IMPUTATIONOUTPUT  [OPTIONS]
+ssimp   --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT 
 
     GWASFILE                Path to an input file.
     IMPUTATIONOUTPUT        Output file, to store the imputation results.
@@ -17,7 +17,7 @@ be downloaded by you.
 If you have already downloaded the 1000genomes reference panel (see below for
 more details) to '~/ref_panels/1000genomes', then you can run this:
 
-    ssimp  gwas.txt  output.txt  ~/ref_panels/1000genomes  --sample.names super_pop=EUR
+    ssimp  gwas.txt  ~/ref_panels/1000genomes output.txt --sample.names super_pop=EUR
 
     ssimp  gwas.txt  ~/ref_panels/1000genomes --out output.txt --sample.names super_pop=EUR
 
@@ -29,9 +29,9 @@ Options:
     --sample.names  [use all]   Sample IDs of individuals to use in the
                                 reference panel.
     --log           [none]      Store a copy of all console output to this file
-    --impute.range  [use all]   ...
-    --impute.maf    [0]         ...
-    --impute.snp    [use all]   ...
+    --impute.range  [use all]   Position range to be imputed (chr:start-chr:end)
+    --impute.maf    [0]         Minimum MAF among SNPs to be imputed
+    --impute.snp    [use all]   List of SNP id’s to be imputed
     --tag.range     [use all]   (same as impute.range, but applied to tag SNPs)
     --tag.maf       [0]         (same as impute.maf,   but applied to tag SNPs)
     --tag.snp       [use all]   (same as impute.snp,   but applied to tag SNPs)
@@ -39,8 +39,8 @@ Options:
                                 correlation matrix. Numeric value, or the
                                 special string "2/sqrt(n)" where n is the
                                 number of individuals in the reference panel.
-    --window.width  [1000000]   ...
-    --flanking.width [1000000]  ...
+    --window.width  [1000000]   Core window length
+    --flanking.width [1000000]  Flanking space left and right of the core window
     --missingness   [none]      'none' (the default), or 'dep' or 'ind'
 
 
