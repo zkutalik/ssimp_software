@@ -220,14 +220,29 @@ void adjust_sample_names_if_it_is_magical() { // check the filename exists. If n
                 };
 
                 offset_of_sample_field != -1 || DIE("Couldn't find ["<<sample_field<<"] field in [" << header_fields << "]?");
+                if(filter_field != "*") { // '*' is a special field name, matching any column
                 offset_of_filter_field != -1 || DIE("Couldn't find ["<<filter_field<<"] field in [" << header_fields << "]?");
+                }
 
                 std:: vector<string> filtered_samples_to_use;
                 string dataline;
                 while(getline(full_panel, dataline)) {
                     auto dataline_split = utils:: tokenize(dataline, delimiter);
-                    if(dataline_split.at(offset_of_filter_field) != filter_value)
-                        continue;
+                    if(offset_of_filter_field != -1) {
+                        if(dataline_split.at(offset_of_filter_field) != filter_value)
+                            continue;
+                    } else {
+                        assert(filter_field == "*");
+                        bool found_a_match = false;
+                        for(auto && x : dataline_split) {
+                            if(x == filter_value) {
+                                found_a_match = true;
+                                break;
+                            }
+                        }
+                        if(found_a_match == false)
+                            continue;
+                    }
                     filtered_samples_to_use.push_back(dataline_split.at(offset_of_sample_field));
                 }
 
