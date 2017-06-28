@@ -2,8 +2,11 @@
 "$SSIMP"                                                                            \
     --gwas "$GWAS"/too.big/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     --out "${OUT_IMPUTATIONS}"                                                      \
-    --ref "$REF"/full.1kg.download/ALL.chr${CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
-    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR \
+    --ref 1KG/EUR                                                                   \
     --reimpute                                                                      \
     --miss ${MISS}                                                                  \
+    --impute.range chr${CHRM}                                                       \
     >     "$OUTPUT"
+    # --ref ~/reference_panels/1KG
+    # --ref "$REF"/full.1kg.download/ALL.chr${CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+    #--sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR \
