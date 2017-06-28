@@ -213,9 +213,9 @@ int main(int argc, char **argv) {
     }
     if(options:: opt_raw_ref.substr(0, 4) == "1KG/") {
          options:: opt_sample_names.empty() || DIE("If refpanel begins with '1KG/', e.g. '1KG/EUR', then you must *not* specify --sample.names");
-         options:: opt_raw_ref == "1KG/EUR" || DIE("Currently, only '1KG/EUR' is supported in this context");
+         auto filter_value = options:: opt_raw_ref.substr(4);
          options:: opt_raw_ref      = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/ALL.chr{{CHRM}}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"  , getenv("HOME"));
-         options:: opt_sample_names = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/*=EUR"                , getenv("HOME"));
+         options:: opt_sample_names = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/*={1}"          , getenv("HOME"), filter_value);
     }
 
     if(!options:: opt_sample_names.empty()) {
