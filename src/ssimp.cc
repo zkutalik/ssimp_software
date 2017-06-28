@@ -1226,6 +1226,28 @@ int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C
 }
 static
 double  adjusted_imputation_quality (double iq_1e8_simple, int N_ref, int number_of_effective_tests) {
+    /* With a small change to the method which is in the paper currently.
+     * As the number_of_effective_tests increases, the resulting (estimate of)
+     * imputation quality decreases.
+     *
+     * However, a very large number_of_effective_tests could give extreme values, much larger than 1.0.
+     * I've seen +400.0 and -400.0
+     *
+     * The IQ is zero when:
+     *  1.0 = (1.0-iq_1e8_simple)*(N_ref - 1.0)/(N_ref - number_of_effective_tests - 1.0);
+     *  (N_ref - number_of_effective_tests - 1.0) =             (1.0-iq_1e8_simple)*(N_ref - 1.0);
+     *         - number_of_effective_tests        = 1 - N_ref + (1.0-iq_1e8_simple)*(N_ref - 1.0);
+     *           number_of_effective_tests        = N_ref - 1 - (1.0-iq_1e8_simple)*(N_ref - 1.0);
+     *           number_of_effective_tests        = N_ref - 1 + (iq_1e8_simple-1.0)*(N_ref - 1.0);
+     *           number_of_effective_tests        =           (1+iq_1e8_simple-1.0)*(N_ref - 1.0);
+     *           number_of_effective_tests        =              iq_1e8_simple     *(N_ref - 1.0);
+     */
+    if(number_of_effective_tests  >= iq_1e8_simple*(N_ref - 1.0)) {
+        // A little over this threshold results in negative IQ. But if
+        // it exceeds N_ref, then it becomes positive again!
+        // In either case though, it should (Aaron thinks) return 0.0
+        return 0;
+    }
     return 1.0 - (1.0-iq_1e8_simple)*(N_ref - 1.0)/(N_ref - number_of_effective_tests - 1.0);
 }
 
