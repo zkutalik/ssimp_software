@@ -12,6 +12,10 @@
 #include<gsl/gsl_blas.h>
 #include<gsl/gsl_eigen.h>
 
+#include <sys/types.h> // for 'opendir'
+#include <dirent.h> // for 'opendir'
+
+
 #include <gzstream.h>
 
 #include "options.hh"
@@ -162,6 +166,59 @@ bool exitWithUsage() {
     return false;
 }
 
+static
+void download_1KG_ifneeded() {
+    assert(options:: opt_raw_ref.substr(0, 3) == "1KG"); // only in here if the user specified a reference panel as '1KG...'
+
+    auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1KG"                                                        , getenv("HOME"));
+    auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
+
+    bool directory_already_exists       = opendir( directory.c_str() );
+    bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
+
+    if(directory_already_exists && panel_file_name_already_exists)
+        return; // all good, proceed as normal
+
+    if(directory_already_exists && !panel_file_name_already_exists)
+        DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the panel file is missing. [{0}]", panel_file_name));
+
+    assert(!directory_already_exists); // here because it doesn't exist and is needed. Need to help the user download it
+
+    std:: cerr
+        << "You have requested the 1000genomes reference panel be used [" << options:: opt_raw_ref << "]."
+        << "It must be downloaded and available at [" << directory<< "]."
+        << "If you have already downloaded it to another location, you can set up a suitable symbolic link from to your data with:"
+        << R"(
+    mkdir -p ~/reference_panels
+    ln -s YOUR_DOWNLOAD_OF_1000GENOMES ~/reference_panels/1KG
+
+If you have not already downloaded it, and you have 'wget' available on your system, then you can use these simple commands:
+
+    mkdir -p ~/reference_panels/1KG
+    cd       ~/reference_panels/1KG
+    wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
+
+This takes up nearly 15 gigabytes of disk space.
+)";
+
+    int ret = system("wget -h > /dev/null");
+    if(ret == 0) {
+        std:: cerr
+        << R"(
+It appears that 'wget' exists on your system. Would you like me to run the above commands for you automatically?
+[NOT YET IMPLEMENTED]
+)";
+    }
+    else {
+        std:: cerr
+        << R"(
+It appears that 'wget' does not exist on your system. You should install it and follow the above commands, or find another way to download a reference panel.
+)";
+    }
+
+    DIE("As described above, 1000genomes reference panel not in the expected location");
+}
+
 int main(int argc, char **argv) {
     if(argc==1) {
         exitWithUsage();
@@ -208,6 +265,14 @@ int main(int argc, char **argv) {
     //        is looked up in the 1kg panel file. If any of those
     //        strings appears in any of the columns, then that
     //        sample is used.
+
+    // But first, check if the relevant directory exists and, if it doesn't
+    // exist, explain to the user how to download it
+    if(options:: opt_raw_ref.substr(0, 3) == "1KG") {
+        download_1KG_ifneeded();
+    }
+
+    // OK, the 1KG directory exists now (if needed). Let's proceed
     if(options:: opt_raw_ref == "1KG") {
         !options:: opt_sample_names.empty() || DIE("If refpanel is exactly '1KG', then you must specify a --sample.names filename specifying the individuals to use");
     }
