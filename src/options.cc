@@ -228,23 +228,25 @@ void adjust_sample_names_if_it_is_magical() { // check the filename exists. If n
                 string dataline;
                 while(getline(full_panel, dataline)) {
                     auto dataline_split = utils:: tokenize(dataline, delimiter);
+                    bool found_a_match = false;
                     if(offset_of_filter_field != -1) {
-                        if(dataline_split.at(offset_of_filter_field) != filter_value)
-                            continue;
+                        if(dataline_split.at(offset_of_filter_field) == filter_value) {
+                                found_a_match = true;
+                        }
                     } else {
                         assert(filter_field == "*");
-                        bool found_a_match = false;
                         for(auto && x : dataline_split) {
                             if(x == filter_value) {
                                 found_a_match = true;
                                 break;
                             }
                         }
-                        if(found_a_match == false)
-                            continue;
                     }
-                    filtered_samples_to_use.push_back(dataline_split.at(offset_of_sample_field));
+                    if(found_a_match)
+                        filtered_samples_to_use.push_back(dataline_split.at(offset_of_sample_field));
                 }
+
+                !filtered_samples_to_use.empty() || DIE(AMD_FORMATTED_STRING("no samples found with [{1}]=[{2}] in [{0}]", underlying_filename, filter_field, filter_value));
 
                 char temporary_dirname[] = "/tmp/ssimp_XXXXXX";
                 mkdtemp(temporary_dirname) || DIE("Couldn't create temporary filename for use with --sample_names [" << temporary_dirname << "]" );
