@@ -74,6 +74,8 @@ mvn:: Matrix apply_lambda_rect   (   mvn:: Matrix copy
 
 static
 int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda);
+static
+double  adjusted_imputation_quality (double iq_1e8_simple, int N_ref, int number_of_effective_tests);
 
 static
 mvn:: SquareMatrix
@@ -939,7 +941,7 @@ void impute_all_the_regions(   string                                   filename
                     assert(res_0 == 0);
                     auto simple_imp_qual = to_store_one_imputation_quality(0,0);
                     //PPe(N_ref, simple_imp_qual);
-                    return 1.0 - (1.0-simple_imp_qual)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
+                    return adjusted_imputation_quality(simple_imp_qual, N_ref, number_of_effective_tests_in_C_nolambda);
                 }();
                 imp_quals_corrected.push_back(imp_qual);
             }
@@ -1223,6 +1225,11 @@ int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C
     return -1; // never going to get here
 }
 static
+double  adjusted_imputation_quality (double iq_1e8_simple, int N_ref, int number_of_effective_tests) {
+    return 1.0 - (1.0-iq_1e8_simple)*(N_ref - 1.0)/(N_ref - number_of_effective_tests - 1.0);
+}
+
+static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & r
     , SNPiterator     const & g
@@ -1309,7 +1316,7 @@ reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
             auto y_1e8 =C1e8_inv(m,m);
             auto iq_1e8_simple = 1-1.0/y_1e8; // we won't actually report this any more
 
-            auto iq_1e8_effective = 1.0 - (1.0-iq_1e8_simple)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
+            auto iq_1e8_effective = adjusted_imputation_quality(iq_1e8_simple, N_ref, number_of_effective_tests_in_C_nolambda);
 
             (void)iq_lambda_simple;
             (void)iq_1e8_effective;
