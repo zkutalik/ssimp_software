@@ -2,15 +2,27 @@
 # Software for Summary Statistics Imputation
 [//]: ========================================
 
-Run ssimp with no arguments to see the usage message. 
+This command line software enables summary statistics imputation (SSimp) for GWAS summary statistics.
 
-This repositorys' purpose is to facilitate the software developement of the SSimp and its documentation. 
+## Installation
+[//]: -------------------------------
 
-The software should be included in quicktest and therefore written in C++.
+### Source code
+1. Clone the github folder. 
+2. Run  `stu bin/ssimp`
+
+### Compiled version
+Download
+[ssimp 0.1 - Mac OS X]()
+[ssimp 0.1 - Ubuntu 12.04]()
 
 ## Documentation
 [//]: -------------------------------
-The folder `docu` contains the user manual.
+Run ssimp with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
+
+Check-out examples [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md)
+
+[Detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt)
 
 ## Minimal example
 [//]: -------------------------------
@@ -21,11 +33,3 @@ The minimal requirements are:
 (2) the path to the reference panel with a `vcf` and `tbi`. 
 
 `bin/ssimp --gwas data/my_gwas.txt` will impute the Z-statistics and generate a file `data/my_gwas.txt.ssimp.txt`.
-
-## Test data
-[//]: -------------------------------
-The folder `gwas` contains examples of summary statistics datasets that are used for test purposes.
-
-## Reference panel
-[//]: -------------------------------
-The folder `ref` contains reference panels for test purposes. 
