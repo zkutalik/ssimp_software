@@ -63,7 +63,6 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`
 
 ## Version (hg18, hg19, hg20)
-[//]: ------ Overview(https://genome.ucsc.edu/FAQ/FAQreleases.html)
 
 | UCSC      |                                    |
 | --------- |:----------------------------------:| 
