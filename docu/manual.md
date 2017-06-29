@@ -62,6 +62,14 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
 - Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`
 
+## Version (hg18, hg19, hg20)
+[//]: ------ Overview(https://genome.ucsc.edu/FAQ/FAQreleases.html)
+| UCSC      |                                    |
+| --------- |:----------------------------------:| 
+| hg20      | Genome Reference Consortium GRCh38 | 
+| hg19      | Genome Reference Consortium GRCh37 | 
+| hg18      | NCBI Build 36                      |   
+
 ## GWAS dataset
 [//]: -------------------------------
 - Column names are automatically recognised using commonly used names (see `../header_translation.md`). Missing values should be marked as `NA` or left empty. 
