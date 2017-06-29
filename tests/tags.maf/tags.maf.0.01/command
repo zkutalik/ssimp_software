@@ -4,6 +4,6 @@
     --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     --out "${OUT_IMPUTATIONS}"                                                              \
     --lambda 0.01                                                                           \
-    --tags.maf  0.0100                                                                      \
+    --tag.maf  0.0100                                                                      \
     --impute.range  chr1-chr2                                                         \
     > "$OUTPUT"

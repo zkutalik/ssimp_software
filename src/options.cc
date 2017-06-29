@@ -21,6 +21,7 @@ namespace action = range :: action;
 
 namespace options {
 
+        std::vector<std:: string>           opt_non_options; // if there are two or three of these, copy them into opt_gwas_filename, opt_out, and opt_raw_ref
         std:: string            opt_raw_ref;
         std:: string            opt_gwas_filename;
         std:: string            opt_out;
@@ -31,19 +32,22 @@ namespace options {
 
         std:: string            opt_impute_range;
         std:: string            opt_impute_snps;
-        std::unordered_set<std::string>    opt_impute_snps_as_a_uset;
+        std::unique_ptr<std::unordered_set<std::string>>    opt_impute_snps_as_a_uset;
         double                  opt_impute_maf =0.0;
 
         // The next few are like the --impute.* above, but applying to tags instead
-        std:: string            opt_tags_range;
-        std:: string            opt_tags_snps;
-        std::unordered_set<std::string>    opt_tags_snps_as_a_uset;
-        double                  opt_tags_maf =0.0; // target not imputed unless maf (in reference) is at least this.
+        std:: string            opt_tag_range;
+        std:: string            opt_tag_snps;
+        std::unique_ptr<std::unordered_set<std::string>>    opt_tag_snps_as_a_uset;
+        double                  opt_tag_maf =0.0; // target not imputed unless maf (in reference) is at least this.
 
         bool                    opt_reimpute_tags = false;
         std:: string            opt_tags_used_output;
 
         std:: string            opt_sample_names;
+        opt_missingness_t       opt_missingness;
+
+
         std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
 void read_in_all_command_line_options(int argc, char **argv) {
@@ -60,13 +64,14 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"impute.range"       ,  required_argument, 0,  8 },
             {"impute.snps"        ,  required_argument, 0,  9 },
             {"impute.maf"         ,  required_argument, 0, 10 },
-            {"tags.range"         ,  required_argument, 0, 11 },
-            {"tags.snps"          ,  required_argument, 0, 12 },
-            {"tags.maf"           ,  required_argument, 0, 13 },
+            {"tag.range"          ,  required_argument, 0, 11 },
+            {"tag.snps"           ,  required_argument, 0, 12 },
+            {"tag.maf"            ,  required_argument, 0, 13 },
             {"reimpute.tags"      ,        no_argument, 0, 14 }, // one-by-one, reimpute each tag by masking it
             {"sample.names"       ,  required_argument, 0, 15 },
             {"tags.used.output"   ,  required_argument, 0, 16 },
             {"log"                ,  required_argument, 0, 17 },
+            {"missingness"        ,  required_argument, 0, 18 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -75,7 +80,8 @@ void read_in_all_command_line_options(int argc, char **argv) {
         if (c == -1)
             break;
         if (c == 1) { // non-option
-            DIE("There shouldn't be any non-options args to this program: ["<<optarg<<"]");
+            opt_non_options.push_back(optarg);
+            // Save all the non-option arguments. There should be two or three of them
         }
         if (c == 2) {
             assert(string("ref") == long_options[long_option_index].name);
@@ -118,19 +124,19 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options::  opt_impute_maf = utils:: lexical_cast<double>(optarg);
         }
         if (c == 11) {
-            options:: opt_tags_range.empty() || DIE("--tags.range specified twice?");
-            assert(string("tags.range") == long_options[long_option_index].name);
-            options::  opt_tags_range = optarg;
+            options:: opt_tag_range.empty() || DIE("--tag.range specified twice?");
+            assert(string("tag.range") == long_options[long_option_index].name);
+            options::  opt_tag_range = optarg;
         }
         if (c == 12) {
-            options:: opt_tags_snps.empty() || DIE("--tags.snps specified twice?");
-            assert(string("tags.snps") == long_options[long_option_index].name);
-            options::  opt_tags_snps = optarg;
+            options:: opt_tag_snps.empty() || DIE("--tag.snps specified twice?");
+            assert(string("tag.snps") == long_options[long_option_index].name);
+            options::  opt_tag_snps = optarg;
         }
         if (c == 13) {
-            options:: opt_tags_maf == 0.0 || DIE("--tags.maf specified twice?");
-            assert(string("tags.maf") == long_options[long_option_index].name);
-            options::  opt_tags_maf = utils:: lexical_cast<double>(optarg);
+            options:: opt_tag_maf == 0.0 || DIE("--tag.maf specified twice?");
+            assert(string("tag.maf") == long_options[long_option_index].name);
+            options::  opt_tag_maf = utils:: lexical_cast<double>(optarg);
         }
         if (c == 14) {
             assert(string("reimpute.tags") == long_options[long_option_index].name);
@@ -140,7 +146,6 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_sample_names.empty() || DIE("--sample.names specified twice?");
             assert(string("sample.names") == long_options[long_option_index].name);
             options::  opt_sample_names = optarg;
-            adjust_sample_names_if_it_is_magical();
         }
         if (c == 16) {
             options:: opt_tags_used_output.empty() || DIE("--tags.used.output specified twice?");
@@ -151,6 +156,22 @@ void read_in_all_command_line_options(int argc, char **argv) {
             options:: opt_log.empty() || DIE("--log specified twice?");
             assert(string("log") == long_options[long_option_index].name);
             options::  opt_log = optarg;
+        }
+        if (c == 18) {
+            assert(string("missingness") == long_options[long_option_index].name);
+            if(false) {}
+            else if(string("none") == optarg) {
+                options::  opt_missingness = opt_missingness_t:: NAIVE;
+            }
+            else if(string("dep") == optarg) {
+                options::  opt_missingness = opt_missingness_t:: DEPENDENCY_MAXIMUM;
+            }
+            else if(string("ind") == optarg) {
+                options::  opt_missingness = opt_missingness_t:: INDEPENDENCE;
+            }
+            else {
+                DIE("--missingness argument ([" << optarg << "]) not understood. Valid values: dep,ind,none");
+            }
         }
     }
 }
@@ -199,16 +220,33 @@ void adjust_sample_names_if_it_is_magical() { // check the filename exists. If n
                 };
 
                 offset_of_sample_field != -1 || DIE("Couldn't find ["<<sample_field<<"] field in [" << header_fields << "]?");
+                if(filter_field != "*") { // '*' is a special field name, matching any column
                 offset_of_filter_field != -1 || DIE("Couldn't find ["<<filter_field<<"] field in [" << header_fields << "]?");
+                }
 
                 std:: vector<string> filtered_samples_to_use;
                 string dataline;
                 while(getline(full_panel, dataline)) {
                     auto dataline_split = utils:: tokenize(dataline, delimiter);
-                    if(dataline_split.at(offset_of_filter_field) != filter_value)
-                        continue;
-                    filtered_samples_to_use.push_back(dataline_split.at(offset_of_sample_field));
+                    bool found_a_match = false;
+                    if(offset_of_filter_field != -1) {
+                        if(dataline_split.at(offset_of_filter_field) == filter_value) {
+                                found_a_match = true;
+                        }
+                    } else {
+                        assert(filter_field == "*");
+                        for(auto && x : dataline_split) {
+                            if(x == filter_value) {
+                                found_a_match = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(found_a_match)
+                        filtered_samples_to_use.push_back(dataline_split.at(offset_of_sample_field));
                 }
+
+                !filtered_samples_to_use.empty() || DIE(AMD_FORMATTED_STRING("no samples found with [{1}]=[{2}] in [{0}]", underlying_filename, filter_field, filter_value));
 
                 char temporary_dirname[] = "/tmp/ssimp_XXXXXX";
                 mkdtemp(temporary_dirname) || DIE("Couldn't create temporary filename for use with --sample_names [" << temporary_dirname << "]" );

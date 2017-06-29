@@ -4,5 +4,5 @@
     --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
-    --tags.range  chr2-3                                                          \
+    --tag.range  chr2-3                                                             \
     > "$OUTPUT"

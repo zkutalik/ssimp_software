@@ -5,5 +5,5 @@
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
     --impute.maf    0.05                                                            \
-    --tags.range  chr1-chr2                                                         \
+    --tag.range  chr1-chr2                                                         \
     > "$OUTPUT"

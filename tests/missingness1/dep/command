@@ -1,0 +1,14 @@
+"$SSIMP"                                                                            \
+    --ref "$REF"/sub1KG-chr19/chr19.vcf.gz                                             \
+    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
+    --gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_JUSTPARTOFCHR19.tsv.gz                   \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 1000000                                                                  \
+    --flan 250000                                                                   \
+    --out "${OUT_IMPUTATIONS}"                                                      \
+    --lambda 0.01                                                                   \
+    --reimpute.tags                                                                 \
+    --missingness dep                                                              \
+    >     "$OUTPUT"
+    #--gwas "$GWAS"/too.big/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz \
+    #--gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_justPARTOFCHR19.tsv                      \

@@ -6,6 +6,6 @@
     --flan 250000                                                                   \
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.03996804                                                             \
-    --tags.snp <(echo  rs62224618 rs138257042                   | tr ' ' '\n')      \
+    --tag.snp <(echo  rs62224618 rs138257042                   | tr ' ' '\n')      \
     --impute.snp <(echo rs587697622 rs587755077 rs587654921     | tr ' ' '\n')      \
     >     "$OUTPUT"

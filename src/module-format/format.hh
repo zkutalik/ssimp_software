@@ -193,7 +193,12 @@ namespace format {
 
     /* Start the 'compile-time' version of this */
     constexpr static size_t cx_strlen(char const *s) {
-        return *s=='\0' ? 0 : (1+cx_strlen(s+1));
+        int l = 0;
+        while(*s++ != '\0') {
+            ++l;
+        }
+        return l;
+        //return *s=='\0' ? 0 : (1+cx_strlen(s+1));
     }
 
     template<typename string_provider_t>

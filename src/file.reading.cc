@@ -129,6 +129,7 @@ struct GwasLineSummary {
     string                   m_allele_alt;
     string                   m_allele_ref;
     double                   m_z;
+    double                   m_N;
 };
 
 GwasFileHandle_NONCONST read_in_a_gwas_file(std:: string file_name) {
@@ -319,6 +320,10 @@ struct SimpleGwasFile : public file_reading:: Effects_I
         auto const & ols = get_gls(i);
         return ols.m_z;
     }
+    virtual double      get_N                 (int i)     const {
+        auto const & ols = get_gls(i);
+        return ols.m_N;
+    }
     virtual void        set_chrpos        (int i, chrpos crps)  {
         assert(i>=0);
         assert(i<number_of_snps());
@@ -397,6 +402,14 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
                         z =  z_undir;
                     //PP(p, z, beta);
                     return z;
+                }
+            }();
+            gls.m_N          = [&](){
+                if(hd.effect_N.m_offset != -1) {
+                    return utils:: lexical_cast<double> (LOOKUP( hd, effect_N, all_split_up));
+                }
+                else {
+                    return -1.0;
                 }
             }();
 

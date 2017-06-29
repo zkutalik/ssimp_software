@@ -1,0 +1,11 @@
+"$SSIMP"                                                                            \
+    "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz  \
+    "$REF"/sub1KG-tiny/chr{CHRM}.vcf.gz                                          \
+    "${OUT_IMPUTATIONS}"                                                      \
+    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 250000                                                                   \
+    --flan 250000                                                                   \
+    --lambda 0.01                                                                   \
+       --tag.maf  0.01                                                              \
+    >     "$OUTPUT"

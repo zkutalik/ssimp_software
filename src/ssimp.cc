@@ -12,10 +12,16 @@
 #include<gsl/gsl_blas.h>
 #include<gsl/gsl_eigen.h>
 
+#include <sys/types.h> // for 'opendir'
+#include <dirent.h> // for 'opendir'
+
+
 #include <gzstream.h>
 
 #include "options.hh"
 #include "file.reading.hh"
+
+#include "usage_special.hh"
 
 #include "bits.and.pieces/utils.hh"
 #include "mvn/mvn.hh"
@@ -63,26 +69,38 @@ void impute_all_the_regions(   string                                   filename
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              );
 static
+mvn::SquareMatrix apply_lambda_square (mvn:: SquareMatrix copy, double lambda);
+static
+mvn:: Matrix apply_lambda_rect   (   mvn:: Matrix copy
+                        ,   vector<RefRecord const *> const & unk2_its
+                        ,   vector<RefRecord const *> const & tag_its_
+                        , double lambda);
+
+static
+int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda);
+static
+double  adjusted_imputation_quality (double iq_1e8_simple, int N_ref, int number_of_effective_tests);
+
+static
 mvn:: SquareMatrix
-make_C_tag_tag_matrix(
-                    vector<vector<int> const *>      const & genotypes_for_the_tags
-                    , double lambda
-                    );
+make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags);
 static
 mvn:: Matrix make_c_unkn_tags_matrix
         ( vector<vector<int> const *>      const & genotypes_for_the_tags
         , vector<vector<int> const *>      const & genotypes_for_the_unks
         , vector<RefRecord const *              > const & tag_its
         , vector<RefRecord const *              > const & unk_its
-        , double                                          lambda
         );
 using reimputed_tags_in_this_window_t = std:: unordered_map< RefRecord const * , std::pair<double,double> >;
 static
 reimputed_tags_in_this_window_t
 reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
-                                ,   mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C1e8_inv
                                 , std:: vector<double> const & tag_zs_
                                 , std:: vector<RefRecord const *> const & rrs
+                                , int const N_ref
+                                , int const number_of_effective_tests_in_C_nolambda
                                 );
 
 enum class which_direction_t { DIRECTION_SHOULD_BE_REVERSED
@@ -142,9 +160,152 @@ void    set_appropriate_locale(ostream & stream) {
     }
 }
 
+bool exitWithUsage() {
+    std:: cerr << usage_text;
+    exit(1);
+    return false;
+}
+
+static
+void download_1KG_ifneeded() {
+    assert(options:: opt_raw_ref.substr(0, 3) == "1KG"); // only in here if the user specified a reference panel as '1KG...'
+
+    auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1KG"                                                        , getenv("HOME"));
+    auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
+
+    bool directory_already_exists       = opendir( directory.c_str() );
+    bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
+
+    if(directory_already_exists && panel_file_name_already_exists)
+        return; // all good, proceed as normal
+
+    if(directory_already_exists && !panel_file_name_already_exists)
+        DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the panel file is missing. [{0}]", panel_file_name));
+
+    assert(!directory_already_exists); // here because it doesn't exist and is needed. Need to help the user download it
+
+    std:: cerr
+        << "You have requested the 1000genomes reference panel be used [" << options:: opt_raw_ref << "]. "
+        << "It must be downloaded and available at [" << directory<< "]. "
+        << "If you have already downloaded it to another location, you can set up a suitable symbolic link from to your data with:"
+        << R"(
+
+    mkdir -p ~/reference_panels
+    ln -s YOUR_DOWNLOAD_OF_1000GENOMES ~/reference_panels/1KG
+
+If you have not already downloaded it, and you have 'wget' available on your system, then you can use these simple commands:
+
+    mkdir -p ~/reference_panels/1KG
+    cd       ~/reference_panels/1KG
+    wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
+
+This takes up nearly 15 gigabytes of disk space.
+)";
+
+    int ret = system("wget -h > /dev/null");
+    if(ret == 0) {
+        std:: cerr
+        << R"(
+It appears that 'wget' exists on your system. Would you like me to run the above commands for you automatically? Type 'yes':
+> )";
+        string response;
+        std:: cin >> response;
+        if(response == "yes") {
+            for(auto && cmd : {
+                 "mkdir -p ~/reference_panels/1KG"
+                ,"cd       ~/reference_panels/1KG && wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'"
+                    }) {
+                std:: cerr << "Running [" << cmd << "]:\n";
+                int ret = system(cmd);
+                if(ret != 0) {
+                    DIE("Error running [" << cmd << "]");
+                }
+            }
+            std:: cerr << "You should be able to rerun 'ssimp' now\n";
+            exit(0);
+        }
+        else {
+            DIE("You typed [" << response << "] not [yes] and therefore I won't download it for you.");
+        }
+    }
+    else {
+        std:: cerr
+        << R"(
+It appears that 'wget' does not exist on your system. You should install it and follow the above commands, or find another way to download a reference panel.
+)";
+    }
+
+    DIE("As described above, 1000genomes reference panel not in the expected location");
+}
+
 int main(int argc, char **argv) {
+    if(argc==1) {
+        exitWithUsage();
+    }
 
     options:: read_in_all_command_line_options(argc, argv);
+
+    // There should be exactly zero, or three, non-option arguments:
+    //     ssimp:  --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT
+    // or
+    //     ssimp:  GWASFILE REFPANEL IMPUTATIONOUTPUT
+    // In the next few lines, we check this and ensure the three values
+    // are stored in the appropriate variables.
+
+    if( options:: opt_non_options.size() == 0 ) {
+        // the three should already have been initialized via
+        // --gwas, --ref, and --out:
+        (!options:: opt_gwas_filename.empty()) || exitWithUsage();
+        (!options:: opt_raw_ref      .empty()) || exitWithUsage();
+        (!options:: opt_out          .empty()) || exitWithUsage();
+    }
+    else {
+        options:: opt_non_options.size() == 3 || exitWithUsage();
+        ( options:: opt_gwas_filename.empty()) || exitWithUsage();
+        ( options:: opt_raw_ref      .empty()) || exitWithUsage();
+        ( options:: opt_out          .empty()) || exitWithUsage();
+        options:: opt_gwas_filename = options:: opt_non_options.at(0);
+        options:: opt_raw_ref       = options:: opt_non_options.at(1);
+        options:: opt_out           = options:: opt_non_options.at(2);
+    }
+
+    // Next we deal with the fact that the ref panel argument is
+    // very special. If it begins with '1KG/', then we take the following
+    // steps:
+    //     1) Either the string is *exactly* '1KG' and the user must
+    //        specify a --sample.names filename containing the list of
+    //        sample IDS
+    //     2) or, the user must *not* specify --sample.names and instead
+    //        the sample IDs are inferred from the refpanel string:
+    //            1KG/EUR
+    //            1KG/TSI,EAS
+    //            1KG/male
+    //        The list of strings after the '/', separated by commas,
+    //        is looked up in the 1kg panel file. If any of those
+    //        strings appears in any of the columns, then that
+    //        sample is used.
+
+    // But first, check if the relevant directory exists and, if it doesn't
+    // exist, explain to the user how to download it
+    if(options:: opt_raw_ref.substr(0, 3) == "1KG") {
+        download_1KG_ifneeded();
+    }
+
+    // OK, the 1KG directory exists now (if needed). Let's proceed
+    if(options:: opt_raw_ref == "1KG") {
+        !options:: opt_sample_names.empty() || DIE("If refpanel is exactly '1KG', then you must specify a --sample.names filename specifying the individuals to use");
+    }
+    if(options:: opt_raw_ref.substr(0, 4) == "1KG/") {
+         options:: opt_sample_names.empty() || DIE("If refpanel begins with '1KG/', e.g. '1KG/EUR', then you must *not* specify --sample.names");
+         auto filter_value = options:: opt_raw_ref.substr(4);
+         options:: opt_raw_ref      = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/ALL.chr{{CHRM}}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"  , getenv("HOME"));
+         options:: opt_sample_names = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/*={1}"          , getenv("HOME"), filter_value);
+    }
+
+    if(!options:: opt_sample_names.empty()) {
+        options:: adjust_sample_names_if_it_is_magical(); // "panelfile.txt/fieldname/filterfield=filtervalue"
+    }
+
 
     if(!options:: opt_log.empty()) {
         logging:: setup_the_console_logging();
@@ -172,6 +333,7 @@ int main(int argc, char **argv) {
 
     cout << std::setprecision(20);
 
+#if 0
     // hack for hpc1. If --ref isn't specified, default it to 1kg
     if( options:: opt_raw_ref.empty() ) {
         options:: opt_raw_ref="/data/sgg/aaron/shared/ref_panels/1kg/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz";
@@ -191,28 +353,34 @@ int main(int argc, char **argv) {
         }
         cout << '\n';
     }
+#endif
 
     if( options:: opt_raw_ref.empty() ||  options:: opt_gwas_filename.empty()) {
-        DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
+        exitWithUsage();
+        //DIE("Should pass args.\n    Usage:   " + string(argv[0]) + " --ref REFERENCEVCF --gwas GWAS --lambda 0.0 --window.width 1000000 --flanking.width 250000");
     }
 
     if( !options:: opt_impute_snps.empty() ) {
         gz:: igzstream f(options:: opt_impute_snps.c_str());
         (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_impute_snps << ']');
         string one_SNPname_or_chrpos;
+        options:: opt_impute_snps_as_a_uset  && DIE("multiple --impute.snps files not yet supported");
+        options:: opt_impute_snps_as_a_uset = std::make_unique< std::unordered_set<std::string> >();
         while(getline( f, one_SNPname_or_chrpos)) {
-            options:: opt_impute_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+            options:: opt_impute_snps_as_a_uset->insert(one_SNPname_or_chrpos);
         }
-        options:: opt_impute_snps_as_a_uset.empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
+        options:: opt_impute_snps_as_a_uset->empty() && DIE("Nothing in --impute.snps file? [" << options:: opt_impute_snps << "]");
     }
-    if( !options:: opt_tags_snps.empty() ) {
-        gz:: igzstream f(options:: opt_tags_snps.c_str());
-        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_tags_snps << ']');
+    if( !options:: opt_tag_snps.empty() ) {
+        gz:: igzstream f(options:: opt_tag_snps.c_str());
+        (f.rdbuf() && f.rdbuf()->is_open()) || DIE("Can't find file [" << options:: opt_tag_snps << ']');
         string one_SNPname_or_chrpos;
+        options:: opt_tag_snps_as_a_uset  && DIE("multiple --tag.snps files not yet supported");
+        options:: opt_tag_snps_as_a_uset = std::make_unique< std::unordered_set<std::string> >();
         while(getline( f, one_SNPname_or_chrpos)) {
-            options:: opt_tags_snps_as_a_uset.insert(one_SNPname_or_chrpos);
+            options:: opt_tag_snps_as_a_uset->insert(one_SNPname_or_chrpos);
         }
-        options:: opt_tags_snps_as_a_uset.empty() && DIE("Nothing in --tags.snps file? [" << options:: opt_tags_snps << "]");
+        options:: opt_tag_snps_as_a_uset->empty() && DIE("Nothing in --tag.snps file? [" << options:: opt_tag_snps << "]");
     }
 
     if( options:: opt_out .empty()) { // --out wasn't specified - default to ${gwas}.ssimp.txt
@@ -237,14 +405,13 @@ int main(int argc, char **argv) {
 
 namespace ssimp{
 
-struct skipper_target_I {
-    virtual bool    skip_me(int chrm, RefRecord const * rrp)    =0;
-    virtual chrpos  conservative_upper_bound()                  { return chrpos{std::numeric_limits<int>::max()   , std::numeric_limits<int>::max()   }; }
-    virtual chrpos  conservative_lower_bound()                  { return chrpos{std::numeric_limits<int>::lowest(), std::numeric_limits<int>::lowest()}; }
-};
-
 static
-chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_chromosome) {
+chrpos  parse_chrpos_text_to_object     (string as_text, bool to_end_of_chromosome) {
+    if  (   as_text.substr(0, 3) == "chr"
+         || as_text.substr(0, 3) == "Chr"
+         || as_text.substr(0, 3) == "CHR"
+        )
+        as_text = as_text.substr(3, string::npos);
     auto separated_by_colon = utils:: tokenize(as_text,':');
     chrpos position;
     switch(separated_by_colon.size()) {
@@ -261,109 +428,83 @@ chrpos lambda_chrpos_text_to_object     (string const &as_text, bool to_end_of_c
     }
     return position;
 }
-
-unique_ptr<skipper_target_I> make_skipper_for_targets
-        (   std:: string                                    range_as_string
-        ,   std::unordered_set<std::string>     const *     uset_of_strings
-        ,   double                                          minmaf
-        ) {
-    assert(uset_of_strings); // always a non-null pointer, even if the pointee is empty
-
-    if(minmaf != 0.0) {
-        assert( range_as_string.empty() );
-        assert( uset_of_strings->empty());
-
-        struct local : skipper_target_I {
-            double m_minmaf;
-            local(double minmaf) : m_minmaf(minmaf) {
-                assert(minmaf >= 0   ); // I should check this first in options.cc, in a more user friendly way
-                assert(minmaf <= 0.5 ); // I should check this first in options.cc, in a more user friendly way
-            }
-
-            bool    skip_me(int     , RefRecord const * rrp)   override {
-                assert(rrp);
-                return rrp->maf < m_minmaf;
-            }
-        };
-        return make_unique<local>(minmaf);
-    }
-
-    if( range_as_string.empty() && uset_of_strings->empty())
-    {
-        struct local : skipper_target_I {
-            bool    skip_me(int     , RefRecord const *    )   override { return false; }
-        };
-        return make_unique<local>();
-    }
-    if( range_as_string.empty() && !uset_of_strings->empty())
-    {   // --impute.snps was specified
-        // We check if either the ID, or the chr:pos is in the --impute.snps file
-        struct local : skipper_target_I {
-            decltype(uset_of_strings) m_uset_of_strings;
-            local(decltype(m_uset_of_strings) p) : m_uset_of_strings(p) { assert(m_uset_of_strings); }
-
-            bool    skip_me(int chrm, RefRecord const * rrp)   override {
-                assert(!m_uset_of_strings->empty());
-                return  (   m_uset_of_strings->count( rrp->ID )
-                        +   m_uset_of_strings->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rrp->pos ) )
-                        ) == 0;
-            }
-        };
-        return make_unique<local>(uset_of_strings);
-    }
-    if( !range_as_string.empty() && uset_of_strings->empty())
-    {   // --impute.range was specified
-        // --impute.range will either be an entire chromosome,
-        // or two locations in one chromosome separated by a '-'
-
-        auto separated_by_hyphen = utils:: tokenize(range_as_string, '-');
-
-        // remove any leading 'chr' or 'Chr'
-        for(auto &s : separated_by_hyphen) {
-            if(     s.substr(0,3) == "chr"
-                 || s.substr(0,3) == "Chr")
-                s = s.substr(3);
-        };
-
-        struct local : skipper_target_I {
-            chrpos  lower_allowed;
-            chrpos  upper_allowed;
-            virtual chrpos  conservative_upper_bound()         override { return upper_allowed; }
-            virtual chrpos  conservative_lower_bound()         override { return lower_allowed; }
-            bool    skip_me(int chrm, RefRecord const * rrp)   override {
-                bool b = !(  chrpos{chrm, rrp->pos} >= lower_allowed && chrpos{chrm, rrp->pos} <= upper_allowed    );
-                return b;
-            }
-        };
-        auto up = make_unique<local>();
-
-        switch(separated_by_hyphen.size()) {
-            break; case 1:
-            {
-                up->lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
-                up->upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), true);
-            }
-            break; case 2:
-            {
-                up->lower_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(0).c_str(), false);
-                up->upper_allowed = lambda_chrpos_text_to_object(separated_by_hyphen.at(1).c_str(), true);
-            }
-           break; default:
-                        DIE("too many hyphens in [" << range_as_string << "]");
+static
+std:: pair<chrpos,chrpos> parse_range_as_pair_of_chrpos(string const &as_text) {
+    auto separated_by_hyphen = utils:: tokenize(as_text, '-');
+    switch(separated_by_hyphen.size()) {
+        break; case 1: { // no hyphen. Just one position, or one entire chromosom
+                auto lower = parse_chrpos_text_to_object(separated_by_hyphen.at(0), false);
+                auto upper = parse_chrpos_text_to_object(separated_by_hyphen.at(0), true);
+                return {lower,upper};
         }
-        return std::move(up);
+        break; case 2: {
+                auto lower = parse_chrpos_text_to_object(separated_by_hyphen.at(0), false);
+                auto upper = parse_chrpos_text_to_object(separated_by_hyphen.at(1), true);
+                return {lower,upper};
+        }
+        break; default:
+                DIE("too many hyphens in [" << as_text << "]");
+    }
+    assert(0); // won't get here
+    return { {-100,-100}, {100,1000} };
+}
+
+enum class enum_tag_or_impute_t { TAG, IMPUTE };
+static
+bool    test_if_skip(enum_tag_or_impute_t toi, RefRecord const &rr, int chrm) {
+
+    // First, deal with --impute.snps or --tag.snps
+    auto & up_snps = toi == enum_tag_or_impute_t::TAG ? options:: opt_tag_snps_as_a_uset : options:: opt_impute_snps_as_a_uset;
+    if  (       up_snps ) {
+        if (    up_snps->count( rr.ID ) == 0
+             && up_snps->count( AMD_FORMATTED_STRING("chr{0}:{1}", chrm, rr.pos)) == 0
+             ) {
+            return true;
+        }
     }
 
-    assert  (   range_as_string.empty()
-             && uset_of_strings->empty());
-    DIE("--impute.range and --impute.snps can't be used together. (I thought I had already checked for this)");
-    return nullptr;
-    // TODO: clean up the end of this function
-    assert(0);
-        struct local : skipper_target_I {
-            bool    skip_me(int     , RefRecord const *    )   override { return false; }
-        };
-        return make_unique<local>();
+    // Next, deal with --impute.maf or --tag.maf
+    auto & up_maf   = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_maf
+                    : options:: opt_impute_maf;
+    if  ( rr.maf < up_maf ) {
+            return true;
+    }
+
+    // --{impute,tag}.range
+    auto & up_range = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_range
+                    : options:: opt_impute_range;
+    if(!up_range.empty()) {
+        auto up_range_parsed =  parse_range_as_pair_of_chrpos(up_range);
+        using utils:: operator<<;
+        if( chrpos{chrm, rr.pos} < up_range_parsed.first )
+            return true;
+        if( chrpos{chrm, rr.pos} > up_range_parsed.second )
+            return true;
+    }
+
+    return false;
+}
+static
+bool    test_if_skip(enum_tag_or_impute_t toi, chrpos l, chrpos u) {
+    // 'l' and 'u' represent a window, or an entire chromosome.
+    // We check here if --{impute,tag}.range is willing to skip
+    // everything between l and u
+
+    auto & up_range = toi == enum_tag_or_impute_t::TAG
+                    ? options:: opt_tag_range
+                    : options:: opt_impute_range;
+    if(!up_range.empty()) {
+        auto up_range_parsed =  parse_range_as_pair_of_chrpos(up_range);
+        using utils:: operator<<;
+        if( u < up_range_parsed.first )
+            return true;
+        if( l > up_range_parsed.second )
+            return true;
+    }
+
+    return false;
 }
 
 static
@@ -403,9 +544,10 @@ void impute_all_the_regions(   string                                   filename
                              * this is *not* used for actual imputation. */
         string      m_ID; // might be blank
         chrpos      m_chrpos;
-        string      m_all_ref; // effect allele
-        string      m_all_alt;
+        string      m_all_ref; // a1, other_allele , ...
+        string      m_all_alt; // a2, effect_allele , ...
         double      m_z;
+        double      m_N;
 
         bool operator< (one_tag_data const & other) const {
             if(m_chrpos     != other.m_chrpos   ) return m_chrpos   < other.m_chrpos    ;
@@ -430,23 +572,30 @@ void impute_all_the_regions(   string                                   filename
       ,options:: opt_flanking_width
             );
 
-    auto skipper_target = make_skipper_for_targets(options:: opt_impute_range, &options:: opt_impute_snps_as_a_uset, options:: opt_impute_maf);
-    auto skipper_tags   = make_skipper_for_targets(options:: opt_tags_range  , &options:: opt_tags_snps_as_a_uset  , options:: opt_tags_maf);
-
-    auto const trg_clb = skipper_target->conservative_lower_bound();
-    auto const trg_cub = skipper_target->conservative_upper_bound();
-    auto const tag_clb = skipper_tags  ->conservative_lower_bound();
-    auto const tag_cub = skipper_tags  ->conservative_upper_bound();
+    double N_max = -1;
+    for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+        N_max = std::max(N_max, gwas->get_N(i));
+    }
 
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
-    bool already_reimputed_the_first_non_empty_window = false;
+    int number_of_windows_seen_so_far_with_at_least_two_tags = 0; // useful to help decide when to do reimputation
     for(int chrm =  1; chrm <= 22; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
-        if  ( chrm < trg_clb.chr ) { continue; }
-        if  ( chrm > trg_cub.chr ) { continue; }
-        if  ( chrm < tag_clb.chr ) { continue; }
-        if  ( chrm > tag_cub.chr ) { continue; }
+        { // *optional* checks to help efficiency. Not necessary for correctness
+
+        /* Skip entire chromosome? if --tags.range *or* --impute.range want
+         * to skip this entire chromosome, then do it.
+         */
+            auto lowest_in_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::lowest() };
+            auto    max_in_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::max()    };
+            if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE
+                        , lowest_in_this_chromosome, max_in_this_chromosome)
+                 || test_if_skip( enum_tag_or_impute_t:: TAG
+                        , lowest_in_this_chromosome, max_in_this_chromosome)
+                )
+                continue;
+        }
 
         tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
@@ -455,24 +604,32 @@ void impute_all_the_regions(   string                                   filename
 
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
-            //PPe(chrm, w, current_window_start, current_window_end, utils::ELAPSED());
-            //PP(__LINE__, utils:: ELAPSED());
 
-            if(chrm == trg_cub.chr) {
-                if(chrpos{chrm,current_window_start                               } > trg_cub) { break; }
-            }
-            if(chrm == tag_cub.chr) {
-                if(chrpos{chrm,current_window_start - options:: opt_flanking_width} > tag_cub) { break; }
+            /* Crucially, first we check if we have already gone past
+             * the end of the current chromosome
+             */
+            {
+                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
+                                    ,   chrpos{chrm,std::numeric_limits<int>::max()                    }
+                                    );
+                RefRecord rr;
+                if(!ref_vcf.read_record_into_a_RefRecord(rr) ){
+                    break; /* There is nothing in this window, *nor* later windows, hence
+                            * we can break out of this chromosome
+                            */
+                }
+
             }
 
-            // applying the lower bound is a little trickier. Must only be applied on the correct
-            // chromosome, or else we get an infinite loop.
-            if(chrm == trg_clb.chr) {
-                if(chrpos{chrm,current_window_end                                 } < trg_clb) { continue; }
-            }
-            if(chrm == tag_clb.chr) {
-                if(chrpos{chrm,current_window_end   + options:: opt_flanking_width} < tag_clb) { continue; }
-            }
+            // Next, check if we can skip the entire window due to --impute.range or --tag.range
+            if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE
+                        , chrpos{chrm,current_window_start - options:: opt_flanking_width}
+                        , chrpos{chrm,current_window_end   + options:: opt_flanking_width} )
+                 || test_if_skip( enum_tag_or_impute_t:: TAG
+                        , chrpos{chrm,current_window_start}
+                        , chrpos{chrm,current_window_end  } )
+                )
+                continue;
 
             /*
              * For a given window, there are three "ranges" to consider:
@@ -490,50 +647,40 @@ void impute_all_the_regions(   string                                   filename
              */
 
             // First, load up all the reference data in the broad window.
-            // If this is empty, and it's the last window, then we can finish with this chromosome.
 
             vector<RefRecord>   all_nearby_ref_data;
-            bool not_the_last_window = false;
             {   // Read in all the reference panel data in this broad window, only bi-allelic SNPs.
-                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width}
-                                    ,   chrpos{chrm,std::numeric_limits<int>::max()                    } // in theory, to the end of the chromosome. See a few lines below
+                ref_vcf.set_region  (   chrpos{chrm,current_window_start - options:: opt_flanking_width} // inclusive
+                                    ,   chrpos{chrm,current_window_end   + options:: opt_flanking_width} // exclusive
                                     );
-                //PP(__LINE__, utils:: ELAPSED());
                 RefRecord rr;
                 while(ref_vcf.read_record_into_a_RefRecord(rr)) {
                     if(N_reference == -1) {
                         N_reference = rr.z12.size();
                         PP(N_reference);
                     }
-
-                    /*
-                     * if the position is beyond the current wide window, it means
-                     * this is *not* the last window
-                     */
-                    if(rr.pos   >= current_window_end   + options:: opt_flanking_width) {
-                        not_the_last_window = true;
-                        break;
-                    }
-
-                    if  (   skipper_tags  ->skip_me(chrm, &rr)
-                         && skipper_target->skip_me(chrm, &rr)
-                        )
-                    { /* skip this entirely as it's neither useful as a tag nor a target */ }
                     else {
-                        all_nearby_ref_data.push_back(rr);
+                        N_reference == ssize(rr.z12) || DIE("Varying size of reference panel? "
+                                << N_reference
+                                << " vs "
+                                << rr.z12.size()
+                                );
                     }
+
+                    if  (   test_if_skip( enum_tag_or_impute_t:: IMPUTE, rr , chrm)
+                         && test_if_skip( enum_tag_or_impute_t:: TAG   , rr , chrm)
+                        )
+                    {
+                        /* skip this SNP as it's neither useful as a tag nor a target */
+                        continue;
+                    }
+                    all_nearby_ref_data.push_back(rr);
 
                 }
-                //PP(__LINE__, utils:: ELAPSED(), all_nearby_ref_data.size());
 
                 for(int o=0; o+1 < ssize(all_nearby_ref_data); ++o) { // check position is monotonic
                     assert(all_nearby_ref_data.at(o).pos <= all_nearby_ref_data.at(o+1).pos);
                 }
-            }
-
-            if(all_nearby_ref_data.empty() && !not_the_last_window) {
-                // No more reference panel data, therefore no tags, therefore end of chromosome
-                break;
             }
 
             if(all_nearby_ref_data.empty()) {
@@ -627,6 +774,7 @@ void impute_all_the_regions(   string                                   filename
             // Next, find tags
             vector<double>                          tag_zs_;
             vector<RefRecord const *              > tag_its_;
+            vector<double>                          tag_Ns;
             {   // Look for tags in the broad window.
                 // This means moving monotonically through 'all_nearby_ref_data' and
                 // the gwas data in parallel, and identifying suitable 'pairs'
@@ -642,12 +790,14 @@ void impute_all_the_regions(   string                                   filename
                             );
                     vector<double> one_tag_zs;
                     vector<RefRecord const *> one_tag_its;
+                    vector<int              > one_tag_Ns;
                     for(; ! ref_candidates.empty(); ref_candidates.advance()) {
                         auto & current_ref = ref_candidates.front_ref();
                         assert( current_ref.pos == crps.pos );
 
-                        if(skipper_tags->skip_me(chrm, &current_ref)) {
-                            continue; // this tag skipped due to --tags.maf or --tags.range or --tags.snps
+                        // apply --tag.{snps,maf,range}
+                        if( test_if_skip( enum_tag_or_impute_t:: TAG, current_ref , chrm) ) {
+                            continue;
                         }
 
                         auto dir = decide_on_a_direction( current_ref
@@ -656,9 +806,11 @@ void impute_all_the_regions(   string                                   filename
                             break; case which_direction_t:: DIRECTION_SHOULD_BE_REVERSED:
                                 one_tag_zs.push_back( -tag_candidate.current_it().get_z() );
                                 one_tag_its.push_back( &current_ref        );
+                                one_tag_Ns.push_back(  tag_candidate.current_it().get_N() );
                             break; case which_direction_t:: DIRECTION_AS_IS             :
                                 one_tag_zs.push_back(  tag_candidate.current_it().get_z() );
                                 one_tag_its.push_back( &current_ref        );
+                                one_tag_Ns.push_back(  tag_candidate.current_it().get_N() );
                             break; case which_direction_t:: NO_ALLELE_MATCH             : ;
                         }
                     }
@@ -671,6 +823,8 @@ void impute_all_the_regions(   string                                   filename
                             tag_zs_.push_back(z);
                         for(auto it : one_tag_its)
                             tag_its_.push_back(it);
+                        for(auto it : one_tag_Ns)
+                            tag_Ns.push_back(it);
                     }
                 }
             }
@@ -691,9 +845,10 @@ void impute_all_the_regions(   string                                   filename
                                                             ,   chrpos{chrm,current_window_end});
                 for(auto it = w_ref_narrow_begin; it<w_ref_narrow_end; ++it) {
 
-                    bool skip_this_target = skipper_target->skip_me(chrm, &*it);
-                    if(skip_this_target)
+                    // apply --impute.{snps,maf,range}
+                    if( test_if_skip( enum_tag_or_impute_t:: IMPUTE, *it , chrm) ) {
                         continue;
+                    }
 
                     auto const & z12_for_this_SNP = it->z12;
                     auto z12_minmax = minmax_element(z12_for_this_SNP.begin(), z12_for_this_SNP.end());
@@ -720,6 +875,9 @@ void impute_all_the_regions(   string                                   filename
 
 
             // We now have at least one tag, and at least one target, so we can proceed
+
+            if  (number_of_tags > 1)
+                ++number_of_windows_seen_so_far_with_at_least_two_tags;
 
             // TODO: I still am including all the tags among the targets - change this?
 
@@ -760,71 +918,10 @@ void impute_all_the_regions(   string                                   filename
                     return 2.0 / sqrt(N_reference);
                 return utils:: lexical_cast<double>(options:: opt_lambda);
             }();
-            mvn:: SquareMatrix  C           = make_C_tag_tag_matrix(genotypes_for_the_tags, lambda);
-            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 0.0); // used only for the effective number of tests
-            mvn:: SquareMatrix  C_1e8lambda  = make_C_tag_tag_matrix(genotypes_for_the_tags, 1e-8);
-            //PP(__LINE__, utils:: ELAPSED());
-            mvn:: VecCol        C_inv_zs    = solve_a_matrix (C, mvn:: make_VecCol(tag_zs_));
-            //PP(__LINE__, utils:: ELAPSED());
-            mvn:: Matrix        c           = make_c_unkn_tags_matrix( genotypes_for_the_tags
-                                                         , genotypes_for_the_unks
-                                                         , tag_its_
-                                                         , unk2_its
-                                                         , lambda
-                                                         );
-            mvn:: Matrix        c_1e8lambda   = make_c_unkn_tags_matrix( genotypes_for_the_tags
-                                                         , genotypes_for_the_unks
-                                                         , tag_its_
-                                                         , unk2_its
-                                                         , 1e-8
-                                                         );
-            //PP(__LINE__, utils:: ELAPSED());
 
-            // Next two lines are the imputation, and its quality.
-            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c, C_inv_zs);
-            auto   Cinv    =                 invert_a_matrix ( C        );
-            auto   Cinv_c  =     mvn:: multiply_NoTrans_Trans( Cinv  , c);
-            auto   C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
-
-            assert( (int)Cinv_c.size1() == number_of_tags );
-            assert( (int)Cinv_c.size2() == number_of_all_targets );
-
-            int number_of_effective_tests_in_C_nolambda = [&C_nolambda]() {
-                int number_of_tags = C_nolambda.size();
-                vector<double> eigenvalues;
-
-                mvn:: VecCol eig_vals (number_of_tags);
-                // compute the eigenvalues of C. TODO: C_lambda or C_nolambda?
-                gsl_eigen_symm_workspace * w = gsl_eigen_symm_alloc(number_of_tags);
-                auto A = C_nolambda; // copy the matrix, so that it can be destroyed by gsl_eigen_symm
-                int ret = gsl_eigen_symm (A.get(), eig_vals.get(), w);
-                assert(ret==0);
-                gsl_eigen_symm_free(w);
-                for(int i = 0; i< utils::ssize(eig_vals); ++i)
-                    eigenvalues.push_back( eig_vals(i) );
-
-                sort(eigenvalues.rbegin(), eigenvalues.rend());
-                //using utils:: operator<<;
-                //PPe(eigenvalues);
-                auto sum_of_eigvals = std:: accumulate(eigenvalues.begin(), eigenvalues.end(), 0.0);
-                assert( std::abs(sum_of_eigvals-number_of_tags) < 1e-5 );
-                double running_total_of_eigenvalues = 0.0;
-
-                for(int i = 0; i< utils::ssize(eigenvalues); ++i) {
-                    running_total_of_eigenvalues += eigenvalues.at(i);
-                    //PPe(running_total_of_eigenvalues);
-                    if( running_total_of_eigenvalues >= 0.995 * sum_of_eigvals ) {
-                        return i+1;
-                    }
-                }
-                assert(0);
-                return -1; // never going to get here
-            }();
-            //PPe(number_of_effective_tests_in_C_nolambda);
-
-            // Finally, print out the imputations
             assert(number_of_all_targets == ssize(unk2_its));
 
+            // Next, record the real z of the tags. Just so we can print it in the output instead of trying to impute it
             std:: unordered_map<RefRecord const *, double> map_of_ref_records_of_tags;
             range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
             |action::unzip_foreach|
@@ -832,42 +929,123 @@ void impute_all_the_regions(   string                                   filename
                 (void)z;
                 map_of_ref_records_of_tags[tag_refrecord] = z;
             };
-
             assert(map_of_ref_records_of_tags.size() == tag_its_.size());
 
-            // if necessary, do reimputation
-            reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
+            // Compute the correlation matrices
+            mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags);
+            mvn:: Matrix        c_nolambda  = make_c_unkn_tags_matrix( genotypes_for_the_tags
+                                                         , genotypes_for_the_unks
+                                                         , tag_its_
+                                                         , unk2_its
+                                                         );
+
+            // Apply lambda
+            auto                C_lambda        = apply_lambda_square(C_nolambda, lambda);
+            auto                C_1e8lambda     = apply_lambda_square(C_nolambda, 1e-8);
+            auto                c_lambda        = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
+            auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, 1e-8);
+
+
+            if(options:: opt_missingness != options:: opt_missingness_t:: NAIVE) {
+                for(double n : tag_Ns) {
+                    n > 1 || DIE("--missingness requires n>1. [" << n << "]");
+                    assert( n <= N_max );
+                }
+            }
+
+            bool do_reimputation_in_this_window = false;
             if  (   number_of_tags > 1
-                 && (   !already_reimputed_the_first_non_empty_window
-                     ||  options:: opt_reimpute_tags
+                 && (   number_of_windows_seen_so_far_with_at_least_two_tags == 1 // this is the first such window
+                     ||  options:: opt_reimpute_tags // if true, do reimputation in all such windows, not just the first one
                     )
                 ) {
-                already_reimputed_the_first_non_empty_window = true;
-                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C, Cinv, tag_zs_, tag_its_);
+                do_reimputation_in_this_window = true;
+            }
+
+            // First, apply the missingness policy. Two matrices must be looped over
+            std:: function<double(double,double,double)> current_missingness_policy;
+            switch(options:: opt_missingness) {
+                break;  case options:: opt_missingness_t:: NAIVE:
+                    current_missingness_policy = [](double , double , double) -> double { return  1.0; }; // don't adjust C - just ignoring missingness for now
+                break;  case options:: opt_missingness_t:: DEPENDENCY_MAXIMUM:
+                    current_missingness_policy = [](double Nbig, double Nsml, double /*Nmax*/) -> double { assert(Nbig >= Nsml); return  std::sqrt(Nsml/Nbig); }; // assume maximum correlation in missingness
+                break;  case options:: opt_missingness_t:: INDEPENDENCE:
+                    current_missingness_policy = [](double Nbig, double Nsml, double Nmax) -> double { return  std::sqrt(Nsml)*std::sqrt(Nbig)/Nmax; };
+            }
+            for(int i=0; i<number_of_tags; ++i) {
+                for(int j=0; j<number_of_tags; ++j) {
+                    auto Ni = tag_Ns.at(i);
+                    auto Nj = tag_Ns.at(j);
+                    auto Nbig = std::max(Ni,Nj);
+                    auto Nsml = std::min(Ni,Nj);
+                    if(i!=j) {
+                        auto delta_ij = current_missingness_policy(Nbig, Nsml, N_max); // *always* pass the big one in first
+                        C_lambda.set   (i,j,  C_lambda   (i,j) * delta_ij);
+                        C_1e8lambda.set(i,j,  C_1e8lambda(i,j) * delta_ij);
+                    }
+                }
+            }
+            assert(c_lambda.size1() == (size_t)number_of_all_targets); // number of rows
+            assert(c_lambda.size2() == (size_t)number_of_tags); // number of columns
+            for(int i=0; i<number_of_all_targets; ++i) {
+                for(int j=0; j<number_of_tags; ++j) {
+                    auto Nj = tag_Ns.at(j);
+                    assert( Nj <= N_max );
+
+                    auto delta_ij = current_missingness_policy(N_max, Nj, N_max); // *always* pass the big one in first
+                    assert(delta_ij > 0.0);
+                    assert(delta_ij <= 1.0);
+                    c_lambda.set   (i,j,  c_lambda   (i,j) * delta_ij);
+                    c_1e8lambda.set(i,j,  c_1e8lambda(i,j) * delta_ij);
+                }
+            }
+            // missingness has now been applied.
+
+            // Compute the imputations
+            auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
+
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
+
+            // if necessary, do reimputation
+            // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
+            reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
+            if  (do_reimputation_in_this_window) {
+                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_1e8lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
 
 
-            mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
+            // Next few lines are for the imputation quality
+            auto C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
+            vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
+
+            for(int i=0; i<number_of_all_targets; ++i) {
+                mvn:: Matrix to_store_one_imputation_quality(1,1); // a one-by-one-matrix
+                auto imp_qual = [&](){ // multiply one vector by another, to directly get
+                                        // the diagonal of the imputation quality matrix.
+                                        // This should be quicker than fully computing
+                                        // c' * inv(C) * c
+                    auto lhs = gsl_matrix_const_submatrix(   c_1e8lambda.get(), i, 0, 1, number_of_tags);
+                    auto rhs = gsl_matrix_const_submatrix( C1e8inv_c1e8 .get(), 0, i, number_of_tags, 1);
+                    // TODO: Maybe move the next line into mvn.{hh,cc}?
+                    const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
+                    assert(res_0 == 0);
+                    auto simple_imp_qual = to_store_one_imputation_quality(0,0);
+                    //PPe(N_ref, simple_imp_qual);
+                    return adjusted_imputation_quality(simple_imp_qual, N_ref, number_of_effective_tests_in_C_nolambda);
+                }();
+                imp_quals_corrected.push_back(imp_qual);
+            }
+            assert(number_of_all_targets == ssize(imp_quals_corrected));
+
+            // Finally, print out everything to the --out file
             for(int i=0; i<number_of_all_targets; ++i) {
                     auto && target = unk2_its.at(i);
                     auto pos  = target->pos;
                     auto SNPname = target->ID;
 
-                    auto imp_qual = [&](){ // multiply one vector by another, to directly get
-                                            // the diagonal of the imputation quality matrix.
-                                            // This should be quicker than fully computing
-                                            // c' * inv(C) * c
-                        auto lhs = gsl_matrix_const_submatrix(   c_1e8lambda.get(), i, 0, 1, number_of_tags);
-                        auto rhs = gsl_matrix_const_submatrix( C1e8inv_c1e8 .get(), 0, i, number_of_tags, 1);
-                        // TODO: Maybe move the next line into mvn.{hh,cc}?
-                        const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
-                        assert(res_0 == 0);
-                        auto simple_imp_qual = to_store_one_imputation_quality(0,0);
-                        //PPe(N_ref, simple_imp_qual);
-                        return 1.0 - (1.0-simple_imp_qual)*(N_ref - 1.0)/(N_ref - number_of_effective_tests_in_C_nolambda - 1.0);
-                    }();
+                    auto imp_qual = imp_quals_corrected.at(i);
 
                     auto z_imp = c_Cinv_zs(i);
                     double Z_reimputed = std::nan("");
@@ -876,12 +1054,10 @@ void impute_all_the_regions(   string                                   filename
                     // Is this target actually a tag SNP?
                     bool const was_in_the_GWAS = map_of_ref_records_of_tags.count(target);
 
-                    if(was_in_the_GWAS) {
+                    if(was_in_the_GWAS) { // don't print the imputation, just copy straight from the GWAS
                         auto GWAS_z = map_of_ref_records_of_tags.at(target);
-
                         // assert(std::abs(imp_qual-1.0) < 1e-5);
                         // assert(std::abs(GWAS_z-z_imp) < 1e-5); // TODO: breaks with 1KG/EUR + UKB-both - I should investigate this further
-
                         imp_qual = 1.0;
                         z_imp = GWAS_z;
 
@@ -908,17 +1084,24 @@ void impute_all_the_regions(   string                                   filename
                         << endl;
             }
 
+            // Finally, store every tag used. We will print it all at the end to
+            // another file (--tags.used.output)
+
             if(!options:: opt_tags_used_output.empty()) {
                 assert(tag_its_.size() == tag_zs_.size());
-                range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
+                range:: zip_val ( from:: vector(tag_its_)
+                                , from:: vector(tag_zs_)
+                                , from:: vector(tag_Ns)
+                                )
                 |action::unzip_foreach|
-                [&](auto && tag_refrecord, auto && z) {
+                [&](auto && tag_refrecord, auto z, auto N) {
                     one_tag_data otd {
                         tag_refrecord->ID
                             , {chrm, tag_refrecord->pos}
                         , tag_refrecord->ref
                         , tag_refrecord->alt
                         , z
+                        , N
                     };
                     tag_data_used.push_back(otd);
                 };
@@ -942,9 +1125,10 @@ void impute_all_the_regions(   string                                   filename
                     << "ID"
             << '\t' << "Chr"
             << '\t' << "Pos"
-            << '\t' << "effect_allele"
-            << '\t' << "other_allele"
+            << '\t' << gwas->get_column_name_allele_ref() // copy column name from the GWAS input
+            << '\t' << gwas->get_column_name_allele_alt() // copy column name from the GWAS input
             << '\t' << "z"
+            << '\t' << "N"
             << '\n'
             ;
         for(auto && otd : tag_data_used) {
@@ -955,6 +1139,7 @@ void impute_all_the_regions(   string                                   filename
             << '\t' << otd.m_all_ref
             << '\t' << otd.m_all_alt
             << '\t' << otd.m_z
+            << '\t' << otd.m_N
             << '\n';
         }
     }
@@ -962,9 +1147,7 @@ void impute_all_the_regions(   string                                   filename
 
 static
 mvn:: SquareMatrix
-make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags
-                     , double                                   lambda
-                     ) {
+make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags) {
     int const number_of_tags = genotypes_for_the_tags.size();
     int const N_ref = genotypes_for_the_tags.at(0)->size();
     assert(N_ref > 0);
@@ -991,11 +1174,10 @@ make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_th
             assert(c_kl <=  1.0);
             if(k==l) {
                 assert(c_kl == 1.0);
-                C.set(k,l,c_kl);
             }
             else {
-                C.set(k,l,c_kl * (1.0-lambda));
             }
+            C.set(k,l,c_kl);
         }
     }
     return C;
@@ -1006,7 +1188,6 @@ mvn:: Matrix make_c_unkn_tags_matrix
         , vector<vector<int> const *>      const & genotypes_for_the_unks
         , vector<RefRecord const *              > const & tag_its
         , vector<RefRecord const *              > const & unk_its
-        , double                                          lambda
         ) {
     int const number_of_tags = genotypes_for_the_tags.size();
     int const number_of_all_targets = genotypes_for_the_unks.size();
@@ -1062,17 +1243,106 @@ mvn:: Matrix make_c_unkn_tags_matrix
 
                 if(tag_its_k == unk_its_u) { // identical pointer value, i.e. same reference entry
                     assert(c_ku ==  1.0);
-                    c.set(u,k,c_ku);
                 }
                 else {
                     assert(c_ku >= -1.0);
                     assert(c_ku <=  1.0);
-                    c.set(u,k,c_ku * (1.0-lambda));
                 }
+                c.set(u,k,c_ku);
          };
     }
     return c;
 };
+static
+mvn::SquareMatrix apply_lambda_square (mvn:: SquareMatrix copy, double lambda) {
+    int s = copy.size();
+    for(int i=0; i<s; ++i) {
+        for(int j=0; j<s; ++j) {
+            if(i!=j)
+                copy.set(i,j,  copy(i,j)*(1.0-lambda));
+        }
+    }
+    return copy;
+}
+static
+mvn:: Matrix apply_lambda_rect   (   mvn:: Matrix copy
+                        ,   vector<RefRecord const *> const & unk2_its
+                        ,   vector<RefRecord const *> const & tag_its_
+                        , double lambda) {
+    int number_of_all_targets = unk2_its.size();
+    int number_of_tags        = tag_its_.size();
+    assert(copy.size1() == (size_t)number_of_all_targets);
+    assert(copy.size2() == (size_t)number_of_tags);
+    for(int i=0; i<number_of_all_targets; ++i) {
+        for(int j=0; j<number_of_tags; ++j) {
+            if(tag_its_.at(j) == unk2_its.at(i))
+                assert(copy(i,j) == 1.0);
+            else {
+                copy.set(i,j, copy(i,j)*(1.0-lambda));
+            }
+        }
+    }
+    return copy;
+}
+static
+int compute_number_of_effective_tests_in_C_nolambda(mvn:: SquareMatrix const & C_smalllambda) {
+    int number_of_tags = C_smalllambda.size();
+    vector<double> eigenvalues;
+
+    mvn:: VecCol eig_vals (number_of_tags);
+    // compute the eigenvalues of C. TODO: C_lambda or C_smalllambda?
+    gsl_eigen_symm_workspace * w = gsl_eigen_symm_alloc(number_of_tags);
+    auto A = C_smalllambda; // copy the matrix, so that it can be destroyed by gsl_eigen_symm
+    int ret = gsl_eigen_symm (A.get(), eig_vals.get(), w);
+    assert(ret==0);
+    gsl_eigen_symm_free(w);
+    for(int i = 0; i< utils::ssize(eig_vals); ++i)
+        eigenvalues.push_back( eig_vals(i) );
+
+    sort(eigenvalues.rbegin(), eigenvalues.rend());
+    //using utils:: operator<<;
+    //PPe(eigenvalues);
+    auto sum_of_eigvals = std:: accumulate(eigenvalues.begin(), eigenvalues.end(), 0.0);
+    assert( std::abs(sum_of_eigvals-number_of_tags) < 1e-5 );
+    double running_total_of_eigenvalues = 0.0;
+
+    for(int i = 0; i< utils::ssize(eigenvalues); ++i) {
+        running_total_of_eigenvalues += eigenvalues.at(i);
+        //PPe(running_total_of_eigenvalues);
+        if( running_total_of_eigenvalues >= 0.995 * sum_of_eigvals ) {
+            return i+1;
+        }
+    }
+    assert(0);
+    return -1; // never going to get here
+}
+static
+double  adjusted_imputation_quality (double iq_1e8_simple, int N_ref, int number_of_effective_tests) {
+    /* With a small change to the method which is in the paper currently.
+     * As the number_of_effective_tests increases, the resulting (estimate of)
+     * imputation quality decreases.
+     *
+     * However, a very large number_of_effective_tests could give extreme values, much larger than 1.0.
+     * I've seen +400.0 and -400.0
+     *
+     * The IQ is zero when:
+     *  1.0 = (1.0-iq_1e8_simple)*(N_ref - 1.0)/(N_ref - number_of_effective_tests - 1.0);
+     *  (N_ref - number_of_effective_tests - 1.0) =             (1.0-iq_1e8_simple)*(N_ref - 1.0);
+     *         - number_of_effective_tests        = 1 - N_ref + (1.0-iq_1e8_simple)*(N_ref - 1.0);
+     *           number_of_effective_tests        = N_ref - 1 - (1.0-iq_1e8_simple)*(N_ref - 1.0);
+     *           number_of_effective_tests        = N_ref - 1 + (iq_1e8_simple-1.0)*(N_ref - 1.0);
+     *           number_of_effective_tests        =           (1+iq_1e8_simple-1.0)*(N_ref - 1.0);
+     *           number_of_effective_tests        =              iq_1e8_simple     *(N_ref - 1.0);
+     */
+    if(number_of_effective_tests  >= iq_1e8_simple*(N_ref - 1.0)) {
+        // A little over this threshold results in negative IQ. But if
+        // it exceeds N_ref, then it becomes positive again!
+        // In either case though, it should (Aaron thinks) return 0.0
+        return 0;
+    }
+    return 1.0 - (1.0-iq_1e8_simple)*(N_ref - 1.0)/(N_ref - number_of_effective_tests - 1.0);
+}
+
 static
     which_direction_t decide_on_a_direction
     ( RefRecord                       const & r
@@ -1121,9 +1391,12 @@ static
 static
 reimputed_tags_in_this_window_t
 reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
-                                ,   mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C_inv
+                                , mvn:: SquareMatrix const & C1e8_inv
                                 , std:: vector<double> const & zs
                                 , std:: vector<RefRecord const *> const & rrs
+                                , int const N_ref
+                                , int const number_of_effective_tests_in_C_nolambda
                                 ) {
     assert(C.size() == zs.size());
     assert(C.size() == C_inv.size());
@@ -1146,7 +1419,26 @@ reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
 
             auto x = multiply_rowvec_by_colvec_giving_scalar( vec, mvn:: make_VecCol(zs) )(0) ;
             auto y =C_inv(m,m);
-            return std:: make_pair(- x / y, C(m,m)-1.0/y);
+
+            auto reimp = -x/y;
+            auto iq_lambda_simple = C(m,m)-1.0/y; // we won't actually report this any more
+
+            // to do the '#effective tests' calculation of IQ, we need to start with the
+            // simple IQ, *but* with negligible lamdba
+
+            assert(C(m,m) == 1);
+            auto y_1e8 =C1e8_inv(m,m);
+            auto iq_1e8_simple = 1-1.0/y_1e8; // we won't actually report this any more
+
+            auto iq_1e8_effective = adjusted_imputation_quality(iq_1e8_simple, N_ref, number_of_effective_tests_in_C_nolambda);
+
+            (void)iq_lambda_simple;
+            (void)iq_1e8_effective;
+
+            return std:: make_pair(reimp
+                    //, iq_lambda_simple
+                    , iq_1e8_effective
+                    );
         }();
         reimputed_tags_z .push_back(z_fast.first);
         reimputed_tags_r2.push_back(z_fast.second);
