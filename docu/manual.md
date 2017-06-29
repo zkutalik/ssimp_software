@@ -83,11 +83,11 @@ Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if 
 [//]: -------------------------------
 To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are needed **(@sina check).**
 
-## Method
+## Method outline
 [//]: -------------------------------
 Briefly, by combining summary statistics for a set of variants and the fine-scale LD structure in the same region, we can estimate summary statistics of new, untyped variants at the same locus. We can formally write this using the conditional expectation of a multivariate normal distribution. 
 
-### Impute Z-statistic 
+### Impute Z-statistics
 
 ![Summary statistics equation](visuals/eq_main.jpg)
 
@@ -100,7 +100,7 @@ We use an adjusted imputation quality that corrects for the effective number of 
 ### Variable missingness
 To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the *C* and *c* matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
 
-### More details
+### More background on method
 
 For more details on the summary statistics imputation method, please see our paper (2017) or (for a shortened method version) our application paper (2017). 
 
