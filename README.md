@@ -13,8 +13,8 @@ This command line software enables summary statistics imputation (SSimp) for GWA
 
 ### Compiled version
 Download
-[ssimp 0.1 - Mac OS X]()
-[ssimp 0.1 - Ubuntu 12.04]()
+* [ssimp 0.1 - Mac OS X]()
+* [ssimp 0.1 - Ubuntu 12.04]()
 
 ## Documentation
 [//]: -------------------------------
