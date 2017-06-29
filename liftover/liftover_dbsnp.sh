@@ -2,7 +2,7 @@
 ## file to lift over
 ## ------------------
 cd /data/sgg/sina/public.data/dbsnp
-zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v '(NotOn|ChrUn)' | awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > dbsnp_hg20.bed
+zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v 'NotOn|ChrUn' | awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > dbsnp_hg20.bed
 
 ## rmove rows with NotOn and ChrUn
 
