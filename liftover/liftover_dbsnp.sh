@@ -1,36 +1,19 @@
-#####################################################################################
-## Author: Sina Rueeger [sina *.* rueger *a*t* unil *.* ch]
-## Project: 
-##        
-## Time-stamp: <[liftover_dbsnp.R] by SR Thu 29/06/2017 17:02 (CEST)>
-##
-## Description:
-## 
-##
-## History:
-## 
-#####################################################################################
-
-## checkout /data/sgg/sina/software/liftOver/howto_liftOver.txt
-rm(list=ls())
-
-data.dbsnp <- "/data/sgg/sina/public.data/dbsnp/"
-liftover <- "/data/sgg/sina/software/liftOver/liftOver"
 
 ## file to lift over
 ## ------------------
-library(readr)
-#zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v NotOn | egrep -v ChrUn | awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > dbsnp_hg20.bed
+cd /data/sgg/sina/public.data/dbsnp
+zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v '(NotOn|ChrUn)' | awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > dbsnp_hg20.bed
 
+## rmove rows with NotOn and ChrUn
 
 ## liftover hg20 > hg19
 ## ---------------------
 
-system(paste0(liftover, " ",data.dbsnp,"dbsnp_hg20.bed /data/sgg/sina/software/liftOver/hg20ToHg19.over.chain ",data.dbsnp,"liftover_hg19.bed ",data.dbsnp,"unlifted_hg19.bed"))
+/data/sgg/sina/software/liftOver/liftOver /data/sgg/sina/public.data/dbsnp/dbsnp_hg20.bed /data/sgg/sina/software/liftOver/hg20ToHg19.over.chain /data/sgg/sina/public.data/dbsnp/liftover_hg19.bed /data/sgg/sina/public.data/dbsnp/unlifted_hg19.bed
 
 ## liftover hg20 > hg18
 ## ---------------------
-system(paste0(liftover," ",data.dbsnp,"liftover_hg19.bed /data/sgg/sina/software/liftOver/hg19ToHg18.over.chain ",data.dbsnp,"liftover_hg18.bed ",data.dbsnp,"unlifted_hg18.bed"))
+/data/sgg/sina/software/liftOver/liftOver /data/sgg/sina/public.data/dbsnp/liftover_hg19.bed /data/sgg/sina/software/liftOver/hg19ToHg18.over.chain /data/sgg/sina/public.data/dbsnp/liftover_hg18.bed /data/sgg/sina/public.data/dbsnp/unlifted_hg18.bed
 
 ## merge files together
 ## --------------------
