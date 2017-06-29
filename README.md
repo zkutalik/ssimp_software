@@ -2,6 +2,8 @@
 # Software for Summary Statistics Imputation
 [//]: ========================================
 
+Run ssimp with no arguments to see the usage message. 
+
 This repositorys' purpose is to facilitate the software developement of the SSimp and its documentation. 
 
 The software should be included in quicktest and therefore written in C++.
