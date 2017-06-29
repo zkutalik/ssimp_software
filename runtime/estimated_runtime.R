@@ -2,7 +2,7 @@
 ## Author: Sina Rueeger [sina *.* rueger *a*t* unil *.* ch]
 ## Project: 
 ##        
-## Time-stamp: <[estimated_runtime.R] by SR Thu 22/06/2017 10:40 (CEST)>
+## Time-stamp: <[estimated_runtime.R] by SR Thu 29/06/2017 10:31 (CEST)>
 ##
 ## Description:
 ## 
@@ -14,7 +14,7 @@
 
 ## take the runtime from chr 22, # of snps imputed and scale it up to the number of snps in each chr
 ## --------------------------
-libary(readr)
+library(readr)
 nams <- grep(".txt", grep("runtime_",dir(), value = TRUE), value = TRUE)
 rem <- grep("tmp", nams)
 nams <- nams[-rem]
