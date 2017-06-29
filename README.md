@@ -20,7 +20,7 @@ Download
 [//]: -------------------------------
 Run ssimp with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
 
-Check-out examples [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md)
+Check-out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md)
 
 [Detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt)
 
