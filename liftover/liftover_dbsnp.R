@@ -30,7 +30,7 @@ toyex[,4] <- paste0("rs",tmp$V1) ## rs#
 toyex[,5] <- tmp$V2  ## CHR
 
 write_tsv(toyex, path = paste0(data.dbsnp, "toy_hg20.bed"), col_names = FALSE)
-
+# zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v NotOn | awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > out.thingy.txt
 
 
 ## liftover hg20 > hg19
