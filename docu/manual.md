@@ -64,6 +64,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 ## Version (hg18, hg19, hg20)
 [//]: ------ Overview(https://genome.ucsc.edu/FAQ/FAQreleases.html)
+
 | UCSC      |                                    |
 | --------- |:----------------------------------:| 
 | hg20      | Genome Reference Consortium GRCh38 | 
