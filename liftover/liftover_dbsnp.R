@@ -19,6 +19,17 @@ liftover <- "/data/sgg/sina/software/liftOver/liftOver"
 ## file to lift over
 ## ------------------
 library(readr)
+
+# a = data.table(rs=commas("rs1,rs2,rs3"), z=rnorm(3))                                                                                     |merge                package:data.table                R Documentation   
+# b = data.table(rs=commas("rs3,rs2,rs4"), z=rnorm(3))                                                                                     |
+#                                                                                                                                       |Merge two data.tables                                                    
+# dt = data.table ( df )                                                                                                                   |     
+#                                                                                                                                         |Description:
+#setkey(a,rs)                                                                                                                             |     
+#setkey(b,rs)                                                                                                                             |     Fast merge of two ‘data.table’s. The ‘data.table’ method behaves    
+#                                                                                                                                         |     very similarly to that of ‘data.frame’s except that, by default,
+#comb = merge(a,b, all=T)                                                                                                                 |     it attempts to merge                                                
+                                                                                                                                         |     
 tmp <- read.table(paste0(data.dbsnp,"b150_SNPChrPosOnRef_108.bcp.gz"), nrow =10,
                   header = FALSE, sep="\t")
 
