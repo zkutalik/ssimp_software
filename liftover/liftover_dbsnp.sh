@@ -1,16 +1,19 @@
-
-## prepare file for liftOver
-## ------------------
+##
 cd /data/sgg/sina/public.data/dbsnp
-zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v NotOn | awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > dbsnp_hg20.bed
+
+## transform bcp.gz to bed file (which is needed for liftover)
+## ------------------
+zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v NotOn | egrep -v Un | awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > tmp.bed ## rearranges the columns and removes lines with "NotOn" and "Un"
+
+awk -F'\t' 'x$2' tmp.bed > dbsnp_hg20.bed  ## removes lines that have an empty field in the second column
+#awk '!/^\t|\t\t\t|\t$/' infile ## removes all lines that have an empty field in any column
 
 
-## liftover hg20 > hg19
+## do liftover hg20 > hg19
 ## ---------------------
-
 /data/sgg/sina/software/liftOver/liftOver /data/sgg/sina/public.data/dbsnp/dbsnp_hg20.bed /data/sgg/sina/software/liftOver/hg20ToHg19.over.chain /data/sgg/sina/public.data/dbsnp/liftover_hg19.bed /data/sgg/sina/public.data/dbsnp/unlifted_hg19.bed
 
-## liftover hg20 > hg18
+## do liftover hg20 > hg18
 ## ---------------------
 /data/sgg/sina/software/liftOver/liftOver /data/sgg/sina/public.data/dbsnp/liftover_hg19.bed /data/sgg/sina/software/liftOver/hg19ToHg18.over.chain /data/sgg/sina/public.data/dbsnp/liftover_hg18.bed /data/sgg/sina/public.data/dbsnp/unlifted_hg18.bed
 
