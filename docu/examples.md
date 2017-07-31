@@ -5,7 +5,7 @@
 
 ### Minimal example
 [//]: -------------------------------
-The minimal requirements are *GWAS summary statistics* stored in a text file with at least the following columns SNP-id, Z-statistic , reference allele and risk allele and at least one row.
+The minimal requirements are *GWAS summary statistics* stored in a text file with at least the following columns SNP-id, Z-statistic, reference allele and risk allele and at least one row.
 
 `ssimp my_gwas.txt` will generate a file `output.txt` containing the imputation results.
 
