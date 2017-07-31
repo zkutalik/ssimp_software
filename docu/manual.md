@@ -16,16 +16,22 @@ will generate a file `output.txt`, containing the imputation results. This is id
 <sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistic, and therefore needs a negative sign if the effect size is negative). </sup>
 	
 
-## Optiona
+## Options
 [//]: -------------------------------
-Here we list all options. Apart from `--gwas`, `--ref` and `--out`, all are optional. Therefore, each optional option has: a default value defined (in `[default]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
+All options are optional, apart from `--gwas`, `--ref` and `--out`. Therefore, each optional option has: a default value defined (in `[default]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
 
-`--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognized automatically (see file `../header_translation.md` ). Missings have to be marked as `NA` or left empty. Column names in QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
+`--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognized automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). **Important** >> currently, there is a default to use the 1KG reference panel (503 EUR) on HPC1. For more info see section `reference panel` below.
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). 
+```diff 
+- currently, there is a default to use the 1KG reference panel (503 EUR) on HPC1. For more info see section `reference panel` below.
+```
 
 `--sample.names [no default]`  The argument can be used in two ways: (1) providing a text file (no header) with sample id's separated by new lines `--sample.names filename.samples.txt` or (2) providing a file with at least a sample id column and a column to constrain on: `--sample.names  x/f/e=v` does a lookup in file 'x' (which has a header), but filters on field 'e' being equal to value 'v', and then
-use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`. **Important** >> currently this argument is defaulted to `super_pop=EUR`. 
+use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`. 
+```diff 
+- currently this argument is defaulted to `super_pop=EUR`. 
+```
 
 `--out [gwasfilename.ssimp.txt]` string. Filename in which to store the imputation results. If not defined, it will be the gwas filename + `.ssimp.txt`. 
 
