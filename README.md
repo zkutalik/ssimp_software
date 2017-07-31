@@ -2,7 +2,7 @@
 # Software for Summary Statistics Imputation
 [//]: ========================================
 
-This command line software enables summary statistics imputation (SSimp) for GWAS summary statistics.
+This command-line software enables summary statistics imputation (SSimp) for GWAS summary statistics.
 
 ## Installation
 [//]: -------------------------------
