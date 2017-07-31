@@ -73,7 +73,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
 - Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. See [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
-[//]: --- ## Version (hg18, hg19, hg20)
+[//]: ------------------------------- ## Version (hg18, hg19, hg20)
 
 [//]: --- | UCSC      |                                    |
 [//]: --- | --------- |:----------------------------------:| 
