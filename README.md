@@ -4,7 +4,7 @@
 
 This command-line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
 
-The only input needed from the user are the **GWAS summary statistics**. The reference panel needed too is installed automatically during the installation of the software.
+The only input needed from the user are the **GWAS summary statistics**. The reference panel (needed for LD computation) is downloaded automatically during the installation of the software.
 
 ## Installation
 [//]: -------------------------------
