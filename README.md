@@ -4,6 +4,8 @@
 
 This command-line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
 
+The only input needed from the user are the **GWAS summary statistics**. The reference panel needed too is installed automatically during the installation of the software.
+
 ## Installation
 [//]: -------------------------------
 
@@ -19,11 +21,11 @@ Download
 ## Minimal example
 [//]: -------------------------------
 
-`bin/ssimp --gwas data/my_gwas.txt` will impute the Z-statistics and generate a file `data/my_gwas.txt.ssimp.txt`.
+`bin/ssimp --gwas data/my_gwas.txt` will impute the Z-statistics and generate a file `data/my_gwas.txt.ssimp.txt`. `data/my_gwas.txt` contains at least the following columns: SNP-id, Z-statistic, reference allele and risk allele, and at least one row. 
 
-my_gwas.txt contains the **GWAS summary statistics** with at least the following columns: SNP-id, Z-statistic, reference allele and risk allele and at least one row. 
+my_gwas.txt contains the  with 
 
-When compiling SSimp, 1000 genomes reference panel (phase 3) is downloaded automatically and will be used as the default reference panel. 
+
 
 ## Documentation
 [//]: -------------------------------
