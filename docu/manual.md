@@ -7,7 +7,9 @@
 [//]: -------------------------------
 The minimal requirements are for `ssimp` to run are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (e.g. `MarkerName`), Z-statistic (e.g. `Z`), reference allele (e.g. `a1`) and risk allele (e.g. `a2`) and at least one row, (2) the path to the reference panel, and (3) the path to the output file.
 
-`ssimp my_gwas.txt ~/.refpanel/my_reference_panel.vcf output.txt` will generate a file `output.txt`, containing the imputation results. This is identical to 
+`ssimp my_gwas.txt ~/.refpanel/my_reference_panel.vcf output.txt` 
+
+will generate a file `output.txt`, containing the imputation results. This is identical to 
 
 `ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
 
