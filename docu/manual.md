@@ -88,9 +88,14 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 [//]: -------------------------------
 Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s).
 
+More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+
 ## Run-time
 [//]: -------------------------------
-To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are needed **(@sina check).**
+To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are needed.
+```diff 
+- sina check
+```
 
 ## Method outline
 [//]: -------------------------------
