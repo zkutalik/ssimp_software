@@ -9,7 +9,7 @@ The minimal requirements are a *GWAS summary statistics* stored in a text file w
 
 `ssimp my_gwas.txt` will generate a file `output.txt` containing the imputation results.
 
-The column names in `my_gwas.txt` will be automatically recognized. See section `header recognition` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
+The column names in `my_gwas.txt` will be automatically recognized. See section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
 ### Use 10 cores
 
