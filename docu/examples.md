@@ -15,7 +15,7 @@ For more info regarding automatical column names recognition in `my_gwas.txt`, s
 ```diff 
 - (this option is not yet integrated)
 ```
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--n.cores 10`**
+`ssimp my_gwas.txt` **`--n.cores 10`**
 
 
 ### Point to your own reference panel
