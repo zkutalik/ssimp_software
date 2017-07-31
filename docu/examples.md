@@ -12,15 +12,6 @@ The minimal requirements are *GWAS summary statistics* stored in a text file wit
 For more info regarding automatical column names recognition in `my_gwas.txt`, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
 
-### Select individuals from reference panel (short version)
-
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--sample.names ref/filename.samples.txt`**
-
-filename.samples.txt contains sample id's separated by new lines (no header). 
-
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--sample.names ref/filename.samples.txt/sample/super_pop=EUR`**
-
-in this case `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
 
 
 ### Impute range of SNPs on a specific chromosome
@@ -53,6 +44,17 @@ If it is only a handful of SNPs it might be easier to use:
 If it is only a handful of SNPs it might be easier to use:
 
 `ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--tag.snp <(echo rs3 rs4 rs5 | tr ' ' '\n')`**
+
+
+### Select individuals from reference panel (short version)
+
+`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--sample.names ref/filename.samples.txt`**
+
+filename.samples.txt contains sample id's separated by new lines (no header). 
+
+`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--sample.names ref/filename.samples.txt/sample/super_pop=EUR`**
+
+in this case `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
 
 
 ### Shrinking by 0.01
