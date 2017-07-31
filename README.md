@@ -34,6 +34,8 @@ as subset of individuals (here AFR) should be used:
 
 `ssimp gwas.txt output.txt ~/ref_panels/1000genomes --sample.names super_pop=AFR`
 
+More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+
 ## Minimal example
 [//]: -------------------------------
 
