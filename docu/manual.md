@@ -16,9 +16,9 @@ will generate a file `output.txt`, containing the imputation results. This is id
 <sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistic, and therefore needs a negative sign if the effect size is negative). </sup>
 	
 
-## Arguments
+## Optiona
 [//]: -------------------------------
-Here are all parameters listed. Each argument has: a default value defined (in `[brackets]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
+Here we list all options. Apart from `--gwas`, `--ref` and `--out`, all are optional. Therefore, each optional option has: a default value defined (in `[default]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
 
 `--gwas [no default]`, filename of the GWAS dataset, extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognized automatically (see file `../header_translation.md` ). Missings have to be marked as `NA` or left empty. Column names in QUICKTEST, SNPTEST, METAL AND PLINK output files will be automatically recognised. The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. For more info on possible sets of columns, see section `GWAS dataset` below.
 
