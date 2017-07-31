@@ -23,10 +23,6 @@ Download
 
 `bin/ssimp --gwas data/my_gwas.txt` will impute the Z-statistics and generate a file `data/my_gwas.txt.ssimp.txt`. `data/my_gwas.txt` contains at least the following columns: SNP-id, Z-statistic, reference allele and risk allele, and at least one row. 
 
-my_gwas.txt contains the  with 
-
-
-
 ## Documentation
 [//]: -------------------------------
 Run ssimp with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
