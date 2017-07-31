@@ -5,17 +5,9 @@
 
 ### Minimal example
 [//]: -------------------------------
-The minimal requirements are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (`MarkerName`), Z-statistic (`Z`), reference allele (`a1`) and risk allele (`a2`) and at least one row, and (2) the path to the reference panel. 
+The minimal requirements are a *GWAS summary statistics* stored in a text file with at least the following columns SNP-id, Z-statistic , reference allele and risk allele and at least one row.
 
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` will generate a file `output.txt` containing the imputation results.
-
-<sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistic, and therefore needs a negative sign if the effect size is negative). </sup>
-
-
-### Store a log file
-
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--log my_ssimp_logfile`**
-
+`ssimp my_gwas.txt` will generate a file `output.txt` containing the imputation results.
 
 ### Use 10 cores
 
@@ -90,6 +82,10 @@ If it is only a handful of SNPs it might be easier to use:
 
 
 
+
+### Store a copy of all console output to a file
+
+`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--log my_ssimp_logfile`**
 
 
 
