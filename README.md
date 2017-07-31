@@ -25,7 +25,7 @@ Download
 
 ## Documentation
 [//]: -------------------------------
-Run ssimp with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). <span style="color:blue">(run ssimp with no arguments: tbd)</span>.
+Run ssimp with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). <p style='color:red'>(run ssimp with no arguments: tbd)</p>
 
 Check-out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
