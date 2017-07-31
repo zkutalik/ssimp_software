@@ -21,7 +21,9 @@ more details) to '~/ref_panels/1000genomes', then you can run this:
 
     ssimp  gwas.txt  ~/ref_panels/1000genomes --out output.txt --sample.names super_pop=EUR
 
+
 Options:
+
     None of these options are necessary.  If an option isn't specified, a
     default value (inside []) is used in it place.  For example, if --lambda X
     is not specified, it is equivalent to specifying --lambda "2/sqrt(n)".
@@ -46,13 +48,13 @@ Options:
 
 Reference panel:
 
-
 You must download a reference panel to use this software. We suggest the
 1000genomes dataset as it is publicly available and includes many populations. 
 If you use the 1000genomes dataset, then it is sufficient
 to read 'Reference panel (simple instructions)'. If you want to use another
 reference panel, see 'Reference panel (complex instructions)' below
 for more details.
+
 
 Reference panel (simple instructions):
 
@@ -78,7 +80,8 @@ the European individuals should be used:
     pop=TSI              Toscani in Italia
 
 (This uses the 'integrated_call_samples_v3.20130502.ALL.panel' file provided
-with 1000genomes to find the sample names in the requested population. For more details on super_pop and pop, see http://www.internationalgenome.org/category/population/.
+with 1000genomes to find the sample names in the requested population. For more details on super_pop and pop, see
+http://www.internationalgenome.org/category/population/.
 
 
 Reference panel (complex instructions):
@@ -105,7 +108,6 @@ the sample IDs from the 'sample' column of that basic filename and only
 for the individuals with 'EUR' in the 'super_pop' field. This is a convenient
 way to use any file (delimited by comma, space, or tab) which lists the
 sample IDs and their population.
-
 
 You can change 'super_pop=EUR' at the end of that command if you want to
 use a different subpopulation, for example 'pop=TSI' or 'super_pop=EAS'.
