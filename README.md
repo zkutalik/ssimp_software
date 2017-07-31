@@ -29,5 +29,5 @@ Run ssimp with no arguments to see the [usage message](https://github.com/sinaru
 
 Check-out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
-We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt) that contains information not present in the usage message.
+We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md) that contains information not present in the usage message.
 
