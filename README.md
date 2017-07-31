@@ -25,10 +25,7 @@ Download
 
 ## Documentation
 [//]: -------------------------------
-Run ssimp with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
-```diff 
-- (run ssimp with no arguments: tbd)
-```
+Run ssimp with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). ```diff - (run ssimp with no arguments: tbd)```
 
 Check-out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
