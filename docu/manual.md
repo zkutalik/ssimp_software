@@ -2,11 +2,6 @@
 # Manual of SSimp
 [//]: ==================================
 
-This command line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
-
-<sup>Details to the method can be found in *our-paper (2017)* (as well as *Pasaniuc et al. (2014)*, or more recently in a review on the use of summary statistics by *Pasaniuc & Price (2016)*). </sup>
-
-	
 
 
 ## Minimal example
@@ -116,7 +111,12 @@ To account for variable sample size in summary statistics of tag SNVs, we use an
 
 ### More background on method
 
-For more details on the summary statistics imputation method, please see our paper (2017) or (for a shortened method version) our application paper (2017). 
+For more details on *summary statistics imputation*, please see *our paper (2017)* or (for a shortened method version) our *application paper (2017)*. 
+
+Most of our method builds on *Pasaniuc et al. (2014)*. 
+
+We also recommend reading the review on the use of summary statistics by *Pasaniuc & Price (2016)*).
+
 
 ## Technical aspects
 [//]: -------------------------------
