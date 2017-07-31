@@ -21,7 +21,7 @@ Download
 ## Minimal example
 [//]: -------------------------------
 
-`bin/ssimp --gwas data/my_gwas.txt` will impute the Z-statistics and generate a file `data/my_gwas.txt.ssimp.txt`. `data/my_gwas.txt` contains at least the following columns: SNP-id, Z-statistic, reference allele and risk allele, and at least one row. 
+`bin/ssimp --gwas data/my_gwas.txt --ref ~/ref_panels/my_reference_panel.vcf --out output.txt` will impute the Z-statistics, using the selected reference panel and generate a file `output.txt`. `data/my_gwas.txt` contains at least the following columns: SNP-id, Z-statistic, reference allele and risk allele, and at least one row. The imputed summary statistics are stored in `output.txt`. 
 
 ## Documentation
 [//]: -------------------------------
