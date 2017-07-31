@@ -72,7 +72,8 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 ## GWAS dataset
 [//]: -------------------------------
-- Column names are automatically recognised using commonly used names (see `../header_translation.md`). Missing values should be marked as `NA` or left empty. 
+- Column names are automatically recognised using commonly used names. The file [file.reading.cc](https://github.com/sinarueeger/ssimp_software/blob/master/src/file.reading.cc) contains all possibilities (look for the keyword `is_in_this_list_CASEINSENSITIVE`). For example, the Z-statistics column can be termed `z.from.peff`, `z`, `stat`, `zscore` or `z.score`. 
+- Missing values should be marked as `NA` or left empty. 
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
