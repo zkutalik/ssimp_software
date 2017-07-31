@@ -11,13 +11,6 @@ The minimal requirements are *GWAS summary statistics* stored in a text file wit
 
 For more info regarding automatical column names recognition in `my_gwas.txt`, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
-### Paralellize computation: use 10 cores 
-```diff 
-- (this option is not yet integrated)
-```
-`ssimp my_gwas.txt` **`--n.cores 10`**
-
-
 ### Point to your own reference panel
 
 Follow the instructions on `ssimp --help`.
@@ -91,6 +84,11 @@ If it is only a handful of SNPs it might be easier to use:
 
 `ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--log my_ssimp_logfile`**
 
+### Paralellize computation: use 10 cores 
+```diff 
+- (this option is not yet integrated)
+```
+`ssimp my_gwas.txt` **`--n.cores 10`**
 
 
 
