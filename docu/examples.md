@@ -7,7 +7,7 @@
 [//]: -------------------------------
 The minimal requirements are *GWAS summary statistics* stored in a text file with at least the following columns SNP-id, Z-statistic, reference allele and risk allele and at least one row.
 
-`ssimp my_gwas.txt` will generate a file `output.txt` containing the imputation results.
+`ssimp my_gwas.txt` will generate a file `my_gwas.txt.ssimp` containing the imputation results.
 
 The column names in `my_gwas.txt` will be automatically recognized. See section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
