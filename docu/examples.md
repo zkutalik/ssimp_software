@@ -11,9 +11,6 @@ The minimal requirements are *GWAS summary statistics* stored in a text file wit
 
 For more info regarding automatical column names recognition in `my_gwas.txt`, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
-### Point to your own reference panel
-
-Follow the instructions on `ssimp --help`.
 
 ### Select individuals from reference panel (short version)
 
@@ -78,11 +75,10 @@ If it is only a handful of SNPs it might be easier to use:
 `ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--missingness dep`**
 
 
-
-
 ### Store a copy of all console output to a file
 
 `ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--log my_ssimp_logfile`**
+
 
 ### Paralellize computation: use 10 cores 
 ```diff 
@@ -90,6 +86,10 @@ If it is only a handful of SNPs it might be easier to use:
 ```
 `ssimp my_gwas.txt` **`--n.cores 10`**
 
+
+### Use your own reference panel
+
+Follow the instructions on `ssimp --help`.
 
 
 
