@@ -73,14 +73,6 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
 - Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. See [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
-[//]: ------------------------------- ## Version (hg18, hg19, hg20)
-
-[//]: --- | UCSC      |                                    |
-[//]: --- | --------- |:----------------------------------:| 
-[//]: --- | hg20      | Genome Reference Consortium GRCh38 | 
-[//]: --- | hg19      | Genome Reference Consortium GRCh37 | 
-[//]: --- | hg18      | NCBI Build 36                      |   
-
 ## GWAS dataset
 [//]: -------------------------------
 - Column names are automatically recognised using commonly used names. The file [file.reading.cc](https://github.com/sinarueeger/ssimp_software/blob/master/src/file.reading.cc) contains all possibilities (look for the keyword `is_in_this_list_CASEINSENSITIVE`). For example, the Z-statistics column can be termed `z.from.peff`, `z`, `stat`, `zscore` or `z.score`. 
@@ -88,11 +80,12 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
-- SNP names should be named so they match the SNP-id in the reference panel. 
-- If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver
+- SNP names should be named so they match the SNP-id in the reference panel. E.g. if the reference panel uses `chr:pos`, the GWAS should have the same SNP idenfitier.
+- If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver.
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
+To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 ![Caption for the picture.](visuals/visualisation_width.jpeg)
 
 ## Reference panel
@@ -110,20 +103,20 @@ To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are nee
 
 ## Method outline
 [//]: -------------------------------
-Briefly, by combining summary statistics for a set of variants and the fine-scale LD structure in the same region, we can estimate summary statistics of new, untyped variants at the same locus. We can formally write this using the conditional expectation of a multivariate normal distribution. 
+Briefly, we can estimate summary statistics of new, untyped variants at the same locus, by combining summary statistics for a set of variants and the fine-scale LD structure in the same region, We can formally write this using the conditional expectation of a multivariate normal distribution. 
 
 ### Impute Z-statistics
 
 ![Summary statistics equation](visuals/eq_main.jpg)
 
-Here we aim to impute the Z-statistic of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), *C* (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, *c* and *C* are regularised using the option `--lambda`. *u* can be extended to a vector. *M* includes SNPs among `--window.width` + left and right `--flanking.region`, whereas the core window (`--window.width`) only covers SNPs to impute. 
+Here we aim to impute the Z-statistic of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), **C** (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, **c** and **C** are regularised using the option `--lambda`. *u* can be extended to a vector. *M* includes SNPs among `--window.width` + left and right `--flanking.region`, whereas the core window (`--window.width`) covers SNPs to impute. 
 
 ### Imputation quality
-We use an adjusted imputation quality that corrects for the effective number of tag SNVs *p.eff*.
+We use an adjusted imputation quality that corrects for the effective number of tag SNVs *p.eff* (n=number of individuals in the reference panel).
 ![Imputation quality](visuals/eq_impqual.jpg)
 
 ### Variable missingness
-To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the *C* and *c* matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
+To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
 
 ### More background on method
 
@@ -138,10 +131,9 @@ We also recommend reading the review on the use of summary statistics by *Pasani
 [//]: -------------------------------
 
 - If SNP-ID are present in the GWAS, then positions (bp) are copied from reference panel. 
-- If SNP-ID are not present, then the combination of Chr:Pos:A1:A2 are taken as identifier
+- If SNP-ID are not present (e.g. filled with `.`), then the combination of Chr:Pos:A1:A2 are taken as identifier
 - Because either SNP-ID or Chr:Pos:A1:A2 are used as identifier, it is also possible to impute indels.
 - Z-statistics are imputed, along with `N_imp` (an estimate for the sample size) and `r2_pred` (adjusted imputation quality).
-- To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 
 ## Output
 [//]: -------------------------------
@@ -153,20 +145,22 @@ The `.log` file is a copy of what is printed to the console. (not supported yet)
 ### out file
 [//]: -------
 The `.ssimp.txt` file has the following columns:
-
-- `SNP` SNP-ID
-- `Chr` Chromosome (only 1 to 22 right now)
-- `Pos` Position (same build as reference panel)
-- `Z_imp` Imputed Z statistics (see below)
+chr     pos     z_imp   source  SNP     a1      a2      maf     r2.pred lambda  Z_reimputed     r2_reimputed
+- `chr` Chromosome (only 1 to 22 right now)
+- `pos` Position (same build as reference panel)
+- `z_imp` Imputed Z statistics (see below)
 - `N_imp` Estimation of N (only if missingness was set to `TRUE`)
-- `r2_pred` Imputation quality (adjusted as in ...)
+- `source` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 
+- `SNP` SNP-ID
 - Reference allele (same column name as in the GWAS file)
 - Effect allele (same column name as in the GWAS file)
-- `lambda` lambda used to impute
-- `origin` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 
-- `Z_reimputed` for the first window, all tag SNPs will be re-imputed (sanity check).
+- `maf` minor allele frequency in reference panel
+- `r2.pred` Imputation quality (as defined above)
+- `lambda` lambda used to penalize.
+- `Z_reimputed` imputed Z-statistics for tag SNPs for the first window (sanity check).
+- `r2_reimputed` imputation quality for the imputed tag SNPs of for the first window (sanity check).
 
-`Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
+To sum up: `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
 
 ## References
 [//]: -------
