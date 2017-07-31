@@ -18,7 +18,9 @@ will generate a file `output.txt`, containing the imputation results. This is id
 
 ## Options
 [//]: -------------------------------
-All options are optional, apart from `--gwas`, `--ref` and `--out`. Therefore, each optional option has: a default value defined (in `[default]`), valid options listed and a definition of the argument given. Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
+The options `--gwas`, `--ref` and `--out` are required arguments. Some options (e.g. `--lambda`) have `[defaults]` defined, and other options (e.g. `--log`) are entirely optional.
+
+Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
 
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognized automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
@@ -27,50 +29,57 @@ All options are optional, apart from `--gwas`, `--ref` and `--out`. Therefore, e
 - currently, there is a default to use the 1KG reference panel (503 EUR) on HPC1. For more info see section `reference panel` below.
 ```
 
+`--out [no default]` string. Filename to store the imputation results. 
+
 `--sample.names [no default]`  The argument can be used in two ways: (1) providing a text file (no header) with sample id's separated by new lines `--sample.names filename.samples.txt` or (2) providing a file with at least a sample id column and a column to constrain on: `--sample.names  x/f/e=v` does a lookup in file 'x' (which has a header), but filters on field 'e' being equal to value 'v', and then
 use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaron/shared/ref_panels/1kg/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`. 
 ```diff 
 - currently this argument is defaulted to `super_pop=EUR`. 
 ```
 
-`--out [gwasfilename.ssimp.txt]` string. Filename in which to store the imputation results. If not defined, it will be the gwas filename + `.ssimp.txt`. 
-
 `--log [no default]` string. Filename in which to store the log file - this is simply a copy of whatever is printed to the console.
 
-`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. (**TBD** >> For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used.)
+`--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed. 
+```diff 
+- TBD: For chromosome `X`, `Y` and `MT`, text or numbers (23, 24, 25) can be used.)
+```
 
 `--tag.snp [no default]` filename with list of tags (no header). For magic in bash see `Note` below.
 
 `--impute.snp [NULL]` filename to define SNPs to impute (no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimise`), n are the number of individuals in the reference panel. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). (`optimise` not yet implemented. )
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`, `optimise`), n are the number of individuals in the reference panel. Lambda controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix). (`optimise` not yet implemented.)
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
 `--tag.maf [0]` numeric value. Lower MAF limit for tag SNPs: everything above and equal this threshold will be used as tag SNPs. 
 
-`--window.width [1000000]` numeric value. Core window length.
+`--window.width [1000000]` numeric value. Core window length. See illustration below.
 
-`--flanking.width [250000]` numeric value. Flanking space left and right of the core window.
+`--flanking.width [250000]` numeric value. Flanking space left and right of the core window. See illustration below.
 		
-`--missingness [none]` string, ind, dep. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. We recommend `ind` (as its... ). This is automatically set to `ind` if `N` is not provided or `N` is set to `NA`.
+`--missingness [TRUE]` string, `ind` (recommended), `dep`. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 
-`--n.cores [1]` Number of cores to use.**TBD** 
+`--n.cores [1]` Number of cores to use.
+```diff 
+- TBD
+```
+
 
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs, see section `output` below).
 - The option `missingness` is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
-- Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`
+- Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. See [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
-## Version (hg18, hg19, hg20)
+[//]: ## Version (hg18, hg19, hg20)
 
-| UCSC      |                                    |
-| --------- |:----------------------------------:| 
-| hg20      | Genome Reference Consortium GRCh38 | 
-| hg19      | Genome Reference Consortium GRCh37 | 
-| hg18      | NCBI Build 36                      |   
+[//]: | UCSC      |                                    |
+[//]: | --------- |:----------------------------------:| 
+[//]: | hg20      | Genome Reference Consortium GRCh38 | 
+[//]: | hg19      | Genome Reference Consortium GRCh37 | 
+[//]: | hg18      | NCBI Build 36                      |   
 
 ## GWAS dataset
 [//]: -------------------------------
