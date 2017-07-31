@@ -30,7 +30,7 @@ to a directory on your computer.
     wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
 
 When using `ssimp` you can then pass this directory name to 'ssimp', and specify that only
-the African individuals should be used:
+as subset of individuals should be used:
 
 `ssimp gwas.txt output.txt ~/ref_panels/1000genomes --sample.names super_pop=AFR`
 
