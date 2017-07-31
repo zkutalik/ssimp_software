@@ -11,8 +11,10 @@ The minimal requirements are *GWAS summary statistics* stored in a text file wit
 
 For more info regarding automatical column names recognition in `my_gwas.txt`, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
-### Use 10 cores
-
+### Paralellize computation: use 10 cores 
+```diff 
+- (this option is not yet integrated)
+```
 `ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--n.cores 10`**
 
 
