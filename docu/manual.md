@@ -58,7 +58,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--flanking.width [250000]` numeric value. Flanking space left and right of the core window. See illustration below.
 		
-`--missingness [TRUE]` string, `ind` (recommended), `dep`. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
+`--missingness [none]`, string, `ind` (recommended), `dep`. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 
 `--n.cores [1]` Number of cores to use.
 ```diff 
