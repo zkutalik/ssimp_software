@@ -9,6 +9,15 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
+### Compiled version
+```diff 
+- TBD
+```
+Download
+* [ssimp 0.1 - Mac OS X]()
+* [ssimp 0.1 - Ubuntu 12.04]()
+
+### Compile from source
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
@@ -21,16 +30,15 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 (3) run the make file (source compilation)
 `make`
 
-(4) Run your first summary statistics imputation on a test file
+(4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 `bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-### Compiled version
-Download
-* [ssimp 0.1 - Mac OS X]()
-* [ssimp 0.1 - Ubuntu 12.04]()
+(5) You need to have a reference panel ready. Checkout the next section to see how to download and install a reference panel. 
 
 ## Download 1000 genomes reference panel
 [//]: -------------------------------
+
+**Important** Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!
 
 Download the files in 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
 to a directory on your computer. 
