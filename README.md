@@ -17,7 +17,7 @@ Download
 * [ssimp 0.1 - Mac OS X]()
 * [ssimp 0.1 - Ubuntu 12.04]()
 
-### Compile from source
+### Compile from source 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
@@ -27,14 +27,15 @@ Download
 
 `cd ssimp_software-master`
 
-(3) run the make file (source compilation)
+(3) run the makefile (source compilation)
+
 `make`
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
 `bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-(5) You need to have a reference panel ready. Checkout the next section to see how to download and install a reference panel. 
+(5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out the next section to see how to download and install a reference panel. 
 
 ## Download 1000 genomes reference panel
 [//]: -------------------------------
@@ -56,10 +57,12 @@ as subset of individuals (here AFR) should be used:
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
-## Minimal example
+## Example
 [//]: -------------------------------
 
-`bin/ssimp --gwas data/my_gwas.txt --ref ~/ref_panels/my_reference_panel.vcf --out output.txt` will impute the Z-statistics, using the selected reference panel (see above) and generate a file `output.txt`. `data/my_gwas.txt` contains at least the following columns: SNP-id, Z-statistic, reference allele and risk allele, and at least one row. The imputed summary statistics are stored in `output.txt`. 
+`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
+
+will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
 
 ## Documentation
 [//]: -------------------------------
