@@ -7,10 +7,18 @@ unzip ssimp_software-master.zip
 ## access the folder
 cd ssimp_software-master
 
-## run the make file
+## run the make file (source compilation)
 make
 
 ## run your first summary statistics imputation on a test file
 bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt
 
+## Do you have a *reference panel* stored somewhere? 
+
+    ## YES: Good!
+        Is it 1000genomes?
+        ## YES: go to line 72 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
+        ## NO: go to line 89 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
+
+    ## NO: go to line 61 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
 
