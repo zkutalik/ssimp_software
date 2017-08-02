@@ -1,0 +1,16 @@
+## Download the zip file.
+wget https://github.com/sinarueeger/ssimp_software/archive/master.zip
+
+## Unpack the zip file with 
+unzip ssimp_software-master.zip
+
+## access the folder
+cd ssimp_software-master
+
+## run the make file
+make
+
+## run your first summary statistics imputation on a test file
+bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt
+
+
