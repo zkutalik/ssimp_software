@@ -7,7 +7,7 @@ unzip ssimp_software-master.zip
 ## access the folder
 cd ssimp_software-master
 
-## run the make file (source compilation)
+## run the makefile (source compilation)
 make
 
 ## run your first summary statistics imputation on a test file
