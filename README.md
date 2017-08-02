@@ -9,9 +9,20 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
-### Source code
-1. Clone the github folder. 
-2. Run  `stu bin/ssimp`
+(1) Download the zip file and unpack the zip file (or clone the github folder)
+
+`wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
+`unzip ssimp_software-master.zip`
+
+(2) access the folder
+
+`cd ssimp_software-master`
+
+(3) run the make file (source compilation)
+`make`
+
+(4) Run your first summary statistics imputation on a test file
+`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 ### Compiled version
 Download
