@@ -31,6 +31,7 @@ Download
 `make`
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
+
 `bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 (5) You need to have a reference panel ready. Checkout the next section to see how to download and install a reference panel. 
