@@ -38,7 +38,7 @@ Download
 ## Download 1000 genomes reference panel
 [//]: -------------------------------
 
-**Important** Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!
+**Important!** Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!
 
 Download the files in 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
 to a directory on your computer. 
