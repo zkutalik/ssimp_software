@@ -37,6 +37,22 @@ Download
 
 (5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out the next section to see how to download and install a reference panel. 
 
+## Example
+[//]: -------------------------------
+
+`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
+
+will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
+
+## Documentation
+[//]: -------------------------------
+Run `ssimp` with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
+
+Check out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
+
+We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md) that contains information not present in the usage message.
+
+
 ## Download 1000 genomes reference panel
 [//]: -------------------------------
 
@@ -66,19 +82,4 @@ as subset of individuals (here AFR) should be used:
 `ssimp gwas.txt output.txt ~/ref_panels/1000genomes --sample.names super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
-
-## Example
-[//]: -------------------------------
-
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
-
-will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
-
-## Documentation
-[//]: -------------------------------
-Run `ssimp` with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
-
-Check out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
-
-We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md) that contains information not present in the usage message.
 
