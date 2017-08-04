@@ -42,6 +42,16 @@ Download
 
 **Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!*
 
+### Automatical download
+By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. For example, if we want the EUR super population used: 
+
+`bin/ssimp gwas/small.random.csv 1KG/EUR output.txt` 
+
+Make sure you have `wget` installed!
+
+
+### Manual download
+
 Download the files in 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
 to a directory on your computer. 
 
@@ -67,9 +77,6 @@ will impute the Z-statistics, using a selected reference panel (see section abov
 ## Documentation
 [//]: -------------------------------
 Run `ssimp` with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
-```diff 
-- (run ssimp with no arguments: tbd)
-```
 
 Check out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
