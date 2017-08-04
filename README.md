@@ -59,12 +59,15 @@ We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_softwar
 **Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!*
 
 ### Automatical download
-By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. For example, if we want the EUR super population used: 
+By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. 
+
+For example, if we want 1000 genomes to be downloaded and EUR population used for imputation, we type: 
 
 `bin/ssimp gwas/small.random.csv 1KG/EUR output.txt` 
 
-Make sure you have `wget` installed!
-
+Make sure that:
+1) you have `wget` installed and
+2) no folder `refpanel` exists.
 
 ### Manual download
 
