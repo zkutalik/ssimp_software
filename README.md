@@ -67,7 +67,7 @@ For example, if we want 1000 genomes to be downloaded and EUR population used fo
 
 Make sure that:
 1) you have `wget` installed and
-2) no folder `refpanel` exists.
+2) no folder `ref_panels` exists.
 
 ### Manual download
 
