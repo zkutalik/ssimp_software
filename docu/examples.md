@@ -15,6 +15,11 @@ The minimal requirements are:
 
 For more info regarding automatical column names recognition of the GWAS file, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
+### Impute Z-statistics
+
+
+### Impute P-values
+
 
 ### Impute a bp range on a specific chromosome
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 22:16000000-22:16050075`**
