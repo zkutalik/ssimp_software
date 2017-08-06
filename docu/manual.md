@@ -74,15 +74,31 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 ## GWAS dataset
 [//]: -------------------------------
-- Column names are automatically recognised using commonly used names. The file [file.reading.cc](https://github.com/sinarueeger/ssimp_software/blob/master/src/file.reading.cc) contains all possibilities (look for the keyword `is_in_this_list_CASEINSENSITIVE`). For example, the Z-statistics column can be termed `z.from.peff`, `z`, `stat`, `zscore` or `z.score`. 
+- Column names are automatically recognised using commonly used names. See subsection below.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes (`b`).
 - Missing values should be marked as `NA` or left empty. 
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
 - SNP names should be named so they match the SNP-id in the reference panel. E.g. if the reference panel uses `chr:pos`, the GWAS should have the same SNP idenfitier.
+- In case no SNP identifiers are present, use `chromosome` and `position`.
 - If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver.
 
+### Automatic header recognition
+The column identifying the
+- **SNP-id** should be named: `ID`, `rnpid`, `snpid`, `rsid`, `MarkerName`, `snp`, `id1` or `marker`.
+- **reference allele** should be named: `REF`, `a1`, `Allele1`, `AlleleA` or `other_allele`.
+- **effect allele** should be named: `ALT`, `a2`, `Allele2`, `AlleleB` or `effect_allele`.
+- **Z-statistic** should be named: `z.from.peff`, `z`, `stat`, `zscore` or `z.score`. 
+- **P-value** should be named: `p`, `P-value`, `P.value`, `PVALUE`, `frequentist_add_pvalue` or `normal.score.p`.
+- **Effect size** should be named: `b`, `beta`, `ALT_EFFSIZE`, `frequentist_add_beta_1` or `normal.score.beta`.
+- **Standard error** should be named: `se`, `frequentist_add_se_1` or `normal.score.se`.
+- **Sample size** should be named: `n`, `NMISS` or `all_total`
+- **Chromosome** should be named: `chr`, `chromosome`, `chrm` or `#CHROM`.
+- **Position** should be named: `POS`,`position` or `BP`.
+
+*Note*
+- Column names provided are not case sensitive. E.g. P-value column can be named `p` or `P`.
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
