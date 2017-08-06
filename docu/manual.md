@@ -13,8 +13,8 @@ will generate a file `output.txt`, containing the imputation results. This is id
 
 `ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
 
-<sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes (the P-value will be turned into a Z-statistic, and therefore needs a negative sign if the effect size is negative). </sup>
-	
+<sup>If P-values are provided instead Z-statistics, there needs to be an extra column containing the effect sizes</sup>
+		
 
 ## Options
 [//]: -------------------------------
@@ -70,18 +70,19 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs, see section `output` below).
 - The option `missingness` is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
-- Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes.
 - Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. See [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
 ## GWAS dataset
 [//]: -------------------------------
 - Column names are automatically recognised using commonly used names. The file [file.reading.cc](https://github.com/sinarueeger/ssimp_software/blob/master/src/file.reading.cc) contains all possibilities (look for the keyword `is_in_this_list_CASEINSENSITIVE`). For example, the Z-statistics column can be termed `z.from.peff`, `z`, `stat`, `zscore` or `z.score`. 
+- Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes (`b`).
 - Missing values should be marked as `NA` or left empty. 
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
 - SNP names should be named so they match the SNP-id in the reference panel. E.g. if the reference panel uses `chr:pos`, the GWAS should have the same SNP idenfitier.
 - If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver.
+
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
