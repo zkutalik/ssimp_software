@@ -4,7 +4,7 @@
 
 All exmples work with test data from the `ref` and `gwas` folder, therefore use significantly smaller GWAS dataset and reference panels to limit computation time. 
 
-### Minimal example
+### Minimal example (default: imputation of Z-statistics)
 [//]: -------------------------------
 The minimal requirements are:
 1. `--gwas`: path to the *GWAS summary statistics* text file, containing at least the following columns SNP-id, Z-statistic, reference allele and risk allele and at least one row, 
@@ -15,10 +15,19 @@ The minimal requirements are:
 
 For more info regarding automatical column names recognition of the GWAS file, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
-### Impute Z-statistics
+
+### Impute OR
+No special argument needed, only the GWAS input file changes by providing Z-statistics of the Odds Ratios. Alternatively, if no Z-statistics is available, provide `b=log(OR)` and the P-value.
+
+So the header of the GWAS file would either be: `SNP  a1  a2  Z`
+
+Or: `SNP  a1  a2  b   p`
 
 
 ### Impute P-values
+No special argument needed, only the GWAS input file changes by providing effect size `b` along with the P-value `p`. 
+
+So the header of the GWAS file would be: `SNP  a1  a2  b   p`
 
 
 ### Impute a bp range on a specific chromosome
