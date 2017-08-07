@@ -98,7 +98,7 @@ The column identifying the
 - **Position** should be named: `POS`,`position` or `BP`.
 
 *Note*
-- Column names provided are not case sensitive. E.g. P-value column can be named `p` or `P`.
+Column names listed above are not case sensitive. E.g. P-value column can be named `p` or `P`.
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
