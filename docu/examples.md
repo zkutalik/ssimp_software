@@ -29,7 +29,7 @@ A **quick solution** is to run `ssimp` without reference panel, but with a short
 ### You don not have the Z-statistics available, but you have...
 [//]: -------------------------------
 
-#### ... p-values and betas
+#### ... P-values and betas
 No special argument needed, but GWAS input file needs to contain effect size `b` along with the P-value `p`. 
 
 So the header of the GWAS file would be: `SNP  a1  a2  b   p`
