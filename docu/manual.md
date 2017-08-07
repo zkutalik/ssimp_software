@@ -77,7 +77,7 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 - Column names are automatically recognised using commonly used names. See subsection below.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes (`b`).
 - Missing values should be marked as `NA` or left empty. 
-- The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then it is also possible to calculate `Z` via `b` and `SE`. 
+- The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then calculate `Z` via `b` and `SE`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
 - SNP names should be named so they match the SNP-id in the reference panel. E.g. if the reference panel uses `chr:pos`, the GWAS should have the same SNP idenfitier.
