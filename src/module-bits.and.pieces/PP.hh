@@ -27,8 +27,8 @@
 
 #define SELECT_PP_IMPL( n ) PP ## n
 #define SELECT_PP( n ) SELECT_PP_IMPL(n)
-#define PP(...) do{ SELECT_PP( COUNT_MACRO_ARGS(__VA_ARGS__) )(cout, __VA_ARGS__) ;}while(0)
-#define PPe(...) do{ SELECT_PP( COUNT_MACRO_ARGS(__VA_ARGS__) )(cerr, __VA_ARGS__) ;}while(0)
+#define PP(...)  [&]()->bool{ SELECT_PP( COUNT_MACRO_ARGS(__VA_ARGS__) )(cout, __VA_ARGS__) ; return true;}()
+#define PPe(...) [&]()->bool{ SELECT_PP( COUNT_MACRO_ARGS(__VA_ARGS__) )(cerr, __VA_ARGS__) ; return true;}()
 
 #define PPL(...) do{ cout << __FILE__ ":" << __LINE__ << "\t   "; PP(__VA_ARGS__); } while(0)
 
