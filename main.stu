@@ -9,3 +9,4 @@
 
 % include bin.stu
 % include tests.stu
+% include rs.chr.pos.database.stu

@@ -1,0 +1,40 @@
+# starting with hg20 at /data/sgg/sina/public.data/dbsnp/b150_SNPChrPosOnRef_108.bcp.gz
+# run liftover to hg19, and then to hg18
+
+                liftover/hg20.orig.bed {
+export  target="liftover/hg20.orig.bed"
+    #zcat b150_SNPChrPosOnRef_108.bcp.gz  | egrep -v NotOn | egrep -v Un | egrep -v '^[0-9]+[[:space:]](Y|AltOnly|[0-9]+)[[:space:]]+$' | egrep '^[0-9]+[[:space:]](X|Y|MT|PAR|[0-9]+|PAR)[[:space:]][0-9]+[[:space:]][0-9]+[[:space:]]+(y)?$' -v  #| awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1"\t"$2}' > tmp.bed ## rearranges the columns and removes lines with "NotOn" and "Un"
+    time zcat liftover/b150_SNPChrPosOnRef_108.bcp.gz  |
+        egrep '^[0-9]+[[:space:]](X|Y|MT|PAR|[0-9]+)[[:space:]][0-9]+[[:space:]][0-9]+[[:space:]]+$' |
+        awk '{print "chr"$2"\t"$3"\t"($3+1)"\trs"$1}' > "$target".tmp
+    mv "$target"{.tmp,}
+    wc -l "$target"
+}
+                liftover/hg19.lift.bed
+            :   liftover/hg20.orig.bed
+                {
+export  target="liftover/hg19.lift.bed"
+    time /data/sgg/sina/software/liftOver/liftOver                   \
+        liftover/hg20.orig.bed                                  \
+        /data/sgg/sina/software/liftOver/hg20ToHg19.over.chain  \
+        "$target".tmp          \
+        unlifted_hg19.bed
+
+    mv "$target"{.tmp,}
+    wc -l "$target"
+}
+
+                liftover/hg18.lift.bed
+            :   liftover/hg19.lift.bed
+                {
+export  target="liftover/hg18.lift.bed"
+    time /data/sgg/sina/software/liftOver/liftOver                   \
+        liftover/hg19.lift.bed                                  \
+        /data/sgg/sina/software/liftOver/hg19ToHg18.over.chain  \
+        "$target".tmp          \
+        unlifted_hg18.bed
+
+    mv "$target"{.tmp,}
+    wc -l "$target"
+}
+
