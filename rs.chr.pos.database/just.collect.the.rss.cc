@@ -18,7 +18,6 @@ int main(int argc, char **argv) {
     set<int> all_rs_in_any_file;
 
     ifstream  fs_1kg(argv[1]);
-
     while(getline( fs_1kg, line)) {
         if(line == "#CHROM\tPOS\tID")
             continue;
@@ -36,5 +35,41 @@ int main(int argc, char **argv) {
         }
 
     }
+
     PP(all_rs_in_any_file.size());
+
+    ifstream  fs_hrc(argv[2]);
+    while(getline( fs_hrc, line)) {
+        auto rs = utils:: lexical_cast<int>(line);
+        //PP(line, rs);
+        all_rs_in_any_file.insert(rs);
+    }
+
+    PP(all_rs_in_any_file.size());
+
+    ifstream  fs_uk10k(argv[3]);
+    while(getline( fs_uk10k, line)) {
+        if(line == "chr,pos.b19,rs,alts,ref,aaf")
+            continue;
+        try {
+            auto split_on_commas = utils:: tokenize(line, ',');
+            auto rs_string = split_on_commas.at(2);
+            rs_string.substr(0,2) == "rs" || DIE("uk10k, rs...");
+            rs_string = rs_string.substr(2);
+            auto rs = utils:: lexical_cast<int>(rs_string);
+            //PP(line, rs_string, rs);
+            all_rs_in_any_file.insert(rs);
+        } catch(std::invalid_argument & e) {
+            PP(line);
+            DIE("uk10k");
+        }
+    }
+
+    PP(all_rs_in_any_file.size());
+
+    fs_1kg.eof() || DIE("fs_1kg.eof()");    // 81'237'339
+    fs_hrc.eof() || DIE("fs_hrc.eof()");    // 36'117'264
+    fs_uk10k.eof() || DIE("fs_uk10k.eof()");// 17'769'027
+
+    // 88'047'858 in the union
 }
