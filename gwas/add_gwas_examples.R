@@ -24,6 +24,15 @@ dat.OR <- dat[,c("rnpid", "a1", "a2", "P","OR")]
 write_csv(dat.OR, "~/Documents/Work/Projects/tagging/ssimp_software/gwas/small.random.p.or.csv")
 
 
+## dat N
+## ---------------
+dat.n <- dat[,c("rnpid", "a1", "a2","z")]
+set.seed(3)
+dat.n$N <- sample(900:1000, nrow(dat.n), replace = TRUE)
+write_csv(dat.n, "~/Documents/Work/Projects/tagging/ssimp_software/gwas/small.random.n.csv")
+
+
+
 ## dat Chr, Pos
 ## ---------------
 sm <- structure(list(SNP = c("rs200923114", "rs200923853", "rs200923865", 
