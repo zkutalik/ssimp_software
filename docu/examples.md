@@ -135,13 +135,13 @@ in this case `filename.samples.txt` contains sample id's (`sample`) along with a
 ### Use the dependent missingness approach
 [//]: -------------------------------
 
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--missingness dep`**
+`ssimp --gwas gwas/small.random.n.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--missingness dep`**
 
 
 ### Store a copy of all console output to a file
 [//]: -------------------------------
 
-`ssimp my_gwas.txt ~/ref_panels/my_reference_panel.vcf output.txt` **`--log my_ssimp_logfile`**
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--log my_ssimp_logfile`**
 
 
 ### Paralellize computation: use 10 cores 
