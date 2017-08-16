@@ -38,9 +38,10 @@ export  target="liftover/hg18.lift.bed"
     wc -l "$target"
 }
 
-        rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt
-    :   rs.chr.pos.database/just.collect.the.rss.cc
+                rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt
+            :   rs.chr.pos.database/just.collect.the.rss.cc
 {
+export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt"
     #head rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt
     #zcat rs.chr.pos.database/three.sources.of.rs/for_aaron_rslistHRC.gz | head
     #head rs.chr.pos.database/three.sources.of.rs/positions.b19.TWINSUKALSPAC..sorted.By.rs
@@ -48,5 +49,7 @@ export  target="liftover/hg18.lift.bed"
     rs.chr.pos.database/just.collect.the.rss                                                \
         rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt                        \
         <(zcat rs.chr.pos.database/three.sources.of.rs/for_aaron_rslistHRC.gz)              \
-        rs.chr.pos.database/three.sources.of.rs/positions.b19.TWINSUKALSPAC..sorted.By.rs
+        rs.chr.pos.database/three.sources.of.rs/positions.b19.TWINSUKALSPAC..sorted.By.rs   \
+        "$target".tmp
+    mv "$target"{.tmp,}
 }

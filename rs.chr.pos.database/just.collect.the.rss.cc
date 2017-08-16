@@ -12,7 +12,7 @@ using std:: string;
 using std:: set;
 
 int main(int argc, char **argv) {
-    argc == 4 || DIE("needs 4 args");
+    argc == 5 || DIE("needs 5 args");
 
     string line;
     set<int> all_rs_in_any_file;
@@ -72,4 +72,12 @@ int main(int argc, char **argv) {
     fs_uk10k.eof() || DIE("fs_uk10k.eof()");// 17'769'027
 
     // 88'047'858 in the union
+
+    std:: ofstream out(argv[4]);
+    for(auto && rs : all_rs_in_any_file) {
+        out << rs << '\n';
+    }
+    out || DIE("problem with output");
+    out.close();
+    out || DIE("problem with output");
 }
