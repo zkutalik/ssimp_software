@@ -7,3 +7,4 @@
 6. stu bin/ssimp
 7. cd ..
 8. zip -r ssimp_linux_v0{.zip,}
+9. scp srueger@hpc1.chuv.ch:/data/sgg/sina/software/ssimp_linux_v0.zip .
