@@ -6,6 +6,7 @@
 
 namespace options {
 
+extern  int                     opt_help /*= 0*/;
 extern  std::vector<std:: string>           opt_non_options; // if there are two or three of these, copy them into opt_gwas_filename, opt_out, and opt_raw_ref
 
 extern  std:: string            opt_raw_ref;
