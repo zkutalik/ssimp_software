@@ -21,6 +21,7 @@ namespace action = range :: action;
 
 namespace options {
 
+        int                     opt_help = 0;
         std::vector<std:: string>           opt_non_options; // if there are two or three of these, copy them into opt_gwas_filename, opt_out, and opt_raw_ref
         std:: string            opt_raw_ref;
         std:: string            opt_gwas_filename;
@@ -54,7 +55,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
     while(1) { // while there are still more options to be processed
         int long_option_index;
         static struct option long_options[] = {
-            //{"header.in",  no_argument, &opt_headerin,  1 }, // a boolean flag
+            {"help"               ,  no_argument, &opt_help,  1 }, // a boolean flag
             {"ref"                ,  required_argument, 0,  2 }, // last arg on each line must be greater than 1
             {"window.width"       ,  required_argument, 0,  3 },
             {"flanking.width"     ,  required_argument, 0,  4 },
