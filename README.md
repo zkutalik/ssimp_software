@@ -10,12 +10,9 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 [//]: -------------------------------
 
 ### Compiled version
-```diff 
-- TBD
-```
-Download
-* [ssimp 0.1 - Mac OS X]()
-* [ssimp 0.1 - Ubuntu 12.04]()
+
+Download for Linux 
+* [ssimp 0.1 - Ubuntu 12.04](compiled/ssimp_linux_v0.zip) (compiled on a CentOS 6.5)
 
 ### Compile from source 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
