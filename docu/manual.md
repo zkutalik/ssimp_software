@@ -98,12 +98,15 @@ The column identifying the
 - **Position** should be named: `POS`,`position` or `BP`.
 
 *Note*
+
 Column names listed above are not case sensitive. E.g. P-value column can be named `p` or `P`.
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
 To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 ![Caption for the picture.](visuals/visualisation_width.jpeg)
+
+This means that for each chromosome you can only impute variants that are in the range between **min(position)+flanking.width** to **max(position)-flanking.width**, the position being the position of all tag SNPs on a specific chromsome.
 
 ## Reference panel
 [//]: -------------------------------
