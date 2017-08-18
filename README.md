@@ -9,9 +9,10 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
-### Compiled version for Linux
+### Compiled version (binary)
 
-[Download ssimp binary](compiled/ssimp-0.1)
+[Linux](compiled/ssimp-linux-0.1)
+[MacOS](compiled/ssimp-mac-0.1)
 
 ### Compile from source 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
@@ -53,7 +54,7 @@ We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_softwar
 ## Download 1000 genomes reference panel
 [//]: -------------------------------
 
-**Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!*
+**Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage.*
 
 ### Automatical download
 [//]: -------------------------------
