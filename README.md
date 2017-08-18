@@ -9,10 +9,9 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
-### Compiled version
+### Compiled version for Linux
 
-Download for Linux 
-* [ssimp v0 - Linux](compiled/ssimp) (compiled on a CentOS 6.5)
+* [Download ssimp binary](compiled/ssimp)
 
 ### Compile from source 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
@@ -37,7 +36,7 @@ Download for Linux
 ## Example
 [//]: -------------------------------
 
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
 
 will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
 
