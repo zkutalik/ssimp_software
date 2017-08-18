@@ -11,7 +11,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 
 ### Compiled version for Linux
 
-* [Download ssimp binary](compiled/ssimp)
+[Download ssimp binary](compiled/ssimp-0.1)
 
 ### Compile from source 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
