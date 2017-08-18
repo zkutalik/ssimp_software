@@ -9,18 +9,15 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
-### Compiled version
-```diff 
-- TBD
-```
-Download
-* [ssimp 0.1 - Mac OS X]()
-* [ssimp 0.1 - Ubuntu 12.04]()
+### Compiled version for Linux
+
+[Download ssimp binary](compiled/ssimp-0.1)
 
 ### Compile from source 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
+
 `unzip ssimp_software-master.zip`
 
 (2) access the folder
@@ -33,14 +30,14 @@ Download
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-(5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out the next section to see how to download and install a reference panel. 
+(5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
 
 ## Example
 [//]: -------------------------------
 
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
 
 will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
 
@@ -59,6 +56,7 @@ We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_softwar
 **Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!*
 
 ### Automatical download
+[//]: -------------------------------
 By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. 
 
 For example, if we want 1000 genomes to be downloaded and EUR population used for imputation, we type: 

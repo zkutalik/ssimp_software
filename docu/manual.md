@@ -25,9 +25,6 @@ Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
 `--ref [no default]` path to vcf file (same folder should contain the `tbi` file). 
-```diff 
-- currently, there is a default to use the 1KG reference panel (503 EUR) on HPC1. For more info see section `reference panel` below.
-```
 
 `--out [no default]` string. Filename to store the imputation results. 
 
@@ -60,11 +57,13 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 		
 `--missingness [none]`, string, `ind` (recommended), `dep`. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. This is automatically set to `FALSE` if `N` is not provided or `N` is set to `NA`.
 
-`--n.cores [1]` Number of cores to use.
-```diff 
-- TBD
-```
+`--n.cores [1]` Number of cores to use (will be implemented around November 2017). Have a look at the workaround below.
 
+### Parallelisation
+[//]: -------
+Until parallelisation is implemented we propose the following solution.
+
+`here goes the script`
 
 ### Note	
 [//]: -------
@@ -98,12 +97,15 @@ The column identifying the
 - **Position** should be named: `POS`,`position` or `BP`.
 
 *Note*
+
 Column names listed above are not case sensitive. E.g. P-value column can be named `p` or `P`.
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
 To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 ![Caption for the picture.](visuals/visualisation_width.jpeg)
+
+This means that for each chromosome you can only impute variants that are in the range between **min(position)+flanking.width** to **max(position)-flanking.width**, the position being the position of all tag SNPs on a specific chromsome.
 
 ## Reference panel
 [//]: -------------------------------

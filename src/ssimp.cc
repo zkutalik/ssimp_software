@@ -245,6 +245,10 @@ int main(int argc, char **argv) {
 
     options:: read_in_all_command_line_options(argc, argv);
 
+    if(options:: opt_help == 1) {
+        exitWithUsage();
+    }
+
     // There should be exactly zero, or three, non-option arguments:
     //     ssimp:  --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT
     // or
