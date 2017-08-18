@@ -12,6 +12,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ### Compiled version (binary)
 
 [Linux](compiled/ssimp-linux-0.1)
+
 [MacOS](compiled/ssimp-mac-0.1)
 
 ### Compile from source 
