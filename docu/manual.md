@@ -59,11 +59,11 @@ use the sample names in column 'f'. An example of the latter is: `/data/sgg/aaro
 
 `--n.cores [1]` Number of cores to use (will be implemented around November 2017). Have a look at the workaround below.
 
-### Parallelisation
+### Multiprocessing
 [//]: -------
-Until parallelisation is implemented we propose the following solution.
+Note that multiprocessing mode is not yet implemented, hence to speed up computation we recommend splitting up the job to smaller chromosomal chunks using
 
-`here goes the script`
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.range 22:16000000-22:16050075`
 
 ### Note	
 [//]: -------
@@ -115,10 +115,7 @@ More info on handling reference panel data can be found starting from line 49 in
 
 ## Run-time
 [//]: -------------------------------
-To run a genome-wide imputation using 1000genomes, roughly 200 CPU hours are needed.
-```diff 
-- sina check
-```
+To run a genome-wide imputation using 1000 genomes, roughly 200 CPU hours are needed.
 
 ## Method outline
 [//]: -------------------------------
@@ -164,11 +161,10 @@ The `.log` file is a copy of what is printed to the console. (not supported yet)
 ### out file
 [//]: -------
 The `.ssimp.txt` file has the following columns:
-chr     pos     z_imp   source  SNP     a1      a2      maf     r2.pred lambda  Z_reimputed     r2_reimputed
 - `chr` Chromosome (only 1 to 22 right now)
 - `pos` Position (same build as reference panel)
 - `z_imp` Imputed Z statistics (see below)
-- `N_imp` Estimation of N (only if missingness was set to `TRUE`)
+- `N_imp` Effective sample size (maximal sample size times the imputation quality)
 - `source` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 
 - `SNP` SNP-ID
 - Reference allele (same column name as in the GWAS file)
