@@ -69,6 +69,12 @@ int main(int argc, char **argv) {
                 if(chrom_string.substr( chrom_string.size() - 7 ) == "_random")
                     continue; // Skip the _random ones. TODO: Confirm this is OK
             }
+            if(chrom_string.substr(0,3) == "Un_")
+                continue;
+            if(chrom_string             == "PAR")
+                continue;
+            if(chrom_string             == "MT")
+                continue;
             assert(split.at(3).substr(0,2) == "rs");
             int chrom = [&]() ->int {
                 if(chrom_string=="X") return static_cast<int>( three_builds_t:: XYZ:: CHROM_X );
