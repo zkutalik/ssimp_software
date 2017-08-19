@@ -8,6 +8,7 @@
 #include "../src/bits.and.pieces/utils.hh"
 
 using std:: ifstream;
+using std:: ofstream;
 using std:: cout;
 using std:: string;
 using std:: set;
@@ -27,6 +28,14 @@ struct three_builds_t {
 
     three_builds_t() : chrom(-1), hg18(-1), hg19(-1), hg20(-1) {}
 };
+
+void write_int(int32_t & input, ofstream & o) {
+    for(int i=3; i>=0; --i) {
+        unsigned char one_byte = (input >> (i*8)) & 0xff;
+        o.write( reinterpret_cast<const char *>(& one_byte), 1 );
+    }
+    o || DIE("couldn't write");
+}
 
 int main(int argc, char **argv) {
     argc == 6 || DIE("needs 6 args");
@@ -117,6 +126,31 @@ int main(int argc, char **argv) {
             }
         }
         fs_one_build.eof() || DIE("fs_one_build.eof()");
+    }
+
+    ofstream fs_out(argv[5], std:: ios_base:: binary);
+    map<int, int> mask_of_three_builds_frequency;
+    for(auto && rs_builds : three_builds_for_all_interesting_snps) {
+        auto rs = rs_builds.first;
+        auto three_builds = rs_builds.second;
+
+        write_int(rs, fs_out);
+        write_int(three_builds.chrom, fs_out);
+        write_int(three_builds.hg18, fs_out);
+        write_int(three_builds.hg19, fs_out);
+        write_int(three_builds.hg20, fs_out);
+
+        auto mask_of_three_builds = (three_builds.hg18 == -1 ? 1 : 0)
+                                  + (three_builds.hg19 == -1 ? 2 : 0)
+                                  + (three_builds.hg20 == -1 ? 4 : 0)
+            ;
+        ++mask_of_three_builds_frequency[mask_of_three_builds];
+    }
+    fs_out.close();;
+    fs_out || DIE("Couldn't close output file");
+
+    for(auto && mask : mask_of_three_builds_frequency) {
+        PP(mask.first, mask.second);
     }
 
 }
