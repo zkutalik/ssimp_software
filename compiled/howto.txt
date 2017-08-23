@@ -1,0 +1,23 @@
+## on LINUX (e.g. HPC1)
+
+stu bin/ssimp-static   # to build the statically-linked version of the executable
+cp bin/ssimp-static compiled/ssimp-linux-0.1
+git add compiled/ssimp-linux-0.1
+git commit -m "statically-linked executable for LINUX"
+
+
+## on a MAC (e.g. sina’s computer)
+
+## stu bin/ssimp-static   # to build the statically-linked version of the executable
+## >> failed, instead
+
+stu bin/ssimp  # to build the statically-linked version of the executable
+cp bin/ssimp compiled/ssimp-osx-0.1
+git add compiled/ssimp-osx-0.1
+git commit -m "executable for OSX"
+
+
+
+
+
+
