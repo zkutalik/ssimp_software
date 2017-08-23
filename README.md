@@ -11,9 +11,9 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.1)
+[Linux](compiled/ssimp-linux-0.1) - static version
 
-[MacOS](compiled/ssimp-osx-0.1)
+[MacOS](compiled/ssimp-osx-0.1) - dynamic version (meaning, it might not work, in which case you should compile it from source)
 
 ### Compile from source 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
