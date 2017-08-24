@@ -86,3 +86,12 @@ as subset of individuals (here AFR) should be used:
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
+## Contributors
+[//]: -------------------------------
+[Aaron McDaid](https://github.com/aaronmcdaid) (developer)
+[Sina Rueeger](https://github.com/sinarueeger) (coordinator)
+
+## Contact
+[//]: -------------------------------
+<sina.rueeger@gmail.com>
+
