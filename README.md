@@ -88,8 +88,8 @@ More info on handling reference panel data can be found starting from line 49 in
 
 ## Contributors
 [//]: -------------------------------
-[Aaron McDaid](https://github.com/aaronmcdaid) (developer)
-[Sina Rueeger](https://github.com/sinarueeger) (coordinator)
+[Aaron McDaid](https://github.com/aaronmcdaid) (Developer)
+[Sina Rueeger](https://github.com/sinarueeger) (Coordinator)
 
 ## Contact
 [//]: -------------------------------
