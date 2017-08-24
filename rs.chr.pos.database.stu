@@ -69,4 +69,5 @@ export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.build.bin"
         liftover/dbsnp_hg20.bed                                                         \
         rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt                                    \
         "$target".tmp
+    mv  "$target".tmp "$target"
 }
