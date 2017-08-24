@@ -140,9 +140,9 @@ int main(int argc, char **argv) {
         write_int(three_builds.hg19, fs_out);
         write_int(three_builds.hg20, fs_out);
 
-        auto mask_of_three_builds = (three_builds.hg18 == -1 ? 1 : 0)
-                                  + (three_builds.hg19 == -1 ? 2 : 0)
-                                  + (three_builds.hg20 == -1 ? 4 : 0)
+        auto mask_of_three_builds = (three_builds.hg18 != -1 ? 1 : 0)
+                                  + (three_builds.hg19 != -1 ? 2 : 0)
+                                  + (three_builds.hg20 != -1 ? 4 : 0)
             ;
         ++mask_of_three_builds_frequency[mask_of_three_builds];
     }
