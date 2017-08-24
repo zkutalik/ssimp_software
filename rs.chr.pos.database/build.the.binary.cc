@@ -104,7 +104,11 @@ int main(int argc, char **argv) {
                         entry->second.chrom = chrom;
                     }
                     if(entry->second.chrom != chrom) {
-                        PP(line, split, chrom, entry->second.chrom);
+                        PP(three_builds_for_all_interesting_snps.size(), line, split, chrom, entry->second.chrom);
+                        assert(chrom >= 1);
+                        assert(entry->second.chrom >= 1);
+                        three_builds_for_all_interesting_snps.erase(entry); // discard this rs-number. Too wierd that the chromosomes aren't the same across builds
+                        continue;
                     }
                     assert(entry->second.chrom == chrom);
 
