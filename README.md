@@ -20,7 +20,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
 
-`unzip ssimp_software-master.zip`
+`unzip master.zip`
 
 (2) access the folder
 
