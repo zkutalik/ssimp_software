@@ -10,15 +10,16 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 [//]: -------------------------------
 
 ### Mac users
-Mac users might need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 ### Compiled version (binary)
 
 [Linux](compiled/ssimp-linux-0.1) - static version
 
-[MacOS](compiled/ssimp-osx-0.1) - dynamic version (meaning, it might not work, in which case you should compile it from source)
+[MacOS](compiled/ssimp-osx-0.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 ### Compile from source 
+Mac user? You need to install GSL: `brew install gsl`.
+
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
