@@ -9,6 +9,11 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
+### Mac users
+Mac users might need to install (GNU Scientific Library)
+
+`brew install gsl`
+
 ### Compiled version (binary)
 
 [Linux](compiled/ssimp-linux-0.1) - static version
@@ -35,6 +40,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 (5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
+
 
 ## Example
 [//]: -------------------------------
@@ -88,8 +94,11 @@ More info on handling reference panel data can be found starting from line 49 in
 
 ## Contributors
 [//]: -------------------------------
-[Aaron McDaid](https://github.com/aaronmcdaid) (Developer)
-[Sina Rueeger](https://github.com/sinarueeger) (Coordinator)
+[Aaron McDaid](https://github.com/aaronmcdaid) (implementation, method development)
+
+[Sina Rueeger](https://github.com/sinarueeger) (coordination, method development)
+
+We have used code (with permission, and under the GPL) from [libStatGen](https://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen) and [stu](https://github.com/kunegis/stu).
 
 ## Contact
 [//]: -------------------------------
