@@ -134,6 +134,15 @@ We use an adjusted imputation quality that corrects for the effective number of 
 ### Variable missingness
 To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
 
+### Transform Z-statistics to b and se(b)
+Imputed Z-statistics can be transformed into effect sizes (b) and standard errors of effect sizes (se(b)).
+
+The calculation depends on the type of model used for your GWAS data. 
+
+If your Z-statistics originated from a linear regression model:
+
+If your Z-statistics originated from a logistic regression:
+
 ### More background on method
 
 For more details on *summary statistics imputation*, please see *our paper (2017)* or (for a shortened method version) our *application paper (2017)*. 
