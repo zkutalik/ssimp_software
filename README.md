@@ -9,8 +9,6 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
-### Mac users
-
 ### Compiled version (binary)
 
 [Linux](compiled/ssimp-linux-0.1) - static version
