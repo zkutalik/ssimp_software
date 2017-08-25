@@ -1,6 +1,6 @@
 # Compile from source
 
-## Mac user? You might want to install GSL 1.16 first.
+## Mac user? You might want to install GSL first: 'brew install gsl'
 
 ## Download the zip file.
 wget https://github.com/sinarueeger/ssimp_software/archive/master.zip
