@@ -10,9 +10,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 [//]: -------------------------------
 
 ### Mac users
-Mac users might need to install (GNU Scientific Library)
-
-`brew install gsl`
+Mac users might need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 ### Compiled version (binary)
 
