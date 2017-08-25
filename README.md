@@ -11,16 +11,18 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.1)
+[Linux](compiled/ssimp-linux-0.1) - static version
 
-[MacOS](compiled/ssimp-osx-0.1)
+[MacOS](compiled/ssimp-osx-0.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
 
 ### Compile from source 
+Mac user? You need to install GSL: `brew install gsl`.
+
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
 
-`unzip ssimp_software-master.zip`
+`unzip master.zip`
 
 (2) access the folder
 
@@ -35,6 +37,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 (5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
+
 
 ## Example
 [//]: -------------------------------
@@ -85,4 +88,16 @@ as subset of individuals (here AFR) should be used:
 `ssimp gwas.txt output.txt ~/ref_panels/1000genomes --sample.names super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+
+## Contributors
+[//]: -------------------------------
+[Aaron McDaid](https://github.com/aaronmcdaid) (implementation, method development)
+
+[Sina Rueeger](https://github.com/sinarueeger) (coordination, method development)
+
+We have used code (with permission, and under the GPL) from [libStatGen](https://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen) and [stu](https://github.com/kunegis/stu).
+
+## Contact
+[//]: -------------------------------
+<sina.rueeger@gmail.com>
 

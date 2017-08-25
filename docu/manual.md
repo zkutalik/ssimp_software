@@ -76,7 +76,7 @@ Note that multiprocessing mode is not yet implemented, hence to speed up computa
 - Column names are automatically recognised using commonly used names. See subsection below.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes (`b`).
 - Missing values should be marked as `NA` or left empty. 
-- The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. Alternatively, if `b` and `SE` are present, then calculate `Z` via `b` and `SE`. 
+- The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. 
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
 - SNP names should be named so they match the SNP-id in the reference panel. E.g. if the reference panel uses `chr:pos`, the GWAS should have the same SNP identifier.
@@ -133,6 +133,15 @@ We use an adjusted imputation quality that corrects for the effective number of 
 
 ### Variable missingness
 To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that data set.
+
+### Transform Z-statistics to b and se(b)
+Imputed Z-statistics can be transformed into effect sizes (b) and standard errors of effect sizes (se(b)).
+
+The calculation depends on the type of model used for your GWAS data. 
+
+If your Z-statistics originated from a linear regression model:
+
+If your Z-statistics originated from a logistic regression:
 
 ### More background on method
 
