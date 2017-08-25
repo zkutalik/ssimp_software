@@ -80,7 +80,7 @@ Note that multiprocessing mode is not yet implemented, hence to speed up computa
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N), as incorporating missingness leads to a more accurate estimate. 
 - SNP names should be named so they match the SNP-id in the reference panel. E.g. if the reference panel uses `chr:pos`, the GWAS should have the same SNP identifier.
-- In case no SNP identifiers are present, use `chromosome` and `position`.
+- In case no SNP identifiers are present, use `chromosome` and `position`, but provide a `SNP` column with empty entries.
 - If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver.
 
 ### Automatic header recognition
@@ -115,7 +115,7 @@ More info on handling reference panel data can be found starting from line 49 in
 
 ## Run-time
 [//]: -------------------------------
-To run a genome-wide imputation using 1000 genomes, roughly 200 CPU hours are needed.
+To run a genome-wide imputation using 1000 genomes reference panel, roughly 200 CPU hours are needed.
 
 ## Method outline
 [//]: -------------------------------
@@ -158,7 +158,6 @@ We also recommend reading the review on the use of summary statistics by *Pasani
 - If SNP-ID are present in the GWAS, then positions (bp) are copied from reference panel. 
 - If SNP-ID are not present (e.g. filled with `.`), then the combination of Chr:Pos:A1:A2 are taken as identifier
 - Because either SNP-ID or Chr:Pos:A1:A2 are used as identifier, it is also possible to impute indels.
-- Z-statistics are imputed, along with `N_imp` (an estimate for the sample size) and `r2_pred` (adjusted imputation quality).
 
 ## Output
 [//]: -------------------------------
@@ -185,6 +184,11 @@ The `.ssimp.txt` file has the following columns:
 - `r2_reimputed` imputation quality for the imputed tag SNPs of for the first window (sanity check).
 
 To sum up: `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
+
+### Transform Z-statistics back to b and se(b)? 
+[//]: -------
+See Method outline above.
+
 
 ## References
 [//]: -------

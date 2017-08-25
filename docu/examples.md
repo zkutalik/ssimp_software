@@ -16,6 +16,13 @@ The minimal requirements are:
 For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
 
+### gwas is gzipped
+[//]: -------------------------------
+
+`ssimp --gwas gwas/small.random.csv.gz --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+
+`.gz` works, `.zip` not.
+
 ### Download the reference panel
 [//]: -------------------------------
 
@@ -49,7 +56,7 @@ Or: `SNP  a1  a2  b   p`
 
 ### Chr and Pos instead of SNP as SNP-identifier
 [//]: -------------------------------
-Provide chromosome and position instead.
+Provide chromosome and position instead, but include a SNP column that is empty too.
 
 `ssimp --gwas gwas/small.random.chr.pos.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 

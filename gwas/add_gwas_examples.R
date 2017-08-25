@@ -5,17 +5,14 @@ dat$se <- 1/sqrt(1000) ## not real
 dat$b <- dat$z * dat$se
 dat$OR <- exp(dat$b)
 
+## make gzipped version
+## gzip gwas/small.random.csv
+
 ## dat P, b
 ## ----------
 dat.P <- dat[,c("rnpid", "a1", "a2", "P","b")]
 
 write_csv(dat.P, "~/Documents/Work/Projects/tagging/ssimp_software/gwas/small.random.p.b.csv")
-
-
-## dat b, se
-## -------------
-dat.b.se <- dat[,c("rnpid", "a1", "a2", "b","se")]
-write_csv(dat.b.se, "~/Documents/Work/Projects/tagging/ssimp_software/gwas/small.random.b.se.csv")
 
 
 ## dat OR, P
@@ -101,4 +98,5 @@ sm <- structure(list(SNP = c("rs200923114", "rs200923853", "rs200923865",
                                                                                                                                                                                                                                                                                                     49L), class = "data.frame")
 tmp <- merge(dat, sm[,c("SNP","Chr","Pos")], by = "rnpid", by.y = "SNP", sort = FALSE)
 dat.pos.chr <- tmp[,c("Chr","Pos","a1","a2","z")]
+dat.pos.chr$SNP <- NA
 write_csv(dat.pos.chr, "~/Documents/Work/Projects/tagging/ssimp_software/gwas/small.random.chr.pos.csv")
