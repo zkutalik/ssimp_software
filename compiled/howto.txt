@@ -16,8 +16,3 @@ cp bin/ssimp compiled/ssimp-osx-0.1
 git add compiled/ssimp-osx-0.1
 git commit -m "executable for OSX"
 
-
-
-
-
-
