@@ -1,8 +1,12 @@
+# Compile from source
+
+## Mac user? You might want to install GSL 1.16 first.
+
 ## Download the zip file.
 wget https://github.com/sinarueeger/ssimp_software/archive/master.zip
 
 ## Unpack the zip file with 
-unzip ssimp_software-master.zip
+unzip master.zip
 
 ## access the folder
 cd ssimp_software-master
