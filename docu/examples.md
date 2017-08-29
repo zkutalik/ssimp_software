@@ -119,10 +119,10 @@ If it is only a few of SNPs it might be easier to use:
 Here, `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
 
 
-### Shrinking by 2/sqrt(n)
+### Shrinking LD matrix by 0.01
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--lambda "2/sqrt(n)"`**
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--lambda 0.01`**
 
 
 ### Impute SNPs with MAF > 0.05
