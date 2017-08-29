@@ -19,7 +19,7 @@ For more info regarding automatically column names recognition of the GWAS file,
 ### --gwas dataset is gzipped
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv.gz --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp` **`--gwas gwas/small.random.csv.gz`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 `.gz` works, `.zip` does not work.
 
@@ -41,7 +41,7 @@ No special argument needed, but GWAS input file needs to contain effect size `b`
 
 The header of the GWAS file should be: `SNP  a1  a2  b   p`
 
-`ssimp --gwas gwas/small.random.p.b.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp` **`--gwas gwas/small.random.p.b.csv`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 
 #### ... odds ratios
@@ -146,8 +146,9 @@ Here, `filename.samples.txt` contains sample id's (`sample`) along with a second
 ### Use the dependent missingness approach
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.n.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--missingness dep`**
+`ssimp` **`--gwas gwas/small.random.n.csv`** `--ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--missingness dep`**
 
+Your GWAS summary statistics needs to have a sample size column. 
 
 ### Store a copy of all console output to a file
 [//]: -------------------------------
