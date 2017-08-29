@@ -61,7 +61,7 @@ First, impute Z-statistics as shown above, then transform the Z-statistic into `
 [//]: -------------------------------
 Provide chromosome and position instead, but include a SNP column that is empty too.
 
-`ssimp --gwas gwas/small.random.chr.pos.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp` **`--gwas gwas/small.random.chr.pos.csv`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 
 ### Impute a bp range on a specific chromosome
