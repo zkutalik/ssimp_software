@@ -2,7 +2,7 @@
 # Examples
 [//]: ==================================
 
-All examples work with test data from the `ref` and `gwas` folder, therefore use significantly smaller GWAS datasets and reference panels to limit computation time. 
+All examples work with test data from the `ref` and `gwas` folder, therefore use much smaller GWAS datasets and reference panels than in reality to limit computation time. 
 
 ### Minimal example (default: imputation of Z-statistics)
 [//]: -------------------------------
