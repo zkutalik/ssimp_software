@@ -4,7 +4,7 @@
 
 All examples work with test data from the `ref` and `gwas` folder, therefore use much smaller GWAS datasets and reference panels than in reality to limit computation time. 
 
-### Minimal example (default: imputation of Z-statistics)
+### Minimal example to impute Z-statistics
 [//]: -------------------------------
 The minimal requirements are:
 1. `--gwas`: path to the *GWAS summary statistics* text file, containing at least the following columns SNP-id, Z-statistic, reference allele and risk allele and at least one row, 
