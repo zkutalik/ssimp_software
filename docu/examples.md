@@ -23,7 +23,7 @@ For more info regarding automatically column names recognition of the GWAS file,
 
 `.gz` works, `.zip` not.
 
-### Download the reference panel
+### Downloading the reference panel
 [//]: -------------------------------
 
 For detailed instructions and explanations see `docu/usage.txt`. 
