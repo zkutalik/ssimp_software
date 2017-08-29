@@ -57,7 +57,7 @@ First, impute Z-statistics as shown above, then transform the Z-statistic into `
 
 
 
-### Chr and Pos instead of SNP as SNP-identifier
+### Chr and Pos instead of SNP-identifier
 [//]: -------------------------------
 Provide chromosome and position instead, but include a SNP column that is empty too.
 
@@ -89,7 +89,7 @@ Provide chromosome and position instead, but include a SNP column that is empty 
 
 `listofimputesnps.txt` contains SNP id's separated by new lines (no header).
 
-If it is only a handful of SNPs it might be easier to use:
+If it is only a few of SNPs it might be easier to use:
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp <(echo rs587755077 rs587697622 | tr ' ' '\n')`**
 
@@ -101,7 +101,7 @@ If it is only a handful of SNPs it might be easier to use:
 
 `listoftagsnps.txt` contains SNP id's separated by new lines (no header).
 
-If it is only a handful of SNPs it might be easier to use:
+If it is only a few of SNPs it might be easier to use:
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.snp <(echo rs62224618 rs333 | tr ' ' '\n')`**
 
@@ -109,13 +109,14 @@ If it is only a handful of SNPs it might be easier to use:
 ### Select individuals from reference panel (short version)
 [//]: -------------------------------
 
+#### 1)
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.small.txt`**
 
-filename.samples.txt contains sample id's separated by new lines (no header). 
+`filename.samples.txt` contains sample id's separated by new lines (no header). 
 
+#### 2)
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.txt/sample/super_pop=EUR`**
-
-in this case `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
+Here, `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
 
 
 ### Shrinking by 2/sqrt(n)
