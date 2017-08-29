@@ -30,7 +30,7 @@ For detailed instructions and explanations see detailed instructions in [usage-t
 
 A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG (all populations, not only the selected one).
 
-`ssimp --gwas gwas/small.random.csv --ref 1KG/EUR --out output.txt`
+`ssimp --gwas gwas/small.random.csv` **`--ref 1KG/EUR`** ` --out output.txt`
 
 
 ### You do not have the Z-statistics available, but you have...
@@ -162,4 +162,4 @@ Your GWAS summary statistics needs to have a sample size column.
 
 ### Use your own reference panel
 [//]: -------------------------------
-Follow the instructions in docu/usage.txt
+Follow the instructions in [docu/usage](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
