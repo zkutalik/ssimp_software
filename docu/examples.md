@@ -16,7 +16,7 @@ The minimal requirements are:
 For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
 
-### gwas is gzipped
+### --gwas dataset is gzipped
 [//]: -------------------------------
 
 `ssimp --gwas gwas/small.random.csv.gz --ref ref/small.vcf.sample.vcf.gz --out output.txt`
