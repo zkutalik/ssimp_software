@@ -21,25 +21,25 @@ For more info regarding automatically column names recognition of the GWAS file,
 
 `ssimp --gwas gwas/small.random.csv.gz --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-`.gz` works, `.zip` not.
+`.gz` works, `.zip` does not work.
 
 ### Downloading the reference panel
 [//]: -------------------------------
 
-For detailed instructions and explanations see `docu/usage.txt`. 
+For detailed instructions and explanations see detailed instructions in [usage-text](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
-A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG.
+A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG (all populations, not only the selected one).
 
 `ssimp --gwas gwas/small.random.csv --ref 1KG/EUR --out output.txt`
 
 
-### You don not have the Z-statistics available, but you have...
+### You do not have the Z-statistics available, but you have...
 [//]: -------------------------------
 
 #### ... P-values and betas
 No special argument needed, but GWAS input file needs to contain effect size `b` along with the P-value `p`. 
 
-So the header of the GWAS file would be: `SNP  a1  a2  b   p`
+The header of the GWAS file should be: `SNP  a1  a2  b   p`
 
 `ssimp --gwas gwas/small.random.p.b.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
@@ -47,15 +47,13 @@ So the header of the GWAS file would be: `SNP  a1  a2  b   p`
 #### ... odds ratios
 No special argument needed, but GWAS input file needs to contain Z-statistics of the odds ratios. 
 
-Alternatively, if no Z-statistics is available, provide `b=log(OR)` and the P-value.
+Alternatively, if no Z-statistic is available, provide `b=log(OR)` and the P-value.
 
-So the header of the GWAS file would either be: `SNP  a1  a2  Z`
-
-Or: `SNP  a1  a2  b   p`
+The header of the GWAS file should either be `SNP  a1  a2  Z` or `SNP  a1  a2  b   p`.
 
 ### Impute b, and not Z
 [//]: -------------------------------
-Impute first Z-statistics as shown above, then transform Z into se(b) and b using this [R-function](https://github.com/sinarueeger/ssimp_software/blob/master/transform_z_to_b.R).
+First, impute Z-statistics as shown above, then transform the Z-statistic into `se(b)` and `b` using this [R-function](https://github.com/sinarueeger/ssimp_software/blob/master/transform_z_to_b.R).
 
 
 
