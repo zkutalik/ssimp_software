@@ -93,7 +93,9 @@ More info on handling reference panel data can be found starting from line 49 in
 [//]: -------------------------------
 [Aaron McDaid](https://github.com/aaronmcdaid) (implementation, method development)
 
-[Sina Rueeger](https://github.com/sinarueeger) (coordination, method development)
+[Sina Rüeger](https://github.com/sinarueeger) (coordination, method development)
+
+[Zoltan Kutalik](https://github.com/zkutalik) (supervision, method development)
 
 We have used code (with permission, and under the GPL) from [libStatGen](https://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen) and [stu](https://github.com/kunegis/stu).
 
