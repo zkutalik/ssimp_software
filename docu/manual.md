@@ -163,7 +163,7 @@ Imputed Z-statistics can be transformed into effect sizes (`b`) and standard err
 
 The calculation depends on the type of model used for your GWAS data. 
 
-If your Z-statistics originated from a linear regression model, `se(b)` can be approximated by:
+If your Z-statistics originated from a linear regression model, the estimated `se(b)` can be approximated by:
 
 ![se(b)](visuals/eq_seb.jpg)
 
