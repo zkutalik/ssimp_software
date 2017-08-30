@@ -158,13 +158,18 @@ We use an adjusted imputation quality that corrects for the effective number of 
 ### Variable missingness
 To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that dataset.
 
-### Transform Z-statistics to b and se(b)
-Imputed Z-statistics can be transformed into effect sizes (b) and standard errors of effect sizes (se(b)).
+### Transform Z-statistics to `b` and `se(b)`
+Imputed Z-statistics can be transformed into effect sizes (`b`) and standard errors of effect sizes (`se(b)`).
 
 The calculation depends on the type of model used for your GWAS data. 
 
-If your Z-statistics originated from a linear regression model:
+If your Z-statistics originated from a linear regression model, `se(b)` can be approximated by:
 
+![se(b)](visuals/eq_seb.jpg)
+
+with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We can approximate the sample size of an untyped SNP by multiplying the maximum sample size with its imputation quality `N_u = N_max * r2_pred`. 
+
+[Here](https://github.com/sinarueeger/ssimp_software/blob/master/transform_z_to_b.R) we provide an R-function that automatically transforms imputed Z-statistics into imputed effect sizes.
 
 ### More background on method
 
@@ -182,3 +187,6 @@ We also recommend reading the review on the use of summary statistics by *Pasani
 
 **Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014).** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment.* Bioinformatics.
 
+**method paper**
+
+**application paper**
