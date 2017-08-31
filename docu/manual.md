@@ -151,7 +151,7 @@ To sum up: `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (
 Here we aim to impute the **Z-statistic** of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), **C** (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, **c** and **C** are regularised using the option `--lambda`. *u* can be extended to a vector. *M* includes SNPs within `--window.width` + 2 * `--flanking.region`, whereas the core window (`--window.width`) covers SNPs to impute. 
 
 ### Imputation quality
-The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor imputation and 1 perfect imputation. We use an adjusted R-square estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel). In this case `--lambda` is set to `1e-6`.
+The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor and 1 perfect imputation. We use an adjusted R<sup>2</sup> estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel). In this case `--lambda` is set to `1e-6`.
 
 ![Imputation quality](visuals/eq_impqual.jpg)
 
