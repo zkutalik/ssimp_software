@@ -144,7 +144,7 @@ To sum up: `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (
 
 ## Method outline
 [//]: -------------------------------
-*Summary statistics imputation* is a method to estimate the summary statistics of new, untyped variants using the information of typed variants. The principle of summary statistics imputation is to combine summary statistics from a set of typed variants and the fine-scale LD structure in the same region. We can formally write this using the conditional expectation of a multivariate normal distribution. 
+The principle of *summary statistics imputation* is to combine summary statistics from a set of typed variants and the fine-scale LD structure in the same region. We can formally write this using the conditional expectation of a multivariate normal distribution. 
 
 ![Summary statistics equation](visuals/eq_main.jpg)
 
