@@ -161,7 +161,7 @@ To account for variable sample size in summary statistics of tag SNVs, we use an
 ### Transform Z-statistics to `b` and `se(b)`
 Imputed Z-statistics can be transformed into effect sizes (`b`) and standard errors of effect sizes (`se(b)`).
 
-The calculation depends on the type of model used for your GWAS data. 
+The calculation depends on the type of model used for your GWAS summary statistics. 
 
 If your Z-statistics originated from a linear regression model, the estimated `se(b)` can be approximated by:
 
