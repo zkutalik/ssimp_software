@@ -144,14 +144,14 @@ To sum up: `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (
 
 ## Method outline
 [//]: -------------------------------
-The principle of *summary statistics imputation* is to combine summary statistics from a set of typed variants and the fine-scale LD structure in the same region. We can formally write this using the conditional expectation of a multivariate normal distribution. 
+The principle of *summary statistics imputation* is to combine the available summary statistics from a set of markers and the fine-scale LD structure in the same region in order to infer association summary statistics of unobserved variants. We can formally write this using the conditional expectation of a multivariate normal distribution. 
 
 ![Summary statistics equation](visuals/eq_main.jpg)
 
-Here we aim to impute the **Z-statistic** of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), **C** (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, **c** and **C** are regularised using the option `--lambda`. *u* can be extended to a vector. *M* includes SNPs within `--window.width` + 2 * `--flanking.region`, whereas the core window (`--window.width`) covers SNPs to impute. 
+Here we aim to impute the **Z-statistic** of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), **C** (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, **c** and **C** are regularised using the option `--lambda`. *u* can be extended to a vector. SNPs to impute are in a core window (of size `--window.width`) and *M* is the set of tag SNPs within the core window +/- a flanking region (of size `--window.width`).
 
 ### Imputation quality
-The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor and 1 perfect imputation. We use an adjusted R<sup>2</sup> estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel). In this case the regularisation is set to `1e-6`.
+The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor and 1 perfect imputation. We use an adjusted R<sup>2</sup> estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel). In this case the regularisation $\lambda$ is set to `1e-6`.
 
 ![Imputation quality](visuals/eq_impqual.jpg)
 
