@@ -17,6 +17,8 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 
 ### Compile from source 
 
+Check your gcc version with `gcc --version`. It needs to be 5.0.0 or higher.
+
 Mac user? You need to install GSL: `brew install gsl`.
 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
