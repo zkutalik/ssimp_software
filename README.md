@@ -16,6 +16,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 [MacOS](compiled/ssimp-osx-0.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
 
 ### Compile from source 
+
 Mac user? You need to install GSL: `brew install gsl`.
 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
