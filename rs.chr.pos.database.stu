@@ -62,7 +62,8 @@ export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.build.bin"
     #head rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt
     #zcat rs.chr.pos.database/three.sources.of.rs/for_aaron_rslistHRC.gz | head
     #head rs.chr.pos.database/three.sources.of.rs/positions.b19.TWINSUKALSPAC..sorted.By.rs
-    g++ rs.chr.pos.database/build.the.binary.cc -o rs.chr.pos.database/build.the.binary -std=c++14
+    echo g++ -Wall -Wextra rs.chr.pos.database/build.the.binary.cc -o rs.chr.pos.database/build.the.binary -std=c++14
+         g++ -Wall -Wextra rs.chr.pos.database/build.the.binary.cc -o rs.chr.pos.database/build.the.binary -std=c++14
     rs.chr.pos.database/build.the.binary                                                \
         liftover/liftover_hg18.bed                                                      \
         liftover/liftover_hg19.bed                                                      \

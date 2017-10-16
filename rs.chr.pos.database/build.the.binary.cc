@@ -106,7 +106,13 @@ int main(int argc, char **argv) {
                     if(entry->second.chrom != chrom) {
                         PP(three_builds_for_all_interesting_snps.size(), line, split, chrom, entry->second.chrom);
                         assert(chrom >= 1);
-                        assert(entry->second.chrom >= 1);
+                        switch(entry->second.chrom) {
+                            break; case int(three_builds_t:: XYZ:: CHROM_X): {}
+                            break; case int(three_builds_t:: XYZ:: CHROM_Y): {}
+                            break; default: {
+                                assert(entry->second.chrom >= 1);
+                            }
+                        }
                         three_builds_for_all_interesting_snps.erase(entry); // discard this rs-number. Too wierd that the chromosomes aren't the same across builds
                         continue;
                     }
