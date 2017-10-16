@@ -2,9 +2,9 @@
 # Examples
 [//]: ==================================
 
-All examples work with test data from the `ref` and `gwas` folder, therefore use significantly smaller GWAS dataset and reference panels to limit computation time. 
+All examples work with test data from the `ref` and `gwas` folder, therefore use much smaller GWAS datasets and reference panels than in reality to limit computation time. 
 
-### Minimal example (default: imputation of Z-statistics)
+### Minimal example to impute Z-statistics
 [//]: -------------------------------
 The minimal requirements are:
 1. `--gwas`: path to the *GWAS summary statistics* text file, containing at least the following columns SNP-id, Z-statistic, reference allele and risk allele and at least one row, 
@@ -13,45 +13,55 @@ The minimal requirements are:
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
+For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in the [manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
 
-### Download the reference panel
+### --gwas dataset is gzipped
 [//]: -------------------------------
 
-For detailed instructions and explanations see `docu/usage.txt`. 
+`ssimp` **`--gwas gwas/small.random.csv.gz`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG.
+`.gz` works, `.zip` does not work.
 
-`ssimp --gwas gwas/small.random.csv --ref 1KG/EUR --out output.txt`
+### Downloading the reference panel
+[//]: -------------------------------
+
+For detailed instructions and explanations see detailed instructions in [usage-text](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+
+A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG (all populations, not only the selected one).
+
+`ssimp --gwas gwas/small.random.csv` **`--ref 1KG/EUR`** ` --out output.txt`
 
 
-### You don not have the Z-statistics available, but you have...
+### You do not have the Z-statistics available, but you have...
 [//]: -------------------------------
 
 #### ... P-values and betas
 No special argument needed, but GWAS input file needs to contain effect size `b` along with the P-value `p`. 
 
-So the header of the GWAS file would be: `SNP  a1  a2  b   p`
+The header of the GWAS file should be: `SNP  a1  a2  b   p`
 
-`ssimp --gwas gwas/small.random.p.b.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp` **`--gwas gwas/small.random.p.b.csv`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 
 #### ... odds ratios
 No special argument needed, but GWAS input file needs to contain Z-statistics of the odds ratios. 
 
-Alternatively, if no Z-statistics is available, provide `b=log(OR)` and the P-value.
+Alternatively, if no Z-statistic is available, provide `b=log(OR)` and the P-value.
 
-So the header of the GWAS file would either be: `SNP  a1  a2  Z`
+The header of the GWAS file should either be `SNP  a1  a2  Z` or `SNP  a1  a2  b   p`.
 
-Or: `SNP  a1  a2  b   p`
-
-
-### Chr and Pos instead of SNP as SNP-identifier
+### Impute b, and not Z
 [//]: -------------------------------
-Provide chromosome and position instead.
+First, impute Z-statistics as shown above, then transform the Z-statistic into `se(b)` and `b` using this [R-function](https://github.com/sinarueeger/ssimp_software/blob/master/transform_z_to_b.R).
 
-`ssimp --gwas gwas/small.random.chr.pos.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+
+
+### Chr and Pos instead of SNP-identifier
+[//]: -------------------------------
+Provide chromosome and position instead, but include a SNP column that is empty too.
+
+`ssimp` **`--gwas gwas/small.random.chr.pos.csv`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 
 ### Impute a bp range on a specific chromosome
@@ -79,7 +89,7 @@ Provide chromosome and position instead.
 
 `listofimputesnps.txt` contains SNP id's separated by new lines (no header).
 
-If it is only a handful of SNPs it might be easier to use:
+If it is only a few of SNPs it might be easier to use:
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp <(echo rs587755077 rs587697622 | tr ' ' '\n')`**
 
@@ -91,7 +101,7 @@ If it is only a handful of SNPs it might be easier to use:
 
 `listoftagsnps.txt` contains SNP id's separated by new lines (no header).
 
-If it is only a handful of SNPs it might be easier to use:
+If it is only a few of SNPs it might be easier to use:
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.snp <(echo rs62224618 rs333 | tr ' ' '\n')`**
 
@@ -99,19 +109,20 @@ If it is only a handful of SNPs it might be easier to use:
 ### Select individuals from reference panel (short version)
 [//]: -------------------------------
 
+#### 1)
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.small.txt`**
 
-filename.samples.txt contains sample id's separated by new lines (no header). 
+`filename.samples.txt` contains sample id's separated by new lines (no header). 
 
+#### 2)
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.txt/sample/super_pop=EUR`**
+Here, `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
 
-in this case `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
 
-
-### Shrinking by 2/sqrt(n)
+### Shrinking LD matrix by 0.01
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--lambda "2/sqrt(n)"`**
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--lambda 0.01`**
 
 
 ### Impute SNPs with MAF > 0.05
@@ -135,8 +146,9 @@ in this case `filename.samples.txt` contains sample id's (`sample`) along with a
 ### Use the dependent missingness approach
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.n.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--missingness dep`**
+`ssimp` **`--gwas gwas/small.random.n.csv`** `--ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--missingness dep`**
 
+Your GWAS summary statistics needs to have a sample size column. 
 
 ### Store a copy of all console output to a file
 [//]: -------------------------------
@@ -144,15 +156,10 @@ in this case `filename.samples.txt` contains sample id's (`sample`) along with a
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--log my_ssimp_logfile`**
 
 
-### Paralellize computation: use 10 cores 
+### Paralellize computation (TBD)
 [//]: -------------------------------
-
-```diff 
-- (this option is not yet integrated)
-```
-`ssimp my_gwas.txt` **`--n.cores 10`**
 
 
 ### Use your own reference panel
 [//]: -------------------------------
-Follow the instructions in docu/usage.txt
+Follow the instructions in [docu/usage](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).

@@ -9,19 +9,23 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
-### Compiled version
-```diff 
-- TBD
-```
-Download
-* [ssimp 0.1 - Mac OS X]()
-* [ssimp 0.1 - Ubuntu 12.04]()
+### Compiled version (binary)
+
+[Linux](compiled/ssimp-linux-0.1) - static version
+
+[MacOS](compiled/ssimp-osx-0.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
 
 ### Compile from source 
+
+Check your gcc version with `gcc --version`. It needs to be 5.0.0 or higher.
+
+Mac user? You need to install GSL: `brew install gsl`.
+
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
-`unzip ssimp_software-master.zip`
+
+`unzip master.zip`
 
 (2) access the folder
 
@@ -33,14 +37,15 @@ Download
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-(5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out the next section to see how to download and install a reference panel. 
+(5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
+
 
 ## Example
 [//]: -------------------------------
 
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
 
 will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
 
@@ -56,9 +61,10 @@ We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_softwar
 ## Download 1000 genomes reference panel
 [//]: -------------------------------
 
-**Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage!*
+**Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage.*
 
 ### Automatical download
+[//]: -------------------------------
 By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. 
 
 For example, if we want 1000 genomes to be downloaded and EUR population used for imputation, we type: 
@@ -85,4 +91,18 @@ as subset of individuals (here AFR) should be used:
 `ssimp gwas.txt output.txt ~/ref_panels/1000genomes --sample.names super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+
+## Contributors
+[//]: -------------------------------
+[Aaron McDaid](https://github.com/aaronmcdaid) (implementation, method development)
+
+[Sina Rüeger](https://github.com/sinarueeger) (coordination, method development)
+
+[Zoltan Kutalik](https://github.com/zkutalik) (supervision, method development)
+
+We have used code (with permission, and under the GPL) from [libStatGen](https://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen) and [stu](https://github.com/kunegis/stu).
+
+## Contact
+[//]: -------------------------------
+<sina.rueeger@gmail.com>
 

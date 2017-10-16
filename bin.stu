@@ -30,6 +30,42 @@
     -o bin/ssimp
 }
 
+# This next rule makes a statically-compiled executable, which we copy into the 'compiled/' folder.
+# It can't be built on every machine, but it should run on every machine on the same platform (Mac or Linux).
+# The binary will be a little bigger.
+
+    bin/ssimp-static
+:   $[LINKER=bin/o/LINKER]
+    $[LD_FLAGS=bin/o/LD_FLAGS]
+
+    bin/o/ssimp.o
+    bin/o/options.o
+    bin/o/logging.o
+    bin/o/file.reading.o
+    bin/o/file.reading.vcfgztbi.o
+    bin/o/mvn/mvn.o
+    bin/o/gz/gzstream/gzstream.o
+    bin/o/usage_special.o
+    src/libStatGen/libStatGen.a # I need to think of a rule to automatically build this - must talk to the author about including her code
+{
+    echo LINKER:"${LINKER}" | tr '\n' ' '; echo
+    echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
+    ${LINKER} \
+        -static \
+        -static-libgcc \
+        bin/o/options.o \
+        bin/o/ssimp.o \
+        bin/o/logging.o \
+        bin/o/file.reading.o \
+        bin/o/file.reading.vcfgztbi.o \
+        bin/o/mvn/mvn.o \
+        bin/o/gz/gzstream/gzstream.o \
+        bin/o/usage_special.o       \
+        src/libStatGen/libStatGen.a \
+        ${LD_FLAGS}               \
+    -o bin/ssimp-static
+}
+
 >   bin/LIST_OF_HH_FILES
 :   -p bin/o
     @unconditional

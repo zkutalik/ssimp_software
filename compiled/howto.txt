@@ -1,0 +1,21 @@
+## on LINUX (e.g. HPC1)
+
+stu bin/ssimp-static   # to build the statically-linked version of the executable
+cp bin/ssimp-static compiled/ssimp-linux-0.1
+git add compiled/ssimp-linux-0.1
+git commit -m "statically-linked executable for LINUX"
+
+
+## on a MAC (e.g. sina’s computer)
+
+## stu bin/ssimp-static   # to build the statically-linked version of the executable
+## >> failed, instead
+Static compilation would help, but I did more investigation and it seems that static compilation will never be possible with Mac:
+https://stackoverflow.com/questions/844819/how-to-static-link-on-os-x
+The 'crt' library was our problem and it appears that Apple refuse to make a static version of it available
+(aaron email 2017-08-25)
+
+stu bin/ssimp  # to build the statically-linked version of the executable
+cp bin/ssimp compiled/ssimp-osx-0.1
+git add compiled/ssimp-osx-0.1
+git commit -m "executable for OSX"
