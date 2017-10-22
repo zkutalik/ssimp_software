@@ -1,4 +1,4 @@
-@all: bin/ssimp;
+@all: @tags bin/ssimp;
 
     bin/ssimp
 :   $[LINKER=bin/o/LINKER]
@@ -194,4 +194,8 @@ src/libStatGen/include/VcfFileReader.h
     find bin/o -name '*.o' -exec rm {} \;
     cd src/libStatGen
     make clean
+}
+
+@tags {
+    ctags src/*.??
 }
