@@ -170,8 +170,8 @@ static
 void download_1KG_ifneeded() {
     assert(options:: opt_raw_ref.substr(0, 3) == "1KG"); // only in here if the user specified a reference panel as '1KG...'
 
-    auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1KG"                                                        , getenv("HOME"));
-    auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
+    auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
+    auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
 
     bool directory_already_exists       = opendir( directory.c_str() );
     bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
@@ -191,12 +191,12 @@ void download_1KG_ifneeded() {
         << R"(
 
     mkdir -p ~/reference_panels
-    ln -s YOUR_DOWNLOAD_OF_1000GENOMES ~/reference_panels/1KG
+    ln -s YOUR_DOWNLOAD_OF_1000GENOMES ~/reference_panels/1000genomes
 
 If you have not already downloaded it, and you have 'wget' available on your system, then you can use these simple commands:
 
-    mkdir -p ~/reference_panels/1KG
-    cd       ~/reference_panels/1KG
+    mkdir -p ~/reference_panels/1000genomes
+    cd       ~/reference_panels/1000genomes
     wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
 
 This takes up nearly 15 gigabytes of disk space.
@@ -212,8 +212,8 @@ It appears that 'wget' exists on your system. Would you like me to run the above
         std:: cin >> response;
         if(response == "yes") {
             for(auto && cmd : {
-                 "mkdir -p ~/reference_panels/1KG"
-                ,"cd       ~/reference_panels/1KG && wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'"
+                 "mkdir -p ~/reference_panels/1000genomes"
+                ,"cd       ~/reference_panels/1000genomes && wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'"
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
@@ -302,8 +302,8 @@ int main(int argc, char **argv) {
     if(options:: opt_raw_ref.substr(0, 4) == "1KG/") {
          options:: opt_sample_names.empty() || DIE("If refpanel begins with '1KG/', e.g. '1KG/EUR', then you must *not* specify --sample.names");
          auto filter_value = options:: opt_raw_ref.substr(4);
-         options:: opt_raw_ref      = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/ALL.chr{{CHRM}}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"  , getenv("HOME"));
-         options:: opt_sample_names = AMD_FORMATTED_STRING("{0}/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/*={1}"          , getenv("HOME"), filter_value);
+         options:: opt_raw_ref      = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/ALL.chr{{CHRM}}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"  , getenv("HOME"));
+         options:: opt_sample_names = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/*={1}"          , getenv("HOME"), filter_value);
     }
 
     if(!options:: opt_sample_names.empty()) {
