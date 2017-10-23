@@ -92,9 +92,16 @@ struct IDchrmThreePos {
         return rs < other.rs;
     }
 };
+enum class which_build_t    {   hg18_0
+                            ,   hg19_0
+                            ,   hg20_0
+                            ,   hg18_1
+                            ,   hg19_1
+                            ,   hg20_1
+                            };
 
 static
-void estimate_build_of_reference_panel(   string                                   filename_of_vcf
+which_build_t estimate_build_of_reference_panel(   string                                   filename_of_vcf
                              ) {
     cout << "Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel\n";
     std::vector<IDchrmPos> some_records_from_each_chromosome;
@@ -154,12 +161,14 @@ void estimate_build_of_reference_panel(   string                                
         target.rs = icp.rs;
         auto it = std:: lower_bound(database_of_builds.begin(), database_of_builds.end(), target);
         // the data in *it is zero-based
+#if 0
         PP(icp.rs, icp.chrom, it->rs
                 , it->hg18
                 , it->hg19
                 , it->hg20
                 , icp.pos
                 );
+#endif
         if  (   icp.rs == it->rs
              && icp.chrom == it->chrom
                 ) {
@@ -180,7 +189,27 @@ void estimate_build_of_reference_panel(   string                                
             , count_of_hg20_1based
             );
 
-
+    // find which of those six numbers is the biggest
+    auto vec = std::vector<int*>{   &count_of_hg18_0based
+            ,&count_of_hg19_0based
+            ,&count_of_hg20_0based
+            ,&count_of_hg18_1based
+            ,&count_of_hg19_1based
+            ,&count_of_hg20_1based
+            };
+    auto mx = std::max_element( vec.begin(), vec.end()
+            , [](auto *l, auto *r) {
+                return *l < *r;
+            }
+            );
+    if(*mx == &count_of_hg18_0based) return which_build_t:: hg18_0;
+    if(*mx == &count_of_hg19_0based) return which_build_t:: hg19_0;
+    if(*mx == &count_of_hg20_0based) return which_build_t:: hg20_0;
+    if(*mx == &count_of_hg18_1based) return which_build_t:: hg18_1;
+    if(*mx == &count_of_hg19_1based) return which_build_t:: hg19_1;
+    if(*mx == &count_of_hg20_1based) return which_build_t:: hg20_1;
+    assert(0); // won't reach here
+    return which_build_t:: hg18_0;
 }
 } // namespace ssimp
 
@@ -532,7 +561,8 @@ int main(int argc, char **argv) {
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
 
-        ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref);
+        ssimp:: which_build_t which_build_ref = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref);
+        PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
 
         // Go through regions, printing how many
         // SNPs there are in each region
