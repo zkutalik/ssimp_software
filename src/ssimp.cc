@@ -88,7 +88,7 @@ struct IDchrmThreePos {
     int hg18;
     int hg19;
     int hg20;
-    bool operator <(IDchrmThreePos const & other) {
+    bool operator <(IDchrmThreePos const & other) const {
         return rs < other.rs;
     }
 };
@@ -101,7 +101,28 @@ enum class which_build_t    {   hg18_0
                             };
 
 static
-which_build_t estimate_build_of_reference_panel(   string                                   filename_of_vcf
+std:: vector<IDchrmThreePos> load_database_of_builds() {
+    std:: ifstream f_database_of_builds(AMD_FORMATTED_STRING("{0}/reference_panels/rss.in.1kg.uk10k.hrc.build.bin"          , getenv("HOME")));
+    std:: vector<IDchrmThreePos> database_of_builds;
+    int lastrs = 0; // to confirm it is increasing
+    while(f_database_of_builds) {
+        assert(f_database_of_builds);
+        int rs = read_int(f_database_of_builds);
+        if(!f_database_of_builds)
+            break;
+        assert(rs > lastrs);
+        lastrs = rs;
+        int chrom = read_int(f_database_of_builds);
+        int hg18 = read_int(f_database_of_builds);
+        int hg19 = read_int(f_database_of_builds);
+        int hg20 = read_int(f_database_of_builds);
+        database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
+    }
+    return database_of_builds;
+}
+static
+which_build_t estimate_build_of_reference_panel (   string                                      filename_of_vcf
+                                                ,   vector<IDchrmThreePos>                   const & database_of_builds
                              ) {
     cout << "Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel\n";
     std::vector<IDchrmPos> some_records_from_each_chromosome;
@@ -130,24 +151,6 @@ which_build_t estimate_build_of_reference_panel(   string                       
         some_records_from_each_chromosome.insert(some_records_from_each_chromosome.end(), a_few_records.begin(), a_few_records.end());
     }
     PP(some_records_from_each_chromosome.size());
-
-    std:: ifstream f_database_of_builds(AMD_FORMATTED_STRING("{0}/reference_panels/rss.in.1kg.uk10k.hrc.build.bin"          , getenv("HOME")));
-    std:: vector<IDchrmThreePos> database_of_builds;
-    int lastrs = 0; // to check it increasing
-    while(f_database_of_builds) {
-        assert(f_database_of_builds);
-        int rs = read_int(f_database_of_builds);
-        if(!f_database_of_builds)
-            break;
-        assert(rs > lastrs);
-        lastrs = rs;
-        int chrom = read_int(f_database_of_builds);
-        int hg18 = read_int(f_database_of_builds);
-        int hg19 = read_int(f_database_of_builds);
-        int hg20 = read_int(f_database_of_builds);
-        database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
-    }
-    PP(database_of_builds.size());
 
     int count_of_hg18_0based = 0;
     int count_of_hg19_0based = 0;
@@ -263,7 +266,7 @@ string to_string(which_direction_t dir) {
         break; case which_direction_t:: NO_ALLELE_MATCH:              return "NO_ALLELE_MATCH";
         break; case which_direction_t:: DIRECTION_AS_IS:              return "DIRECTION_AS_IS";
     }
-    assert(1==2);
+    //assert(1==2);
     return ""; // should never get here
 }
 static
@@ -561,8 +564,11 @@ int main(int argc, char **argv) {
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
 
-        ssimp:: which_build_t which_build_ref = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref);
+        auto database_of_builds = ssimp:: load_database_of_builds();
+        PP(database_of_builds.size());
+        ssimp:: which_build_t which_build_ref = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
         PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
+        assert(1==2);
 
         // Go through regions, printing how many
         // SNPs there are in each region
