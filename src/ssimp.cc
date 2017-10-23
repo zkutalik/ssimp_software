@@ -200,7 +200,9 @@ If you have not already downloaded it, and you have 'wget' available on your sys
 
     mkdir -p ~/reference_panels/1000genomes
     cd       ~/reference_panels/1000genomes
-    wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
+    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
+    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
+    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
 
 This takes up nearly 15 gigabytes of disk space.
 )";
@@ -216,7 +218,9 @@ It appears that 'wget' exists on your system. Would you like me to run the above
         if(response == "yes") {
             for(auto && cmd : {
                  "mkdir -p ~/reference_panels/1000genomes"
-                ,"cd       ~/reference_panels/1000genomes && wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'"
+                ,"cd       ~/reference_panels/1000genomes && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'"
+                                                        " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'"
+                                                        " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'"
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
