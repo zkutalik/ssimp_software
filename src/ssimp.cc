@@ -5,6 +5,7 @@
 #include <limits>
 #include <unordered_map>
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <iterator>
 #include <gsl/gsl_statistics_int.h>
@@ -213,6 +214,23 @@ which_build_t estimate_build_of_reference_panel (   string                      
     if(*mx == &count_of_hg20_1based) return which_build_t:: hg20_1;
     assert(0); // won't reach here
     return which_build_t:: hg18_0;
+}
+static
+void // which_build_t
+estimate_build_of_the_gwas  (   std::shared_ptr<file_reading::Effects_I>    gwas
+                            ,   vector<IDchrmThreePos>                      const & //database_of_builds
+                            )   {
+    std:: set<chrpos> gwas_all_chrpos;
+    for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+        //N_max = std::max(N_max, gwas->get_N(i));
+        chrpos gwas_chrpos  =   gwas->get_chrpos(i);
+        PP(gwas_chrpos.chr
+          ,gwas_chrpos.pos
+                );
+        if(gwas_chrpos.chr != -1)
+            gwas_all_chrpos.insert(gwas_chrpos);
+    }
+    PP(gwas_all_chrpos.size());
 }
 } // namespace ssimp
 
@@ -568,6 +586,7 @@ int main(int argc, char **argv) {
         PP(database_of_builds.size());
         ssimp:: which_build_t which_build_ref = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
         PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
+        ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
         assert(1==2);
 
         // Go through regions, printing how many
