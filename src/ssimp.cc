@@ -168,7 +168,10 @@ bool exitWithUsage() {
 
 static
 void download_1KG_ifneeded() {
-    assert(options:: opt_raw_ref.substr(0, 3) == "1KG"); // only in here if the user specified a reference panel as '1KG...'
+
+#define NICKNAME_FOR_1000_GENOMES "1KG"
+
+    assert(utils:: startsWith(options:: opt_raw_ref, NICKNAME_FOR_1000_GENOMES)); // only in here if the user specified a reference panel as '1KG...'
 
     auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
     auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
@@ -291,17 +294,19 @@ int main(int argc, char **argv) {
 
     // But first, check if the relevant directory exists and, if it doesn't
     // exist, explain to the user how to download it
-    if(options:: opt_raw_ref.substr(0, 3) == "1KG") {
+    if(utils:: startsWith(options:: opt_raw_ref, NICKNAME_FOR_1000_GENOMES)) {
         download_1KG_ifneeded();
     }
 
     // OK, the 1KG directory exists now (if needed). Let's proceed
-    if(options:: opt_raw_ref == "1KG") {
-        !options:: opt_sample_names.empty() || DIE("If refpanel is exactly '1KG', then you must specify a --sample.names filename specifying the individuals to use");
+    if(options:: opt_raw_ref == NICKNAME_FOR_1000_GENOMES) {
+        !options:: opt_sample_names.empty() || DIE("If refpanel is exactly '" NICKNAME_FOR_1000_GENOMES "', then you must specify a --sample.names filename specifying the individuals to use");
     }
-    if(options:: opt_raw_ref.substr(0, 4) == "1KG/") {
-         options:: opt_sample_names.empty() || DIE("If refpanel begins with '1KG/', e.g. '1KG/EUR', then you must *not* specify --sample.names");
-         auto filter_value = options:: opt_raw_ref.substr(4);
+    if(utils:: startsWith(options:: opt_raw_ref, NICKNAME_FOR_1000_GENOMES "/")) {
+         options:: opt_sample_names.empty() || DIE("If refpanel begins with '" NICKNAME_FOR_1000_GENOMES "', e.g. '" NICKNAME_FOR_1000_GENOMES "/EUR', then you must *not* specify --sample.names");
+         auto filter_value = options:: opt_raw_ref.substr(
+                 string(NICKNAME_FOR_1000_GENOMES "/").length() // everything after the first '/'
+                 );
          options:: opt_raw_ref      = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/ALL.chr{{CHRM}}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"  , getenv("HOME"));
          options:: opt_sample_names = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/*={1}"          , getenv("HOME"), filter_value);
     }
