@@ -62,8 +62,130 @@ using tbi:: RefRecord;
 
 
 namespace ssimp {
-// Some forward declarations
+static
+int32_t read_int(std:: ifstream & o) {
+    assert(o);
+    int32_t result = 0;
+    for(int i=3; i>=0; --i) {
+        //unsigned char one_byte = (input >> (i*8)) & 0xff;
+        unsigned char one_byte;
+        o.read( reinterpret_cast<char *>(& one_byte), 1 );
+        if(!o) return -1; // file is finished
+        result = result * 256 + one_byte;
+        assert(o);
+    }
+    return result;
+}
 
+struct IDchrmPos {
+    int rs;
+    int chrom;
+    int pos;
+};
+struct IDchrmThreePos {
+    int rs;
+    int chrom;
+    int hg18;
+    int hg19;
+    int hg20;
+    bool operator <(IDchrmThreePos const & other) {
+        return rs < other.rs;
+    }
+};
+
+static
+void estimate_build_of_reference_panel(   string                                   filename_of_vcf
+                             ) {
+    cout << "Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel\n";
+    std::vector<IDchrmPos> some_records_from_each_chromosome;
+    for(int chrm =  1; chrm <= 22; ++chrm) {
+        cout.flush(); std::cerr.flush(); // helps with --log
+
+        std::vector<IDchrmPos> a_few_records;
+
+        tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
+
+        ref_vcf.set_region  (   chrpos{chrm, 0}
+                            ,   chrpos{chrm,std::numeric_limits<int>::max()}
+                            );
+        RefRecord rr;
+        while(ref_vcf.read_record_into_a_RefRecord(rr) ){
+            if(utils:: startsWith(rr.ID, "rs")) {
+                try {
+                    int rs = utils:: lexical_cast<int>(rr.ID.substr(2));
+                    a_few_records.push_back( IDchrmPos{ rs , chrm, rr.pos });
+                    if(a_few_records.size() >= 100)
+                        break;
+                } catch (std:: invalid_argument &) {
+                }
+            }
+        }
+        some_records_from_each_chromosome.insert(some_records_from_each_chromosome.end(), a_few_records.begin(), a_few_records.end());
+    }
+    PP(some_records_from_each_chromosome.size());
+
+    std:: ifstream f_database_of_builds(AMD_FORMATTED_STRING("{0}/reference_panels/rss.in.1kg.uk10k.hrc.build.bin"          , getenv("HOME")));
+    std:: vector<IDchrmThreePos> database_of_builds;
+    int lastrs = 0; // to check it increasing
+    while(f_database_of_builds) {
+        assert(f_database_of_builds);
+        int rs = read_int(f_database_of_builds);
+        if(!f_database_of_builds)
+            break;
+        assert(rs > lastrs);
+        lastrs = rs;
+        int chrom = read_int(f_database_of_builds);
+        int hg18 = read_int(f_database_of_builds);
+        int hg19 = read_int(f_database_of_builds);
+        int hg20 = read_int(f_database_of_builds);
+        database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
+    }
+    PP(database_of_builds.size());
+
+    int count_of_hg18_0based = 0;
+    int count_of_hg19_0based = 0;
+    int count_of_hg20_0based = 0;
+    int count_of_hg18_1based = 0;
+    int count_of_hg19_1based = 0;
+    int count_of_hg20_1based = 0;
+    for(auto const & icp : some_records_from_each_chromosome) {
+        // look up these in the database_of_builds.
+        IDchrmThreePos target;
+        target.rs = icp.rs;
+        auto it = std:: lower_bound(database_of_builds.begin(), database_of_builds.end(), target);
+        // the data in *it is zero-based
+        PP(icp.rs, icp.chrom, it->rs
+                , it->hg18
+                , it->hg19
+                , it->hg20
+                , icp.pos
+                );
+        if  (   icp.rs == it->rs
+             && icp.chrom == it->chrom
+                ) {
+            // check the pos against 6 possibilities
+            if(icp.pos == it->hg18) ++ count_of_hg18_0based;
+            if(icp.pos == it->hg19) ++ count_of_hg19_0based;
+            if(icp.pos == it->hg20) ++ count_of_hg20_0based;
+            if(icp.pos == it->hg18+1) ++ count_of_hg18_1based;
+            if(icp.pos == it->hg19+1) ++ count_of_hg19_1based;
+            if(icp.pos == it->hg20+1) ++ count_of_hg20_1based;
+        }
+    }
+    PP(       count_of_hg18_0based
+            , count_of_hg19_0based
+            , count_of_hg20_0based
+            , count_of_hg18_1based
+            , count_of_hg19_1based
+            , count_of_hg20_1based
+            );
+
+
+}
+} // namespace ssimp
+
+namespace ssimp {
+// Some forward declarations
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
@@ -409,6 +531,8 @@ int main(int argc, char **argv) {
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
+
+        ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref);
 
         // Go through regions, printing how many
         // SNPs there are in each region
