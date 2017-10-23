@@ -119,7 +119,7 @@
     if   test "$(whoami)" = 'amcdaid'  \
            -o "$(whoami)" = 'aaron'
     then
-           echo ' -Werror'
+           #echo ' -Werror'
            echo " -pg -ggdb                  " # For profiling
     fi
 

@@ -479,6 +479,11 @@ bool is_in(T && t, std:: initializer_list<U> l) {
     return false;
 }
 
+inline
+bool startsWith(std:: string const & s, std:: string const & prefix) {
+    return s.substr(0, prefix.length()) == prefix;
+}
+
 } // namespace utils
 
 #endif
