@@ -99,6 +99,7 @@ enum class which_build_t    {   hg18_0
                             ,   hg18_1
                             ,   hg19_1
                             ,   hg20_1
+                            ,   unknown
                             };
 
 static
@@ -121,6 +122,64 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
     }
     return database_of_builds;
 }
+struct six_counts_t {
+    int count_of_hg18_0based = 0;
+    int count_of_hg19_0based = 0;
+    int count_of_hg20_0based = 0;
+    int count_of_hg18_1based = 0;
+    int count_of_hg19_1based = 0;
+    int count_of_hg20_1based = 0;
+    void insert_position(int pos
+            , vector<IDchrmThreePos> :: const_iterator it
+            ) {
+        if(pos == it->hg18) ++ count_of_hg18_0based;
+        if(pos == it->hg19) ++ count_of_hg19_0based;
+        if(pos == it->hg20) ++ count_of_hg20_0based;
+        if(pos == it->hg18+1) ++ count_of_hg18_1based;
+        if(pos == it->hg19+1) ++ count_of_hg19_1based;
+        if(pos == it->hg20+1) ++ count_of_hg20_1based;
+    }
+    void print() const {
+        PP(   count_of_hg18_0based
+            , count_of_hg19_0based
+            , count_of_hg20_0based
+            , count_of_hg18_1based
+            , count_of_hg19_1based
+            , count_of_hg20_1based
+            );
+    }
+    which_build_t which_is_the_most_popular_build() const {
+        // find which of those six numbers is the biggest
+        auto vec = std::vector<int const *>{
+                 &count_of_hg18_0based
+                ,&count_of_hg19_0based
+                ,&count_of_hg20_0based
+                ,&count_of_hg18_1based
+                ,&count_of_hg19_1based
+                ,&count_of_hg20_1based
+                };
+
+        // check if all the counts are still zero
+        {   int sum = 0
+        ;   for(auto * p : vec) { sum += *p; }
+        ;   if(sum == 0)    { return which_build_t:: unknown; }
+        }
+
+        auto mx = std::max_element( vec.begin(), vec.end()
+                , [](auto *l, auto *r) {
+                    return *l < *r;
+                }
+                );
+        if(*mx == &count_of_hg18_0based) return which_build_t:: hg18_0;
+        if(*mx == &count_of_hg19_0based) return which_build_t:: hg19_0;
+        if(*mx == &count_of_hg20_0based) return which_build_t:: hg20_0;
+        if(*mx == &count_of_hg18_1based) return which_build_t:: hg18_1;
+        if(*mx == &count_of_hg19_1based) return which_build_t:: hg19_1;
+        if(*mx == &count_of_hg20_1based) return which_build_t:: hg20_1;
+        assert(0); // won't reach here
+        return which_build_t:: hg18_0;
+    }
+};
 static
 which_build_t estimate_build_of_reference_panel (   string                                      filename_of_vcf
                                                 ,   vector<IDchrmThreePos>                   const & database_of_builds
@@ -153,12 +212,7 @@ which_build_t estimate_build_of_reference_panel (   string                      
     }
     PP(some_records_from_each_chromosome.size());
 
-    int count_of_hg18_0based = 0;
-    int count_of_hg19_0based = 0;
-    int count_of_hg20_0based = 0;
-    int count_of_hg18_1based = 0;
-    int count_of_hg19_1based = 0;
-    int count_of_hg20_1based = 0;
+    six_counts_t six_counts;
     for(auto const & icp : some_records_from_each_chromosome) {
         // look up these in the database_of_builds.
         IDchrmThreePos target;
@@ -177,60 +231,47 @@ which_build_t estimate_build_of_reference_panel (   string                      
              && icp.chrom == it->chrom
                 ) {
             // check the pos against 6 possibilities
-            if(icp.pos == it->hg18) ++ count_of_hg18_0based;
-            if(icp.pos == it->hg19) ++ count_of_hg19_0based;
-            if(icp.pos == it->hg20) ++ count_of_hg20_0based;
-            if(icp.pos == it->hg18+1) ++ count_of_hg18_1based;
-            if(icp.pos == it->hg19+1) ++ count_of_hg19_1based;
-            if(icp.pos == it->hg20+1) ++ count_of_hg20_1based;
+            six_counts.insert_position(icp.pos, it);
         }
     }
-    PP(       count_of_hg18_0based
-            , count_of_hg19_0based
-            , count_of_hg20_0based
-            , count_of_hg18_1based
-            , count_of_hg19_1based
-            , count_of_hg20_1based
-            );
-
-    // find which of those six numbers is the biggest
-    auto vec = std::vector<int*>{   &count_of_hg18_0based
-            ,&count_of_hg19_0based
-            ,&count_of_hg20_0based
-            ,&count_of_hg18_1based
-            ,&count_of_hg19_1based
-            ,&count_of_hg20_1based
-            };
-    auto mx = std::max_element( vec.begin(), vec.end()
-            , [](auto *l, auto *r) {
-                return *l < *r;
-            }
-            );
-    if(*mx == &count_of_hg18_0based) return which_build_t:: hg18_0;
-    if(*mx == &count_of_hg19_0based) return which_build_t:: hg19_0;
-    if(*mx == &count_of_hg20_0based) return which_build_t:: hg20_0;
-    if(*mx == &count_of_hg18_1based) return which_build_t:: hg18_1;
-    if(*mx == &count_of_hg19_1based) return which_build_t:: hg19_1;
-    if(*mx == &count_of_hg20_1based) return which_build_t:: hg20_1;
-    assert(0); // won't reach here
-    return which_build_t:: hg18_0;
+    six_counts.print();
+    return six_counts.which_is_the_most_popular_build();
 }
 static
-void // which_build_t
+which_build_t
 estimate_build_of_the_gwas  (   std::shared_ptr<file_reading::Effects_I>    gwas
-                            ,   vector<IDchrmThreePos>                      const & //database_of_builds
+                            ,   vector<IDchrmThreePos>                      const & database_of_builds
                             )   {
+    // For the purpose of this check, we ignore the SNPnames that are in the GWAS file, and look only
+    // at the chrpos that are in the GWAS file (of which there may be zero).
     std:: set<chrpos> gwas_all_chrpos;
     for(int i = 0; i<gwas->number_of_snps(); ++i ) {
         //N_max = std::max(N_max, gwas->get_N(i));
         chrpos gwas_chrpos  =   gwas->get_chrpos(i);
-        PP(gwas_chrpos.chr
-          ,gwas_chrpos.pos
-                );
+        //PP  (   gwas_chrpos.chr ,   gwas_chrpos.pos);
         if(gwas_chrpos.chr != -1)
             gwas_all_chrpos.insert(gwas_chrpos);
     }
     PP(gwas_all_chrpos.size());
+
+    six_counts_t six_counts;
+
+    for(auto const & db_entry : database_of_builds) {
+        //if(pos == it->hg18+1) ++ count_of_hg18_1based;
+        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg18  } ) == 1) ++six_counts.count_of_hg18_0based;
+        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg19  } ) == 1) ++six_counts.count_of_hg19_0based;
+        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg20  } ) == 1) ++six_counts.count_of_hg20_0based;
+        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg18+1} ) == 1) ++six_counts.count_of_hg18_1based;
+        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg19+1} ) == 1) ++six_counts.count_of_hg19_1based;
+        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg20+1} ) == 1) ++six_counts.count_of_hg20_1based;
+    }
+    six_counts.print();
+
+    if(gwas_all_chrpos.size() == 0) {
+        return which_build_t:: unknown;
+    }
+
+    return six_counts.which_is_the_most_popular_build();
 }
 } // namespace ssimp
 
@@ -584,10 +625,13 @@ int main(int argc, char **argv) {
 
         auto database_of_builds = ssimp:: load_database_of_builds();
         PP(database_of_builds.size());
-        ssimp:: which_build_t which_build_ref = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
+        ssimp:: which_build_t which_build_ref   = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
+        ssimp:: which_build_t which_build_gwas  = ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
+
+        assert(which_build_ref != ssimp:: which_build_t:: unknown);
+        assert(which_build_ref == which_build_gwas);
+
         PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
-        ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
-        assert(1==2);
 
         // Go through regions, printing how many
         // SNPs there are in each region
