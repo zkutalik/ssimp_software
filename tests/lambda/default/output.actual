@@ -5,6 +5,7 @@ some_records_from_each_chromosome.size():1'538
 count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 28 , 0 , 0 , 1'503 , 0
 gwas_all_chrpos.size():0
 count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 0 , 0 , 0 , 0 , 0
+gwas_count_known,gwas_count_unknown:	1'013 , 1
 options:: opt_window_width,options:: opt_flanking_width:	250'000 , 250'000
 N_reference:503
 
