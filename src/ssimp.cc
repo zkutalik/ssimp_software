@@ -115,10 +115,16 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
         assert(rs > lastrs);
         lastrs = rs;
         int chrom = read_int(f_database_of_builds);
+        assert(f_database_of_builds);
         int hg18 = read_int(f_database_of_builds);
+        assert(f_database_of_builds);
         int hg19 = read_int(f_database_of_builds);
+        assert(f_database_of_builds);
         int hg20 = read_int(f_database_of_builds);
-        database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
+        assert(f_database_of_builds);
+        if(chrom >= 1 && chrom <= 22) { // we just ignore XY for now. TODO: extend this?
+            database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
+        }
     }
     return database_of_builds;
 }
