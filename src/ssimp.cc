@@ -640,13 +640,19 @@ int main(int argc, char **argv) {
 
     // Finished adjusting the command line options
 
-    // Now, do the imputation!
+    // Next, edit the positions in the gwas, if the builds don't match, then finally do the imputation!
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
 
         auto database_of_builds = ssimp:: load_database_of_builds();
-        PP(database_of_builds.size());
+        std:: map<int, size_t> database_of_builds_rs_to_offset;
+        for(size_t offset = 0; offset < database_of_builds.size(); ++offset) {
+            ssimp:: IDchrmThreePos const db_entry = database_of_builds.at(offset);
+            database_of_builds_rs_to_offset.insert( std:: make_pair(db_entry.rs, offset) );
+        }
+        PP(database_of_builds.size(), database_of_builds_rs_to_offset.size());
+
         ssimp:: which_build_t which_build_ref   = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
         ssimp:: which_build_t which_build_gwas  = ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
 
