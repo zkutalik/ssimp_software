@@ -659,7 +659,7 @@ int main(int argc, char **argv) {
         assert(which_build_ref != ssimp:: which_build_t:: unknown);
         assert(which_build_ref == which_build_gwas);
 
-        PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
+        //PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
 
         // Go through regions, printing how many
         // SNPs there are in each region
