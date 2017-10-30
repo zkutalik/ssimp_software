@@ -657,6 +657,31 @@ int main(int argc, char **argv) {
         ssimp:: which_build_t which_build_gwas  = ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
 
         assert(which_build_ref != ssimp:: which_build_t:: unknown);
+        if(which_build_gwas == ssimp:: which_build_t:: unknown) {
+            // let's copy in as much as we can from the database into the gwas.
+            // We only have the rs-number to go on though.
+            for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
+            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+                auto   gwas_rs      =   gwas->get_SNPname(i);
+                if(gwas_rs.substr(0,2) == "rs") {
+                    int gwas_rs_int = utils:: lexical_cast<int>(gwas_rs.substr(2));
+                    //PP(gwas_rs, gwas_rs_int);
+                    if(1==database_of_builds_rs_to_offset.count(gwas_rs_int)) {
+                        auto offset_into_big_db = database_of_builds_rs_to_offset[gwas_rs_int];
+                        assert(database_of_builds.at(offset_into_big_db).rs == gwas_rs_int);
+                        chrpos new_chrpos = get_one_build(database_of_builds.at(offset_into_big_db), which_build_ref);
+                        //PP(gwas_rs_int, new_chrpos);
+                        assert(new_chrpos != (chrpos{-1,0}));
+                        gwas->set_chrpos(i, new_chrpos);
+                    } else {
+                        // not in the database - should we delete it?
+                        // TODO: decide whether to delete or now
+                    }
+                }
+            }
+            for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
+            which_build_gwas = which_build_ref; // we've changed the gwas positions, so we here record that fact
+        }
         assert(which_build_ref == which_build_gwas);
 
         //PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
