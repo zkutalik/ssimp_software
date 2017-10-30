@@ -684,6 +684,25 @@ int main(int argc, char **argv) {
         }
         assert(which_build_ref == which_build_gwas);
 
+        { /* before finally doing imputation, let's count how many GWAS SNPs
+           * now have position, and how many don't
+           */
+            int gwas_count_unknown = 0;
+            int gwas_count_known = 0;
+            for(int i = 0; i<gwas->number_of_snps(); ++i )
+            {   auto crps = gwas->get_chrpos(i)
+            ;   if(crps == chrpos{-1,-1})
+                {   ++ gwas_count_unknown
+                ;   }
+                else
+                {   ++ gwas_count_known
+                ;   assert(crps.chr >= 1 && crps.chr <= 22)
+                ;   assert(crps.pos > 0)
+                ;   }
+            }
+            PP(gwas_count_known, gwas_count_unknown);
+        }
+
         //PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
 
         // Go through regions, printing how many
