@@ -976,8 +976,10 @@ void impute_all_the_regions(   string                                   filename
                             // just copy it in
                                 gwas_it.set_chrpos(chrpos{chrm,pos_in_ref});
                         }
-                        else
+                        else {
+                            PP(gwas_it.get_chrpos(), chrm, pos_in_ref);
                             DIE("disagreement on position");
+                        }
                     }
                 }
             }
