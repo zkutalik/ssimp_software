@@ -101,6 +101,22 @@ enum class which_build_t    {   hg18_0
                             ,   hg20_1
                             ,   unknown
                             };
+chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build) {
+    int chrm = db_entry.chrom;
+    switch(which_build) {
+        break; case which_build_t:: hg18_0: return { chrm, db_entry.hg18 };
+        break; case which_build_t:: hg19_0: return { chrm, db_entry.hg19 };
+        break; case which_build_t:: hg20_0: return { chrm, db_entry.hg20 };
+
+        break; case which_build_t:: hg18_1: return { chrm, db_entry.hg18+1 };
+        break; case which_build_t:: hg19_1: return { chrm, db_entry.hg19+1 };
+        break; case which_build_t:: hg20_1: return { chrm, db_entry.hg20+1 };
+
+        break; default: ;
+    }
+    assert(1==2); // shouldn't get here
+    return {-1,-1};
+}
 
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
