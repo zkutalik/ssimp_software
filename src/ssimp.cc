@@ -325,7 +325,7 @@ string to_string(which_direction_t dir) {
         break; case which_direction_t:: NO_ALLELE_MATCH:              return "NO_ALLELE_MATCH";
         break; case which_direction_t:: DIRECTION_AS_IS:              return "DIRECTION_AS_IS";
     }
-    //assert(1==2);
+    assert(1==2);
     return ""; // should never get here
 }
 static
