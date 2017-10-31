@@ -727,7 +727,7 @@ int main(int argc, char **argv) {
                     assert  (   gwas_old_build_to_new[under_gwas] == -1
                              || gwas_old_build_to_new[under_gwas] == under_ref.pos
                             );
-                    assert(under_ref != chrpos({-1,-1}));
+                    assert(under_ref != (chrpos{-1,-1}));
                     assert(under_ref.chr == under_gwas.chr);
                     gwas_old_build_to_new[under_gwas] = under_ref.pos;
                 }
