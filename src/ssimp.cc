@@ -101,6 +101,18 @@ enum class which_build_t    {   hg18_0
                             ,   hg20_1
                             ,   unknown
                             };
+ostream & operator<<(ostream & o, which_build_t w) {
+    switch(w) {
+        break; case which_build_t:: hg18_0: o << "hg18_0";
+        break; case which_build_t:: hg19_0: o << "hg19_0";
+        break; case which_build_t:: hg20_0: o << "hg20_0";
+        break; case which_build_t:: hg18_1: o << "hg18_1";
+        break; case which_build_t:: hg19_1: o << "hg19_1";
+        break; case which_build_t:: hg20_1: o << "hg20_1";
+        break; case which_build_t:: unknown:o << "unknown";
+    }
+    return o;
+}
 chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build) {
     int chrm = db_entry.chrom;
     switch(which_build) {
@@ -656,7 +668,10 @@ int main(int argc, char **argv) {
         ssimp:: which_build_t which_build_ref   = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
         ssimp:: which_build_t which_build_gwas  = ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
 
+        PP(which_build_gwas, which_build_ref);
+
         assert(which_build_ref != ssimp:: which_build_t:: unknown);
+
         if(which_build_gwas == ssimp:: which_build_t:: unknown) {
             // let's copy in as much as we can from the database into the gwas.
             // We only have the rs-number to go on though.
