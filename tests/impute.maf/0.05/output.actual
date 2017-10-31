@@ -1,4 +1,5 @@
 file_name:gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
+... loading the 1.7GB database of positions under three builds. This will take about a minute.  Loaded.
 database_of_builds.size(),database_of_builds_rs_to_offset.size():	87'329'642 , 87'329'642
 Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel
 some_records_from_each_chromosome.size():1'800
