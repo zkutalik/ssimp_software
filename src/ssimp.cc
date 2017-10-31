@@ -697,10 +697,67 @@ int main(int argc, char **argv) {
             for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
             which_build_gwas = which_build_ref; // we've changed the gwas positions, so we here record that fact
         }
+
+        if(which_build_ref != which_build_gwas) {
+            // This is the 'awkward' one
+            cout << "builds are different. Need to adjust the positions in the GWAS to match those in the ref panel\n";
+            assert(which_build_gwas != ssimp:: which_build_t:: unknown);
+            std:: map< chrpos, int > gwas_old_build_to_new; // for only the positions in the gwas
+            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+                auto crps = gwas->get_chrpos(i);
+                if(crps != chrpos{-1,-1}) {
+                    gwas_old_build_to_new[crps] = -1; // we don't yet know the position, so we just make this placeholder first
+                }
+            }
+            PP(gwas_old_build_to_new.size());
+            for(auto && db_entry : database_of_builds) {
+                auto under_gwas = get_one_build( db_entry, which_build_gwas);
+                if(gwas_old_build_to_new.count( under_gwas ) == 1) {
+                    auto under_ref = get_one_build( db_entry, which_build_ref);
+                    if      (   gwas_old_build_to_new[under_gwas] == -1
+                             || gwas_old_build_to_new[under_gwas] == under_ref.pos
+                            ){}
+                    else {
+                        PP  (   under_gwas, under_ref
+                            ,   gwas_old_build_to_new[under_gwas]
+                            );
+                    }
+                    assert  (   gwas_old_build_to_new[under_gwas] == -1
+                             || gwas_old_build_to_new[under_gwas] == under_ref.pos
+                            );
+                    assert(under_ref != chrpos({-1,-1}));
+                    assert(under_ref.chr == under_gwas.chr);
+                    gwas_old_build_to_new[under_gwas] = under_ref.pos;
+                }
+            }
+
+            // now to apply those adjustments to the gwas
+            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+                auto crps = gwas->get_chrpos(i);
+                if(crps != chrpos{-1,-1}) {
+                    // we must either delete, or update, this gwas entry.
+                    // Can't leave the gwas as a mixture of builds
+                    if  (   gwas_old_build_to_new.count(crps)   == 1
+                         && gwas_old_build_to_new[crps]         != -1
+                        ) {
+                        auto newpos = gwas_old_build_to_new[crps];
+                        assert(newpos != -1);
+                        crps.pos = newpos;
+                        gwas->set_chrpos(i, crps);
+                    }
+                    else {
+                        gwas->set_chrpos(i, chrpos{-1,-1});
+                    }
+                }
+            }
+            which_build_gwas = which_build_ref;
+        }
+
         assert(which_build_ref == which_build_gwas);
 
         { /* before finally doing imputation, let's count how many GWAS SNPs
-           * now have position, and how many don't
+           * now have position, and how many don't.
+           * And delete those with unknown position
            */
             int gwas_count_unknown = 0;
             int gwas_count_known = 0;
