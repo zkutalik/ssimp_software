@@ -702,6 +702,12 @@ int main(int argc, char **argv) {
             }
             PP(gwas_count_known, gwas_count_unknown);
         }
+        // now, delete those with unknown position
+        // This is where, finally, we get the speed up
+        {   cout << "Delete the SNPs with unknown position ...\n";
+        ;   gwas->delete_snps_with_no_position()
+        ;   PP(gwas->number_of_snps())
+        ;}
 
         //PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
 
