@@ -1019,6 +1019,29 @@ void impute_all_the_regions(   string                                   filename
                 )
                 continue;
 
+            gwas->sort_my_entries(); // Sort them by position
+            assert(gwas->get_chrpos(0) != (chrpos{-1,-1})); // confirm that all gwas positions are now known
+            {   /* What follows is another optional speed optimization:
+                 * As we now know all the positions of the tags, we may be able
+                 * to skip windows (on the current chromosome)
+                 */
+                auto start_of_window = chrpos{ chrm, current_window_start - options:: opt_flanking_width };
+                auto   end_of_window = chrpos{ chrm, current_window_end   + options:: opt_flanking_width };
+                auto start = std:: lower_bound( begin_from_file(gwas)   , end_from_file(gwas) , start_of_window );
+                auto   end = std:: lower_bound( start                   , end_from_file(gwas) , end_of_window   );
+                assert(end >= start);
+                if(end == start) {
+                    // If end==start, then there are no tags in this window. Therefore,
+                    // we either break to the next chromosome, or continue to the next window in this chromosome
+                    auto   chrom_end = std:: lower_bound( start                   , end_from_file(gwas) , chrpos{chrm, std::numeric_limits<int>::max()}   );
+                    assert(chrom_end >= end);
+                    if(chrom_end != end) // there are more tags on this chromosome
+                        continue;
+                    else
+                        break;
+                }
+            }
+
             /*
              * For a given window, there are three "ranges" to consider:
              *  -   The range of GWAS SNPs in the "broad" window (i.e. including the flanking region)
@@ -1074,85 +1097,6 @@ void impute_all_the_regions(   string                                   filename
             if(all_nearby_ref_data.empty()) {
                 // no tags
                 continue; // to the next window in this chromosome
-            }
-
-            {   // Update the gwas data with position information from the ref panel
-                // I should put this chunk of code into another function
-                std:: unordered_map<string, int> map_SNPname_to_pos; // just for this broad window
-                for(auto & rr : all_nearby_ref_data) {
-                    switch(map_SNPname_to_pos.count(rr.ID)) {
-                        break; case 0:
-                            map_SNPname_to_pos[rr.ID] = rr.pos;
-                        break; case 1:
-                        {
-                            if(map_SNPname_to_pos[rr.ID] != rr.pos) {
-                                PP(rr.ID); // TODO: remove this. I think it will be ID='.'
-                                map_SNPname_to_pos[rr.ID] = -1;
-                            }
-                        }
-                    }
-                }
-                auto it = map_SNPname_to_pos.begin();
-                while(it != map_SNPname_to_pos.end()) {
-                    if(it->second == -1) {
-                        it = map_SNPname_to_pos.erase(it);
-                    }
-                    else {
-                        ++it;
-                    }
-                }
-
-                for(auto & msp : map_SNPname_to_pos) {
-                    assert(msp.second != -1); // TODO: remove these instead
-                }
-
-                // Now that we have the position data from ref panel, see if we can copy it into the GWAS data
-                auto gwas_it = begin_from_file(gwas);
-                auto const e_gwas =   end_from_file(gwas);
-                for(; gwas_it != e_gwas; ++gwas_it) {
-                    auto gwas_SNPname = gwas_it.get_SNPname();
-                    if(                     map_SNPname_to_pos.count( gwas_SNPname )) {
-                        auto pos_in_ref =   map_SNPname_to_pos      [ gwas_SNPname ];
-                        if  (   gwas_it.get_chrpos().chr == chrm
-                             && gwas_it.get_chrpos().pos == pos_in_ref) {
-                            // this fine, nothing to change, the two data sources agree
-                        }
-                        else if (   gwas_it.get_chrpos().chr == -1
-                                 && gwas_it.get_chrpos().pos == -1) {
-                            // just copy it in
-                                gwas_it.set_chrpos(chrpos{chrm,pos_in_ref});
-                        }
-                        else {
-                            PP(gwas_it.get_chrpos(), chrm, pos_in_ref);
-                            DIE("disagreement on position");
-                        }
-                    }
-                }
-            }
-            //PP(__LINE__, utils:: ELAPSED());
-            // Now, thanks to the block just completed, we have all the positions in the GWAS
-            // that are relevant for this window.
-            gwas->sort_my_entries(); // Sort them by position
-            {   /* What follows is another optional speed optimization:
-                 * If we now know all the positions of the tags, we may be able
-                 * to skip windows (on the current chromome)
-                 */
-                if(gwas->get_chrpos(0) != chrpos{-1,-1}) { // every GWAS SNP has known position now
-                    // check if the last tag on this chromosome is already too far back
-                    auto x = std:: lower_bound( begin_from_file(gwas), end_from_file(gwas), chrpos{ chrm, std::numeric_limits<int>::lowest() });
-                    auto last_tag_on_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::lowest() };
-                    while(x != end_from_file(gwas) && x.get_chrpos().chr == chrm) {
-                        auto cur = x.get_chrpos();
-                        assert( cur >= last_tag_on_this_chromosome );
-                        last_tag_on_this_chromosome = cur;
-                        ++x;
-                    }
-                    assert(chrm == last_tag_on_this_chromosome.chr);
-                    if(last_tag_on_this_chromosome.pos < current_window_start - options:: opt_flanking_width) {
-                        //PPe("break out", last_tag_on_this_chromosome.pos , current_window_start - options:: opt_flanking_width);
-                        break;
-                    }
-                }
             }
 
             // Of the next four lines, only the two are interesting (to find the range of GWAS snps for this window)
