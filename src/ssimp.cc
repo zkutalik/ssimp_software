@@ -132,7 +132,8 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
 
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
-    std:: ifstream f_database_of_builds(AMD_FORMATTED_STRING("{0}/reference_panels/rss.in.1kg.uk10k.hrc.build.bin"          , getenv("HOME")));
+    cout << "... loading the 1.7GB database of positions under three builds. This will take about a minute.";
+    std:: ifstream f_database_of_builds(AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"          , getenv("HOME")));
     std:: vector<IDchrmThreePos> database_of_builds;
     int lastrs = 0; // to confirm it is increasing
     while(f_database_of_builds) {
@@ -154,6 +155,7 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
             database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
         }
     }
+    cout << "  Loaded.\n";
     return database_of_builds;
 }
 struct six_counts_t {
