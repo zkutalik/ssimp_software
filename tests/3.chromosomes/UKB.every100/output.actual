@@ -5,6 +5,7 @@ some_records_from_each_chromosome.size():1'800
 count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 36 , 0 , 0 , 1'756 , 0
 gwas_all_chrpos.size():0
 count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 0 , 0 , 0 , 0 , 0
+which_build_gwas,which_build_ref:	unknown , hg19_1
 gwas_count_known,gwas_count_unknown:	1'013 , 1
 Delete the SNPs with unknown position ...
 gwas->number_of_snps():1'013
