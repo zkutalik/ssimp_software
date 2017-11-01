@@ -497,6 +497,7 @@ struct compile_time_constant_as_a_type {
     operator T  ()                  const   {   return c; }
 };
 
+// must comment this out as it fails on hpc1, IIRC
 //template<typename T, T c>
 //constexpr compile_time_constant_as_a_type<T, c>     cx_val  = compile_time_constant_as_a_type<T,c>{}; // Consider using my own type here instead of integral_constant?
 
