@@ -5,9 +5,12 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <tuple> // for tuple::get
 #include <utility> // for tuple::get
 #include <vector>
 #include <string>
+#include <stdexcept>
+#include <algorithm> // for shuffle
 
 #include "ASSERT.hh"
 
@@ -66,6 +69,10 @@ template<typename F, typename G>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G> &pr);
 template<typename F, typename G, typename H>
 std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr);
+template<typename F, typename G, typename H, typename I>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H, I> &pr);
+template<typename F, typename G, typename H, typename I, typename J>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H, I, J> &pr);
 template<typename T>
 auto operator<< (std:: ostream &o, T &t)
 -> decltype(  o << t.to_string() );
@@ -135,6 +142,34 @@ std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H> &pr) {
         << std::get<1>(pr)
         << ','
         << std::get<2>(pr)
+        << ')';
+    return o;
+}
+template<typename F, typename G, typename H, typename I>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H, I> &pr) {
+    o << '('
+        << std::get<0>(pr)
+        << ','
+        << std::get<1>(pr)
+        << ','
+        << std::get<2>(pr)
+        << ','
+        << std::get<3>(pr)
+        << ')';
+    return o;
+}
+template<typename F, typename G, typename H, typename I, typename J>
+std::ostream & operator<< (std:: ostream &o, const std:: tuple<F, G, H, I, J> &pr) {
+    o << '('
+        << std::get<0>(pr)
+        << ','
+        << std::get<1>(pr)
+        << ','
+        << std::get<2>(pr)
+        << ','
+        << std::get<3>(pr)
+        << ','
+        << std::get<4>(pr)
         << ')';
     return o;
 }
@@ -366,12 +401,18 @@ T   un_lref(T &t) { return t; }
 template<typename T>
 T   un_lref(T &&) = delete;
 
-inline double ELAPSED(void) {
-       return double(clock()) / CLOCKS_PER_SEC;
+inline std:: string ELAPSED(void) {
+    std:: ostringstream oss;
+    oss << double(clock()) / CLOCKS_PER_SEC << 's';
+    return oss.str();
 }
 
 struct {} stdget0;
 struct {} stdget1;
+template<size_t I>
+struct tupget_t{};
+template<size_t I>
+auto tupget = tupget_t<I>{};
 template<typename T>
 decltype(auto) operator| (T&& t, decltype(stdget0)) {
     return std:: get<0>( std::forward<T>(t) );
@@ -379,6 +420,10 @@ decltype(auto) operator| (T&& t, decltype(stdget0)) {
 template<typename T>
 decltype(auto) operator| (T&& t, decltype(stdget1)) {
     return std:: get<1>( std::forward<T>(t) );
+}
+template<typename T, size_t I>
+decltype(auto) operator| (T&& t, tupget_t<I>) {
+    return std:: get<I>( std::forward<T>(t) );
 }
 
 struct save_ostream_briefly {
@@ -452,22 +497,22 @@ struct compile_time_constant_as_a_type {
     operator T  ()                  const   {   return c; }
 };
 
-template<typename T, T c>
-constexpr compile_time_constant_as_a_type<T, c>     cx_val  = {}; // Consider using my own type here instead of integral_constant?
+//template<typename T, T c>
+//constexpr compile_time_constant_as_a_type<T, c>     cx_val  = compile_time_constant_as_a_type<T,c>{}; // Consider using my own type here instead of integral_constant?
 
 template<typename T, T c1, T c2>
 constexpr
 auto    operator+   (   compile_time_constant_as_a_type<T,c1>
                     ,   compile_time_constant_as_a_type<T,c2>   )
 {
-    return cx_val<T, c1+c2>;
+    return compile_time_constant_as_a_type<T, c1+c2>{};
 }
 template<typename T, T c1, T c2>
 constexpr
 auto    operator==  (   compile_time_constant_as_a_type<T,c1>
                     ,   compile_time_constant_as_a_type<T,c2>   )
 {
-    return cx_val<bool, c1==c2>;
+    return compile_time_constant_as_a_type<bool, c1==c2>{};
 }
 
 template<typename T, typename U>
@@ -483,6 +528,16 @@ inline
 bool startsWith(std:: string const & s, std:: string const & prefix) {
     return s.substr(0, prefix.length()) == prefix;
 }
+
+template<typename Container, typename ... Ts>
+decltype(auto) shuffle(Container & c, Ts && ... ts) {
+    return std:: shuffle(c.begin(), c.end(), std::forward<Ts>(ts)...);
+}
+template<typename Container, typename ... Ts>
+decltype(auto) sort(Container & c, Ts && ... ts) {
+    return std:: sort(c.begin(), c.end(), std::forward<Ts>(ts)...);
+}
+
 
 } // namespace utils
 
