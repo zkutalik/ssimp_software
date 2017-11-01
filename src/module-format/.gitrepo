@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:aaronmcdaid/module-format.git
 	branch = master
-	commit = c142fe8e0e39079a4d4d6cdbf6a92a17003abf6e
-	parent = bb9666783c54e33bec071e5013e05490bb2443e8
+	commit = c066c65c0aff97541968b2e3beb273268f4b9043
+	parent = b67c712bc462aa5d068088fedfca99a1c734d091
 	cmdver = 0.3.1
