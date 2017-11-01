@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:aaronmcdaid/module-range.git
 	branch = master
-	commit = 2cbec3ce79534db346a6acc38e9cbd0c1d556c0d
-	parent = 7077db35b6c623eaa2d250c9aa81b1602009c6de
+	commit = 05e6e50ea34b7dec4d236d9ce0e3c4c07fff9051
+	parent = b99fdfffea2f0cb153b25204986c71ea7ef38265
 	cmdver = 0.3.1
