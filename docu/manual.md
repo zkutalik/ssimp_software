@@ -125,11 +125,10 @@ The `.log` file is a copy of what is printed to the console. (not supported yet)
 
 ### out file
 [//]: -------
-The `.ssimp.txt` file has the following columns:
+The output file specified in `--out` file has the following columns:
 - `chr` Chromosome (only 1 to 22 right now)
 - `pos` Position (same build as reference panel)
 - `z_imp` Imputed Z statistics (see below)
-- `N_imp` Effective sample size (maximal sample size times the imputation quality)
 - `source` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 
 - `SNP` SNP-ID
 - Reference allele (same column name as in the GWAS file)
@@ -140,7 +139,12 @@ The `.ssimp.txt` file has the following columns:
 - `Z_reimputed` imputed Z-statistics for tag SNPs for the first window (sanity check).
 - `r2_reimputed` imputation quality for the imputed tag SNPs of for the first window (sanity check).
 
-To sum up: `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
+Note that `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
+
+Other summary statistics can be easily calculated from the output above:
+- `N_imp` Effective sample size after imputation (maximal sample size times the imputation quality (r2.pred))
+- `P_imp` Imputed P-value [2*CDF(-|z_imp|)]
+- `bst_imp` Imputed standardised effect size [z_imp/sqrt(N_imp)]
 
 ## Method outline
 [//]: -------------------------------
