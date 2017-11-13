@@ -134,7 +134,7 @@ The output file specified in `--out` file has the following columns:
 - Reference allele (same column name as in the GWAS file)
 - Effect allele (same column name as in the GWAS file)
 - `maf` minor allele frequency in reference panel
-- `r2.pred` Imputation quality (as defined above)
+- `r2.pred` Imputation quality (as defined in the Method outline)
 - `lambda` lambda used to penalize.
 - `Z_reimputed` imputed Z-statistics for tag SNPs for the first window (sanity check).
 - `r2_reimputed` imputation quality for the imputed tag SNPs of for the first window (sanity check).
@@ -155,12 +155,12 @@ The principle of *summary statistics imputation* is to combine the available sum
 Here we aim to impute the **Z-statistic** of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), **C** (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, **c** and **C** are regularised using the option `--lambda`. *u* can be extended to a vector. SNPs to impute are in a core window (of size `--window.width`) and *M* is the set of tag SNPs within the core window +/- a flanking region (of size `--window.width`).
 
 ### Imputation quality
-The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor and 1 perfect imputation. We use an adjusted R<sup>2</sup> estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel). In this case the regularisation Î» is set to `1e-6`.
+The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor and 1 perfect imputation. We use an adjusted R<sup>2</sup> estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel).
 
 ![Imputation quality](visuals/eq_impqual.jpg)
 
 ### Variable missingness
-To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that dataset.
+To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that dataset. Turning matrices **C** and **c** into **D** and **d**, respecively, the matrices are used for imputation of summary statistics as well as the calculation of the imputation quality. 
 
 ### Transform Z-statistics to `b` and `se(b)`
 Imputed Z-statistics can be transformed into effect sizes (`b`) and standard errors of effect sizes (`se(b)`).
@@ -191,6 +191,7 @@ We also recommend reading the review on the use of summary statistics by *Pasani
 
 **Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014).** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment.* Bioinformatics.
 
-**method paper**
+**Rüeger, S.,  (2014).** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment.* Bioinformatics.
+Sina Rüeger, Aaron McDaid,  Kutalik, 
 
 **application paper**
