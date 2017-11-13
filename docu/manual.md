@@ -18,7 +18,7 @@ will generate a file `output.txt`, containing the imputation results. This is id
 [//]: -------------------------------
 The options `--gwas`, `--ref` and `--out` are required arguments. Some options (e.g. `--lambda`) have `[defaults]` defined, and other options (e.g. `--log`) are entirely optional.
 
-Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
+Note that arguments can be shortenend, e.g. `--wind` instead of `--window.width`.
 
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
@@ -60,7 +60,7 @@ Note that multiprocessing mode is not yet implemented, hence to speed up computa
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs of the first window for sanity checks, see section `output` below).
-- Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
+- Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
 ## GWAS dataset
 [//]: -------------------------------
@@ -96,7 +96,7 @@ Column names listed above are not case sensitive. E.g. P-value column can be nam
 To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 ![Caption for the picture.](visuals/visualisation_width.jpeg)
 
-On each chromosome you can only impute variants that are in the range between **min(position)+flanking.width** to **max(position)-flanking.width**, the position being the position of all tag SNPs on a specific chromsome.
+On each chromosome you can only impute variants that are in the range between **min(position)+flanking.width** to **max(position)-flanking.width**, the position being the position of all tag SNPs on a specific chromosome.
 
 ## Reference panel
 [//]: -------------------------------
@@ -135,7 +135,7 @@ The output file specified in `--out` file has the following columns:
 - Effect allele (same column name as in the GWAS file)
 - `maf` minor allele frequency in reference panel
 - `r2.pred` Imputation quality (as defined in the Method outline)
-- `lambda` lambda used to penalize.
+- `lambda` lambda used to penalise.
 - `Z_reimputed` imputed Z-statistics for tag SNPs for the first window (sanity check).
 - `r2_reimputed` imputation quality for the imputed tag SNPs of for the first window (sanity check).
 
@@ -160,7 +160,7 @@ The estimated imputation quality is a measure that varies between 0 and 1, with 
 ![Imputation quality](visuals/eq_impqual.jpg)
 
 ### Variable missingness
-To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that dataset. Turning matrices **C** and **c** into **D** and **d**, respecively, the matrices are used for imputation of summary statistics as well as the calculation of the imputation quality. 
+To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that dataset. Using such down-weighting, turns matrices **C** and **c** into **D** and **d**. Subsequently, the matrices are used for imputation of summary statistics as well as the calculation of the imputation quality. 
 
 ### Transform Z-statistics to `b` and `se(b)`
 Imputed Z-statistics can be transformed into effect sizes (`b`) and standard errors of effect sizes (`se(b)`).
