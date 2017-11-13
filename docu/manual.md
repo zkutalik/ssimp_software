@@ -189,10 +189,10 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 **Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics* Nature Reviews Genetics. [doi:10.1038/nrg.2016.142](https://www.nature.com/articles/nrg.2016.142)
 
 
-**Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014).** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment* Bioinformatics. (https://doi.org/10.1093/bioinformatics/btu416)[https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416]
+**Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014).** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment* Bioinformatics. [https://doi.org/10.1093/bioinformatics/btu416](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416)
 
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* [bioRxiv 203927; doi: https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
+**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* [bioRxiv 204560; doi: https://doi.org/10.1101/204560](https://www.biorxiv.org/content/early/2017/10/18/204560)
+**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* bioRxiv. [https://doi.org/10.1101/204560](https://www.biorxiv.org/content/early/2017/10/18/204560)
 
