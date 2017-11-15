@@ -12,16 +12,13 @@ The minimal requirements are for `ssimp` to run are: (1) GWAS summary statistics
 will generate a file `output.txt`, containing the imputation results. This is identical to 
 
 `ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
-	
-An executable example is:
-
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+		
 
 ## Options
 [//]: -------------------------------
 The options `--gwas`, `--ref` and `--out` are required arguments. Some options (e.g. `--lambda`) have `[defaults]` defined, and other options (e.g. `--log`) are entirely optional.
 
-Note that arguments can be shortenend, e.g. `--wind` instead of `--window.width`.
+Note that arguments can be shortend, e.g. `--wind` instead of `--window.width`.
 
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
@@ -40,7 +37,7 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 `--impute.snp [NULL]` filename to define SNPs to impute (each SNP has a new line, no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (𝜆) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (λ) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
@@ -63,7 +60,7 @@ Note that multiprocessing mode is not yet implemented, hence to speed up computa
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs of the first window for sanity checks, see section `output` below).
-- Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
+- Magic tipp in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
 
 ## GWAS dataset
 [//]: -------------------------------
@@ -99,7 +96,7 @@ Column names listed above are not case sensitive. E.g. P-value column can be nam
 To speed up computation, we use a sliding window approach (`--window.width` and `--flanking.width`). SNPs to be imputed are assigned to one window.
 ![Caption for the picture.](visuals/visualisation_width.jpeg)
 
-On each chromosome you can only impute variants that are in the range between **min(position)+flanking.width** to **max(position)-flanking.width**, the position being the position of all tag SNPs on a specific chromosome.
+On each chromosome you can only impute variants that are in the range between **min(position)+flanking.width** to **max(position)-flanking.width**, the position being the position of all tag SNPs on a specific chromsome.
 
 ## Reference panel
 [//]: -------------------------------
@@ -128,26 +125,22 @@ The `.log` file is a copy of what is printed to the console. (not supported yet)
 
 ### out file
 [//]: -------
-The output file specified in `--out` file has the following columns:
+The `.ssimp.txt` file has the following columns:
 - `chr` Chromosome (only 1 to 22 right now)
 - `pos` Position (same build as reference panel)
 - `z_imp` Imputed Z statistics (see below)
+- `N_imp` Effective sample size (maximal sample size times the imputation quality)
 - `source` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 
 - `SNP` SNP-ID
 - Reference allele (same column name as in the GWAS file)
 - Effect allele (same column name as in the GWAS file)
 - `maf` minor allele frequency in reference panel
-- `r2.pred` Imputation quality (as defined in the Method outline)
-- `lambda` lambda used to penalise.
+- `r2.pred` Imputation quality (as defined above)
+- `lambda` lambda used to penalize.
 - `Z_reimputed` imputed Z-statistics for tag SNPs for the first window (sanity check).
 - `r2_reimputed` imputation quality for the imputed tag SNPs of for the first window (sanity check).
 
-Note that `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
-
-Other summary statistics can be easily calculated from the output above:
-- `N_imp` Effective sample size after imputation (maximal sample size times the imputation quality (r2.pred))
-- `P_imp` Imputed P-value [2*CDF(-|z_imp|)]
-- `bst_imp` Imputed standardised effect size [z_imp/sqrt(N_imp)]
+To sum up: `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
 
 ## Method outline
 [//]: -------------------------------
@@ -158,12 +151,12 @@ The principle of *summary statistics imputation* is to combine the available sum
 Here we aim to impute the **Z-statistic** of an untyped SNP *u*, given the Z-statistics of a set of tag SNPs called *M* (LHS of the equation). The RHS of the equation contains **c** (representing the correlations between SNP *u* and all the tag SNPs *M*), **C** (the pairwise correlations among the tag SNPs), and the Z-statistics of a set of tag SNPs *M*. Both, **c** and **C** are regularised using the option `--lambda`. *u* can be extended to a vector. SNPs to impute are in a core window (of size `--window.width`) and *M* is the set of tag SNPs within the core window +/- a flanking region (of size `--window.width`).
 
 ### Imputation quality
-The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor and 1 perfect imputation. We use an adjusted R<sup>2</sup> estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel).
+The estimated imputation quality is a measure that varies between 0 and 1, with 0 reflecting poor and 1 perfect imputation. We use an adjusted R<sup>2</sup> estimation that is additionally corrected by the effective number of tag SNVs `p_eff` (`n`=number of individuals in the reference panel). In this case the regularisation λ is set to `1e-6`.
 
 ![Imputation quality](visuals/eq_impqual.jpg)
 
 ### Variable missingness
-To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that dataset. Using such down-weighting, turns matrices **C** and **c** into **D** and **d**. Subsequently, the matrices are used for imputation of summary statistics as well as the calculation of the imputation quality. 
+To account for variable sample size in summary statistics of tag SNVs, we use an approach to down-weight entries in the **C** and **c** matrices for which summary statistics was estimated from a GWAS sample size lower than the maximum sample size in that dataset.
 
 ### Transform Z-statistics to `b` and `se(b)`
 Imputed Z-statistics can be transformed into effect sizes (`b`) and standard errors of effect sizes (`se(b)`).
@@ -180,24 +173,20 @@ with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We c
 
 ### More background on method
 
-For more details on *summary statistics imputation*, see [Rüeger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/16/203927) or - for a shortened method section - [Rüeger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/18/204560). 
+For more details on *summary statistics imputation*, see *our paper (2017)* or - for a shortened method section - our *application paper (2017)*. 
 
-Most of our extended method builds on [Pasaniuc et al. (2014)](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416). 
+Most of our extended method builds on *Pasaniuc et al. (2014)*. 
 
-We also recommend reading the review on the use of summary statistics by [Pasaniuc & Price (2016)](https://www.nature.com/articles/nrg.2016.142).
+We also recommend reading the review on the use of summary statistics by *Pasaniuc & Price (2016)*).
+
 
 
 ## References
 [//]: -------
+**Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics.* Nature Reviews Genetics.
 
+**Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014).** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment.* Bioinformatics.
 
-**Pasaniuc, B., Zaitlen, N., Shi, H., Bhatia, G., Gusev, A., Pickrell, J., Hirschhorn, J., Strachan, D. P., Patterson, N., and Price, A. L. (2014).** *Fast and accurate imputation of summary statistics enhances evidence of functional enrichment* Bioinformatics. [https://doi.org/10.1093/bioinformatics/btu416](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416)
+**method paper**
 
-**Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics* Nature Reviews Genetics. [doi:10.1038/nrg.2016.142](https://www.nature.com/articles/nrg.2016.142)
-
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
-
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* bioRxiv. [https://doi.org/10.1101/204560](https://www.biorxiv.org/content/early/2017/10/18/204560)
-
-<a href="http://example.com/" target="_blank">Hello, world!</a>
-
+**application paper**
