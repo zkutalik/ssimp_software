@@ -39,7 +39,7 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 `wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.bin`
 
-Move this file to the folder `reference_panels`
+Create a folder `reference_panels` and move the file there.
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
