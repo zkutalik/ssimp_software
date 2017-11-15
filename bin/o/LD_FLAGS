@@ -1,0 +1,2 @@
+-L/usr/local/Cellar/gsl/1.16/lib -lgsl -lgslcblas
+ -lz 
