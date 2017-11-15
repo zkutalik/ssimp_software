@@ -48,13 +48,13 @@
     tests/test.wood/imputations.txt
     tests/test.wood.R/imputations.txt
 
-    # tests/test0/imputations.txt # reference build undetectable. I think those five SNPs aren't in my database. Must check this again
+    tests/test0/imputations.txt
     tests/test0.R/imputations.txt
 
     tests/sub1KG-tiny/EUR.via.filter.chr4.5/imputations.txt
 
     tests.compare/COMP.wood.txt # a pseudo-test to check that both 'test.wood' and 'test.wood.R' agree with each other
-    #tests.compare/COMP0.txt
+    tests.compare/COMP0.txt
 ;
 
     tests/${testname}/imputations.txt

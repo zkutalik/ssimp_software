@@ -26,10 +26,6 @@
 #include<memory>
 
 #include "../bits.and.pieces/utils.hh"
-namespace utils {
-    template<typename T, T c>
-    constexpr compile_time_constant_as_a_type<T, c>     cx_val  = compile_time_constant_as_a_type<T,c>{}; // Consider using my own type here instead of integral_constant?
-} // namespace utils
 
 #define AMD_FORMATTED_STRING(s, ...) format:: do_formatting( [](){ struct local { constexpr static char const * str() { return s; }}; return format:: make_a_char_pack_from_stringy_type<local>::type{}; }() ,__VA_ARGS__)
 
