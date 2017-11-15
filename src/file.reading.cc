@@ -328,8 +328,8 @@ struct SimpleGwasFile : public file_reading:: Effects_I
         assert(i>=0);
         assert(i<number_of_snps());
         auto & existing = m_each_SNP_and_its_z.at(i);
-        //assert(existing.m_chrpos.chr == -1);
-        //assert(existing.m_chrpos.pos == -1);
+        assert(existing.m_chrpos.chr == -1);
+        assert(existing.m_chrpos.pos == -1);
         existing.m_chrpos = crps;
     }
     virtual std::string get_column_name_allele_ref () const  { return m_header_details.allele_ref.m_name; }
@@ -341,14 +341,6 @@ struct SimpleGwasFile : public file_reading:: Effects_I
                 return l.m_chrpos < r.m_chrpos;
             }
             );
-    }
-    virtual void        delete_snps_with_no_position() {
-        for(int i=0; i<utils::ssize(m_each_SNP_and_its_z); ++i) {
-            if(this->get_chrpos(i) == chrpos{-1,-1}) {
-                assert( (m_each_SNP_and_its_z.begin()+i)->m_chrpos == chrpos({-1,-1}) );
-                m_each_SNP_and_its_z.erase(m_each_SNP_and_its_z.begin() + i);
-            }
-        }
     }
 
     GwasLineSummary  get_gls         (int i)     const {

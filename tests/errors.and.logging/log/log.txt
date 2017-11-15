@@ -1,3 +1,3 @@
 file_name:/nonexistent/../..
 
-Exiting: src/file.reading.cc:367	Error: Can't find file [/nonexistent/../..]
+Exiting: src/file.reading.cc:359	Error: Can't find file [/nonexistent/../..]

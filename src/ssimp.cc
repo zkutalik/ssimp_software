@@ -5,7 +5,6 @@
 #include <limits>
 #include <unordered_map>
 #include <vector>
-#include <set>
 #include <algorithm>
 #include <iterator>
 #include <gsl/gsl_statistics_int.h>
@@ -63,260 +62,8 @@ using tbi:: RefRecord;
 
 
 namespace ssimp {
-static
-int32_t read_int(std:: ifstream & o) {
-    assert(o);
-    int32_t result = 0;
-    for(int i=3; i>=0; --i) {
-        //unsigned char one_byte = (input >> (i*8)) & 0xff;
-        unsigned char one_byte;
-        o.read( reinterpret_cast<char *>(& one_byte), 1 );
-        if(!o) return -1; // file is finished
-        result = result * 256 + one_byte;
-        assert(o);
-    }
-    return result;
-}
-
-struct IDchrmPos {
-    int rs;
-    int chrom;
-    int pos;
-};
-struct IDchrmThreePos {
-    int rs;
-    int chrom;
-    int hg18;
-    int hg19;
-    int hg20;
-    bool operator <(IDchrmThreePos const & other) const {
-        return rs < other.rs;
-    }
-};
-enum class which_build_t    {   hg18_0
-                            ,   hg19_0
-                            ,   hg20_0
-                            ,   hg18_1
-                            ,   hg19_1
-                            ,   hg20_1
-                            ,   unknown
-                            };
-ostream & operator<<(ostream & o, which_build_t w) {
-    switch(w) {
-        break; case which_build_t:: hg18_0: o << "hg18_0";
-        break; case which_build_t:: hg19_0: o << "hg19_0";
-        break; case which_build_t:: hg20_0: o << "hg20_0";
-        break; case which_build_t:: hg18_1: o << "hg18_1";
-        break; case which_build_t:: hg19_1: o << "hg19_1";
-        break; case which_build_t:: hg20_1: o << "hg20_1";
-        break; case which_build_t:: unknown:o << "unknown";
-    }
-    return o;
-}
-chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build) {
-    int chrm = db_entry.chrom;
-    switch(which_build) {
-        break; case which_build_t:: hg18_0: return { chrm, db_entry.hg18 };
-        break; case which_build_t:: hg19_0: return { chrm, db_entry.hg19 };
-        break; case which_build_t:: hg20_0: return { chrm, db_entry.hg20 };
-
-        break; case which_build_t:: hg18_1: return { chrm, db_entry.hg18+1 };
-        break; case which_build_t:: hg19_1: return { chrm, db_entry.hg19+1 };
-        break; case which_build_t:: hg20_1: return { chrm, db_entry.hg20+1 };
-
-        break; default: ;
-    }
-    assert(1==2); // shouldn't get here
-    return {-1,-1};
-}
-
-static
-std:: vector<IDchrmThreePos> load_database_of_builds() {
-    cout << "... loading the 1.7GB database of positions under three builds. This will take about a minute.";
-    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"          , getenv("HOME"));
-    std:: ifstream f_database_of_builds(path_to_build_database);
-    if(!f_database_of_builds) {
-        DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the build database file is missing. [{0}]", path_to_build_database));
-    }
-    std:: vector<IDchrmThreePos> database_of_builds;
-    int lastrs = 0; // to confirm it is increasing
-    while(f_database_of_builds) {
-        assert(f_database_of_builds);
-        int rs = read_int(f_database_of_builds);
-        if(!f_database_of_builds)
-            break;
-        assert(rs > lastrs);
-        lastrs = rs;
-        int chrom = read_int(f_database_of_builds);
-        assert(f_database_of_builds);
-        int hg18 = read_int(f_database_of_builds);
-        assert(f_database_of_builds);
-        int hg19 = read_int(f_database_of_builds);
-        assert(f_database_of_builds);
-        int hg20 = read_int(f_database_of_builds);
-        assert(f_database_of_builds);
-        if(chrom >= 1 && chrom <= 22) { // we just ignore XY for now. TODO: extend this?
-            database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
-        }
-    }
-    cout << "  Loaded.\n";
-    return database_of_builds;
-}
-struct six_counts_t {
-    int count_of_hg18_0based = 0;
-    int count_of_hg19_0based = 0;
-    int count_of_hg20_0based = 0;
-    int count_of_hg18_1based = 0;
-    int count_of_hg19_1based = 0;
-    int count_of_hg20_1based = 0;
-    void insert_position(int pos
-            , vector<IDchrmThreePos> :: const_iterator it
-            ) {
-        if(pos == it->hg18) ++ count_of_hg18_0based;
-        if(pos == it->hg19) ++ count_of_hg19_0based;
-        if(pos == it->hg20) ++ count_of_hg20_0based;
-        if(pos == it->hg18+1) ++ count_of_hg18_1based;
-        if(pos == it->hg19+1) ++ count_of_hg19_1based;
-        if(pos == it->hg20+1) ++ count_of_hg20_1based;
-    }
-    void print() const {
-        PP(   count_of_hg18_0based
-            , count_of_hg19_0based
-            , count_of_hg20_0based
-            , count_of_hg18_1based
-            , count_of_hg19_1based
-            , count_of_hg20_1based
-            );
-    }
-    which_build_t which_is_the_most_popular_build() const {
-        // find which of those six numbers is the biggest
-        auto vec = std::vector<int const *>{
-                 &count_of_hg18_0based
-                ,&count_of_hg19_0based
-                ,&count_of_hg20_0based
-                ,&count_of_hg18_1based
-                ,&count_of_hg19_1based
-                ,&count_of_hg20_1based
-                };
-
-        // check if all the counts are still zero
-        {   int sum = 0
-        ;   for(auto * p : vec) { sum += *p; }
-        ;   if(sum == 0)    { return which_build_t:: unknown; }
-        }
-
-        auto mx = std::max_element( vec.begin(), vec.end()
-                , [](auto *l, auto *r) {
-                    return *l < *r;
-                }
-                );
-        if(*mx == &count_of_hg18_0based) return which_build_t:: hg18_0;
-        if(*mx == &count_of_hg19_0based) return which_build_t:: hg19_0;
-        if(*mx == &count_of_hg20_0based) return which_build_t:: hg20_0;
-        if(*mx == &count_of_hg18_1based) return which_build_t:: hg18_1;
-        if(*mx == &count_of_hg19_1based) return which_build_t:: hg19_1;
-        if(*mx == &count_of_hg20_1based) return which_build_t:: hg20_1;
-        assert(0); // won't reach here
-        return which_build_t:: hg18_0;
-    }
-};
-static
-which_build_t estimate_build_of_reference_panel (   string                                      filename_of_vcf
-                                                ,   vector<IDchrmThreePos>                   const & database_of_builds
-                             ) {
-    cout << "Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel\n";
-    std::vector<IDchrmPos> some_records_from_each_chromosome;
-    for(int chrm =  1; chrm <= 22; ++chrm) {
-        cout.flush(); std::cerr.flush(); // helps with --log
-
-        std::vector<IDchrmPos> a_few_records;
-
-        tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
-
-        ref_vcf.set_region  (   chrpos{chrm, 0}
-                            ,   chrpos{chrm,std::numeric_limits<int>::max()}
-                            );
-        RefRecord rr;
-        while(ref_vcf.read_record_into_a_RefRecord(rr) ){
-            if(utils:: startsWith(rr.ID, "rs")) {
-                try {
-                    int rs = utils:: lexical_cast<int>(rr.ID.substr(2));
-                    a_few_records.push_back( IDchrmPos{ rs , chrm, rr.pos });
-                    if(a_few_records.size() >= 100)
-                        break;
-                } catch (std:: invalid_argument &) {
-                }
-            }
-        }
-        some_records_from_each_chromosome.insert(some_records_from_each_chromosome.end(), a_few_records.begin(), a_few_records.end());
-    }
-    PP(some_records_from_each_chromosome.size());
-
-    six_counts_t six_counts;
-    for(auto const & icp : some_records_from_each_chromosome) {
-        // look up these in the database_of_builds.
-        IDchrmThreePos target;
-        target.rs = icp.rs;
-        auto it = std:: lower_bound(database_of_builds.begin(), database_of_builds.end(), target);
-        // the data in *it is zero-based
-#if 0
-        PP(icp.rs, icp.chrom, it->rs
-                , it->hg18
-                , it->hg19
-                , it->hg20
-                , icp.pos
-                );
-#endif
-        if  (   icp.rs == it->rs
-             && icp.chrom == it->chrom
-                ) {
-            // check the pos against 6 possibilities
-            six_counts.insert_position(icp.pos, it);
-        }
-    }
-    six_counts.print();
-    return six_counts.which_is_the_most_popular_build();
-}
-static
-which_build_t
-estimate_build_of_the_gwas  (   std::shared_ptr<file_reading::Effects_I>    gwas
-                            ,   vector<IDchrmThreePos>                      const & database_of_builds
-                            )   {
-    // For the purpose of this check, we ignore the SNPnames that are in the GWAS file, and look only
-    // at the chrpos that are in the GWAS file (of which there may be zero).
-    std:: set<chrpos> gwas_all_chrpos;
-    for(int i = 0; i<gwas->number_of_snps(); ++i ) {
-        //N_max = std::max(N_max, gwas->get_N(i));
-        chrpos gwas_chrpos  =   gwas->get_chrpos(i);
-        //PP  (   gwas_chrpos.chr ,   gwas_chrpos.pos);
-        if(gwas_chrpos.chr != -1)
-            gwas_all_chrpos.insert(gwas_chrpos);
-    }
-    PP(gwas_all_chrpos.size());
-
-    six_counts_t six_counts;
-
-    for(auto const & db_entry : database_of_builds) {
-        //if(pos == it->hg18+1) ++ count_of_hg18_1based;
-        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg18  } ) == 1) ++six_counts.count_of_hg18_0based;
-        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg19  } ) == 1) ++six_counts.count_of_hg19_0based;
-        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg20  } ) == 1) ++six_counts.count_of_hg20_0based;
-        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg18+1} ) == 1) ++six_counts.count_of_hg18_1based;
-        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg19+1} ) == 1) ++six_counts.count_of_hg19_1based;
-        if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg20+1} ) == 1) ++six_counts.count_of_hg20_1based;
-    }
-    six_counts.print();
-
-    if(gwas_all_chrpos.size() == 0) {
-        return which_build_t:: unknown;
-    }
-
-    return six_counts.which_is_the_most_popular_build();
-}
-} // namespace ssimp
-
-namespace ssimp {
 // Some forward declarations
+
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
@@ -453,9 +200,7 @@ If you have not already downloaded it, and you have 'wget' available on your sys
 
     mkdir -p ~/reference_panels/1000genomes
     cd       ~/reference_panels/1000genomes
-    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
-    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
-    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
+    wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
 
 This takes up nearly 15 gigabytes of disk space.
 )";
@@ -471,9 +216,7 @@ It appears that 'wget' exists on your system. Would you like me to run the above
         if(response == "yes") {
             for(auto && cmd : {
                  "mkdir -p ~/reference_panels/1000genomes"
-                ,"cd       ~/reference_panels/1000genomes && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'"
-                                                        " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'"
-                                                        " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'"
+                ,"cd       ~/reference_panels/1000genomes && wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'"
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
@@ -658,136 +401,10 @@ int main(int argc, char **argv) {
 
     // Finished adjusting the command line options
 
-    // Next, edit the positions in the gwas, if the builds don't match, then finally do the imputation!
+    // Now, do the imputation!
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
-
-        auto database_of_builds = ssimp:: load_database_of_builds();
-        std:: map<int, size_t> database_of_builds_rs_to_offset;
-        for(size_t offset = 0; offset < database_of_builds.size(); ++offset) {
-            ssimp:: IDchrmThreePos const db_entry = database_of_builds.at(offset);
-            database_of_builds_rs_to_offset.insert( std:: make_pair(db_entry.rs, offset) );
-        }
-        PP(database_of_builds.size(), database_of_builds_rs_to_offset.size());
-
-        ssimp:: which_build_t which_build_ref   = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
-        ssimp:: which_build_t which_build_gwas  = ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
-
-        PP(which_build_gwas, which_build_ref);
-
-        assert(which_build_ref != ssimp:: which_build_t:: unknown);
-
-        if(which_build_gwas == ssimp:: which_build_t:: unknown) {
-            // let's copy in as much as we can from the database into the gwas.
-            // We only have the rs-number to go on though.
-            for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
-            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
-                auto   gwas_rs      =   gwas->get_SNPname(i);
-                if(gwas_rs.substr(0,2) == "rs") {
-                    int gwas_rs_int = utils:: lexical_cast<int>(gwas_rs.substr(2));
-                    //PP(gwas_rs, gwas_rs_int);
-                    if(1==database_of_builds_rs_to_offset.count(gwas_rs_int)) {
-                        auto offset_into_big_db = database_of_builds_rs_to_offset[gwas_rs_int];
-                        assert(database_of_builds.at(offset_into_big_db).rs == gwas_rs_int);
-                        chrpos new_chrpos = get_one_build(database_of_builds.at(offset_into_big_db), which_build_ref);
-                        //PP(gwas_rs_int, new_chrpos);
-                        assert(new_chrpos != (chrpos{-1,0}));
-                        gwas->set_chrpos(i, new_chrpos);
-                    } else {
-                        // not in the database - should we delete it?
-                        // TODO: decide whether to delete or now
-                    }
-                }
-            }
-            for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
-            which_build_gwas = which_build_ref; // we've changed the gwas positions, so we here record that fact
-        }
-
-        if(which_build_ref != which_build_gwas) {
-            // This is the 'awkward' one
-            cout << "builds are different. Need to adjust the positions in the GWAS to match those in the ref panel\n";
-            assert(which_build_gwas != ssimp:: which_build_t:: unknown);
-            std:: map< chrpos, int > gwas_old_build_to_new; // for only the positions in the gwas
-            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
-                auto crps = gwas->get_chrpos(i);
-                if(crps != chrpos{-1,-1}) {
-                    gwas_old_build_to_new[crps] = -1; // we don't yet know the position, so we just make this placeholder first
-                }
-            }
-            PP(gwas_old_build_to_new.size());
-            for(auto && db_entry : database_of_builds) {
-                auto under_gwas = get_one_build( db_entry, which_build_gwas);
-                if(gwas_old_build_to_new.count( under_gwas ) == 1) {
-                    auto under_ref = get_one_build( db_entry, which_build_ref);
-                    if      (   gwas_old_build_to_new[under_gwas] == -1
-                             || gwas_old_build_to_new[under_gwas] == under_ref.pos
-                            ){}
-                    else {
-                        PP  (   under_gwas, under_ref
-                            ,   gwas_old_build_to_new[under_gwas]
-                            );
-                    }
-                    assert  (   gwas_old_build_to_new[under_gwas] == -1
-                             || gwas_old_build_to_new[under_gwas] == under_ref.pos
-                            );
-                    assert(under_ref != (chrpos{-1,-1}));
-                    assert(under_ref.chr == under_gwas.chr);
-                    gwas_old_build_to_new[under_gwas] = under_ref.pos;
-                }
-            }
-
-            // now to apply those adjustments to the gwas
-            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
-                auto crps = gwas->get_chrpos(i);
-                if(crps != chrpos{-1,-1}) {
-                    // we must either delete, or update, this gwas entry.
-                    // Can't leave the gwas as a mixture of builds
-                    if  (   gwas_old_build_to_new.count(crps)   == 1
-                         && gwas_old_build_to_new[crps]         != -1
-                        ) {
-                        auto newpos = gwas_old_build_to_new[crps];
-                        assert(newpos != -1);
-                        crps.pos = newpos;
-                        gwas->set_chrpos(i, crps);
-                    }
-                    else {
-                        gwas->set_chrpos(i, chrpos{-1,-1});
-                    }
-                }
-            }
-            which_build_gwas = which_build_ref;
-        }
-
-        assert(which_build_ref == which_build_gwas);
-
-        { /* before finally doing imputation, let's count how many GWAS SNPs
-           * now have position, and how many don't.
-           * And delete those with unknown position
-           */
-            int gwas_count_unknown = 0;
-            int gwas_count_known = 0;
-            for(int i = 0; i<gwas->number_of_snps(); ++i )
-            {   auto crps = gwas->get_chrpos(i)
-            ;   if(crps == chrpos{-1,-1})
-                {   ++ gwas_count_unknown
-                ;   }
-                else
-                {   ++ gwas_count_known
-                ;   assert(crps.chr >= 1 && crps.chr <= 22)
-                ;   assert(crps.pos > 0)
-                ;   }
-            }
-            PP(gwas_count_known, gwas_count_unknown);
-        }
-        // now, delete those with unknown position
-        // This is where, finally, we get the speed up
-        {   cout << "Delete the SNPs with unknown position ...\n";
-        ;   gwas->delete_snps_with_no_position()
-        ;   PP(gwas->number_of_snps())
-        ;}
-
-        //PP(which_build_ref == ssimp:: which_build_t:: hg19_1);
 
         // Go through regions, printing how many
         // SNPs there are in each region
@@ -1023,29 +640,6 @@ void impute_all_the_regions(   string                                   filename
                 )
                 continue;
 
-            gwas->sort_my_entries(); // Sort them by position
-            assert(gwas->get_chrpos(0) != (chrpos{-1,-1})); // confirm that all gwas positions are now known
-            {   /* What follows is another optional speed optimization:
-                 * As we now know all the positions of the tags, we may be able
-                 * to skip windows (on the current chromosome)
-                 */
-                auto start_of_window = chrpos{ chrm, current_window_start - options:: opt_flanking_width };
-                auto   end_of_window = chrpos{ chrm, current_window_end   + options:: opt_flanking_width };
-                auto start = std:: lower_bound( begin_from_file(gwas)   , end_from_file(gwas) , start_of_window );
-                auto   end = std:: lower_bound( start                   , end_from_file(gwas) , end_of_window   );
-                assert(end >= start);
-                if(end == start) {
-                    // If end==start, then there are no tags in this window. Therefore,
-                    // we either break to the next chromosome, or continue to the next window in this chromosome
-                    auto   chrom_end = std:: lower_bound( start                   , end_from_file(gwas) , chrpos{chrm, std::numeric_limits<int>::max()}   );
-                    assert(chrom_end >= end);
-                    if(chrom_end != end) // there are more tags on this chromosome
-                        continue;
-                    else
-                        break;
-                }
-            }
-
             /*
              * For a given window, there are three "ranges" to consider:
              *  -   The range of GWAS SNPs in the "broad" window (i.e. including the flanking region)
@@ -1101,6 +695,83 @@ void impute_all_the_regions(   string                                   filename
             if(all_nearby_ref_data.empty()) {
                 // no tags
                 continue; // to the next window in this chromosome
+            }
+
+            {   // Update the gwas data with position information from the ref panel
+                // I should put this chunk of code into another function
+                std:: unordered_map<string, int> map_SNPname_to_pos; // just for this broad window
+                for(auto & rr : all_nearby_ref_data) {
+                    switch(map_SNPname_to_pos.count(rr.ID)) {
+                        break; case 0:
+                            map_SNPname_to_pos[rr.ID] = rr.pos;
+                        break; case 1:
+                        {
+                            if(map_SNPname_to_pos[rr.ID] != rr.pos) {
+                                PP(rr.ID); // TODO: remove this. I think it will be ID='.'
+                                map_SNPname_to_pos[rr.ID] = -1;
+                            }
+                        }
+                    }
+                }
+                auto it = map_SNPname_to_pos.begin();
+                while(it != map_SNPname_to_pos.end()) {
+                    if(it->second == -1) {
+                        it = map_SNPname_to_pos.erase(it);
+                    }
+                    else {
+                        ++it;
+                    }
+                }
+
+                for(auto & msp : map_SNPname_to_pos) {
+                    assert(msp.second != -1); // TODO: remove these instead
+                }
+
+                // Now that we have the position data from ref panel, see if we can copy it into the GWAS data
+                auto gwas_it = begin_from_file(gwas);
+                auto const e_gwas =   end_from_file(gwas);
+                for(; gwas_it != e_gwas; ++gwas_it) {
+                    auto gwas_SNPname = gwas_it.get_SNPname();
+                    if(                     map_SNPname_to_pos.count( gwas_SNPname )) {
+                        auto pos_in_ref =   map_SNPname_to_pos      [ gwas_SNPname ];
+                        if  (   gwas_it.get_chrpos().chr == chrm
+                             && gwas_it.get_chrpos().pos == pos_in_ref) {
+                            // this fine, nothing to change, the two data sources agree
+                        }
+                        else if (   gwas_it.get_chrpos().chr == -1
+                                 && gwas_it.get_chrpos().pos == -1) {
+                            // just copy it in
+                                gwas_it.set_chrpos(chrpos{chrm,pos_in_ref});
+                        }
+                        else
+                            DIE("disagreement on position");
+                    }
+                }
+            }
+            //PP(__LINE__, utils:: ELAPSED());
+            // Now, thanks to the block just completed, we have all the positions in the GWAS
+            // that are relevant for this window.
+            gwas->sort_my_entries(); // Sort them by position
+            {   /* What follows is another optional speed optimization:
+                 * If we now know all the positions of the tags, we may be able
+                 * to skip windows (on the current chromome)
+                 */
+                if(gwas->get_chrpos(0) != chrpos{-1,-1}) { // every GWAS SNP has known position now
+                    // check if the last tag on this chromosome is already too far back
+                    auto x = std:: lower_bound( begin_from_file(gwas), end_from_file(gwas), chrpos{ chrm, std::numeric_limits<int>::lowest() });
+                    auto last_tag_on_this_chromosome = chrpos{ chrm, std::numeric_limits<int>::lowest() };
+                    while(x != end_from_file(gwas) && x.get_chrpos().chr == chrm) {
+                        auto cur = x.get_chrpos();
+                        assert( cur >= last_tag_on_this_chromosome );
+                        last_tag_on_this_chromosome = cur;
+                        ++x;
+                    }
+                    assert(chrm == last_tag_on_this_chromosome.chr);
+                    if(last_tag_on_this_chromosome.pos < current_window_start - options:: opt_flanking_width) {
+                        //PPe("break out", last_tag_on_this_chromosome.pos , current_window_start - options:: opt_flanking_width);
+                        break;
+                    }
+                }
             }
 
             // Of the next four lines, only the two are interesting (to find the range of GWAS snps for this window)

@@ -4,12 +4,10 @@
 #include<vector>
 #include<string>
 
-#include<gsl/gsl_vector.h>
 #include<gsl/gsl_matrix.h>
 #include<cmath>
 
 #include "../module-bits.and.pieces/ASSERT.hh"
-#include "../bits.and.pieces/utils.hh"
 
 namespace mvn {
 
@@ -145,52 +143,20 @@ double norm_2(const VecCol       &x);
 // These two operator== overloads are strange becuase gsl_matrix_equal isn't
 // available on hpc1.
 // I should check they still work elsewhere
-
-namespace detail {
-
-    template<typename SquareMatrix=SquareMatrix>
-    auto    equals    (utils:: priority_tag<2>, SquareMatrix const& lhs, SquareMatrix const &rhs)
-        ->decltype( gsl_matrix_equal(lhs.get(), rhs.get()) )
-    {
-        assert(lhs.size() == rhs.size());
-        return gsl_matrix_equal(lhs.get(), rhs.get());
-    }
-    inline
-    bool    equals    (utils:: priority_tag<1>, SquareMatrix const& lhs, SquareMatrix const &rhs)
-    {
-        assert(lhs.size() == rhs.size());
-        for(size_t i=0; i<lhs.size(); ++i)
-            for(size_t j=0; j<lhs.size(); ++j)
-                if(lhs(i,j) != rhs(i,j))
-                    return false;
-        return(true);
-    }
-
-    inline
-    bool    equals    (utils:: priority_tag<1>, VecCol const& lhs, VecCol const &rhs)
-    {
-        assert(lhs.size() == rhs.size());
-        for(size_t d=0; d<lhs.size(); ++d)
-            if(lhs(d) != rhs(d))
-                return false;
-        return(true);
-    }
-
-    template<typename  VecCol= VecCol>
-    auto    equals    (utils:: priority_tag<2>, VecCol const& lhs, VecCol const &rhs)
-        -> decltype( gsl_vector_equal(lhs.get(), rhs.get()) )
-    {
-        assert(lhs.size() == rhs.size());
-        return gsl_vector_equal(lhs.get(), rhs.get());
-    }
-} // namespace detail
-inline
-bool    operator==  (SquareMatrix const& lhs, SquareMatrix const &rhs) {
-    return detail:: equals(utils:: priority_tag<9>{}, lhs, rhs);
+template<typename  SquareMatrix= SquareMatrix>
+auto    operator==(SquareMatrix const& lhs, SquareMatrix const &rhs)
+    -> decltype(gsl_matrix_equal(lhs.get(), rhs.get()))
+{
+    assert(lhs.size1() == rhs.size1());
+    assert(lhs.size2() == rhs.size2());
+    return gsl_matrix_equal(lhs.get(), rhs.get());
 }
-inline
-bool    operator==  (VecCol const& lhs, VecCol const &rhs) {
-    return detail:: equals(utils:: priority_tag<9>{}, lhs, rhs);
+template<typename  VecCol= VecCol>
+auto    operator==(VecCol const& lhs, VecCol const &rhs)
+    -> decltype( gsl_vector_equal(lhs.get(), rhs.get()) )
+{
+    assert(lhs.size() == rhs.size());
+    return gsl_vector_equal(lhs.get(), rhs.get());
 }
 
 long double
