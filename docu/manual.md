@@ -15,7 +15,7 @@ will generate a file `output.txt`, containing the imputation results. This is id
 	
 An executable example is:
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 ## Options
 [//]: -------------------------------
