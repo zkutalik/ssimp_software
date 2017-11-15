@@ -84,7 +84,9 @@ if it is available on your machine:
     cd ~                # to your home directory
     mkdir -p ref_panels/1000genomes
     cd       ref_panels/1000genomes
-    wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
+    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
+    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
+    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'
 
 You can then pass this directory name to 'ssimp', and specify that only
 the European individuals should be used:

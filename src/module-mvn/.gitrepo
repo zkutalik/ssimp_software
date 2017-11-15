@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:aaronmcdaid/module-mvn.git
 	branch = master
-	commit = 7b413a782379c75c9a36cc228aefbd459cc88ffa
-	parent = 9d3187afa44e27aefd9923711f1c987220aa626f
+	commit = 5d25d6fbfb83f46efc4be8ac0f1ec4584d0ef143
+	parent = b7f4b7f824e9d276810d104efff7c8632177d3cb
 	cmdver = 0.3.1
