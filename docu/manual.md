@@ -12,7 +12,10 @@ The minimal requirements are for `ssimp` to run are: (1) GWAS summary statistics
 will generate a file `output.txt`, containing the imputation results. This is identical to 
 
 `ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
-		
+	
+An executable example is:
+
+`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.range`
 
 ## Options
 [//]: -------------------------------
@@ -37,7 +40,7 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 `--impute.snp [NULL]` filename to define SNPs to impute (each SNP has a new line, no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (Î») controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (ÃŽÂ») controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
@@ -177,7 +180,7 @@ with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We c
 
 ### More background on method
 
-For more details on *summary statistics imputation*, see [Rüeger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/16/203927) or - for a shortened method section - [Rüeger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/18/204560). 
+For more details on *summary statistics imputation*, see [RÃ¼eger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/16/203927) or - for a shortened method section - [RÃ¼eger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/18/204560). 
 
 Most of our extended method builds on [Pasaniuc et al. (2014)](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416). 
 
@@ -192,9 +195,9 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 
 **Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics* Nature Reviews Genetics. [doi:10.1038/nrg.2016.142](https://www.nature.com/articles/nrg.2016.142)
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
+**RÃ¼eger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* bioRxiv. [https://doi.org/10.1101/204560](https://www.biorxiv.org/content/early/2017/10/18/204560)
+**RÃ¼eger, S., McDaid, A., Kutalik, Z. (2017).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* bioRxiv. [https://doi.org/10.1101/204560](https://www.biorxiv.org/content/early/2017/10/18/204560)
 
 <a href="http://example.com/" target="_blank">Hello, world!</a>
 
