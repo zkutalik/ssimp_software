@@ -36,17 +36,22 @@ Mac user? You need to install GSL: `brew install gsl`.
 `make`
 
 (4) download the dataset that allows you fast computation of a small selection of SNPs. 
+
 `wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.bin`
+
+Move this file to the folder `reference_panels`
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-(5) To run your own summary statistics imputation, you need to have a reference panel ready. Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
+(5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panel`). Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
 
 (6) In order to use multi-core processors, download the follwing file and run `ssimp_chunks.R` that will create you a bash script file.
 
 `wget https://drive.switch.ch/index.php/s/1ZT3VD3I2y74lAe/download -O dbsnp_hg20_chr_pos.txt.gz`
+
+Move this file to the folder `reference_panels`
 
 
 
