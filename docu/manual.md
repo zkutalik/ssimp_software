@@ -40,7 +40,7 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 `--impute.snp [NULL]` filename to define SNPs to impute (each SNP has a new line, no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (Î») controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (𝜆) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
