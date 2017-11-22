@@ -82,7 +82,7 @@ Provide chromosome and position instead, but include a SNP column that is empty 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 20-22`**
 
 
-### Impute specific set of SNPs
+### Impute specific set of SNPs >> this is currently extremely slow!
 [//]: -------------------------------
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp listofimputesnps.txt`**
