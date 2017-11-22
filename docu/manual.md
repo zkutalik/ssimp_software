@@ -186,7 +186,7 @@ Most of our extended method builds on [Pasaniuc et al. (2014)](https://academic.
 
 We also recommend reading the review on the use of summary statistics by [Pasaniuc & Price (2016)](https://www.nature.com/articles/nrg.2016.142).
 
-## How to cite
+## How to cite SSimp
 [//]: ----------
 
 **Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
