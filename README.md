@@ -54,7 +54,7 @@ Create a folder `reference_panels` and move the file there.
 
 ## Warning about the size of the software 
 [//]: -------------------------------
-While the github folder itself is rather small (136 MB), the folder `reference_panels` uses 1.7 GB and `ref_panels` nearly 15 GB. 
+While the github folder itself is rather small (136 MB), the folder `reference_panels` is around 17 GB large when 1KG is installed.
 
 Be careful when running the software in parallel!
 
