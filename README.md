@@ -35,21 +35,18 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 `make`
 
-(4) download the dataset that allows you fast computation of a small selection of SNPs. 
-
-`wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.bin`
-
-Create a folder `reference_panels` and move the file there.
-
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 (5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panels`). Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
 
-(6) In order to impute single SNPs efficiently, download the following file to the previously created sub-folder `reference_panels`:
+(6) Download the dataset that allows you fast imputation of single SNPs. 
 
-`wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O dbsnp_hg20_chr_pos.txt.gz`
+`wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.bin`
+
+Create a folder `reference_panels` and move the file there.
+
 
 
 ## Warning about the size of the software 
