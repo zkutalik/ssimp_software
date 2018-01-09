@@ -45,9 +45,9 @@ Create a folder `reference_panels` and move the file there.
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-(5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panel`). Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
+(5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panels`). Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
 
-(6) In order to impute single SNPs efficiently, download the following file to the sub-folder `reference_panels`:
+(6) In order to impute single SNPs efficiently, download the following file to the previously created sub-folder `reference_panels`:
 
 `wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O dbsnp_hg20_chr_pos.txt.gz`
 
@@ -81,7 +81,7 @@ We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_softwar
 
 **Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage.*
 
-### Automatical download
+### Automatic download
 [//]: -------------------------------
 By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. 
 
@@ -91,7 +91,7 @@ For example, if we want 1000 genomes to be downloaded and EUR population used fo
 
 Make sure that:
 1) you have `wget` installed and
-2) no folder `ref_panels` exists.
+2) no folder `reference_panels` exists.
 
 ### Manual download
 
@@ -114,7 +114,7 @@ More info on handling reference panel data can be found starting from line 49 in
 [//]: -------------------------------
 [Aaron McDaid](https://github.com/aaronmcdaid) (implementation, method development)
 
-[Sina Rüeger](https://github.com/sinarueeger) (coordination, method development)
+[Sina R&uuml;eger](https://github.com/sinarueeger) (coordination, method development)
 
 [Zoltan Kutalik](https://github.com/zkutalik) (supervision, method development)
 
