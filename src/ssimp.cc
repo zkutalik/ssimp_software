@@ -1432,7 +1432,7 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << target->maf
                         << '\t' << imp_qual
                         << '\t' << lambda
- 						<< '\t' << N_imp
+ 			<< '\t' << N_imp
                         << '\t' << P_imp
                         << '\t' << bst_imp
                         << '\t' << (std::isnan( Z_reimputed) ? "" : AMD_FORMATTED_STRING("{0}",  Z_reimputed))
