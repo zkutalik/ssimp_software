@@ -120,6 +120,11 @@ More info on handling reference panel data can be found starting from line 49 in
 
 We have used code (with permission, and under the GPL) from [libStatGen](https://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen) and [stu](https://github.com/kunegis/stu).
 
+
+## Bug report
+[//]: -------------------------------
+Report bugs here: (https://github.com/sinarueeger/ssimp_software/issues)[https://github.com/sinarueeger/ssimp_software/issues]
+
 ## Contact
 [//]: -------------------------------
 <sina.rueeger@gmail.com>
