@@ -93,6 +93,11 @@ If it is only a few of SNPs it might be easier to use:
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp <(echo rs587755077 rs587697622 | tr ' ' '\n')`**
 
+A more complex example with SNPs from two different chromosomes:
+
+`ssimp gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz ref/sub1KG-tiny/chr{CHRM}.vcf.gz output.txt --sample.names ref/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR --impute.snps <(echo rs148911000 rs111659000 rs183059100 rs76979500 rs150095300 rs115012100 rs187649300 rs560286600
+rs78808100 | tr ' ' '\n')`
+
 
 ### Use a set of tag SNPs
 [//]: -------------------------------
