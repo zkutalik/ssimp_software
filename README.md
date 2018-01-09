@@ -45,12 +45,13 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 `wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.bin`
 
-Create a folder `reference_panels` and move the file there.
+Move it into the same folder as (5) (`reference_panels` in your root).
 
 
 
 ## Warning about the size of the software 
 [//]: -------------------------------
+
 While the github folder itself is rather small (136 MB), the folder `reference_panels` is around 17 GB large when 1KG is installed.
 
 Be careful when running the software in parallel!
