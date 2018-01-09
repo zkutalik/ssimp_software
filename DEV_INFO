@@ -1,0 +1,1093 @@
+.
+├── DEV_INFO
+├── INSTALL
+├── Makefile
+├── README.md
+├── VERSION
+├── bin
+│   ├── LIST_OF_HH_FILES
+│   ├── local
+│   │   ├── gsl_cflags
+│   │   └── gsl_libs
+│   ├── o
+│   │   ├── CXX_WITH_FLAGS
+│   │   ├── GCC_OR_CLANG
+│   │   ├── LD_FLAGS
+│   │   ├── LINKER
+│   │   ├── file.reading.o
+│   │   ├── file.reading.vcfgztbi.o
+│   │   ├── gz
+│   │   │   └── gzstream
+│   │   │       └── gzstream.o
+│   │   ├── logging.o
+│   │   ├── mvn
+│   │   │   └── mvn.o
+│   │   ├── options.o
+│   │   ├── ssimp.o
+│   │   └── usage_special.o
+│   ├── ssimp
+│   └── ssimp-static-AaronsLaptopJanuary2017
+├── bin.stu
+├── compiled
+│   ├── howto.txt
+│   ├── ssimp-linux-0.1
+│   ├── ssimp-linux-0.2
+│   ├── ssimp-osx-0.1
+│   └── ssimp-osx-0.2
+├── docu
+│   ├── examples.md
+│   ├── manual.md
+│   ├── usage.txt
+│   └── visuals
+│       ├── eq_impqual.jpg
+│       ├── eq_impqual.pdf
+│       ├── eq_main.jpg
+│       ├── eq_main.pdf
+│       ├── eq_seb.jpg
+│       ├── eq_seb.pdf
+│       ├── prep_figs.sh
+│       ├── visualisation_width.jpeg
+│       └── visualisation_width.key
+├── gwas
+│   ├── GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
+│   ├── GIANT_HEIGHT_Wood_et_al_JUSTPARTOFCHR19.tsv.gz
+│   ├── GIANT_HEIGHT_Wood_oneWindowOnChr22.tsv.gz
+│   ├── GIANT_HEIGHT_Wood_somechr22snps.txt.appendZcolumn.txt
+│   ├── add_gwas_examples.R
+│   ├── small.random.chr.pos.csv
+│   ├── small.random.csv
+│   ├── small.random.csv.gz
+│   ├── small.random.n.csv
+│   ├── small.random.p.b.csv
+│   └── small.random.p.or.csv
+├── header_translation.md
+├── liftover
+│   └── liftover_dbsnp.sh
+├── main.stu
+├── ref
+│   ├── 1000genomes_somechr22snps_EURsamples.vcf
+│   ├── 1000genomes_somechr22snps_EURsamples.vcf.gz
+│   ├── 1000genomes_somechr22snps_EURsamples.vcf.gz.tbi
+│   ├── 1kg.just.EUR
+│   │   ├── chr22.17750K.19250K.vcf.gz
+│   │   └── chr22.17750K.19250K.vcf.gz.tbi
+│   ├── filename.samples.small.txt
+│   ├── filename.samples.txt
+│   ├── link.to.1kg.data
+│   │   └── integrated_call_samples_v3.20130502.ALL.panel
+│   ├── small.vcf.sample.vcf
+│   ├── small.vcf.sample.vcf.gz
+│   ├── small.vcf.sample.vcf.gz.tbi
+│   ├── sub1KG-chr19
+│   │   ├── chr19.vcf.gz
+│   │   └── chr19.vcf.gz.tbi
+│   ├── sub1KG-tiny
+│   │   ├── chr1.vcf.gz
+│   │   ├── chr1.vcf.gz.tbi
+│   │   ├── chr10.vcf.gz
+│   │   ├── chr10.vcf.gz.tbi
+│   │   ├── chr11.vcf.gz
+│   │   ├── chr11.vcf.gz.tbi
+│   │   ├── chr12.vcf.gz
+│   │   ├── chr12.vcf.gz.tbi
+│   │   ├── chr13.vcf.gz
+│   │   ├── chr13.vcf.gz.tbi
+│   │   ├── chr14.vcf.gz
+│   │   ├── chr14.vcf.gz.tbi
+│   │   ├── chr15.vcf.gz
+│   │   ├── chr15.vcf.gz.tbi
+│   │   ├── chr16.vcf.gz
+│   │   ├── chr16.vcf.gz.tbi
+│   │   ├── chr17.vcf.gz
+│   │   ├── chr17.vcf.gz.tbi
+│   │   ├── chr18.vcf.gz
+│   │   ├── chr18.vcf.gz.tbi
+│   │   ├── chr19.vcf.gz
+│   │   ├── chr19.vcf.gz.tbi
+│   │   ├── chr2.vcf.gz
+│   │   ├── chr2.vcf.gz.tbi
+│   │   ├── chr20.vcf.gz
+│   │   ├── chr20.vcf.gz.tbi
+│   │   ├── chr21.vcf.gz
+│   │   ├── chr21.vcf.gz.tbi
+│   │   ├── chr22.vcf.gz
+│   │   ├── chr22.vcf.gz.tbi
+│   │   ├── chr3.vcf.gz
+│   │   ├── chr3.vcf.gz.tbi
+│   │   ├── chr4.vcf.gz
+│   │   ├── chr4.vcf.gz.tbi
+│   │   ├── chr5.vcf.gz
+│   │   ├── chr5.vcf.gz.tbi
+│   │   ├── chr6.vcf.gz
+│   │   ├── chr6.vcf.gz.tbi
+│   │   ├── chr7.vcf.gz
+│   │   ├── chr7.vcf.gz.tbi
+│   │   ├── chr8.vcf.gz
+│   │   ├── chr8.vcf.gz.tbi
+│   │   ├── chr9.vcf.gz
+│   │   └── chr9.vcf.gz.tbi
+│   └── tbi
+│       ├── 1000genomes_somechr22snps_EURsamples.vcf.gz
+│       ├── 1000genomes_somechr22snps_EURsamples.vcf.gz.tbi
+│       ├── small.vcf.sample.vcf.gz
+│       └── small.vcf.sample.vcf.gz.tbi
+├── rs.chr.pos.database
+│   ├── build.the.binary.cc
+│   ├── just.collect.the.rss.cc
+│   └── mk.rs.chr.pos.db.cc
+├── rs.chr.pos.database.stu
+├── runtime
+│   ├── estimated_runtime.R
+│   ├── impute.snp
+│   ├── impute.snp2
+│   ├── log_chr22.txt
+│   ├── prep_wood.R
+│   ├── run.sub
+│   ├── runtime_chr1.txt
+│   ├── runtime_chr22.txt
+│   └── runtime_fullgenome.R
+├── schurcomplement.tex
+├── src
+│   ├── R
+│   │   ├── ASSERT_for_R.hh
+│   │   ├── vcfGTz.demo.R
+│   │   └── vcfGTz.reader.R
+│   ├── bits.and.pieces -> module-bits.and.pieces
+│   ├── file.reading.cc
+│   ├── file.reading.hh
+│   ├── file.reading.vcfgztbi.cc
+│   ├── file.reading.vcfgztbi.hh
+│   ├── format -> module-format
+│   ├── gz
+│   │   └── gzstream
+│   │       ├── gzstream.C
+│   │       └── gzstream.h
+│   ├── libStatGen
+│   │   ├── Doxyfile
+│   │   ├── Makefile
+│   │   ├── Makefiles
+│   │   │   ├── Makefile.base
+│   │   │   ├── Makefile.common
+│   │   │   ├── Makefile.ext
+│   │   │   ├── Makefile.extlib
+│   │   │   ├── Makefile.footer
+│   │   │   ├── Makefile.help
+│   │   │   ├── Makefile.include
+│   │   │   ├── Makefile.lib
+│   │   │   ├── Makefile.src
+│   │   │   ├── Makefile.test
+│   │   │   ├── Makefile.tool
+│   │   │   ├── Makefile.toolchain
+│   │   │   └── Makefile.wholepackage
+│   │   ├── README.md
+│   │   ├── copyrights
+│   │   │   ├── COPYING -> LICENSE.txt
+│   │   │   ├── COPYING.samtools -> ../samtools/COPYING
+│   │   │   ├── LICENSE.md5
+│   │   │   ├── LICENSE.twister -> ../general/LICENSE.twister
+│   │   │   └── LICENSE.txt -> ../general/LICENSE.txt
+│   │   ├── general
+│   │   │   ├── BaseAsciiMap.cpp
+│   │   │   ├── BaseAsciiMap.h
+│   │   │   ├── BaseQualityHelper.cpp
+│   │   │   ├── BaseQualityHelper.h
+│   │   │   ├── BaseUtilities.cpp
+│   │   │   ├── BaseUtilities.h
+│   │   │   ├── BasicHash.cpp
+│   │   │   ├── BasicHash.h
+│   │   │   ├── BgzfFileType.cpp
+│   │   │   ├── BgzfFileType.h
+│   │   │   ├── BgzfFileTypeRecovery.cpp
+│   │   │   ├── BgzfFileTypeRecovery.h
+│   │   │   ├── CSG_MD5.h
+│   │   │   ├── CharBuffer.cpp
+│   │   │   ├── CharBuffer.h
+│   │   │   ├── Chromosome.cpp
+│   │   │   ├── Chromosome.h
+│   │   │   ├── Cigar.cpp
+│   │   │   ├── Cigar.h
+│   │   │   ├── CigarRoller.cpp
+│   │   │   ├── CigarRoller.h
+│   │   │   ├── Constant.h
+│   │   │   ├── Error.cpp
+│   │   │   ├── Error.h
+│   │   │   ├── ErrorHandler.cpp
+│   │   │   ├── ErrorHandler.h
+│   │   │   ├── FileType.cpp
+│   │   │   ├── FileType.h
+│   │   │   ├── FortranFormat.cpp
+│   │   │   ├── FortranFormat.h
+│   │   │   ├── Generic.cpp
+│   │   │   ├── Generic.h
+│   │   │   ├── GenomeSequence.cpp
+│   │   │   ├── GenomeSequence.h
+│   │   │   ├── GenomeSequenceHelpers.h
+│   │   │   ├── GenotypeLists.cpp
+│   │   │   ├── GenotypeLists.h
+│   │   │   ├── GreedyTupleAligner.h
+│   │   │   ├── GzipFileType.cpp
+│   │   │   ├── GzipFileType.h
+│   │   │   ├── GzipHeader.cpp
+│   │   │   ├── GzipHeader.h
+│   │   │   ├── Hash.cpp
+│   │   │   ├── Hash.h
+│   │   │   ├── IndexBase.cpp
+│   │   │   ├── IndexBase.h
+│   │   │   ├── InplaceMerge.cpp
+│   │   │   ├── InplaceMerge.h
+│   │   │   ├── Input.cpp
+│   │   │   ├── Input.h
+│   │   │   ├── InputFile.cpp
+│   │   │   ├── InputFile.h
+│   │   │   ├── IntArray.cpp
+│   │   │   ├── IntArray.h
+│   │   │   ├── IntHash.cpp
+│   │   │   ├── IntHash.h
+│   │   │   ├── LICENSE.twister
+│   │   │   ├── LICENSE.txt
+│   │   │   ├── LongHash.h
+│   │   │   ├── LongInt.h
+│   │   │   ├── LongLongCounter.cpp
+│   │   │   ├── LongLongCounter.h
+│   │   │   ├── Makefile
+│   │   │   ├── Makefile.depends
+│   │   │   ├── MapFunction.cpp
+│   │   │   ├── MapFunction.h
+│   │   │   ├── MathConstant.h
+│   │   │   ├── MathMatrix.cpp
+│   │   │   ├── MathMatrix.h
+│   │   │   ├── MathVector.cpp
+│   │   │   ├── MathVector.h
+│   │   │   ├── MemoryAllocators.cpp
+│   │   │   ├── MemoryAllocators.h
+│   │   │   ├── MemoryInfo.cpp
+│   │   │   ├── MemoryInfo.h
+│   │   │   ├── MemoryMap.cpp
+│   │   │   ├── MemoryMap.h
+│   │   │   ├── MemoryMapArray.cpp
+│   │   │   ├── MemoryMapArray.h
+│   │   │   ├── MiniDeflate.cpp
+│   │   │   ├── MiniDeflate.h
+│   │   │   ├── NonOverlapRegions.cpp
+│   │   │   ├── NonOverlapRegions.h
+│   │   │   ├── PackedVector.h
+│   │   │   ├── Parameters.cpp
+│   │   │   ├── Parameters.h
+│   │   │   ├── Pedigree.cpp
+│   │   │   ├── Pedigree.h
+│   │   │   ├── PedigreeAlleleFreq.cpp
+│   │   │   ├── PedigreeAlleleFreq.h
+│   │   │   ├── PedigreeAlleles.h
+│   │   │   ├── PedigreeDescription.cpp
+│   │   │   ├── PedigreeDescription.h
+│   │   │   ├── PedigreeFamily.cpp
+│   │   │   ├── PedigreeFamily.h
+│   │   │   ├── PedigreeGlobals.cpp
+│   │   │   ├── PedigreeGlobals.h
+│   │   │   ├── PedigreeLoader.cpp
+│   │   │   ├── PedigreePerson.cpp
+│   │   │   ├── PedigreePerson.h
+│   │   │   ├── PedigreeTrim.cpp
+│   │   │   ├── PedigreeTwin.cpp
+│   │   │   ├── Performance.h
+│   │   │   ├── PhoneHome.cpp
+│   │   │   ├── PhoneHome.h
+│   │   │   ├── QuickIndex.cpp
+│   │   │   ├── QuickIndex.h
+│   │   │   ├── Random.cpp
+│   │   │   ├── Random.h
+│   │   │   ├── ReferenceSequence.cpp
+│   │   │   ├── ReferenceSequence.h
+│   │   │   ├── ReusableVector.h
+│   │   │   ├── STLUtilities.cpp
+│   │   │   ├── STLUtilities.h
+│   │   │   ├── SimpleStats.h
+│   │   │   ├── SmithWaterman.cpp
+│   │   │   ├── SmithWaterman.h
+│   │   │   ├── Sort.cpp
+│   │   │   ├── Sort.h
+│   │   │   ├── StatGenStatus.cpp
+│   │   │   ├── StatGenStatus.h
+│   │   │   ├── String.cpp
+│   │   │   ├── StringAlias.cpp
+│   │   │   ├── StringAlias.h
+│   │   │   ├── StringArray.cpp
+│   │   │   ├── StringArray.h
+│   │   │   ├── StringBasics.cpp
+│   │   │   ├── StringBasics.h
+│   │   │   ├── StringHash.cpp
+│   │   │   ├── StringHash.h
+│   │   │   ├── StringMap.cpp
+│   │   │   ├── StringMap.h
+│   │   │   ├── Tabix.cpp
+│   │   │   ├── Tabix.h
+│   │   │   ├── TrimSequence.h
+│   │   │   ├── UncompressedFileType.cpp
+│   │   │   ├── UncompressedFileType.h
+│   │   │   ├── UnitTest.h
+│   │   │   ├── glfHandler.cpp
+│   │   │   ├── glfHandler.h
+│   │   │   ├── obj
+│   │   │   │   ├── BaseAsciiMap.o
+│   │   │   │   ├── BaseQualityHelper.o
+│   │   │   │   ├── BaseUtilities.o
+│   │   │   │   ├── BasicHash.o
+│   │   │   │   ├── BgzfFileType.o
+│   │   │   │   ├── BgzfFileTypeRecovery.o
+│   │   │   │   ├── CharBuffer.o
+│   │   │   │   ├── Chromosome.o
+│   │   │   │   ├── Cigar.o
+│   │   │   │   ├── CigarRoller.o
+│   │   │   │   ├── Error.o
+│   │   │   │   ├── ErrorHandler.o
+│   │   │   │   ├── FileType.o
+│   │   │   │   ├── FortranFormat.o
+│   │   │   │   ├── GenomeSequence.o
+│   │   │   │   ├── GenotypeLists.o
+│   │   │   │   ├── GzipFileType.o
+│   │   │   │   ├── GzipHeader.o
+│   │   │   │   ├── Hash.o
+│   │   │   │   ├── IndexBase.o
+│   │   │   │   ├── Input.o
+│   │   │   │   ├── InputFile.o
+│   │   │   │   ├── IntArray.o
+│   │   │   │   ├── IntHash.o
+│   │   │   │   ├── LongLongCounter.o
+│   │   │   │   ├── MapFunction.o
+│   │   │   │   ├── MathMatrix.o
+│   │   │   │   ├── MathVector.o
+│   │   │   │   ├── MemoryAllocators.o
+│   │   │   │   ├── MemoryInfo.o
+│   │   │   │   ├── MemoryMap.o
+│   │   │   │   ├── MemoryMapArray.o
+│   │   │   │   ├── MiniDeflate.o
+│   │   │   │   ├── NonOverlapRegions.o
+│   │   │   │   ├── Parameters.o
+│   │   │   │   ├── Pedigree.o
+│   │   │   │   ├── PedigreeAlleleFreq.o
+│   │   │   │   ├── PedigreeDescription.o
+│   │   │   │   ├── PedigreeFamily.o
+│   │   │   │   ├── PedigreeGlobals.o
+│   │   │   │   ├── PedigreeLoader.o
+│   │   │   │   ├── PedigreePerson.o
+│   │   │   │   ├── PedigreeTrim.o
+│   │   │   │   ├── PedigreeTwin.o
+│   │   │   │   ├── PhoneHome.o
+│   │   │   │   ├── QuickIndex.o
+│   │   │   │   ├── README.txt
+│   │   │   │   ├── Random.o
+│   │   │   │   ├── ReferenceSequence.o
+│   │   │   │   ├── STLUtilities.o
+│   │   │   │   ├── SmithWaterman.o
+│   │   │   │   ├── Sort.o
+│   │   │   │   ├── StatGenStatus.o
+│   │   │   │   ├── StringAlias.o
+│   │   │   │   ├── StringArray.o
+│   │   │   │   ├── StringBasics.o
+│   │   │   │   ├── StringHash.o
+│   │   │   │   ├── StringMap.o
+│   │   │   │   ├── Tabix.o
+│   │   │   │   ├── UncompressedFileType.o
+│   │   │   │   ├── debug
+│   │   │   │   │   ├── BaseAsciiMap.o
+│   │   │   │   │   ├── BaseQualityHelper.o
+│   │   │   │   │   ├── BaseUtilities.o
+│   │   │   │   │   ├── BasicHash.o
+│   │   │   │   │   ├── BgzfFileType.o
+│   │   │   │   │   ├── BgzfFileTypeRecovery.o
+│   │   │   │   │   ├── CharBuffer.o
+│   │   │   │   │   ├── Chromosome.o
+│   │   │   │   │   ├── Cigar.o
+│   │   │   │   │   ├── CigarRoller.o
+│   │   │   │   │   ├── Error.o
+│   │   │   │   │   ├── ErrorHandler.o
+│   │   │   │   │   ├── FileType.o
+│   │   │   │   │   ├── FortranFormat.o
+│   │   │   │   │   ├── GenomeSequence.o
+│   │   │   │   │   ├── GenotypeLists.o
+│   │   │   │   │   ├── GzipFileType.o
+│   │   │   │   │   ├── GzipHeader.o
+│   │   │   │   │   ├── Hash.o
+│   │   │   │   │   ├── IndexBase.o
+│   │   │   │   │   ├── Input.o
+│   │   │   │   │   ├── InputFile.o
+│   │   │   │   │   ├── IntArray.o
+│   │   │   │   │   ├── IntHash.o
+│   │   │   │   │   ├── LongLongCounter.o
+│   │   │   │   │   ├── MapFunction.o
+│   │   │   │   │   ├── MathMatrix.o
+│   │   │   │   │   ├── MathVector.o
+│   │   │   │   │   ├── MemoryAllocators.o
+│   │   │   │   │   ├── MemoryInfo.o
+│   │   │   │   │   ├── MemoryMap.o
+│   │   │   │   │   ├── MemoryMapArray.o
+│   │   │   │   │   ├── MiniDeflate.o
+│   │   │   │   │   ├── NonOverlapRegions.o
+│   │   │   │   │   ├── Parameters.o
+│   │   │   │   │   ├── Pedigree.o
+│   │   │   │   │   ├── PedigreeAlleleFreq.o
+│   │   │   │   │   ├── PedigreeDescription.o
+│   │   │   │   │   ├── PedigreeFamily.o
+│   │   │   │   │   ├── PedigreeGlobals.o
+│   │   │   │   │   ├── PedigreeLoader.o
+│   │   │   │   │   ├── PedigreePerson.o
+│   │   │   │   │   ├── PedigreeTrim.o
+│   │   │   │   │   ├── PedigreeTwin.o
+│   │   │   │   │   ├── PhoneHome.o
+│   │   │   │   │   ├── QuickIndex.o
+│   │   │   │   │   ├── Random.o
+│   │   │   │   │   ├── ReferenceSequence.o
+│   │   │   │   │   ├── STLUtilities.o
+│   │   │   │   │   ├── SmithWaterman.o
+│   │   │   │   │   ├── Sort.o
+│   │   │   │   │   ├── StatGenStatus.o
+│   │   │   │   │   ├── StringAlias.o
+│   │   │   │   │   ├── StringArray.o
+│   │   │   │   │   ├── StringBasics.o
+│   │   │   │   │   ├── StringHash.o
+│   │   │   │   │   ├── StringMap.o
+│   │   │   │   │   ├── Tabix.o
+│   │   │   │   │   ├── UncompressedFileType.o
+│   │   │   │   │   └── glfHandler.o
+│   │   │   │   ├── glfHandler.o
+│   │   │   │   └── profile
+│   │   │   │       ├── BaseAsciiMap.o
+│   │   │   │       ├── BaseQualityHelper.o
+│   │   │   │       ├── BaseUtilities.o
+│   │   │   │       ├── BasicHash.o
+│   │   │   │       ├── BgzfFileType.o
+│   │   │   │       ├── BgzfFileTypeRecovery.o
+│   │   │   │       ├── CharBuffer.o
+│   │   │   │       ├── Chromosome.o
+│   │   │   │       ├── Cigar.o
+│   │   │   │       ├── CigarRoller.o
+│   │   │   │       ├── Error.o
+│   │   │   │       ├── ErrorHandler.o
+│   │   │   │       ├── FileType.o
+│   │   │   │       ├── FortranFormat.o
+│   │   │   │       ├── GenomeSequence.o
+│   │   │   │       ├── GenotypeLists.o
+│   │   │   │       ├── GzipFileType.o
+│   │   │   │       ├── GzipHeader.o
+│   │   │   │       ├── Hash.o
+│   │   │   │       ├── IndexBase.o
+│   │   │   │       ├── Input.o
+│   │   │   │       ├── InputFile.o
+│   │   │   │       ├── IntArray.o
+│   │   │   │       ├── IntHash.o
+│   │   │   │       ├── LongLongCounter.o
+│   │   │   │       ├── MapFunction.o
+│   │   │   │       ├── MathMatrix.o
+│   │   │   │       ├── MathVector.o
+│   │   │   │       ├── MemoryAllocators.o
+│   │   │   │       ├── MemoryInfo.o
+│   │   │   │       ├── MemoryMap.o
+│   │   │   │       ├── MemoryMapArray.o
+│   │   │   │       ├── MiniDeflate.o
+│   │   │   │       ├── NonOverlapRegions.o
+│   │   │   │       ├── Parameters.o
+│   │   │   │       ├── Pedigree.o
+│   │   │   │       ├── PedigreeAlleleFreq.o
+│   │   │   │       ├── PedigreeDescription.o
+│   │   │   │       ├── PedigreeFamily.o
+│   │   │   │       ├── PedigreeGlobals.o
+│   │   │   │       ├── PedigreeLoader.o
+│   │   │   │       ├── PedigreePerson.o
+│   │   │   │       ├── PedigreeTrim.o
+│   │   │   │       ├── PedigreeTwin.o
+│   │   │   │       ├── PhoneHome.o
+│   │   │   │       ├── QuickIndex.o
+│   │   │   │       ├── Random.o
+│   │   │   │       ├── ReferenceSequence.o
+│   │   │   │       ├── STLUtilities.o
+│   │   │   │       ├── SmithWaterman.o
+│   │   │   │       ├── Sort.o
+│   │   │   │       ├── StatGenStatus.o
+│   │   │   │       ├── StringAlias.o
+│   │   │   │       ├── StringArray.o
+│   │   │   │       ├── StringBasics.o
+│   │   │   │       ├── StringHash.o
+│   │   │   │       ├── StringMap.o
+│   │   │   │       ├── Tabix.o
+│   │   │   │       ├── UncompressedFileType.o
+│   │   │   │       └── glfHandler.o
+│   │   │   └── test
+│   │   │       ├── Chromosome_test.cpp
+│   │   │       ├── GenomeSequence_test.cpp
+│   │   │       ├── GreedyTupleAligner_test.cpp
+│   │   │       ├── Makefile
+│   │   │       ├── STLUtilities_test.cpp
+│   │   │       ├── TrimSequence_test.cpp
+│   │   │       ├── baseUtilitiesTest
+│   │   │       │   ├── BaseUtilitiesTest.cpp
+│   │   │       │   ├── BaseUtilitiesTest.h
+│   │   │       │   └── Makefile
+│   │   │       ├── cigar
+│   │   │       │   ├── CigarRollerTest.cpp
+│   │   │       │   ├── CigarRollerTest.h
+│   │   │       │   └── Makefile
+│   │   │       ├── dbsnp
+│   │   │       │   ├── Main.cpp
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── expected
+│   │   │       │   │   └── results.txt
+│   │   │       │   └── testFiles
+│   │   │       │       ├── chr1_partial-bs.umfa
+│   │   │       │       ├── chr1_partial.fa
+│   │   │       │       ├── dbsnp.vcf
+│   │   │       │       └── dbsnp.vcf.gz
+│   │   │       ├── gtest.cpp
+│   │   │       ├── inputFileTest
+│   │   │       │   ├── InputFileTest.cpp
+│   │   │       │   ├── InputFileTest.h
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── data
+│   │   │       │   │   ├── InputFileTest.bam
+│   │   │       │   │   ├── InputFileTest.glf
+│   │   │       │   │   ├── InputFileTest.gz
+│   │   │       │   │   ├── InputFileTest.txt
+│   │   │       │   │   ├── InputFileTest2.gz
+│   │   │       │   │   ├── InputFileTest2.txt
+│   │   │       │   │   ├── InputFileTestLarge.bam
+│   │   │       │   │   ├── InputFileTestLarge.glf
+│   │   │       │   │   ├── InputFileTestLarge.gz
+│   │   │       │   │   ├── InputFileTestLarge.txt
+│   │   │       │   │   ├── textFile.gz
+│   │   │       │   │   └── textFile.txt
+│   │   │       │   └── expected
+│   │   │       │       ├── results.log
+│   │   │       │       └── resultsNoZlib.log
+│   │   │       ├── memoryMapArrayTest
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── MemoryMapArrayTest.cpp
+│   │   │       │   └── MemoryMapArrayTest.h
+│   │   │       ├── nonOverlapRegions
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── NonOverlapRegionsTest.cpp
+│   │   │       │   ├── NonOverlapRegionsTest.h
+│   │   │       │   ├── expectedNonOverlapRegionsTest.txt
+│   │   │       │   └── results
+│   │   │       ├── packedVectorTest
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── PackedVectorTest.cpp
+│   │   │       │   └── PackedVectorTest.h
+│   │   │       ├── phiX.fa
+│   │   │       ├── referenceSequenceTest
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── ReferenceSequenceTest.cpp
+│   │   │       │   └── ReferenceSequenceTest.h
+│   │   │       ├── reusableVector
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── ReusableVectorTest.cpp
+│   │   │       │   └── ReusableVectorTest.h
+│   │   │       ├── string
+│   │   │       │   ├── Makefile
+│   │   │       │   ├── StringTest.cpp
+│   │   │       │   ├── StringTest.h
+│   │   │       │   └── testFiles
+│   │   │       │       └── testFile.txt
+│   │   │       ├── test_memmap_data.txt
+│   │   │       └── trimSequence
+│   │   │           ├── Makefile
+│   │   │           └── TrimSequence.cpp
+│   │   ├── include
+│   │   │   ├── BaseAsciiMap.h -> ../general/BaseAsciiMap.h
+│   │   │   ├── BaseQualityHelper.h -> ../general/BaseQualityHelper.h
+│   │   │   ├── BaseUtilities.h -> ../general/BaseUtilities.h
+│   │   │   ├── BasicHash.h -> ../general/BasicHash.h
+│   │   │   ├── BgzfFileType.h -> ../general/BgzfFileType.h
+│   │   │   ├── BgzfFileTypeRecovery.h -> ../general/BgzfFileTypeRecovery.h
+│   │   │   ├── CSG_MD5.h -> ../general/CSG_MD5.h
+│   │   │   ├── CharBuffer.h -> ../general/CharBuffer.h
+│   │   │   ├── Chromosome.h -> ../general/Chromosome.h
+│   │   │   ├── Cigar.h -> ../general/Cigar.h
+│   │   │   ├── CigarRoller.h -> ../general/CigarRoller.h
+│   │   │   ├── Constant.h -> ../general/Constant.h
+│   │   │   ├── Error.h -> ../general/Error.h
+│   │   │   ├── ErrorHandler.h -> ../general/ErrorHandler.h
+│   │   │   ├── FileType.h -> ../general/FileType.h
+│   │   │   ├── FortranFormat.h -> ../general/FortranFormat.h
+│   │   │   ├── Generic.h -> ../general/Generic.h
+│   │   │   ├── GenomeSequence.h -> ../general/GenomeSequence.h
+│   │   │   ├── GenomeSequenceHelpers.h -> ../general/GenomeSequenceHelpers.h
+│   │   │   ├── GenotypeLists.h -> ../general/GenotypeLists.h
+│   │   │   ├── GreedyTupleAligner.h -> ../general/GreedyTupleAligner.h
+│   │   │   ├── GzipFileType.h -> ../general/GzipFileType.h
+│   │   │   ├── GzipHeader.h -> ../general/GzipHeader.h
+│   │   │   ├── Hash.h -> ../general/Hash.h
+│   │   │   ├── IndexBase.h -> ../general/IndexBase.h
+│   │   │   ├── InplaceMerge.h -> ../general/InplaceMerge.h
+│   │   │   ├── Input.h -> ../general/Input.h
+│   │   │   ├── InputFile.h -> ../general/InputFile.h
+│   │   │   ├── IntArray.h -> ../general/IntArray.h
+│   │   │   ├── IntHash.h -> ../general/IntHash.h
+│   │   │   ├── LongHash.h -> ../general/LongHash.h
+│   │   │   ├── LongInt.h -> ../general/LongInt.h
+│   │   │   ├── LongLongCounter.h -> ../general/LongLongCounter.h
+│   │   │   ├── MapFunction.h -> ../general/MapFunction.h
+│   │   │   ├── MathConstant.h -> ../general/MathConstant.h
+│   │   │   ├── MathMatrix.h -> ../general/MathMatrix.h
+│   │   │   ├── MathVector.h -> ../general/MathVector.h
+│   │   │   ├── MemoryAllocators.h -> ../general/MemoryAllocators.h
+│   │   │   ├── MemoryInfo.h -> ../general/MemoryInfo.h
+│   │   │   ├── MemoryMap.h -> ../general/MemoryMap.h
+│   │   │   ├── MemoryMapArray.h -> ../general/MemoryMapArray.h
+│   │   │   ├── MiniDeflate.h -> ../general/MiniDeflate.h
+│   │   │   ├── NonOverlapRegions.h -> ../general/NonOverlapRegions.h
+│   │   │   ├── PackedVector.h -> ../general/PackedVector.h
+│   │   │   ├── Parameters.h -> ../general/Parameters.h
+│   │   │   ├── Pedigree.h -> ../general/Pedigree.h
+│   │   │   ├── PedigreeAlleleFreq.h -> ../general/PedigreeAlleleFreq.h
+│   │   │   ├── PedigreeAlleles.h -> ../general/PedigreeAlleles.h
+│   │   │   ├── PedigreeDescription.h -> ../general/PedigreeDescription.h
+│   │   │   ├── PedigreeFamily.h -> ../general/PedigreeFamily.h
+│   │   │   ├── PedigreeGlobals.h -> ../general/PedigreeGlobals.h
+│   │   │   ├── PedigreePerson.h -> ../general/PedigreePerson.h
+│   │   │   ├── Performance.h -> ../general/Performance.h
+│   │   │   ├── PhoneHome.h -> ../general/PhoneHome.h
+│   │   │   ├── QuickIndex.h -> ../general/QuickIndex.h
+│   │   │   ├── Random.h -> ../general/Random.h
+│   │   │   ├── ReferenceSequence.h -> ../general/ReferenceSequence.h
+│   │   │   ├── ReusableVector.h -> ../general/ReusableVector.h
+│   │   │   ├── STLUtilities.h -> ../general/STLUtilities.h
+│   │   │   ├── SimpleStats.h -> ../general/SimpleStats.h
+│   │   │   ├── SmithWaterman.h -> ../general/SmithWaterman.h
+│   │   │   ├── Sort.h -> ../general/Sort.h
+│   │   │   ├── StatGenStatus.h -> ../general/StatGenStatus.h
+│   │   │   ├── StringAlias.h -> ../general/StringAlias.h
+│   │   │   ├── StringArray.h -> ../general/StringArray.h
+│   │   │   ├── StringBasics.h -> ../general/StringBasics.h
+│   │   │   ├── StringHash.h -> ../general/StringHash.h
+│   │   │   ├── StringMap.h -> ../general/StringMap.h
+│   │   │   ├── Tabix.h -> ../general/Tabix.h
+│   │   │   ├── TrimSequence.h -> ../general/TrimSequence.h
+│   │   │   ├── UncompressedFileType.h -> ../general/UncompressedFileType.h
+│   │   │   ├── UnitTest.h -> ../general/UnitTest.h
+│   │   │   ├── VcfFile.h -> ../vcf/VcfFile.h
+│   │   │   ├── VcfFileReader.h -> ../vcf/VcfFileReader.h
+│   │   │   ├── VcfFileWriter.h -> ../vcf/VcfFileWriter.h
+│   │   │   ├── VcfGenotypeField.h -> ../vcf/VcfGenotypeField.h
+│   │   │   ├── VcfGenotypeFormat.h -> ../vcf/VcfGenotypeFormat.h
+│   │   │   ├── VcfGenotypeSample.h -> ../vcf/VcfGenotypeSample.h
+│   │   │   ├── VcfHeader.h -> ../vcf/VcfHeader.h
+│   │   │   ├── VcfHelper.h -> ../vcf/VcfHelper.h
+│   │   │   ├── VcfRecord.h -> ../vcf/VcfRecord.h
+│   │   │   ├── VcfRecordDiscardRules.h -> ../vcf/VcfRecordDiscardRules.h
+│   │   │   ├── VcfRecordField.h -> ../vcf/VcfRecordField.h
+│   │   │   ├── VcfRecordFilter.h -> ../vcf/VcfRecordFilter.h
+│   │   │   ├── VcfRecordGenotype.h -> ../vcf/VcfRecordGenotype.h
+│   │   │   ├── VcfRecordInfo.h -> ../vcf/VcfRecordInfo.h
+│   │   │   ├── VcfSubsetSamples.h -> ../vcf/VcfSubsetSamples.h
+│   │   │   ├── bam.h -> ../samtools/bam.h
+│   │   │   ├── bgzf.h -> ../samtools/bgzf.h
+│   │   │   ├── glfHandler.h -> ../general/glfHandler.h
+│   │   │   ├── khash.h -> ../samtools/khash.h
+│   │   │   └── knetfile.h -> ../samtools/knetfile.h
+│   │   ├── libStatGen.a
+│   │   ├── libStatGen_debug.a
+│   │   ├── libStatGen_profile.a
+│   │   ├── samtools
+│   │   │   ├── COPYING
+│   │   │   ├── Makefile
+│   │   │   ├── Makefile.depends
+│   │   │   ├── README.txt
+│   │   │   ├── bam.h
+│   │   │   ├── bgzf.c
+│   │   │   ├── bgzf.h
+│   │   │   ├── khash.h
+│   │   │   ├── knetfile.c
+│   │   │   ├── knetfile.h
+│   │   │   └── obj
+│   │   │       ├── bgzf.o
+│   │   │       ├── debug
+│   │   │       │   ├── bgzf.o
+│   │   │       │   └── knetfile.o
+│   │   │       ├── knetfile.o
+│   │   │       └── profile
+│   │   │           ├── bgzf.o
+│   │   │           └── knetfile.o
+│   │   └── vcf
+│   │       ├── Makefile
+│   │       ├── VcfFile.cpp
+│   │       ├── VcfFile.h
+│   │       ├── VcfFileReader.cpp
+│   │       ├── VcfFileReader.h
+│   │       ├── VcfFileWriter.cpp
+│   │       ├── VcfFileWriter.h
+│   │       ├── VcfGenotypeField.cpp
+│   │       ├── VcfGenotypeField.h
+│   │       ├── VcfGenotypeFormat.cpp
+│   │       ├── VcfGenotypeFormat.h
+│   │       ├── VcfGenotypeSample.cpp
+│   │       ├── VcfGenotypeSample.h
+│   │       ├── VcfHeader.cpp
+│   │       ├── VcfHeader.h
+│   │       ├── VcfHelper.cpp
+│   │       ├── VcfHelper.h
+│   │       ├── VcfRecord.cpp
+│   │       ├── VcfRecord.h
+│   │       ├── VcfRecordDiscardRules.cpp
+│   │       ├── VcfRecordDiscardRules.h
+│   │       ├── VcfRecordField.cpp
+│   │       ├── VcfRecordField.h
+│   │       ├── VcfRecordFilter.cpp
+│   │       ├── VcfRecordFilter.h
+│   │       ├── VcfRecordGenotype.cpp
+│   │       ├── VcfRecordGenotype.h
+│   │       ├── VcfRecordInfo.cpp
+│   │       ├── VcfRecordInfo.h
+│   │       ├── VcfSubsetSamples.cpp
+│   │       ├── VcfSubsetSamples.h
+│   │       ├── obj
+│   │       │   ├── VcfFile.o
+│   │       │   ├── VcfFileReader.o
+│   │       │   ├── VcfFileWriter.o
+│   │       │   ├── VcfGenotypeField.o
+│   │       │   ├── VcfGenotypeFormat.o
+│   │       │   ├── VcfGenotypeSample.o
+│   │       │   ├── VcfHeader.o
+│   │       │   ├── VcfHelper.o
+│   │       │   ├── VcfRecord.o
+│   │       │   ├── VcfRecordDiscardRules.o
+│   │       │   ├── VcfRecordField.o
+│   │       │   ├── VcfRecordFilter.o
+│   │       │   ├── VcfRecordGenotype.o
+│   │       │   ├── VcfRecordInfo.o
+│   │       │   ├── VcfSubsetSamples.o
+│   │       │   ├── debug
+│   │       │   │   ├── VcfFile.o
+│   │       │   │   ├── VcfFileReader.o
+│   │       │   │   ├── VcfFileWriter.o
+│   │       │   │   ├── VcfGenotypeField.o
+│   │       │   │   ├── VcfGenotypeFormat.o
+│   │       │   │   ├── VcfGenotypeSample.o
+│   │       │   │   ├── VcfHeader.o
+│   │       │   │   ├── VcfHelper.o
+│   │       │   │   ├── VcfRecord.o
+│   │       │   │   ├── VcfRecordDiscardRules.o
+│   │       │   │   ├── VcfRecordField.o
+│   │       │   │   ├── VcfRecordFilter.o
+│   │       │   │   ├── VcfRecordGenotype.o
+│   │       │   │   ├── VcfRecordInfo.o
+│   │       │   │   └── VcfSubsetSamples.o
+│   │       │   └── profile
+│   │       │       ├── VcfFile.o
+│   │       │       ├── VcfFileReader.o
+│   │       │       ├── VcfFileWriter.o
+│   │       │       ├── VcfGenotypeField.o
+│   │       │       ├── VcfGenotypeFormat.o
+│   │       │       ├── VcfGenotypeSample.o
+│   │       │       ├── VcfHeader.o
+│   │       │       ├── VcfHelper.o
+│   │       │       ├── VcfRecord.o
+│   │       │       ├── VcfRecordDiscardRules.o
+│   │       │       ├── VcfRecordField.o
+│   │       │       ├── VcfRecordFilter.o
+│   │       │       ├── VcfRecordGenotype.o
+│   │       │       ├── VcfRecordInfo.o
+│   │       │       └── VcfSubsetSamples.o
+│   │       └── test
+│   │           ├── Main.cpp
+│   │           ├── Makefile
+│   │           ├── VcfFileTest.cpp
+│   │           ├── VcfFileTest.h
+│   │           ├── VcfHeaderTest.cpp
+│   │           ├── VcfHeaderTest.h
+│   │           ├── expected
+│   │           │   ├── vcfFileNoInfo.vcf
+│   │           │   ├── vcfFileNoInfoBGZF.vcf
+│   │           │   ├── vcfFileNoInfoKeepGQHQ.vcf
+│   │           │   ├── vcfFileNoInfoKeepGT.vcf
+│   │           │   └── vcfHeader.vcf
+│   │           ├── results
+│   │           └── testFiles
+│   │               ├── exclude2.txt
+│   │               ├── excludeIDs.txt
+│   │               ├── includeIDs.txt
+│   │               ├── subset1.txt
+│   │               ├── subset2.txt
+│   │               ├── testTabix.vcf
+│   │               ├── testTabix.vcf.bgzf
+│   │               ├── testTabix.vcf.bgzf.tbi
+│   │               ├── testTabixBadIndex.vcf.bgzf
+│   │               ├── testTabixBadIndex.vcf.bgzf.tbi
+│   │               └── vcfFile.vcf
+│   ├── logging.cc
+│   ├── logging.hh
+│   ├── module-bits.and.pieces
+│   │   ├── ASSERT.hh
+│   │   ├── DIE.hh
+│   │   ├── PP.hh
+│   │   ├── assertVERYCLOSE.hh
+│   │   ├── utils.cc
+│   │   └── utils.hh
+│   ├── module-format
+│   │   └── format.hh
+│   ├── module-mvn
+│   │   ├── mvn.cc
+│   │   └── mvn.hh
+│   ├── module-range
+│   │   ├── orange.hh
+│   │   ├── range.hh
+│   │   ├── range_action.hh
+│   │   ├── range_from.hh
+│   │   ├── range_view.hh
+│   │   └── test.orange.cc
+│   ├── mvn -> module-mvn
+│   ├── options.cc
+│   ├── options.hh
+│   ├── range -> module-range
+│   ├── ssimp.cc
+│   ├── usage_special.cc
+│   ├── usage_special.hh
+│   ├── vcfGTz.cc
+│   └── vcfGTz_reader.hh
+├── ssimp_chunks.sh
+├── stu
+│   ├── buffer.hh
+│   ├── color.hh
+│   ├── dependency.hh
+│   ├── error.hh
+│   ├── execution.hh
+│   ├── format.hh
+│   ├── job.hh
+│   ├── link.hh
+│   ├── options.hh
+│   ├── parser.hh
+│   ├── rule.hh
+│   ├── stu.cc
+│   ├── target.hh
+│   ├── text.hh
+│   ├── timestamp.hh
+│   ├── token.hh
+│   ├── tokenizer.hh
+│   └── version.hh
+├── tests
+│   ├── 3.chromosomes
+│   │   └── UKB.every100
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       └── output.actual
+│   ├── errors.and.logging
+│   │   └── log
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       ├── log.txt
+│   │       ├── output.actual
+│   │       ├── output.stderr
+│   │       └── tag.data.used.here.tsv
+│   ├── full1KG.EUR.Wood
+│   │   ├── command.template
+│   │   └── some_plots
+│   │       └── some_plots.R
+│   ├── impute.maf
+│   │   └── 0.05
+│   │       ├── a.list.of.snps.txt
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       └── output.actual
+│   ├── impute.range
+│   │   ├── chr1_1000000-chr1_2000000
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   └── output.actual
+│   │   ├── chr2
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   └── output.actual
+│   │   └── chr2-3
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       └── output.actual
+│   ├── lambda
+│   │   ├── 0.001
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── 0.0891756
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── 0.999
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── 2sqrtn
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   └── default
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       ├── output.actual
+│   │       └── tag.data.used.here.tsv
+│   ├── lambda1.0
+│   │   ├── command
+│   │   ├── imputations.txt
+│   │   └── output.actual
+│   ├── missingness.chr22
+│   │   ├── dep
+│   │   │   ├── command
+│   │   │   └── output.actual
+│   │   ├── ind
+│   │   │   ├── command
+│   │   │   └── output.actual
+│   │   ├── none
+│   │   │   ├── command
+│   │   │   └── output.actual
+│   │   └── some_plots.R
+│   ├── missingness.partchr22
+│   │   └── none
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       ├── output.actual
+│   │       └── tag.data.used.here.tsv
+│   ├── missingness1
+│   │   ├── dep
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── ind
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── none
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   └── some_plots.R
+│   ├── r-function.R
+│   ├── sub1KG-chr19-18M
+│   │   ├── dense.tags
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   └── dense.tags.reimputeall
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       ├── output.actual
+│   │       └── tag.data.used.here.tsv
+│   ├── sub1KG-tiny
+│   │   ├── EUR.via.filter.all22
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── EUR.via.filter.all22..impute.maf
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── EUR.via.filter.all22..impute.range
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── EUR.via.filter.all22..impute.snps
+│   │   │   ├── _--impute.snps
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── EUR.via.filter.all22..tag.maf
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── EUR.via.filter.all22..tag.range
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── EUR.via.filter.all22..tag.snps
+│   │   │   ├── _--impute.snps
+│   │   │   ├── _--tag.snps
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── EUR.via.filter.all22.reimputeall
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   └── EUR.via.filter.chr4.5
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       ├── output.actual
+│   │       └── tag.data.used.here.tsv
+│   ├── swapping
+│   │   ├── swap.just.the.allele.headers
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   └── output.actual
+│   │   ├── swap.some.alleles
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   └── output.actual
+│   │   └── swap.some.alleles.and.their.zs
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       └── output.actual
+│   ├── tags.maf
+│   │   └── tags.maf.0.01
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       └── output.actual
+│   ├── tags.range
+│   │   ├── chr1_1000000-chr1_2000000
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   ├── output.actual
+│   │   │   └── tag.data.used.here.tsv
+│   │   ├── chr2
+│   │   │   ├── command
+│   │   │   ├── imputations.txt
+│   │   │   └── output.actual
+│   │   └── chr2-3
+│   │       ├── command
+│   │       ├── imputations.txt
+│   │       └── output.actual
+│   ├── test.whatever
+│   │   ├── command
+│   │   ├── imputations.txt
+│   │   └── output.actual
+│   ├── test.wood
+│   │   ├── command
+│   │   ├── imputations.txt
+│   │   ├── output.actual
+│   │   └── tag.data.used.here.tsv
+│   ├── test.wood.R
+│   │   ├── command
+│   │   ├── imputations.txt
+│   │   ├── imputations_tag.txt
+│   │   ├── log.txt
+│   │   ├── output.actual
+│   │   └── test.wood.R
+│   ├── test0
+│   │   ├── command
+│   │   ├── imputations.txt
+│   │   ├── output.actual
+│   │   └── tag.data.used.here.tsv
+│   └── test0.R
+│       ├── command
+│       ├── imputations.txt
+│       ├── imputations_tag.txt
+│       ├── log.txt
+│       ├── output.actual
+│       └── test0.R
+├── tests.compare
+│   └── COMP.wood.txt
+├── tests.compare.R
+├── tests.stu
+└── transform_z_to_b.R
+
+129 directories, 961 files
