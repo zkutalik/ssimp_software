@@ -2,3 +2,6 @@ Versions of ssimp
 
 
 ssimp-0.1       first release (2017-08-18)
+ssimp-0.2       (2018-01-09)
+		efficient imputation of single SNPs
+		added script that allows multiprocessing

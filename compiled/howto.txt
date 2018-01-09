@@ -1,8 +1,8 @@
 ## on LINUX (e.g. HPC1)
 
 stu bin/ssimp-static   # to build the statically-linked version of the executable
-cp bin/ssimp-static compiled/ssimp-linux-0.1
-git add compiled/ssimp-linux-0.1
+cp bin/ssimp-static compiled/ssimp-linux-VERSION
+git add compiled/ssimp-linux-VERSION
 git commit -m "statically-linked executable for LINUX"
 
 
@@ -16,6 +16,6 @@ The 'crt' library was our problem and it appears that Apple refuse to make a sta
 (aaron email 2017-08-25)
 
 stu bin/ssimp  # to build the statically-linked version of the executable
-cp bin/ssimp compiled/ssimp-osx-0.1
-git add compiled/ssimp-osx-0.1
+cp bin/ssimp compiled/ssimp-osx-VERSION
+git add compiled/ssimp-osx-VERSION
 git commit -m "executable for OSX"
