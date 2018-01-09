@@ -47,11 +47,16 @@ Create a folder `reference_panels` and move the file there.
 
 (5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panel`). Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
 
-(6) In order to use multi-core processors, download the follwing file and run `ssimp_chunks.R` that will create you a bash script file.
+(6) In order to impute single SNPs efficiently, download the following file to the sub-folder `reference_panels`:
 
-`wget https://drive.switch.ch/index.php/s/1ZT3VD3I2y74lAe/download -O dbsnp_hg20_chr_pos.txt.gz`
+`wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O dbsnp_hg20_chr_pos.txt.gz`
 
-Move this file to the folder `reference_panels`
+
+## Warning about the size of the software 
+[//]: -------------------------------
+While the github folder itself is rather small (136 MB), the folder `reference_panels` uses 1.7 GB and `ref_panels` nearly 15 GB. 
+
+Be careful when running the software in parallel!
 
 
 
