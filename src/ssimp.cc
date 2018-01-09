@@ -498,6 +498,14 @@ It appears that 'wget' does not exist on your system. You should install it and 
     DIE("As described above, 1000genomes reference panel not in the expected location");
 }
 
+// computes pvalue // added by sina
+double normalCFD(double value)
+{
+  return erfc(abs(value) * M_SQRT1_2);
+}
+
+
+
 int main(int argc, char **argv) {
     if(argc==1) {
         exitWithUsage();
@@ -927,6 +935,9 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << "maf"
                         << '\t' << "r2.pred"
                         << '\t' << "lambda"
+   						<< '\t' << "N_imp"
+                        << '\t' << "P_imp"
+                        << '\t' << "bst_imp"
                         << '\t' << "Z_reimputed"
                         << '\t' << "r2_reimputed"
                         << endl;
@@ -1385,8 +1396,11 @@ void impute_all_the_regions(   string                                   filename
                     auto SNPname = target->ID;
 
                     auto imp_qual = imp_quals_corrected.at(i);
-
+  					auto N_imp = N_max * imp_qual; // added by SR, only calc when N provided. 
+                   
                     auto z_imp = c_Cinv_zs(i);
+ 					auto P_imp = normalCFD(z_imp); // added by SR
+                    auto bst_imp = z_imp/sqrt(N_imp); // added by SR
                     double Z_reimputed = std::nan("");
                     double r2_reimputed = std::nan("");
 
@@ -1418,6 +1432,9 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << target->maf
                         << '\t' << imp_qual
                         << '\t' << lambda
+ 						<< '\t' << N_imp
+                        << '\t' << P_imp
+                        << '\t' << bst_imp
                         << '\t' << (std::isnan( Z_reimputed) ? "" : AMD_FORMATTED_STRING("{0}",  Z_reimputed))
                         << '\t' << (std::isnan(r2_reimputed) ? "" : AMD_FORMATTED_STRING("{0}", r2_reimputed))
                         << endl;
