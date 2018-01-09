@@ -36,7 +36,7 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 `--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed.
 
-`--tag.snp [no default]` filename with a list of tag SNPs (each SNP has a new line, no header). For magic in bash see `Note` below. !!!This option is currently extremely slow!!!.
+`--tag.snp [no default]` filename with a list of tag SNPs (each SNP has a new line, no header). For magic in bash see `Note` below.
 
 `--impute.snp [NULL]` filename to define SNPs to impute (each SNP has a new line, no header). For magic in bash see `Note` below.
 
