@@ -349,7 +349,7 @@ static
 reimputed_tags_in_this_window_t
 reimpute_tags_one_by_one   (   mvn:: SquareMatrix const & C
                                 , mvn:: SquareMatrix const & C_inv
-                                , mvn:: SquareMatrix const & C1e8_inv
+                                //                  , mvn:: SquareMatrix const & C1e8_inv // used to cacl number of effective tests
                                 , std:: vector<double> const & tag_zs_
                                 , std:: vector<RefRecord const *> const & rrs
                                 , int const N_ref
@@ -1348,7 +1348,7 @@ void impute_all_the_regions(   string                                   filename
             // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
             reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
             if  (do_reimputation_in_this_window) {
-                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_1e8lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
+                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda); //invert_a_matrix(C_1e8lambda), s
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
