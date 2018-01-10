@@ -99,6 +99,15 @@ A more complex example with SNPs from two different chromosomes:
 rs78808100 | tr ' ' '\n')`
 
 
+
+### Imputing SNPs on the X-chromosome
+[//]: -------------------------------
+
+This is currently not possible. 
+
+To speed up imputation of single SNPs, we needed to combine different reference panel builds from 1000 genome, that contains no sex chromosomes. 
+
+
 ### Use a set of tag SNPs
 [//]: -------------------------------
 
