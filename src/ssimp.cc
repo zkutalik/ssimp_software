@@ -486,6 +486,7 @@ It appears that 'wget' exists on your system. Would you like me to run the above
                 ,"cd       ~/reference_panels/1000genomes && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'"
+                ,"cd       ~/reference_panels             && wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin"
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
