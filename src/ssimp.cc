@@ -137,7 +137,7 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
     std:: ifstream f_database_of_builds(path_to_build_database);
     if(!f_database_of_builds) {
         DIE("Necessary file missing ["
-                << path_to_build_database 
+                << path_to_build_database
                 << "]. "
                 <<
 R"(Please download it with the following commands:
@@ -557,7 +557,6 @@ int main(int argc, char **argv) {
         options:: opt_raw_ref       = options:: opt_non_options.at(1);
         options:: opt_out           = options:: opt_non_options.at(2);
     }
-    //if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) { auto database_of_builds = ssimp:: load_database_of_builds();
 
     // Next we deal with the fact that the ref panel argument is
     // very special. If it begins with '1KG/', then we take the following
