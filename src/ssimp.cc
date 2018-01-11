@@ -12,6 +12,7 @@
 #include <gsl/gsl_vector.h>
 #include<gsl/gsl_blas.h>
 #include<gsl/gsl_eigen.h>
+#include<gsl/gsl_cdf.h>
 
 #include <sys/types.h> // for 'opendir'
 #include <dirent.h> // for 'opendir'
@@ -929,6 +930,9 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << "lambda"
                         << '\t' << "Z_reimputed"
                         << '\t' << "r2_reimputed"
+                        << '\t' << "P.imp"
+                        << '\t' << "N.imp"
+                        << '\t' << "bst.imp"
                         << endl;
     }
 
@@ -1419,6 +1423,9 @@ void impute_all_the_regions(   string                                   filename
                         << '\t' << lambda
                         << '\t' << (std::isnan( Z_reimputed) ? "" : AMD_FORMATTED_STRING("{0}",  Z_reimputed))
                         << '\t' << (std::isnan(r2_reimputed) ? "" : AMD_FORMATTED_STRING("{0}", r2_reimputed))
+                        << '\t' << 2.0*gsl_cdf_gaussian_P(-std::abs(z_imp), 1)      // P.imp
+                        << '\t' << N_max * imp_qual                                 // N.imp
+                        << '\t' << z_imp / std::sqrt(N_max*imp_qual)                // bst.imp
                         << endl;
             }
 
