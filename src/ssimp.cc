@@ -455,7 +455,7 @@ Please download it with:
 
     cd       ~/reference_panels
     wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
-)", panel_file_name));
+)", blddb_file_name));
 
     if(directory_already_exists && !both_files_already_exist) // actually, I don't expect this to ever happen. Except perhaps if the download of 1KG was interrupted part way
         DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the panel file is missing. [{0}]", panel_file_name));
