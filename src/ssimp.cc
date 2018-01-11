@@ -438,14 +438,26 @@ void download_1KG_ifneeded() {
 
     auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
     auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"                               , getenv("HOME"));
 
     bool directory_already_exists       = opendir( directory.c_str() );
     bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
+    bool blddb_file_name_already_exists = std:: fopen( blddb_file_name.c_str(), "r" );
+    bool both_files_already_exist = panel_file_name_already_exists && blddb_file_name_already_exists;
 
-    if(directory_already_exists && panel_file_name_already_exists)
+    if(directory_already_exists && both_files_already_exist)
         return; // all good, proceed as normal
 
-    if(directory_already_exists && !panel_file_name_already_exists)
+    if(directory_already_exists && panel_file_name_already_exists && !blddb_file_name_already_exists)
+        DIE(AMD_FORMATTED_STRING(R"(The directory for 1000genomes seems to exist, but the build database file is missing. [{0}].
+
+Please download it with:
+
+    cd       ~/reference_panels
+    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+)", panel_file_name));
+
+    if(directory_already_exists && !both_files_already_exist) // actually, I don't expect this to ever happen. Except perhaps if the download of 1KG was interrupted part way
         DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the panel file is missing. [{0}]", panel_file_name));
 
     assert(!directory_already_exists); // here because it doesn't exist and is needed. Need to help the user download it
@@ -545,6 +557,7 @@ int main(int argc, char **argv) {
         options:: opt_raw_ref       = options:: opt_non_options.at(1);
         options:: opt_out           = options:: opt_non_options.at(2);
     }
+    //if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) { auto database_of_builds = ssimp:: load_database_of_builds();
 
     // Next we deal with the fact that the ref panel argument is
     // very special. If it begins with '1KG/', then we take the following
