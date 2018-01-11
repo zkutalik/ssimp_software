@@ -456,6 +456,8 @@ If you have not already downloaded it, and you have 'wget' available on your sys
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'
+    cd       ~/reference_panels
+    test -f database.of.builds.1kg.uk10k.hrc.bin || wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
 
 This takes up nearly 15 gigabytes of disk space.
 )";
