@@ -136,7 +136,17 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
     std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"          , getenv("HOME"));
     std:: ifstream f_database_of_builds(path_to_build_database);
     if(!f_database_of_builds) {
-        DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the build database file is missing. [{0}]", path_to_build_database));
+        DIE("Necessary file missing ["
+                << path_to_build_database 
+                << "]. "
+                <<
+R"(Please download it with the following commands:
+
+    cd       ~/reference_panels
+    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+)"
+                );
+
     }
     std:: vector<IDchrmThreePos> database_of_builds;
     int lastrs = 0; // to confirm it is increasing
