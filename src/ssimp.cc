@@ -1310,9 +1310,9 @@ void impute_all_the_regions(   string                                   filename
 
             // Apply lambda
             auto                C_lambda        = apply_lambda_square(C_nolambda, lambda);
-            auto                C_1e8lambda     = apply_lambda_square(C_nolambda, 1e-8);
+            auto                C_1e8lambda     = apply_lambda_square(C_nolambda, lambda);
             auto                c_lambda        = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
-            auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, 1e-8);
+            auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
 
 
             if(options:: opt_missingness != options:: opt_missingness_t:: NAIVE) {
