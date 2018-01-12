@@ -39,13 +39,7 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-(5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panels`). Check out `Download 1000 genomes reference panel` below to download and install a reference panel. 
-
-(6) Download the dataset that allows you fast imputation of single SNPs. 
-
-`wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.bin`
-
-Move it into the same folder as (5) (`reference_panels` in your root).
+(5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panels` in your home directory). Check out `Download 1000 genomes reference panel` below to download. 
 
 
 
@@ -83,28 +77,20 @@ We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_softwar
 [//]: -------------------------------
 By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. 
 
-For example, if we want 1000 genomes to be downloaded and EUR population used for imputation, we type: 
-
-`bin/ssimp gwas/small.random.csv 1KG/EUR output.txt` 
-
 Make sure that:
 1) you have `wget` installed and
 2) no folder `reference_panels` exists.
 
-### Manual download
+For example, if we want 1000 genomes to be downloaded and EUR population used for imputation, we type: 
 
-Download the files in 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
-to a directory on your computer. 
+`bin/ssimp gwas/small.random.csv 1KG/EUR output.txt` 
 
-    cd ~                # to your home directory
-    mkdir -p ref_panels/1000genomes
-    cd       ref_panels/1000genomes
-    wget -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/'
+It will then download 1000 genomes reference panel **and** a file that enables fast imputation of single SNPs. 
 
 When using `ssimp` you can then pass this directory name to 'ssimp', and specify that only
 as subset of individuals (here AFR) should be used:
 
-`ssimp gwas.txt output.txt ~/ref_panels/1000genomes --sample.names super_pop=AFR`
+`ssimp gwas.txt output.txt ~/reference_panels/1000genomes --sample.names super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
