@@ -136,7 +136,17 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
     std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"          , getenv("HOME"));
     std:: ifstream f_database_of_builds(path_to_build_database);
     if(!f_database_of_builds) {
-        DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the build database file is missing. [{0}]", path_to_build_database));
+        DIE("Necessary file missing ["
+                << path_to_build_database
+                << "]. "
+                <<
+R"(Please download it with the following commands:
+
+    cd       ~/reference_panels
+    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+)"
+                );
+
     }
     std:: vector<IDchrmThreePos> database_of_builds;
     int lastrs = 0; // to confirm it is increasing
@@ -428,14 +438,26 @@ void download_1KG_ifneeded() {
 
     auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
     auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"                               , getenv("HOME"));
 
     bool directory_already_exists       = opendir( directory.c_str() );
     bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
+    bool blddb_file_name_already_exists = std:: fopen( blddb_file_name.c_str(), "r" );
+    bool both_files_already_exist = panel_file_name_already_exists && blddb_file_name_already_exists;
 
-    if(directory_already_exists && panel_file_name_already_exists)
+    if(directory_already_exists && both_files_already_exist)
         return; // all good, proceed as normal
 
-    if(directory_already_exists && !panel_file_name_already_exists)
+    if(directory_already_exists && panel_file_name_already_exists && !blddb_file_name_already_exists)
+        DIE(AMD_FORMATTED_STRING(R"(The directory for 1000genomes seems to exist, but the build database file is missing. [{0}].
+
+Please download it with:
+
+    cd       ~/reference_panels
+    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+)", blddb_file_name));
+
+    if(directory_already_exists && !both_files_already_exist) // actually, I don't expect this to ever happen. Except perhaps if the download of 1KG was interrupted part way
         DIE(AMD_FORMATTED_STRING("The directory for 1000genomes seems to exist, but the panel file is missing. [{0}]", panel_file_name));
 
     assert(!directory_already_exists); // here because it doesn't exist and is needed. Need to help the user download it
@@ -455,7 +477,9 @@ If you have not already downloaded it, and you have 'wget' available on your sys
     cd       ~/reference_panels/1000genomes
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
-    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
+    wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'
+    cd       ~/reference_panels
+    test -f database.of.builds.1kg.uk10k.hrc.bin || wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
 
 This takes up nearly 15 gigabytes of disk space.
 )";
@@ -474,6 +498,7 @@ It appears that 'wget' exists on your system. Would you like me to run the above
                 ,"cd       ~/reference_panels/1000genomes && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'"
+                ,"cd       ~/reference_panels             && wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin"
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
