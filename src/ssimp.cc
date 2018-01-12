@@ -1310,9 +1310,7 @@ void impute_all_the_regions(   string                                   filename
 
             // Apply lambda
             auto                C_lambda        = apply_lambda_square(C_nolambda, lambda);
-            auto                C_1e8lambda     = apply_lambda_square(C_nolambda, lambda);
             auto                c_lambda        = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
-            auto                c_1e8lambda     = apply_lambda_rect(c_nolambda, unk2_its, tag_its_, lambda);
 
 
             if(options:: opt_missingness != options:: opt_missingness_t:: NAIVE) {
@@ -1350,7 +1348,6 @@ void impute_all_the_regions(   string                                   filename
                     if(i!=j) {
                         auto delta_ij = current_missingness_policy(Nbig, Nsml, N_max); // *always* pass the big one in first
                         C_lambda.set   (i,j,  C_lambda   (i,j) * delta_ij);
-                        C_1e8lambda.set(i,j,  C_1e8lambda(i,j) * delta_ij);
                     }
                 }
             }
@@ -1365,7 +1362,6 @@ void impute_all_the_regions(   string                                   filename
                     assert(delta_ij > 0.0);
                     assert(delta_ij <= 1.0);
                     c_lambda.set   (i,j,  c_lambda   (i,j) * delta_ij);
-                    c_1e8lambda.set(i,j,  c_1e8lambda(i,j) * delta_ij);
                 }
             }
             // missingness has now been applied.
@@ -1373,20 +1369,20 @@ void impute_all_the_regions(   string                                   filename
             // Compute the imputations
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
 
-            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_1e8lambda);
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_lambda);
 
             // if necessary, do reimputation
             // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
             reimputed_tags_in_this_window_t reimputed_tags_in_this_window;
             if  (do_reimputation_in_this_window) {
-                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_1e8lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
+                reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
             }
             assert(ssize(reimputed_tags_in_this_window) == 0
                 || ssize(reimputed_tags_in_this_window) == number_of_tags);
 
 
             // Next few lines are for the imputation quality
-            auto C1e8inv_c1e8   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_1e8lambda)  , c_1e8lambda);
+            auto Cinv_c   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_lambda)  , c_lambda);
             vector<double> imp_quals_corrected; // using the 'number_of_effective_tests' thing
 
             for(int i=0; i<number_of_all_targets; ++i) {
@@ -1395,8 +1391,8 @@ void impute_all_the_regions(   string                                   filename
                                         // the diagonal of the imputation quality matrix.
                                         // This should be quicker than fully computing
                                         // c' * inv(C) * c
-                    auto lhs = gsl_matrix_const_submatrix(   c_1e8lambda.get(), i, 0, 1, number_of_tags);
-                    auto rhs = gsl_matrix_const_submatrix( C1e8inv_c1e8 .get(), 0, i, number_of_tags, 1);
+                    auto lhs = gsl_matrix_const_submatrix(   c_lambda.get(), i, 0, 1, number_of_tags);
+                    auto rhs = gsl_matrix_const_submatrix(     Cinv_c.get(), 0, i, number_of_tags, 1);
                     // TODO: Maybe move the next line into mvn.{hh,cc}?
                     const int res_0 = gsl_blas_dgemm (CblasNoTrans, CblasNoTrans, 1.0, &lhs.matrix, &rhs.matrix, 0, to_store_one_imputation_quality.get());
                     assert(res_0 == 0);
