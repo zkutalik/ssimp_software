@@ -154,13 +154,13 @@ The output file specified in `--out` file has the following columns:
 - `lambda` lambda used to penalise.
 - `Z_reimputed` imputed Z-statistics for tag SNPs for the first window (sanity check).
 - `r2_reimputed` imputation quality for the imputed tag SNPs of for the first window (sanity check).
+- `N.imp` Effective sample size after imputation (maximal sample size times the imputation quality (`r2.pred`))
+- `P.imp` Imputed P-value [2 x CDF(-|`z_imp`|)] (CDF = cumulative distribution function of the normal distribution)
+- `bst.imp` Imputed standardised effect size [`z_imp`/sqrt(`N_imp`)]
 
 Note that `Z_imp` reports the imputed Z-statistics for SNPs that were imputed (`origin = SSimp`), as well as the GWAS Z-statistics for tag SNPs (`origin = GWAS`). 
 
-Other summary statistics can be easily calculated from the output above:
-- `N_imp` Effective sample size after imputation (maximal sample size times the imputation quality (`r2.pred`))
-- `P_imp` Imputed P-value [2*CDF(-|`z_imp`|)]
-- `bst_imp` Imputed standardised effect size [`z_imp`/sqrt(`N_imp`)]
+The imputation quality (`r2.pred`) can become zero, which results in `N.imp=0` and `bst.imp=inf`.
 
 ## Method outline
 [//]: -------------------------------
