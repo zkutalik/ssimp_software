@@ -15,11 +15,11 @@ reference panel, with a population structure similar to your GWAS sample, must
 be downloaded by you.
 
 If you have already downloaded the 1000genomes reference panel (see below for
-more details) to '~/ref_panels/1000genomes', then you can run this:
+more details) to '~/reference_panels/1000genomes', then you can run this:
 
-    ssimp  gwas.txt  ~/ref_panels/1000genomes output.txt --sample.names super_pop=EUR
+    ssimp  gwas.txt  ~/reference_panels/1000genomes output.txt --sample.names super_pop=EUR
 
-    ssimp  gwas.txt  ~/ref_panels/1000genomes --out output.txt --sample.names super_pop=EUR
+    ssimp  gwas.txt  ~/reference_panels/1000genomes --out output.txt --sample.names super_pop=EUR
 
 
 Options:
@@ -70,7 +70,7 @@ bin/ssimp gwas/small.random.csv 1KG/EUR output.txt
 
 Make sure that:
 1) you have `wget` installed and
-2) no folder `ref_panels` exists yet.
+2) no folder `reference_panels` exists yet in your home directory. 
 
 
 Reference panel (simple instructions):
@@ -82,16 +82,20 @@ your web browser, but it is more convenient to use 'wget' on the command line
 if it is available on your machine:
 
     cd ~                # to your home directory
-    mkdir -p ref_panels/1000genomes
-    cd       ref_panels/1000genomes
+    mkdir -p reference_panels/1000genomes
+    cd       reference_panels/1000genomes
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'
 
+Additionally, download the dataset that allows you fast imputation of single SNPs.
+
+wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.bin
+
 You can then pass this directory name to 'ssimp', and specify that only
 the European individuals should be used:
 
-    ssimp  gwas.txt  output.txt  ~/ref_panels/1000genomes  --sample.names super_pop=EUR
+    ssimp  gwas.txt  output.txt  ~/reference_panels/1000genomes  --sample.names super_pop=EUR
 
 'super_pop=EUR' can be replaced with other (super-)populations if necessary. E.g.
 
@@ -111,8 +115,8 @@ specify the filename of the .vcf.gz files. If you have 22 separate .vcf.gz files
 direct ssimp to replace that string with the chromosome number. For example:
 
     ssimp  gwas.txt output.txt              \
-            ~/ref_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
-            --sample.names ~/ref_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
+            ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+            --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
 
 If the '--sample.names' option is not specified, all individuals in the
 .vcf.gz file will be used. This is inappropriate in some cases (for example
@@ -121,7 +125,7 @@ individuals that match the ancestry of your GWAS. You can use '--sample.names'
 in two ways. First, it can simply be a file with the sample IDs that you
 wish to use. The sample IDs are the column names in the .vcf.gz file.
 The second way is demonstrated in the example command line above, where you
-can append the basic filename ('~/ref_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel')
+can append the basic filename ('~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel')
 with a special extra string ('/sample/super_pop=EUR') which directs ssimp to use
 the sample IDs from the 'sample' column of that basic filename and only
 for the individuals with 'EUR' in the 'super_pop' field. This is a convenient
@@ -139,4 +143,4 @@ Rüeger, S., McDaid, A., Kutalik, Z. (2017). Improved imputation of summary stat
 Rüeger, S., McDaid, A., Kutalik, Z. (2017). Evaluation and application of summary statistic imputation to discover new height-associated loci bioRxiv. https://doi.org/10.1101/204560
 
 Copyright 2017.
-(Aaron McDaid, Sina Rüeger, Zoltán Kutalik, website link)
+(Aaron McDaid, Sina Rüeger, Zoltán Kutalik, https://github.com/sinarueeger/ssimp_software)
