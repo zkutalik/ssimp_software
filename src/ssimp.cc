@@ -1285,6 +1285,8 @@ void impute_all_the_regions(   string                                   filename
                     return 2.0 / sqrt(N_reference);
                 return utils:: lexical_cast<double>(options:: opt_lambda);
             }();
+            assert(lambda >= 0);
+            assert(lambda >  0);
 
             assert(number_of_all_targets == ssize(unk2_its));
 
