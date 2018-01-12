@@ -21,9 +21,9 @@ bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out o
 
     ## YES: Good!
         Is it 1000genomes?
-        ## YES: go to line 72 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
-        ## NO: go to line 89 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
+        ## YES: go to line 93 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
+        ## NO: go to line 114 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
 
-    ## NO: go to line 61 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
+    ## NO: go to line 62 in https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt
 
 
