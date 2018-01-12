@@ -56,6 +56,8 @@ If you use the 1000genomes dataset, then it is sufficient to read 'Reference pan
 (automatical download)'. If you want to use another reference panel, see 
 'Reference panel (complex instructions)' below for more details.
 
+The reference panel folder (named `reference_panels`) must be stored in the home directory.
+
 
 Reference panel (automatical download):
 
