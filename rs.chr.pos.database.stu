@@ -72,9 +72,9 @@ export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.build.bin"
     echo g++ -Wall -Wextra rs.chr.pos.database/build.the.binary.cc -o rs.chr.pos.database/build.the.binary -std=c++14
          g++ -Wall -Wextra rs.chr.pos.database/build.the.binary.cc -o rs.chr.pos.database/build.the.binary -std=c++14
     rs.chr.pos.database/build.the.binary                                                \
-        liftover/liftover_hg18.bed                                                      \
-        liftover/liftover_hg19.bed                                                      \
-        liftover/dbsnp_hg20.bed                                                         \
+        liftover/dbsnp/liftover_hg18.bed                                                      \
+        liftover/dbsnp/liftover_hg19.bed                                                      \
+        liftover/dbsnp/dbsnp_hg20.bed                                                         \
         rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt                                    \
         "$target".tmp
     mv  "$target".tmp "$target"
