@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
     ifstream  fs_uk10k(argv[3]);
     while(getline( fs_uk10k, line)) {
-        if(line == "chr,pos.b19,rs,alts,ref,aaf")
+        if(line, line.substr(0,27)  == "chr,pos.b19,rs,alts,ref,aaf")
             continue;
         try {
             auto split_on_commas = utils:: tokenize(line, ',');
