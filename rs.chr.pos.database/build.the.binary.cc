@@ -55,7 +55,8 @@ int main(int argc, char **argv) {
     }
 
     PP(three_builds_for_all_interesting_snps.size(), utils:: ELAPSED());
-    assert(three_builds_for_all_interesting_snps.size() == 88'047'858);
+    assert(three_builds_for_all_interesting_snps.size() == 88'047'858
+        || three_builds_for_all_interesting_snps.size() == 89'506'168);
 
     for(int argv_index : {1,2,3}) { // the filenames to hg18, hg19, and hg20
         PP(argv_index, argv[argv_index], utils:: ELAPSED());
@@ -106,14 +107,26 @@ int main(int argc, char **argv) {
                 //PP(chrom, posa, rs);
                 assert(posb == posa+1);
 
+                // try to find this snp in the database. The database started
+                // with nearly 90 million SNPs, but some might have been discarded
+                // already (see below) if two builds assigned the SNP to different chromosomes
                 auto entry = three_builds_for_all_interesting_snps.find(rs);
-                if(entry != three_builds_for_all_interesting_snps.end()) {
+                if(entry != three_builds_for_all_interesting_snps.end()) { // ... if it's in the database
+
+                    // We need to update the entry in the database with the data we've just
+                    // read from the liftover file
+
+                    // First, record the chromosome number if not already recorded
                     if(entry->second.chrom == -1) {
                         entry->second.chrom = chrom;
                     }
+
+                    // Second, if the chromosome contradicts that from an earlier build,
+                    // then erase this entry from the database and no longer consider this rs-number.
                     if(entry->second.chrom != chrom) {
                         PP(three_builds_for_all_interesting_snps.size(), line, split, chrom, entry->second.chrom);
-                        assert(chrom >= 1);
+                        assert(chrom >= 1 || chrom == -3 || chrom == -2);
+                        assert(chrom >= 1 || chrom == -3); // Actually, we're not considering Y for now
                         switch(entry->second.chrom) {
                             break; case int(three_builds_t:: XYZ:: CHROM_X): {}
                             break; case int(three_builds_t:: XYZ:: CHROM_Y): {}
@@ -126,6 +139,7 @@ int main(int argc, char **argv) {
                     }
                     assert(entry->second.chrom == chrom);
 
+                    // Finally, store the position in the appropriate place
                     int * position_under_current_build = nullptr;
                     switch(argv_index) {
                         break; case 1: position_under_current_build = & entry->second.hg18;
@@ -148,9 +162,12 @@ int main(int argc, char **argv) {
 
     ofstream fs_out(argv[5], std:: ios_base:: binary);
     map<int, int> mask_of_three_builds_frequency;
+    map<int, int> chrom_counts;
     for(auto && rs_builds : three_builds_for_all_interesting_snps) {
         auto rs = rs_builds.first;
         auto three_builds = rs_builds.second;
+        if(three_builds.chrom == -3)
+            three_builds.chrom = 23; // just rename X/-3 to 23 when actually writing the final database
 
         write_int(rs, fs_out);
         write_int(three_builds.chrom, fs_out);
@@ -163,7 +180,10 @@ int main(int argc, char **argv) {
                                   + (three_builds.hg20 != -1 ? 4 : 0)
             ;
         ++mask_of_three_builds_frequency[mask_of_three_builds];
+        ++chrom_counts[three_builds.chrom];
     }
+    for(auto && chrom_count : chrom_counts)
+        PP(chrom_count.first, chrom_count.second);
     fs_out.close();;
     fs_out || DIE("Couldn't close output file");
 
