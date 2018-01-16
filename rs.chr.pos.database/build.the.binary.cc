@@ -17,7 +17,7 @@ using utils:: operator<<;
 
 struct three_builds_t {
     enum class XYZ : int {
-        CHROM_Z = -1,
+        CHROM_unknown = -1,
         CHROM_Y = -2,
         CHROM_X = -3,
     };
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 
     map<int, three_builds_t> three_builds_for_all_interesting_snps;
 
-    ifstream fs_just_rss(argv[4]);
+    ifstream fs_just_rss(argv[4]); // this is the list of approx. 88 million rs-numbers
     int32_t one_rs_number;
     while(fs_just_rss >> one_rs_number) {
         assert(three_builds_for_all_interesting_snps.count(one_rs_number)==0);
@@ -57,18 +57,19 @@ int main(int argc, char **argv) {
     PP(three_builds_for_all_interesting_snps.size(), utils:: ELAPSED());
     assert(three_builds_for_all_interesting_snps.size() == 88'047'858);
 
-    for(int argv_index : {1,2,3}) { // should be filenames to hg18, hg19, and hg20
+    for(int argv_index : {1,2,3}) { // the filenames to hg18, hg19, and hg20
         PP(argv_index, argv[argv_index], utils:: ELAPSED());
         ifstream  fs_one_build(argv[argv_index]);
 
         int line_number = 0;
         string line;
 
-        while(getline( fs_one_build, line)) {
+        while(getline( fs_one_build, line)) { // read a line from the liftover file
             ++line_number;
             if(line_number % 10'000'000 == 0) {
                 PP(line_number, utils:: ELAPSED());
             }
+            // next few lines parse the relevant info from the liftover line
             auto split = utils:: tokenize(line, '\t');
             //PP(line, split);
             auto chrom_string = split.at(0);
@@ -86,11 +87,18 @@ int main(int argc, char **argv) {
                 continue;
             assert(split.at(3).substr(0,2) == "rs");
 
+            // now we try to store the data that we have just parsed into
+            // the datastructure
+
             try {
                 int chrom = [&]() ->int {
-                    if(chrom_string=="X") return static_cast<int>( three_builds_t:: XYZ:: CHROM_X );
-                    if(chrom_string=="Y") return static_cast<int>( three_builds_t:: XYZ:: CHROM_Y );
-                    return utils:: lexical_cast<int>(chrom_string);
+                    if(chrom_string=="X")
+                        return static_cast<int>( three_builds_t:: XYZ:: CHROM_X );
+                    if(chrom_string=="Y")
+                        return static_cast<int>( three_builds_t:: XYZ:: CHROM_Y );
+                    int chrom = utils:: lexical_cast<int>(chrom_string);
+                    assert(chrom >= 1 && chrom <= 22); // unless it's "X" or "Y", of course.
+                    return chrom;
                 }();
                 int posa  = utils:: lexical_cast<int>(split.at(1));
                 int posb  = utils:: lexical_cast<int>(split.at(2));
