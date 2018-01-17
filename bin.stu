@@ -63,7 +63,10 @@
         bin/o/usage_special.o       \
         src/libStatGen/libStatGen.a \
         ${LD_FLAGS}               \
+        -L /home/dalco/src/gsl-2.4/.libs \
+        -L /home/dalco/src/gsl-2.4/cblas/.libs \
     -o bin/ssimp-static
+    # The last two -L lines ('...dalco...') are needed to compile the static binary on 'hpc1'
 }
 
 >   bin/LIST_OF_HH_FILES
