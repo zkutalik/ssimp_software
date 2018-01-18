@@ -15,7 +15,9 @@ will generate a file `output.txt`, containing the imputation results. This is id
 	
 An executable example is:
 
-`bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+
+Where `ssimp` is the newest version in the `compiled/` folder. 
 
 ## Options
 [//]: -------------------------------
@@ -58,7 +60,7 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 [//]: -------
 Note that multiprocessing mode is not implemented, hence to speed up computation we recommend splitting up the job to smaller chromosomal chunks using the option `--impute.range`:
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.range 22:16000000-22:16050075`
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.range 22:18000000-22:18100075`
 
 #### Compute chunks
 These ranges can be computed automatically, by giving your main arguments [`args1`], the number of chunks [`args2`] and the name of the shell script returned [`args3`]. 
@@ -66,7 +68,7 @@ These ranges can be computed automatically, by giving your main arguments [`args
 `./ssimp_chunks.sh "args1" args2 args3`
 
 For example, run this in your terminal:
-`./ssimp_chunks.sh "bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt" 100 run_ssimp_array.sh`
+`./ssimp_chunks.sh "bin/ssimp --gwas gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz --ref ref/sub1KG-tiny/chr22.vcf.gz --out output.txt" 100 run_ssimp_array.sh`
 
 Note, that you still need to integrate the shell script content into your scheduler (slurm, bsub, qsub, ...).
 

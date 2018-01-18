@@ -11,8 +11,7 @@ The minimal requirements are:
 2. `--ref`: path to the *reference panel*,
 3. `--out`: path for output file.
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
-`compiled/ssimp --gwas gwas/small.random.csv --ref ref/sub1KG-tiny/chr{CHRM}.vcf.gz --out output.txt`
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in the [manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
@@ -20,7 +19,7 @@ For more info regarding automatically column names recognition of the GWAS file,
 ### --gwas dataset is gzipped
 [//]: -------------------------------
 
-`ssimp` **`--gwas gwas/small.random.csv.gz`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp` **`--gwas gwas/small.random.txt.gz`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 `.gz` works, `.zip` does not work.
 
@@ -127,7 +126,7 @@ If it is only a few of SNPs it might be easier to use:
 #### 1)
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.small.txt`**
 
-`filename.samples.txt` contains sample id's separated by new lines (no header). 
+`filename.samples.small.txt` contains sample id's separated by new lines (no header). 
 
 #### 2)
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.txt/sample/super_pop=EUR`**
@@ -171,7 +170,7 @@ Your GWAS summary statistics needs to have a sample size column.
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--log my_ssimp_logfile`**
 
 
-### Paralellize computation (TBD)
+### Parallelize computation (TBD)
 [//]: -------------------------------
 
 
