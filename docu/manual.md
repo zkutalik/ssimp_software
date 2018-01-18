@@ -164,6 +164,8 @@ Note that `z_imp` reports the imputed Z-statistics for SNPs that were imputed (`
 
 The imputation quality (`r2.pred`) can become zero, which results in `N.imp=0` and `bst.imp=inf`.
 
+Check the R-file `docu/sanitycheck_reimputed.R` to find out more about the columns `Z_reimputed`, `r2_reimputed` and `source`.	
+
 ## Method outline
 [//]: -------------------------------
 The principle of *summary statistics imputation* is to combine the available summary statistics from a set of markers and the fine-scale LD structure in the same region in order to infer association summary statistics of unobserved variants. We can formally write this using the conditional expectation of a multivariate normal distribution. 

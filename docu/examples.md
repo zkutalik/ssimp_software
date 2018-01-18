@@ -170,6 +170,11 @@ Your GWAS summary statistics needs to have a sample size column.
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--log my_ssimp_logfile`**
 
 
+### Sanitycheck
+[//]: -------------------------------
+Check R-file `docu/sanitycheck_reimputed.R`
+
+
 ### Parallelize computation (TBD)
 [//]: -------------------------------
 
