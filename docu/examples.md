@@ -30,7 +30,7 @@ For detailed instructions and explanations see detailed instructions in [usage-t
 
 A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG (all populations, not only the selected one).
 
-`ssimp --gwas gwas/small.random.csv` **`--ref 1KG/EUR`** ` --out output.txt`
+`ssimp --gwas gwas/small.random.txt` **`--ref 1KG/EUR`** ` --out output.txt`
 
 
 ### You do not have the Z-statistics available, but you have...
@@ -41,7 +41,7 @@ No special argument needed, but GWAS input file needs to contain effect size `b`
 
 The header of the GWAS file should be: `SNP  a1  a2  b   p`
 
-`ssimp` **`--gwas gwas/small.random.p.b.csv`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp` **`--gwas gwas/small.random.p.b.txt`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 
 #### ... odds ratios
@@ -61,37 +61,37 @@ First, impute Z-statistics as shown above, then transform the Z-statistic into `
 [//]: -------------------------------
 Provide chromosome and position instead, but include a SNP column that is empty too.
 
-`ssimp` **`--gwas gwas/small.random.chr.pos.csv`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp` **`--gwas gwas/small.random.chr.pos.txt`** ` --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 
 ### Impute a bp range on a specific chromosome
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 22:16000000-22:16050075`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 22:18000000-22:18100075`**
 
 
 ### Impute chromosome 22
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 22`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 22`**
 
 
 ### Impute chromosome 20 to 22
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 20-22`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.range 20-22`**
 
 
 ### Impute specific set of SNPs
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp listofimputesnps.txt`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp gwas/listofimputesnps.txt`**
 
 `listofimputesnps.txt` contains SNP id's separated by new lines (no header).
 
 If it is only a few of SNPs it might be easier to use:
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp <(echo rs587755077 rs587697622 | tr ' ' '\n')`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp <(echo rs2587101 rs2277831 | tr ' ' '\n')`**
 
 A more complex example with SNPs from two different chromosomes:
 
@@ -103,7 +103,7 @@ rs78808100 | tr ' ' '\n')`
 ### Imputing SNPs on the X-chromosome
 [//]: -------------------------------
 
-This is currently not possible. 
+We are currently working on this option.
 
 To speed up imputation of single SNPs, we needed to combine different reference panel builds from 1000 genome, that contains no sex chromosomes. 
 
@@ -111,63 +111,63 @@ To speed up imputation of single SNPs, we needed to combine different reference 
 ### Use a set of tag SNPs
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.snp listoftagsnps.txt`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.snp gwas/listoftagsnps.txt`**
 
 `listoftagsnps.txt` contains SNP id's separated by new lines (no header).
 
 If it is only a few of SNPs it might be easier to use:
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.snp <(echo rs62224618 rs333 | tr ' ' '\n')`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.snp <(echo  rs2305001 rs10854521 | tr ' ' '\n')`**
 
 
 ### Select individuals from reference panel (short version)
 [//]: -------------------------------
 
 #### 1)
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.small.txt`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.small.txt`**
 
 `filename.samples.small.txt` contains sample id's separated by new lines (no header). 
 
 #### 2)
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.txt/sample/super_pop=EUR`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--sample.names ref/filename.samples.pop.txt/sample/super_pop=EAS`**
 Here, `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
 
 
 ### Shrinking LD matrix by 0.01
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--lambda 0.01`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--lambda 0.01`**
 
 
 ### Impute SNPs with MAF > 0.05
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.maf 0.05`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.maf 0.05`**
 
 
 ### Use tag SNPs with MAF > 0.05
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.maf 0.05`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--tag.maf 0.05`**
 
 
 ### Use a smaller core window and flanking region
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--window.width 500000 --flanking.width 100000`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--window.width 500000 --flanking.width 100000`**
 
 
 ### Use the dependent missingness approach
 [//]: -------------------------------
 
-`ssimp` **`--gwas gwas/small.random.n.csv`** `--ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--missingness dep`**
+`ssimp` **`--gwas gwas/small.random.n.txt`** `--ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--missingness dep`**
 
 Your GWAS summary statistics needs to have a sample size column. 
 
 ### Store a copy of all console output to a file
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--log my_ssimp_logfile`**
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--log my_ssimp_logfile`**
 
 
 ### Parallelize computation (TBD)

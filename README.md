@@ -43,6 +43,7 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 
 
+
 ## :warning: Size of the software 
 [//]: -------------------------------
 
@@ -108,6 +109,12 @@ We have used code (with permission, and under the GPL) from [libStatGen](https:/
 ## Bug report
 [//]: -------------------------------
 Report bugs here: (https://github.com/sinarueeger/ssimp_software/issues)[https://github.com/sinarueeger/ssimp_software/issues]
+
+
+## Wiki / FAQ
+[//]: -------------------------------
+We are currently working on a Wiki.
+
 
 ## Contact
 [//]: -------------------------------

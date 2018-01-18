@@ -7,9 +7,10 @@ system("cp ../ref/sub1KG-tiny/chr22.vcf.gz.tbi ../ref/small.vcf.sample.vcf.gz.tb
 
 
 
-##create 
-library(readr)
+## create GWAS
+## -------------
 library(tidyverse)
+
 dat <- read_tsv("../gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz")
 ref <- read_tsv("../ref/small.vcf.sample.vcf.gz")
 
@@ -27,6 +28,9 @@ write_delim(small.random.txt, path = "../gwas/small.random.txt",delim = " ")
 write_delim(small.random.p.b.txt, path = "../gwas/small.random.p.b.txt",delim = " ")
 write_delim(small.random.chr.pos.txt, path = "../gwas/small.random.chr.pos.txt",delim = " ")
 
+
+## listof...
+## -------------
 set.seed(3)
 listofimputesnps <- ref %>% select(ID) %>% sample_n(10)
 listoftagsnps <- dat %>% select(MarkerName) %>% sample_n(10)
@@ -36,8 +40,15 @@ write_delim(, path = "../gwas/listoftagsnps.txt",delim = " ",col_names=FALSE)
 write_delim(, path = "../gwas/filename.samples.txt",delim = " ",col_names=FALSE)
 write_delim(, path = "../gwas/filename.samples.txt",delim = " ",col_names=FALSE)
 
+## 
+## -------------
+sample.small <- read_table("../ref/filename.samples.small.txt",col_names=FALSE)
+sample.pop <- read_delim("../ref/filename.samples.txt",delim="\t")
 
-`listofimputesnps.txt` contains SNP id's separated by new lines (no header).
-`listoftagsnps.txt` contains SNP id's separated by new lines (no header).
-`filename.samples.txt` contains sample id's separated by new lines (no header). >> should be able to leave this
-Here, `filename.samples.txt` contains sample id's (`sample`) along with a second attribute (here `super_pop`) that has different values, among them is `EUR`, for which we separate. 
+## make half european/gbr
+sample.pop.small <- sample.pop %>% filter(sample %in% sample.small$X1) %>% select(sample, pop,super_pop, gender)
+sample.pop.small[1:7,"pop"] <- "GBR"
+sample.pop.small[1:7,"super_pop"] <- "EUR"
+
+write_delim(sample.pop.small, path = "../gwas/filename.samples.pop.txt", delim = "\t")
+
