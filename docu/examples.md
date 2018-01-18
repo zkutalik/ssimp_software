@@ -12,6 +12,7 @@ The minimal requirements are:
 3. `--out`: path for output file.
 
 `ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`compiled/ssimp --gwas gwas/small.random.csv --ref ref/sub1KG-tiny/chr{CHRM}.vcf.gz --out output.txt`
 
 For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in the [manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md).
 
