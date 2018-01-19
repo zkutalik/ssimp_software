@@ -929,6 +929,9 @@ static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              ) {
+    gwas->sort_my_entries(); // Sort them by position
+    assert(gwas->get_chrpos(0) != (chrpos{-1,-1})); // confirm that all gwas positions are now known
+
     unique_ptr<ofstream>   out_stream_for_imputations;
     ostream              * out_stream_ptr = nullptr;
     if(!options:: opt_out.empty()) {
@@ -1026,6 +1029,27 @@ void impute_all_the_regions(   string                                   filename
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
 
+            {   /* This optional speed optimization:
+                 * As we now know all the positions of the tags, we may be able
+                 * to skip windows (on the current chromosome)
+                 */
+                auto start_of_window = chrpos{ chrm, current_window_start - options:: opt_flanking_width };
+                auto   end_of_window = chrpos{ chrm, current_window_end   + options:: opt_flanking_width };
+                auto start = std:: lower_bound( begin_from_file(gwas)   , end_from_file(gwas) , start_of_window );
+                auto   end = std:: lower_bound( start                   , end_from_file(gwas) , end_of_window   );
+                assert(end >= start);
+                if(end == start) {
+                    // If end==start, then there are no tags in this window. Therefore,
+                    // we either break to the next chromosome, or continue to the next window in this chromosome
+                    auto   chrom_end = std:: lower_bound( start                   , end_from_file(gwas) , chrpos{chrm, std::numeric_limits<int>::max()}   );
+                    assert(chrom_end >= end);
+                    if(chrom_end != end) // there are more tags on this chromosome
+                        continue;
+                    else
+                        break;
+                }
+            }
+
             /* Crucially, first we check if we have already gone past
              * the end of the current chromosome
              */
@@ -1051,29 +1075,6 @@ void impute_all_the_regions(   string                                   filename
                         , chrpos{chrm,current_window_end  } )
                 )
                 continue;
-
-            gwas->sort_my_entries(); // Sort them by position
-            assert(gwas->get_chrpos(0) != (chrpos{-1,-1})); // confirm that all gwas positions are now known
-            {   /* What follows is another optional speed optimization:
-                 * As we now know all the positions of the tags, we may be able
-                 * to skip windows (on the current chromosome)
-                 */
-                auto start_of_window = chrpos{ chrm, current_window_start - options:: opt_flanking_width };
-                auto   end_of_window = chrpos{ chrm, current_window_end   + options:: opt_flanking_width };
-                auto start = std:: lower_bound( begin_from_file(gwas)   , end_from_file(gwas) , start_of_window );
-                auto   end = std:: lower_bound( start                   , end_from_file(gwas) , end_of_window   );
-                assert(end >= start);
-                if(end == start) {
-                    // If end==start, then there are no tags in this window. Therefore,
-                    // we either break to the next chromosome, or continue to the next window in this chromosome
-                    auto   chrom_end = std:: lower_bound( start                   , end_from_file(gwas) , chrpos{chrm, std::numeric_limits<int>::max()}   );
-                    assert(chrom_end >= end);
-                    if(chrom_end != end) // there are more tags on this chromosome
-                        continue;
-                    else
-                        break;
-                }
-            }
 
             /*
              * For a given window, there are three "ranges" to consider:
