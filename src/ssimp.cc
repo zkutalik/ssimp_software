@@ -170,7 +170,6 @@ R"(Please download it with the following commands:
             database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
         }
     }
-    cout << "  Loaded.\n";
     return database_of_builds;
 }
 struct six_counts_t {
@@ -695,7 +694,8 @@ int main(int argc, char **argv) {
             ssimp:: IDchrmThreePos const db_entry = database_of_builds.at(offset);
             database_of_builds_rs_to_offset.insert( std:: make_pair(db_entry.rs, offset) );
         }
-        PP(database_of_builds.size(), database_of_builds_rs_to_offset.size());
+        assert(database_of_builds.size() == database_of_builds_rs_to_offset.size());
+        cout << "  Loaded.\n";
 
         ssimp:: which_build_t which_build_ref   = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
         ssimp:: which_build_t which_build_gwas  = ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
