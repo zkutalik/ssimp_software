@@ -29,6 +29,21 @@ write_delim(small.random.p.b.txt, path = "../gwas/small.random.p.b.txt",delim = 
 write_delim(small.random.chr.pos.txt, path = "../gwas/small.random.chr.pos.txt",delim = " ")
 
 
+
+## chr x example
+## ----------------
+ref <- read_tsv("../ref/sub1KG-tiny/chrX.vcf.gz")
+
+map.x <- ref %>% select(1,2,3,4,5) %>% rename("CHR" = !!names(.[1])) 
+
+set.seed(4)
+gwas.x <- map.x %>%  sample_n(nrow(ref)/3*2) %>% mutate(Z = runif(nrow(.), -4,4))
+target.id <- setdiff( map.x$ID, gwas$ID)
+target.pos <- setdiff( map.x$POS, gwas$POS)
+
+write_delim(gwas.x, path = "../gwas/small.random.x.txt",delim = " ")
+
+
 ## listof...
 ## -------------
 set.seed(3)
