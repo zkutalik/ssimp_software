@@ -83,7 +83,11 @@ namespace tbi {
             int r = record.getGT(i, 1);
             if(r==-1)
             {
-                r = 0; // must be on the X chromosome. A male. Should we 'assert' this?
+                // This is a male on the X chromosome.
+                // We'll upscale by copying the left into the right.
+                // i.e.  0/-1 becomes 0/0
+                //  and  1/-1 becomes 1/1
+                r = l;
             }
             assert((l | 1) == 1);
             assert((r | 1) == 1);
