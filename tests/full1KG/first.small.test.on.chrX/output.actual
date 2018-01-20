@@ -1,0 +1,78 @@
+file_name:gwas/a.couple.of.SNPs.on.X.txt
+... loading the 1.7GB database of positions under three builds. This will take about a minute.  Loaded.
+Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel
+some_records_from_each_chromosome.size():2'300
+count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 70 , 36 , 100 , 1'897 , 860
+gwas_all_chrpos.size():0
+count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 0 , 0 , 0 , 0 , 0
+which_build_gwas,which_build_ref:	unknown , hg19_1
+gwas_count_known,gwas_count_unknown:	5 , 0
+Delete the SNPs with unknown position ...
+gwas->number_of_snps():5
+options:: opt_window_width,options:: opt_flanking_width:	1'000 , 1'000
+N_reference:503
+
+chrm2	   18'326'000-18'327'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+       8 # target SNPs (anything in narrow window, will include some tags)
+
+chrm2	   18'327'000-18'328'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+       7 # target SNPs (anything in narrow window, will include some tags)
+
+chrm2	   18'328'000-18'329'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+       8 # target SNPs (anything in narrow window, will include some tags)
+
+chrm5	   18'135'000-18'136'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+       2 # target SNPs (anything in narrow window, will include some tags)
+
+chrm5	   18'136'000-18'137'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+       7 # target SNPs (anything in narrow window, will include some tags)
+
+chrm5	   18'137'000-18'138'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+      11 # target SNPs (anything in narrow window, will include some tags)
+
+chrm9	   18'148'000-18'149'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+       6 # target SNPs (anything in narrow window, will include some tags)
+
+chrm9	   18'149'000-18'150'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+      10 # target SNPs (anything in narrow window, will include some tags)
+
+chrm9	   18'150'000-18'151'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+      12 # target SNPs (anything in narrow window, will include some tags)
+
+chrm23	   2'701'000-2'702'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+       4 # target SNPs (anything in narrow window, will include some tags)
+
+chrm23	   2'702'000-2'703'000
+       2 # GWAS     SNPs in this window (with 1'000 flanking)
+       2 # SNPs in both (i.e. useful as tags)
+      14 # target SNPs (anything in narrow window, will include some tags)
+
+chrm23	   2'703'000-2'704'000
+       2 # GWAS     SNPs in this window (with 1'000 flanking)
+       2 # SNPs in both (i.e. useful as tags)
+       9 # target SNPs (anything in narrow window, will include some tags)
+
+chrm23	   2'704'000-2'705'000
+       1 # GWAS     SNPs in this window (with 1'000 flanking)
+       1 # SNPs in both (i.e. useful as tags)
+      11 # target SNPs (anything in narrow window, will include some tags)

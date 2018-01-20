@@ -1,0 +1,6 @@
+"$SSIMP"                                                                        \
+    "$GWAS"/a.couple.of.SNPs.on.X.txt                                           \
+    1KG/EUR                                                                     \
+    "${OUT_IMPUTATIONS}"                                                        \
+    --wind 1000 --flank 1000                                                    \
+    > "$OUTPUT"
