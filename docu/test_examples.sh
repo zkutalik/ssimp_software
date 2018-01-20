@@ -44,3 +44,18 @@ compiled/ssimp-osx-0.2 --gwas gwas/small.random.txt --ref ref/small.vcf.sample.v
 compiled/ssimp-osx-0.2 --gwas gwas/small.random.n.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --missingness dep
 
 compiled/ssimp-osx-0.2 --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --log my_ssimp_logfile
+
+
+
+
+
+
+compiled/ssimp-osx-0.3 --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out output.txt
+
+compiled/ssimp-osx-0.3 --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out output.txt --impute.snp <(echo rs183055800 rs146115300 rs150092800 | tr ' ' '\n')
+
+compiled/ssimp-osx-0.3 --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out output.txt --impute.snp <(echo X:18008535 X:18010084 X:18037863 | tr ' ' '\n')
+
+compiled/ssimp-osx-0.3 --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out output.txt --impute.snp <(echo 23:18008535 23:18010084 23:18037863 | tr ' ' '\n')
+
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--impute.snp <(echo X:18008535 X:18010084 X:18037863 | tr ' ' '\n')`**
