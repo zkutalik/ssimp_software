@@ -240,7 +240,7 @@ which_build_t estimate_build_of_reference_panel (   string                      
                              ) {
     cout << "Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel\n";
     std::vector<IDchrmPos> some_records_from_each_chromosome;
-    for(int chrm =  1; chrm <= 22; ++chrm) {
+    for(int chrm =  1; chrm <= 23; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
         std::vector<IDchrmPos> a_few_records;
@@ -1007,7 +1007,7 @@ void impute_all_the_regions(   string                                   filename
 
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
     int number_of_windows_seen_so_far_with_at_least_two_tags = 0; // useful to help decide when to do reimputation
-    for(int chrm =  1; chrm <= 22; ++chrm) {
+    for(int chrm =  1; chrm <= 23; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
         { // *optional* checks to help efficiency. Not necessary for correctness
