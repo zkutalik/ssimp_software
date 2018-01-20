@@ -134,7 +134,7 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
     cout << "... loading the 1.7GB database of positions under three builds. This will take about a minute.";
-    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"          , getenv("HOME"));
+    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"          , getenv("HOME"));
     std:: ifstream f_database_of_builds(path_to_build_database);
     if(!f_database_of_builds) {
         DIE("Necessary file missing ["
@@ -144,7 +144,7 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
 R"(Please download it with the following commands:
 
     cd       ~/reference_panels
-    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+    wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 )"
                 );
 
@@ -438,7 +438,7 @@ void download_1KG_ifneeded() {
 
     auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
     auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
-    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"                               , getenv("HOME"));
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"                               , getenv("HOME"));
 
     bool directory_already_exists       = opendir( directory.c_str() );
     bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
@@ -454,7 +454,7 @@ void download_1KG_ifneeded() {
 Please download it with:
 
     cd       ~/reference_panels
-    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+    wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 )", blddb_file_name));
 
     if(directory_already_exists && !both_files_already_exist) // actually, I don't expect this to ever happen. Except perhaps if the download of 1KG was interrupted part way
@@ -479,7 +479,7 @@ If you have not already downloaded it, and you have 'wget' available on your sys
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'
     cd       ~/reference_panels
-    test -f database.of.builds.1kg.uk10k.hrc.bin || wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+    test -f database.of.builds.1kg.uk10k.hrc.2018.01.18.bin || wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 
 This takes up nearly 15 gigabytes of disk space.
 )";
@@ -498,7 +498,7 @@ It appears that 'wget' exists on your system. Would you like me to run the above
                 ,"cd       ~/reference_panels/1000genomes && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'"
-                ,"cd       ~/reference_panels             && wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin"
+                ,"cd       ~/reference_panels             && wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
