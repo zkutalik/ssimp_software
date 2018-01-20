@@ -151,6 +151,7 @@ R"(Please download it with the following commands:
     }
     std:: vector<IDchrmThreePos> database_of_builds;
     int lastrs = 0; // to confirm it is increasing
+    std::map<int, int> chrom_counts;
     while(f_database_of_builds) {
         assert(f_database_of_builds);
         int rs = read_int(f_database_of_builds);
@@ -166,10 +167,13 @@ R"(Please download it with the following commands:
         assert(f_database_of_builds);
         int hg20 = read_int(f_database_of_builds);
         assert(f_database_of_builds);
-        if(chrom >= 1 && chrom <= 22) { // we just ignore XY for now. TODO: extend this?
+        if(chrom >= 1 && chrom <= 23) { // we just ignore XY for now. TODO: extend this?
             database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
         }
+
+        ++chrom_counts[chrom];
     }
+    //for(auto && p : chrom_counts) PP(p.first, p.second);
     return database_of_builds;
 }
 struct six_counts_t {
@@ -800,7 +804,7 @@ int main(int argc, char **argv) {
                 ;   }
                 else
                 {   ++ gwas_count_known
-                ;   assert(crps.chr >= 1 && crps.chr <= 22)
+                ;   assert(crps.chr >= 1 && crps.chr <= 23)
                 ;   assert(crps.pos > 0)
                 ;   }
             }
