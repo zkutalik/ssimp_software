@@ -37,7 +37,7 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt`
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
 (5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panels` in your home directory). Check out `Download 1000 genomes reference panel` below to download. 
 
