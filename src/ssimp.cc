@@ -134,7 +134,7 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
     cout << "... loading the 1.7GB database of positions under three builds. This will take about a minute.";
-    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"          , getenv("HOME"));
+    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"          , getenv("HOME"));
     std:: ifstream f_database_of_builds(path_to_build_database);
     if(!f_database_of_builds) {
         DIE("Necessary file missing ["
@@ -144,13 +144,14 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
 R"(Please download it with the following commands:
 
     cd       ~/reference_panels
-    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+    wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 )"
                 );
 
     }
     std:: vector<IDchrmThreePos> database_of_builds;
     int lastrs = 0; // to confirm it is increasing
+    std::map<int, int> chrom_counts;
     while(f_database_of_builds) {
         assert(f_database_of_builds);
         int rs = read_int(f_database_of_builds);
@@ -166,11 +167,13 @@ R"(Please download it with the following commands:
         assert(f_database_of_builds);
         int hg20 = read_int(f_database_of_builds);
         assert(f_database_of_builds);
-        if(chrom >= 1 && chrom <= 22) { // we just ignore XY for now. TODO: extend this?
+        if(chrom >= 1 && chrom <= 23) { // we just ignore XY for now. TODO: extend this?
             database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
         }
+
+        ++chrom_counts[chrom];
     }
-    cout << "  Loaded.\n";
+    //for(auto && p : chrom_counts) PP(p.first, p.second);
     return database_of_builds;
 }
 struct six_counts_t {
@@ -237,29 +240,33 @@ which_build_t estimate_build_of_reference_panel (   string                      
                              ) {
     cout << "Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel\n";
     std::vector<IDchrmPos> some_records_from_each_chromosome;
-    for(int chrm =  1; chrm <= 22; ++chrm) {
+    for(int chrm =  1; chrm <= 23; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
-        std::vector<IDchrmPos> a_few_records;
+        try {
+            std::vector<IDchrmPos> a_few_records;
 
-        tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
+            tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
-        ref_vcf.set_region  (   chrpos{chrm, 0}
-                            ,   chrpos{chrm,std::numeric_limits<int>::max()}
-                            );
-        RefRecord rr;
-        while(ref_vcf.read_record_into_a_RefRecord(rr) ){
-            if(utils:: startsWith(rr.ID, "rs")) {
-                try {
-                    int rs = utils:: lexical_cast<int>(rr.ID.substr(2));
-                    a_few_records.push_back( IDchrmPos{ rs , chrm, rr.pos });
-                    if(a_few_records.size() >= 100)
-                        break;
-                } catch (std:: invalid_argument &) {
+            ref_vcf.set_region  (   chrpos{chrm, 0}
+                                ,   chrpos{chrm,std::numeric_limits<int>::max()}
+                                );
+            RefRecord rr;
+            while(ref_vcf.read_record_into_a_RefRecord(rr) ){
+                if(utils:: startsWith(rr.ID, "rs")) {
+                    try {
+                        int rs = utils:: lexical_cast<int>(rr.ID.substr(2));
+                        a_few_records.push_back( IDchrmPos{ rs , chrm, rr.pos });
+                        if(a_few_records.size() >= 100)
+                            break;
+                    } catch (std:: invalid_argument &) {
+                    }
                 }
             }
+            some_records_from_each_chromosome.insert(some_records_from_each_chromosome.end(), a_few_records.begin(), a_few_records.end());
         }
-        some_records_from_each_chromosome.insert(some_records_from_each_chromosome.end(), a_few_records.begin(), a_few_records.end());
+        catch (std::runtime_error &)
+        { }
     }
     PP(some_records_from_each_chromosome.size());
 
@@ -439,7 +446,7 @@ void download_1KG_ifneeded() {
 
     auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
     auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
-    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.bin"                               , getenv("HOME"));
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"                               , getenv("HOME"));
 
     bool directory_already_exists       = opendir( directory.c_str() );
     bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
@@ -455,7 +462,7 @@ void download_1KG_ifneeded() {
 Please download it with:
 
     cd       ~/reference_panels
-    wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+    wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 )", blddb_file_name));
 
     if(directory_already_exists && !both_files_already_exist) // actually, I don't expect this to ever happen. Except perhaps if the download of 1KG was interrupted part way
@@ -480,7 +487,7 @@ If you have not already downloaded it, and you have 'wget' available on your sys
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'
     cd       ~/reference_panels
-    test -f database.of.builds.1kg.uk10k.hrc.bin || wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin
+    test -f database.of.builds.1kg.uk10k.hrc.2018.01.18.bin || wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 
 This takes up nearly 15 gigabytes of disk space.
 )";
@@ -499,7 +506,7 @@ It appears that 'wget' exists on your system. Would you like me to run the above
                 ,"cd       ~/reference_panels/1000genomes && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'"
-                ,"cd       ~/reference_panels             && wget -c -nd    'https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download' -O database.of.builds.1kg.uk10k.hrc.bin"
+                ,"cd       ~/reference_panels             && wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
@@ -695,7 +702,8 @@ int main(int argc, char **argv) {
             ssimp:: IDchrmThreePos const db_entry = database_of_builds.at(offset);
             database_of_builds_rs_to_offset.insert( std:: make_pair(db_entry.rs, offset) );
         }
-        PP(database_of_builds.size(), database_of_builds_rs_to_offset.size());
+        assert(database_of_builds.size() == database_of_builds_rs_to_offset.size());
+        cout << "  Loaded.\n";
 
         ssimp:: which_build_t which_build_ref   = ssimp:: estimate_build_of_reference_panel(options:: opt_raw_ref, database_of_builds);
         ssimp:: which_build_t which_build_gwas  = ssimp:: estimate_build_of_the_gwas(gwas, database_of_builds);
@@ -800,7 +808,7 @@ int main(int argc, char **argv) {
                 ;   }
                 else
                 {   ++ gwas_count_known
-                ;   assert(crps.chr >= 1 && crps.chr <= 22)
+                ;   assert(crps.chr >= 1 && crps.chr <= 23)
                 ;   assert(crps.pos > 0)
                 ;   }
             }
@@ -929,6 +937,9 @@ static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              ) {
+    gwas->sort_my_entries(); // Sort them by position
+    assert(gwas->get_chrpos(0) != (chrpos{-1,-1})); // confirm that all gwas positions are now known
+
     unique_ptr<ofstream>   out_stream_for_imputations;
     ostream              * out_stream_ptr = nullptr;
     if(!options:: opt_out.empty()) {
@@ -1000,7 +1011,7 @@ void impute_all_the_regions(   string                                   filename
 
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
     int number_of_windows_seen_so_far_with_at_least_two_tags = 0; // useful to help decide when to do reimputation
-    for(int chrm =  1; chrm <= 22; ++chrm) {
+    for(int chrm =  1; chrm <= 23; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
         { // *optional* checks to help efficiency. Not necessary for correctness
@@ -1018,6 +1029,7 @@ void impute_all_the_regions(   string                                   filename
                 continue;
         }
 
+        try {
         tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
         for(int w = 0; ; ++w ) {
@@ -1025,6 +1037,27 @@ void impute_all_the_regions(   string                                   filename
 
             int current_window_start = w     * options:: opt_window_width;
             int current_window_end   = (w+1) * options:: opt_window_width;
+
+            {   /* This optional speed optimization:
+                 * As we now know all the positions of the tags, we may be able
+                 * to skip windows (on the current chromosome)
+                 */
+                auto start_of_window = chrpos{ chrm, current_window_start - options:: opt_flanking_width };
+                auto   end_of_window = chrpos{ chrm, current_window_end   + options:: opt_flanking_width };
+                auto start = std:: lower_bound( begin_from_file(gwas)   , end_from_file(gwas) , start_of_window );
+                auto   end = std:: lower_bound( start                   , end_from_file(gwas) , end_of_window   );
+                assert(end >= start);
+                if(end == start) {
+                    // If end==start, then there are no tags in this window. Therefore,
+                    // we either break to the next chromosome, or continue to the next window in this chromosome
+                    auto   chrom_end = std:: lower_bound( start                   , end_from_file(gwas) , chrpos{chrm, std::numeric_limits<int>::max()}   );
+                    assert(chrom_end >= end);
+                    if(chrom_end != end) // there are more tags on this chromosome
+                        continue;
+                    else
+                        break;
+                }
+            }
 
             /* Crucially, first we check if we have already gone past
              * the end of the current chromosome
@@ -1051,29 +1084,6 @@ void impute_all_the_regions(   string                                   filename
                         , chrpos{chrm,current_window_end  } )
                 )
                 continue;
-
-            gwas->sort_my_entries(); // Sort them by position
-            assert(gwas->get_chrpos(0) != (chrpos{-1,-1})); // confirm that all gwas positions are now known
-            {   /* What follows is another optional speed optimization:
-                 * As we now know all the positions of the tags, we may be able
-                 * to skip windows (on the current chromosome)
-                 */
-                auto start_of_window = chrpos{ chrm, current_window_start - options:: opt_flanking_width };
-                auto   end_of_window = chrpos{ chrm, current_window_end   + options:: opt_flanking_width };
-                auto start = std:: lower_bound( begin_from_file(gwas)   , end_from_file(gwas) , start_of_window );
-                auto   end = std:: lower_bound( start                   , end_from_file(gwas) , end_of_window   );
-                assert(end >= start);
-                if(end == start) {
-                    // If end==start, then there are no tags in this window. Therefore,
-                    // we either break to the next chromosome, or continue to the next window in this chromosome
-                    auto   chrom_end = std:: lower_bound( start                   , end_from_file(gwas) , chrpos{chrm, std::numeric_limits<int>::max()}   );
-                    assert(chrom_end >= end);
-                    if(chrom_end != end) // there are more tags on this chromosome
-                        continue;
-                    else
-                        break;
-                }
-            }
 
             /*
              * For a given window, there are three "ranges" to consider:
@@ -1475,6 +1485,9 @@ void impute_all_the_regions(   string                                   filename
                 };
             }
         } // loop over windows
+    } // try, in order to ignore a chromosome (such as 'chrX') if it's not present
+    catch (std:: runtime_error &)
+    {}
     } // loop over chromosomes
 
     if(!options:: opt_tags_used_output.empty()) {

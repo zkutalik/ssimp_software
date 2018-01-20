@@ -144,7 +144,7 @@ The `.log` file is a copy of what is printed to the console. (not supported yet)
 ### out file
 [//]: -------
 The output file specified in `--out` file has the following columns:
-- `chr` Chromosome (only 1 to 22 right now)
+- `chr` Chromosome (1-22, X)
 - `pos` Position (same build as reference panel)
 - `z_imp` Imputed Z statistics (see below)
 - `source` GWAS or SSimp, depending if the SNP was a tag SNP or an imputed SNP. 

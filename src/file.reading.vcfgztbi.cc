@@ -16,9 +16,19 @@ namespace tbi {
                 std:: ifstream test_if_file_exists(filename.c_str());
                 if(!test_if_file_exists) {
                     auto CHRM = filename.find("{CHRM}");
+                    if(chromosome == 23)
+                    {
+                        if(filename.substr(CHRM) == "{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz")
+                        {
+                            filename = filename.substr(0, CHRM) + "{CHRM}.phase3_shapeit2_mvncall_integrated_v1b.20130502.genotypes.vcf.gz";
+                        }
+                    }
                     std:: ostringstream filename_for_this_chromosome;
                     filename_for_this_chromosome << filename.substr(0, CHRM);
-                    filename_for_this_chromosome << chromosome;
+                    if(chromosome == 23)
+                        filename_for_this_chromosome << "X";
+                    else
+                        filename_for_this_chromosome << chromosome;
                     filename_for_this_chromosome << filename.substr(CHRM+6); // 6, to skip over {CHRM}
                     filename = filename_for_this_chromosome.str();
                 }
@@ -47,7 +57,10 @@ namespace tbi {
         }
         void read_vcf_with_tbi:: set_region(file_reading:: chrpos b, file_reading:: chrpos e) {
             assert(b.chr == e.chr);
-            reader.set1BasedReadSection(AMD_FORMATTED_STRING("{0}", b.chr).c_str(), b.pos, e.pos);
+            if(b.chr == 23)
+                reader.set1BasedReadSection("X"                                       , b.pos, e.pos);
+            else
+                reader.set1BasedReadSection(AMD_FORMATTED_STRING("{0}", b.chr).c_str(), b.pos, e.pos);
             /* "...will set the code to read the specified chromosome starting
              * at the specified 1-based position up to, but not including, the
              * specified 1-based end position"
@@ -68,6 +81,10 @@ namespace tbi {
             //assert(2==record.getNumGTs(i));
             int l = record.getGT(i, 0);
             int r = record.getGT(i, 1);
+            if(r==-1)
+            {
+                r = 0; // must be on the X chromosome. A male. Should we 'assert' this?
+            }
             assert((l | 1) == 1);
             assert((r | 1) == 1);
             rr.z12.push_back(l+r);

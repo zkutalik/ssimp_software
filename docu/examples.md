@@ -103,9 +103,9 @@ rs78808100 | tr ' ' '\n')`
 ### Imputing SNPs on the X-chromosome
 [//]: -------------------------------
 
-We are currently working on this option.
+This was fixed with version 0.3. 
 
-To speed up imputation of single SNPs, we needed to combine different reference panel builds from 1000 genome, that contains no sex chromosomes. 
+Examples underway. 
 
 
 ### Use a set of tag SNPs

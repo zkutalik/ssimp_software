@@ -36,15 +36,22 @@ rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt
         | egrep -v '^##' | cut -f1-3 > rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt.tmp
     mv 1kg.chrom.pos.id.txt.tmp 1kg.chrom.pos.id.txt
 }
-
-                rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt
-            :   rs.chr.pos.database/just.collect.the.rss.cc
-                rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt
+rs.chr.pos.database/three.sources.of.rs/1kgX.chrom.pos.id.txt # same as the last rule, but include X also
 {
-export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt"
+    mkdir -p rs.chr.pos.database/three.sources.of.rs
+    zcat /data/sgg/aaron/shared/ref_panels/1kg/ALL.chr*.phase3_shapeit2_mvncall_integrated_v*.20130502.genotypes.vcf.gz \
+        | egrep -v '^##' | cut -f1-3 > rs.chr.pos.database/three.sources.of.rs/1kgX.chrom.pos.id.txt.tmp
+    mv 1kgX.chrom.pos.id.txt.tmp 1kgX.chrom.pos.id.txt
+}
+
+                rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.txt
+            :   rs.chr.pos.database/just.collect.the.rss.cc
+                rs.chr.pos.database/three.sources.of.rs/1kgX.chrom.pos.id.txt
+{
+export  target="rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.txt"
 
     # print the head of each of the three inputs, just to confirm they are there.
-    head rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt
+    head rs.chr.pos.database/three.sources.of.rs/1kgX.chrom.pos.id.txt
     zcat rs.chr.pos.database/three.sources.of.rs/for_aaron_rslistHRC.gz | head
     head rs.chr.pos.database/three.sources.of.rs/positions.b19.TWINSUKALSPAC..sorted.By.rs
 
@@ -52,20 +59,20 @@ export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt"
     g++ rs.chr.pos.database/just.collect.the.rss.cc -o rs.chr.pos.database/just.collect.the.rss -std=c++14
 
     # run the program, it takes just about 10 minutes and creates the file
-    # with 88'047'858 rs-numbers:    rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt
+    # with ????? rs-numbers:    rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.txt
     rs.chr.pos.database/just.collect.the.rss                                                \
-        rs.chr.pos.database/three.sources.of.rs/1kg.chrom.pos.id.txt                        \
+        rs.chr.pos.database/three.sources.of.rs/1kgX.chrom.pos.id.txt                        \
         <(zcat rs.chr.pos.database/three.sources.of.rs/for_aaron_rslistHRC.gz)              \
         rs.chr.pos.database/three.sources.of.rs/positions.b19.TWINSUKALSPAC..sorted.By.rs   \
         "$target".tmp
     mv "$target"{.tmp,}
 }
-                rs.chr.pos.database/rss.in.1kg.uk10k.hrc.build.bin
-            :   rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt
+                rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.build.bin
+            :   rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.txt
                 rs.chr.pos.database/build.the.binary.cc
 {
-export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.build.bin"
-    ls rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt
+export  target="rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.build.bin"
+    ls rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.txt
     head    liftover/dbsnp/liftover_hg18.bed    \
             liftover/dbsnp/liftover_hg19.bed          \
             liftover/dbsnp/dbsnp_hg20.bed
@@ -75,7 +82,7 @@ export  target="rs.chr.pos.database/rss.in.1kg.uk10k.hrc.build.bin"
         liftover/dbsnp/liftover_hg18.bed                                                      \
         liftover/dbsnp/liftover_hg19.bed                                                      \
         liftover/dbsnp/dbsnp_hg20.bed                                                         \
-        rs.chr.pos.database/rss.in.1kg.uk10k.hrc.txt                                    \
+        rs.chr.pos.database/rss.in.1kgX.uk10k.hrc.txt                                    \
         "$target".tmp
     mv  "$target".tmp "$target"
 }
