@@ -1,8 +1,8 @@
 file_name:gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
 ... loading the 1.7GB database of positions under three builds. This will take about a minute.  Loaded.
 Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel
-some_records_from_each_chromosome.size():1'538
-count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 28 , 0 , 0 , 1'503 , 0
+some_records_from_each_chromosome.size():1'549
+count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 28 , 0 , 0 , 1'513 , 0
 gwas_all_chrpos.size():0
 count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 0 , 0 , 0 , 0 , 0
 which_build_gwas,which_build_ref:	unknown , hg19_1
