@@ -243,26 +243,30 @@ which_build_t estimate_build_of_reference_panel (   string                      
     for(int chrm =  1; chrm <= 23; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
-        std::vector<IDchrmPos> a_few_records;
+        try {
+            std::vector<IDchrmPos> a_few_records;
 
-        tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
+            tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
-        ref_vcf.set_region  (   chrpos{chrm, 0}
-                            ,   chrpos{chrm,std::numeric_limits<int>::max()}
-                            );
-        RefRecord rr;
-        while(ref_vcf.read_record_into_a_RefRecord(rr) ){
-            if(utils:: startsWith(rr.ID, "rs")) {
-                try {
-                    int rs = utils:: lexical_cast<int>(rr.ID.substr(2));
-                    a_few_records.push_back( IDchrmPos{ rs , chrm, rr.pos });
-                    if(a_few_records.size() >= 100)
-                        break;
-                } catch (std:: invalid_argument &) {
+            ref_vcf.set_region  (   chrpos{chrm, 0}
+                                ,   chrpos{chrm,std::numeric_limits<int>::max()}
+                                );
+            RefRecord rr;
+            while(ref_vcf.read_record_into_a_RefRecord(rr) ){
+                if(utils:: startsWith(rr.ID, "rs")) {
+                    try {
+                        int rs = utils:: lexical_cast<int>(rr.ID.substr(2));
+                        a_few_records.push_back( IDchrmPos{ rs , chrm, rr.pos });
+                        if(a_few_records.size() >= 100)
+                            break;
+                    } catch (std:: invalid_argument &) {
+                    }
                 }
             }
+            some_records_from_each_chromosome.insert(some_records_from_each_chromosome.end(), a_few_records.begin(), a_few_records.end());
         }
-        some_records_from_each_chromosome.insert(some_records_from_each_chromosome.end(), a_few_records.begin(), a_few_records.end());
+        catch (std::runtime_error &)
+        { }
     }
     PP(some_records_from_each_chromosome.size());
 
@@ -1025,6 +1029,7 @@ void impute_all_the_regions(   string                                   filename
                 continue;
         }
 
+        try {
         tbi:: read_vcf_with_tbi ref_vcf { filename_of_vcf, chrm };
 
         for(int w = 0; ; ++w ) {
@@ -1480,6 +1485,9 @@ void impute_all_the_regions(   string                                   filename
                 };
             }
         } // loop over windows
+    } // try, in order to ignore a chromosome (such as 'chrX') if it's not present
+    catch (std:: runtime_error &)
+    {}
     } // loop over chromosomes
 
     if(!options:: opt_tags_used_output.empty()) {
