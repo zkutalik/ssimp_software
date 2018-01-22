@@ -51,10 +51,10 @@ Alternatively, if no Z-statistic is available, provide `b=log(OR)` and the P-val
 
 The header of the GWAS file should either be `SNP  a1  a2  Z` or `SNP  a1  a2  b   p`.
 
+
 ### Impute b, and not Z
 [//]: -------------------------------
 First, impute Z-statistics as shown above, then transform the Z-statistic into `se(b)` and `b` using this [R-function](https://github.com/sinarueeger/ssimp_software/blob/master/transform_z_to_b.R).
-
 
 
 ### Chr and Pos instead of SNP-identifier
@@ -103,9 +103,15 @@ rs78808100 | tr ' ' '\n')`
 ### Imputing SNPs on the X-chromosome
 [//]: -------------------------------
 
-This was fixed with version 0.3. 
+This was fixed in version 0.3. 
 
-Examples underway. 
+`ssimp --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out output.txt`
+
+Impute single SNPs (rsid)
+`ssimp --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out output.txt --impute.snp <(echo rs183055800 rs146115300 rs150092800 | tr ' ' '\n')`
+
+Impute range of SNPs (X:pos)
+`ssimp --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out output.txt --impute.range 23:18000000-23:18100075`
 
 
 ### Use a set of tag SNPs
@@ -170,7 +176,7 @@ Your GWAS summary statistics needs to have a sample size column.
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` **`--log my_ssimp_logfile`**
 
 
-### Sanitycheck
+### Sanitycheck with reimputed tag SNPs
 [//]: -------------------------------
 Check R-file `docu/sanitycheck_reimputed.R`
 
