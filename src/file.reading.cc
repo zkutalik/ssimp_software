@@ -429,7 +429,10 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
             gls.m_chrpos.chr = -1;
             gls.m_chrpos.pos = -1;
             if(hd.chromosome.m_offset != -1) {
-                gls.m_chrpos.chr = utils:: lexical_cast<int>( LOOKUP(hd, chromosome, all_split_up) );
+                std::string chr = LOOKUP(hd, chromosome, all_split_up);
+                if(chr == "X" || chr == "x")
+                    chr = "23";
+                gls.m_chrpos.chr = utils:: lexical_cast<int>( chr );
             }
             if(hd.position.m_offset != -1) {
                 gls.m_chrpos.pos = utils:: lexical_cast<int>( LOOKUP(hd, position, all_split_up) );
