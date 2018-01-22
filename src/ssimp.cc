@@ -832,6 +832,15 @@ int main(int argc, char **argv) {
 namespace ssimp{
 
 static
+int
+lexical_cast_int_X_is_23(std::string const & s)
+{
+    if(s=="X" || s == "x")
+        return 23;
+    return utils::lexical_cast<int>(s);
+}
+
+static
 chrpos  parse_chrpos_text_to_object     (string as_text, bool to_end_of_chromosome) {
     if  (   as_text.substr(0, 3) == "chr"
          || as_text.substr(0, 3) == "Chr"
@@ -842,13 +851,13 @@ chrpos  parse_chrpos_text_to_object     (string as_text, bool to_end_of_chromoso
     chrpos position;
     switch(separated_by_colon.size()) {
         break; case 1: // no colon, just a chromosome
-                position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
+                position.chr = lexical_cast_int_X_is_23(separated_by_colon.at(0));
                 position.pos = to_end_of_chromosome
                                 ?  std:: numeric_limits<int>::max()
                                 :  std:: numeric_limits<int>::lowest() ;
         break; case 2:
-                position.chr = utils:: lexical_cast<int>(separated_by_colon.at(0));
-                position.pos = utils:: lexical_cast<int>(separated_by_colon.at(1));
+                position.chr = lexical_cast_int_X_is_23(separated_by_colon.at(0));
+                position.pos = lexical_cast_int_X_is_23(separated_by_colon.at(1));
         break; default:
                 DIE("too many colons in [" << as_text << "]");
     }
