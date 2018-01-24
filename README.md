@@ -53,6 +53,12 @@ While the github folder itself is rather small (136 MB), the folder `reference_p
 When running, the software uses about 5 GB of memory. Make sure you have enough RAM when running the software in parallel!
 
 
+## Runtime
+[//]: -------------------------------
+
+It is roughly ~200 CPU hours to impute to full genome (~20M variants). Runtime is depends on the number of variants imputed and the size of the reference panel. 
+
+
 ## Example
 [//]: -------------------------------
 
