@@ -56,7 +56,7 @@ When running, the software uses about 5 GB of memory. Make sure you have enough 
 ## Runtime
 [//]: -------------------------------
 
-It takes roughly ~200 CPU hours to impute to full genome (~20M variants). Runtime is depends on the number of variants imputed and the size of the reference panel. 
+It takes roughly ~200 CPU hours to impute to full genome (~20M variants). Runtime depends on the number of variants imputed and the size of the reference panel. 
 
 
 ## Example
