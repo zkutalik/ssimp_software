@@ -1,4 +1,3 @@
-list(rm = ls())
 
 ## chromosome to impute
 args <- commandArgs(trailingOnly = TRUE)

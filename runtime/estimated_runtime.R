@@ -16,8 +16,8 @@
 ## --------------------------
 library(readr)
 nams <- grep(".txt", grep("runtime_",dir(), value = TRUE), value = TRUE)
-rem <- grep("tmp", nams)
-nams <- nams[-rem]
+#rem <- grep("tmp", nams)
+#nams <- nams[-rem]
 
 out.raw <- lapply(nams, function(x) read_tsv(x))
 out <- do.call("rbind", out.raw)
@@ -36,3 +36,5 @@ out$estim.chr22[out$chr == 22] <- out$runtime[out$chr == 22]
 sum(out$estim.chr1)
 sum(out$estim.chr22)
  
+
+## ~200 CPU hours to impute full genome its ~20M variants
