@@ -11,9 +11,9 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.2) - static version
+[Linux](compiled/ssimp-linux-0.3) - static version
 
-[MacOS](compiled/ssimp-osx-0.2) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
+[MacOS](compiled/ssimp-osx-0.3) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
 
 ### Compile from source 
 
@@ -62,7 +62,7 @@ It takes roughly ~200 CPU hours to impute to full genome (~20M variants). Runtim
 ## Example
 [//]: -------------------------------
 
-`ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
+`ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
 
 will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
 
