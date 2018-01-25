@@ -1,0 +1,6 @@
+This folder is to track traffic in a github folder. 
+
+## 1) execute the A_github_traffic.sh file. This will read out csv files.
+## 2) execute the B_github_traffic.sh file. This will bundle all the existing csv files and remove
+## duplicated rows. 
+## 3) execute the C_github_traffic.sh file. This will create graphs similar to the ones on github. 
