@@ -2,6 +2,21 @@
 ## https://github.com/nchah/github-traffic-stats
 
 
+## OSX
+## ------
+# pip install --user virtualenv
+# mkdir -p ~/my.python.virtualenvs
+# cd ~/my.python.virtualenvs
+# /Users/admin/Library/Python/2.7/bin/virtualenv gh-traffic-stats  # use any name you please
+# ls   # to see the virtual envs
+# ##you can switch to another directory on the system if you like
+# ##now, the place where you wish to save your traffic stats
+source ~/my.python.virtualenvs/gh-traffic-stats/bin/activate # every time you log in to rerun the traffic stats, you will need to rerun this line to 'activate' this virtual env
+pip install github_traffic_stats # this will "install" it somewhere inside ~/my.python.virtualenvs/gh-traffic-stats
+gts sinarueeger ssimp_software
+
+## HPC
+## -------
 source ~/my.python.virtualenvs/gh-traffic-stats/bin/activate 
 #every time you log in to rerun the traffic stats, you will need to rerun this line to 'activate' this virtual env
 pip install github_traffic_stats # this will "install" it somewhere inside ~/my.python.virtualenvs/gh-traffic-stats
