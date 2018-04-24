@@ -11,16 +11,17 @@
 # ls   # to see the virtual envs
 # ##you can switch to another directory on the system if you like
 # ##now, the place where you wish to save your traffic stats
-source ~/my.python.virtualenvs/gh-traffic-stats/bin/activate # every time you log in to rerun the traffic stats, you will need to rerun this line to 'activate' this virtual env
+
+#source ~/my.python.virtualenvs/gh-traffic-stats/bin/activate # every time you log in to rerun the traffic stats, you will need to rerun this line to 'activate' this virtual env
 pip install github_traffic_stats # this will "install" it somewhere inside ~/my.python.virtualenvs/gh-traffic-stats
 gts sinarueeger ssimp_software
 
 ## HPC
 ## -------
-source ~/my.python.virtualenvs/gh-traffic-stats/bin/activate 
+#source ~/my.python.virtualenvs/gh-traffic-stats/bin/activate 
 #every time you log in to rerun the traffic stats, you will need to rerun this line to 'activate' this virtual env
-pip install github_traffic_stats # this will "install" it somewhere inside ~/my.python.virtualenvs/gh-traffic-stats
-gts sinarueeger ssimp_software # This works, you must enter your password
+#pip install github_traffic_stats # this will "install" it somewhere inside ~/my.python.virtualenvs/gh-traffic-stats
+#gts sinarueeger ssimp_software # This works, you must enter your password
 
 ## stores some csv files.
 
