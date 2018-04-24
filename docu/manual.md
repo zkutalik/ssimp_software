@@ -17,7 +17,7 @@ An executable example is:
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-Where `ssimp` is the newest version in the `compiled/` folder. 
+Where `ssimp` is the newest version in the `compiled/` or `bin/`folder. 
 
 ## Options
 [//]: -------------------------------

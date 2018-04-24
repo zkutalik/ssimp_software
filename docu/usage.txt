@@ -68,7 +68,7 @@ panel and use the specified super population for imputation.
 For example, if we want 1000 genomes to be downloaded and EUR population used 
 for imputation, we type: 
 
-bin/ssimp gwas/small.random.csv 1KG/EUR output.txt
+ssimp gwas/small.random.txt 1KG/EUR output.txt
 
 Make sure that:
 1) you have `wget` installed and
