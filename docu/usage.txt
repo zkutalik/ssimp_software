@@ -17,9 +17,9 @@ be downloaded by you.
 If you have already downloaded the 1000genomes reference panel (see below for
 more details) to '~/reference_panels/1000genomes', then you can run this:
 
-    ssimp  gwas.txt  ~/reference_panels/1000genomes output.txt --sample.names super_pop=EUR
+    ssimp  gwas.txt  ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
 
-    ssimp  gwas.txt  ~/reference_panels/1000genomes --out output.txt --sample.names super_pop=EUR
+    ssimp  gwas.txt  ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz --out output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
 
 
 Options:
@@ -97,7 +97,7 @@ wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of
 You can then pass this directory name to 'ssimp', and specify that only
 the European individuals should be used:
 
-    ssimp  gwas.txt  output.txt  ~/reference_panels/1000genomes  --sample.names super_pop=EUR
+    ssimp  gwas.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.g output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
 
 'super_pop=EUR' can be replaced with other (super-)populations if necessary. E.g.
 
@@ -116,9 +116,10 @@ specify the filename of the .vcf.gz files. If you have 22 separate .vcf.gz files
 (one for each chromosome), then replace the chromosome number with  {CHRM}  to
 direct ssimp to replace that string with the chromosome number. For example:
 
-    ssimp  gwas.txt output.txt              \
+    ssimp  gwas.txt              \
             ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
-            --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
+           output.txt \
+           --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
 
 If the '--sample.names' option is not specified, all individuals in the
 .vcf.gz file will be used. This is inappropriate in some cases (for example

@@ -26,11 +26,18 @@ For more info regarding automatically column names recognition of the GWAS file,
 ### Downloading the reference panel
 [//]: -------------------------------
 
+If you have a reference panel `REF/myrefpanel{CHR}.vcf.gz` available, use it as follows
+
+`ssimp --gwas gwas/small.random.txt` **`--ref REF/myrefpanel{CHR}.vcf.gz`** ` --out output.txt`
+
 For detailed instructions and explanations see detailed instructions in [usage-text](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
 A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG (all populations, not only the selected one).
 
 `ssimp --gwas gwas/small.random.txt` **`--ref 1KG/EUR`** ` --out output.txt`
+
+Then, use it as follows:
+`ssimp --gwas gwas/small.random.txt ~/reference_panels/1KG/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`
 
 
 ### You do not have the Z-statistics available, but you have...

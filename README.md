@@ -64,7 +64,9 @@ It takes roughly ~200 CPU hours to impute to full genome (~20M variants) with 50
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt` 
 
-will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`. 
+will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`.
+
+Instead of `ssimp` you should type either `./compiled/ssimp-linux-0.3` or `./compiled/ssimp-osx-0.3` (or `bin/ssimp`, if compiled on your machine).
 
 ## Documentation
 [//]: -------------------------------
@@ -90,14 +92,14 @@ Make sure that:
 
 For example, if we want 1000 genomes to be downloaded and EUR population used for imputation, we type: 
 
-`bin/ssimp gwas/small.random.csv 1KG/EUR output.txt` 
+`ssimp gwas/small.random.txt 1KG/EUR output.txt` 
 
 It will then download 1000 genomes reference panel **and** a file that enables fast imputation of single SNPs. 
 
 When using `ssimp` you can then pass this directory name to 'ssimp', and specify that only
 as subset of individuals (here AFR) should be used:
 
-`ssimp gwas.txt output.txt ~/reference_panels/1000genomes --sample.names super_pop=AFR`
+`ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
