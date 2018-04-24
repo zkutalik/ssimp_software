@@ -9,20 +9,20 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Installation
 [//]: -------------------------------
 
-### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.3) - static version
+### Folder with compiled version (binary)
 
-[MacOS](compiled/ssimp-osx-0.3) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
-
-You can also download the zip file and unpack the zip file (or clone the github folder). This will give you access to all toy examples. 
+We recommend to download the full folder. This will give you access to all toy examples. 
 
 (1) Download
+
 `wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
 
 `unzip master.zip`
 
 (2) Access the folder
+
+`cd ssimp_software-master`
 
 (3) Rename the binary
 
@@ -31,6 +31,12 @@ Depending on what OS you are on:
 `cp compiled/ssimp-linux-0.3 ssimp`
 
 `cp compiled/ssimp-osx-0.3 ssimp`
+
+### Compiled version (binary)
+
+[Linux](compiled/ssimp-linux-0.3) - static version
+
+[MacOS](compiled/ssimp-osx-0.3) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
 
 
 ### Compile from source 
