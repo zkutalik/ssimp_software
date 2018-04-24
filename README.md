@@ -15,6 +15,24 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 
 [MacOS](compiled/ssimp-osx-0.3) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
 
+You can also download the zip file and unpack the zip file (or clone the github folder). This will give you access to all toy examples. 
+
+(1) Download
+`wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
+
+`unzip master.zip`
+
+(2) Access the folder
+
+(3) Rename the binary
+
+Depending on what OS you are on:
+
+`cp compiled/ssimp-linux-0.3 ssimp`
+
+`cp compiled/ssimp-osx-0.3 ssimp`
+
+
 ### Compile from source 
 
 Check your gcc version with `gcc --version`. It needs to be 5.0.0 or higher.
@@ -27,19 +45,23 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 `unzip master.zip`
 
-(2) access the folder
+(2) Access the folder
 
 `cd ssimp_software-master`
 
-(3) run the makefile (source compilation)
+(3) Run the makefile (source compilation)
 
 `make`
+
+This will create a file `bin/ssimp`.
+
+`cp bin/ssimp ssimp`
 
 (4) Run your first summary statistics imputation on a test file (uses a small toy reference panel)
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-(5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panels` in your home directory). Check out `Download 1000 genomes reference panel` below to download. 
+(5) To run your own summary statistics imputation, you need to have a reference panel ready (in the folder `reference_panels` in your home directory). Check out [Download 1000 genomes reference panel](#download-1000-genomes-reference-panel) below to download. 
 
 
 
@@ -66,7 +88,6 @@ It takes roughly ~200 CPU hours to impute to full genome (~20M variants) with 50
 
 will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`.
 
-Instead of `ssimp` you should type either `./compiled/ssimp-linux-0.3` or `./compiled/ssimp-osx-0.3` (or `bin/ssimp`, if compiled on your machine).
 
 ## Documentation
 [//]: -------------------------------
@@ -99,7 +120,7 @@ It will then download 1000 genomes reference panel **and** a file that enables f
 When using `ssimp` you can then pass this directory name to 'ssimp', and specify that only
 as subset of individuals (here AFR) should be used:
 
-`ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names super_pop=AFR`
+`ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
