@@ -17,7 +17,7 @@ An executable example is:
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-Where `ssimp` is the newest version in the `compiled/` folder. 
+Where `ssimp` is the newest version in the `compiled/` or `bin/`folder. 
 
 ## Options
 [//]: -------------------------------
@@ -27,7 +27,7 @@ Note that arguments can be shortenend, e.g. `--wind` instead of `--window.width`
 
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). 
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). The same folder should contain also the `.tbi` file(s). Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
 
 `--out [no default]` string. Filename to store the imputation results. 
 
@@ -206,7 +206,7 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 ## How to cite SSimp
 [//]: ----------
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
+**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2018/02/09/203927)
 
 
 ## References
