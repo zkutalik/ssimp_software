@@ -3,9 +3,8 @@
 [//]: ========================================
 
 ```diff
-- The latest version of the SSIMP software (0.3) is buggy. 
+- ## The latest version of the SSIMP software (0.3) is buggy. For details see issue [62](issue/62). We will fix the problem as soon as we can. 
 ```
-For details see issue [62](issue/62). We will fix the problem as soon as we can. 
 
 
 This command-line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
