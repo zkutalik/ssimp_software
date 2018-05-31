@@ -3,7 +3,7 @@
 [//]: ========================================
 
 
-<span style="color:red" style="font-size:larger">The latest version of the SSIMP software (0.3) is buggy.</span>, for details see issue [62](issue/62). We will fix the problem as soon as we can. 
+<p style='color:red'>The latest version of the SSIMP software (0.3) is buggy.</p>, for details see issue [62](issue/62). We will fix the problem as soon as we can. 
 
 
 This command-line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
