@@ -3,7 +3,7 @@
 [//]: ========================================
 
 
-<span style="color:red" style="font-size:larger;">**The latest version of the SSIMP software (0.3) is buggy.**</span>, for details see issue (62)[issue/62]. We will fix the problem as soon as we can. 
+<span style="color:red" style="font-size:larger">**The latest version of the SSIMP software (0.3) is buggy.**</span>, for details see issue [62](issue/62). We will fix the problem as soon as we can. 
 
 
 This command-line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
@@ -150,12 +150,12 @@ We have used code (with permission, and under the GPL) from [libStatGen](https:/
 Report bugs here: (https://github.com/sinarueeger/ssimp_software/issues)[https://github.com/sinarueeger/ssimp_software/issues]
 
 
-## Wiki / FAQ
+<!--## Wiki / FAQ
 [//]: -------------------------------
-We are currently working on a Wiki.
+We are currently working on a Wiki.-->
 
 
 ## Contact
 [//]: -------------------------------
-<sina.rueeger@gmail.com>
+<zoltan.kutalik@gmail.com>
 
