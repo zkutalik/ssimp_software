@@ -6,6 +6,8 @@ This command-line software enables summary statistics imputation (SSimp) for GWA
 
 The only input needed from the user are the **GWAS summary statistics** and a **reference panel** (e.g. 1000 genomes, needed for LD computation).
 
+This installation
+
 ## Installation
 [//]: -------------------------------
 
