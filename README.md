@@ -2,15 +2,19 @@
 # Software for Summary Statistics Imputation
 [//]: ========================================
 
-```diff
-- The latest version of the SSIMP software (0.3) is buggy. 
-- For details see issue [62](issue/62). We will fix the problem as soon as we can. 
-```
-
 
 This command-line software enables summary statistics imputation (SSimp) for GWAS summary statistics. 
 
 The only input needed from the user are the **GWAS summary statistics** and a **reference panel** (e.g. 1000 genomes, needed for LD computation).
+
+
+## Current version
+[//]: -------------------------------
+```diff
+- The latest version of the SSIMP software (0.3) is buggy. 
+```
+For details see issue [62](issue/62). We will fix the problem as soon as we can. 
+
 
 ## Installation
 [//]: -------------------------------
