@@ -13,7 +13,7 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ```diff
 - The latest version of the SSIMP software (0.3) is buggy. 
 ```
-For details see issue [62](issue/62). We will fix the problem as soon as we can. 
+For details see issue [62](https://github.com/zkutalik/ssimp_software/issues/62). We will fix the problem as soon as we can. 
 
 
 ## Installation
