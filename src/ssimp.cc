@@ -114,6 +114,13 @@ ostream & operator<<(ostream & o, which_build_t w) {
     }
     return o;
 }
+static
+int add_one_if_not_negative(int x) {
+    if(x==-1)
+        return -1;
+    else
+        return x+1;
+}
 chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build) {
     int chrm = db_entry.chrom;
     switch(which_build) {
@@ -121,9 +128,12 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
         break; case which_build_t:: hg19_0: return { chrm, db_entry.hg19 };
         break; case which_build_t:: hg20_0: return { chrm, db_entry.hg20 };
 
-        break; case which_build_t:: hg18_1: return { chrm, db_entry.hg18+1 };
-        break; case which_build_t:: hg19_1: return { chrm, db_entry.hg19+1 };
-        break; case which_build_t:: hg20_1: return { chrm, db_entry.hg20+1 };
+        // otherwise, we want to add one to the position, but only if the
+        // position is not -1. i.e. not unknown.
+        // We want to keep '-1' to mean "unknown position"
+        break; case which_build_t:: hg18_1: return { chrm, add_one_if_not_negative(db_entry.hg18) };
+        break; case which_build_t:: hg19_1: return { chrm, add_one_if_not_negative(db_entry.hg19) };
+        break; case which_build_t:: hg20_1: return { chrm, add_one_if_not_negative(db_entry.hg20) };
 
         break; default: ;
     }
