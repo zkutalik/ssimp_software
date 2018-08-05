@@ -735,9 +735,15 @@ int main(int argc, char **argv) {
                         auto offset_into_big_db = database_of_builds_rs_to_offset[gwas_rs_int];
                         assert(database_of_builds.at(offset_into_big_db).rs == gwas_rs_int);
                         chrpos new_chrpos = get_one_build(database_of_builds.at(offset_into_big_db), which_build_ref);
-                        //PP(gwas_rs_int, new_chrpos);
-                        assert(new_chrpos != (chrpos{-1,0}));
-                        gwas->set_chrpos(i, new_chrpos);
+                        if (new_chrpos.pos == -1) {
+                            // we can't do anything here, as we don't know its position.
+                            // This is a SNP which is known in at least one build (hence
+                            // it's in the database), but it's not known in the desired
+                            // build
+                        } else {
+                            assert(new_chrpos != (chrpos{-1,0}));
+                            gwas->set_chrpos(i, new_chrpos);
+                        }
                     } else {
                         // not in the database - should we delete it?
                         // TODO: decide whether to delete or now
