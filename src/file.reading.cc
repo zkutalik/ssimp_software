@@ -343,11 +343,13 @@ struct SimpleGwasFile : public file_reading:: Effects_I
             );
     }
     virtual void        delete_snps_with_no_position() {
-        for(int i=0; i<utils::ssize(m_each_SNP_and_its_z); ++i) {
+        for(int i=0; i<utils::ssize(m_each_SNP_and_its_z);) {
             if(this->get_chrpos(i) == chrpos{-1,-1}) {
                 assert( (m_each_SNP_and_its_z.begin()+i)->m_chrpos == chrpos({-1,-1}) );
                 m_each_SNP_and_its_z.erase(m_each_SNP_and_its_z.begin() + i);
             }
+            else
+                ++i;
         }
     }
 
