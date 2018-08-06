@@ -725,7 +725,11 @@ int main(int argc, char **argv) {
         if(which_build_gwas == ssimp:: which_build_t:: unknown) {
             // let's copy in as much as we can from the database into the gwas.
             // We only have the rs-number to go on though.
-            for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
+            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+                // first, clear out any position already assigned. We
+                // don't know the build, so we can't really trust them.
+                gwas->set_chrpos(i, chrpos{-1,-1});
+            }
             for(int i = 0; i<gwas->number_of_snps(); ++i ) {
                 auto   gwas_rs      =   gwas->get_SNPname(i);
                 if(gwas_rs.substr(0,2) == "rs") {
