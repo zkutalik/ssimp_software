@@ -114,6 +114,13 @@ ostream & operator<<(ostream & o, which_build_t w) {
     }
     return o;
 }
+static
+int add_one_if_not_negative(int x) {
+    if(x==-1)
+        return -1;
+    else
+        return x+1;
+}
 chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build) {
     int chrm = db_entry.chrom;
     switch(which_build) {
@@ -121,9 +128,12 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
         break; case which_build_t:: hg19_0: return { chrm, db_entry.hg19 };
         break; case which_build_t:: hg20_0: return { chrm, db_entry.hg20 };
 
-        break; case which_build_t:: hg18_1: return { chrm, db_entry.hg18+1 };
-        break; case which_build_t:: hg19_1: return { chrm, db_entry.hg19+1 };
-        break; case which_build_t:: hg20_1: return { chrm, db_entry.hg20+1 };
+        // otherwise, we want to add one to the position, but only if the
+        // position is not -1. i.e. not unknown.
+        // We want to keep '-1' to mean "unknown position"
+        break; case which_build_t:: hg18_1: return { chrm, add_one_if_not_negative(db_entry.hg18) };
+        break; case which_build_t:: hg19_1: return { chrm, add_one_if_not_negative(db_entry.hg19) };
+        break; case which_build_t:: hg20_1: return { chrm, add_one_if_not_negative(db_entry.hg20) };
 
         break; default: ;
     }
@@ -715,7 +725,11 @@ int main(int argc, char **argv) {
         if(which_build_gwas == ssimp:: which_build_t:: unknown) {
             // let's copy in as much as we can from the database into the gwas.
             // We only have the rs-number to go on though.
-            for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
+            for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+                // first, clear out any position already assigned. We
+                // don't know the build, so we can't really trust them.
+                gwas->set_chrpos(i, chrpos{-1,-1});
+            }
             for(int i = 0; i<gwas->number_of_snps(); ++i ) {
                 auto   gwas_rs      =   gwas->get_SNPname(i);
                 if(gwas_rs.substr(0,2) == "rs") {
@@ -725,9 +739,15 @@ int main(int argc, char **argv) {
                         auto offset_into_big_db = database_of_builds_rs_to_offset[gwas_rs_int];
                         assert(database_of_builds.at(offset_into_big_db).rs == gwas_rs_int);
                         chrpos new_chrpos = get_one_build(database_of_builds.at(offset_into_big_db), which_build_ref);
-                        //PP(gwas_rs_int, new_chrpos);
-                        assert(new_chrpos != (chrpos{-1,0}));
-                        gwas->set_chrpos(i, new_chrpos);
+                        if (new_chrpos.pos == -1) {
+                            // we can't do anything here, as we don't know its position.
+                            // This is a SNP which is known in at least one build (hence
+                            // it's in the database), but it's not known in the desired
+                            // build
+                        } else {
+                            assert(new_chrpos != (chrpos{-1,0}));
+                            gwas->set_chrpos(i, new_chrpos);
+                        }
                     } else {
                         // not in the database - should we delete it?
                         // TODO: decide whether to delete or now
