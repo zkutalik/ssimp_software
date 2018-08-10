@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SSIMP="compiled/ssimp-osx-0.4"
+SSIMP="compiled/ssimp-linux-0.4"
 
 $SSIMP --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt
 
@@ -63,6 +63,6 @@ $SSIMP --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out ou
 $SSIMP --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.snp <(echo X:18008535 X:18010084 X:18037863 | tr ' ' '\n')
 
 
-$SSIMP --gwas gwas/small.random.txt --ref 1KG/EUR --out output.txt
+### $SSIMP --gwas gwas/small.random.txt --ref 1KG/EUR --out output.txt
 
-$SSIMP --gwas gwas/small.random.txt ~/reference_panels/1KG/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
+$SSIMP --gwas gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR
