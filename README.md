@@ -38,15 +38,15 @@ We recommend to download the full folder. This will give you access to all toy e
 
 Depending on what OS you are on:
 
-`cp compiled/ssimp-linux-0.3 ssimp`
+`cp compiled/ssimp-linux-0.4 ssimp`
 
-`cp compiled/ssimp-osx-0.3 ssimp`
+`cp compiled/ssimp-osx-0.4 ssimp`
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.3) - static version
+[Linux](compiled/ssimp-linux-0.4) - static version
 
-[MacOS](compiled/ssimp-osx-0.3) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
+[MacOS](compiled/ssimp-osx-0.4) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/). 
 
 
 ### Compile from source 
@@ -141,10 +141,16 @@ as subset of individuals (here AFR) should be used:
 More info on handling reference panel data can be found starting from line 49 in [usage
 message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
 
+
 ## Run tests
 [//]: -------------------------------
-`stu @all.tests`
+`stu @all.tests` or check [this file](tests/howto.txt). 
 
+## Compile new version
+[//]: -------------------------------
+
+1. Follow instructions in [this file](compiled/howto.txt).
+2. Update VERSION file.
 
 ## Contributors
 [//]: -------------------------------
