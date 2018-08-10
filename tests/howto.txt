@@ -1,0 +1,3 @@
+run   
+
+stu @all.tests

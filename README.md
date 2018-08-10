@@ -138,7 +138,13 @@ as subset of individuals (here AFR) should be used:
 
 `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
 
-More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+More info on handling reference panel data can be found starting from line 49 in [usage
+message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+
+## Run tests
+[//]: -------------------------------
+`stu @all.tests`
+
 
 ## Contributors
 [//]: -------------------------------
