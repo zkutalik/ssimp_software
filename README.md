@@ -162,6 +162,17 @@ message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.tx
 
 We have used code (with permission, and under the GPL) from [libStatGen](https://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen) and [stu](https://github.com/kunegis/stu).
 
+## Citation
+[//]: -------------------------------
+
+If you use this software in your scientific research, please consider citing
+
+Rüeger, S., McDaid, A., Kutalik, Z. (2017). Evaluation and application of summary statistic imputation to discover new height-associated loci. PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
+
+Rüeger, S., McDaid, A., Kutalik, Z. (2017). Improved imputation of summary statistics for realistic settings. bioRxiv. https://doi.org/10.1101/203927
+
+Copyright 2018.
+(Aaron McDaid, Sina Rüeger, Zoltán Kutalik, https://github.com/zkutalik/ssimp_software)
 
 ## Bug report
 [//]: -------------------------------
