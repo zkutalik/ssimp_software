@@ -11,6 +11,22 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Current version: 0.4
 [//]: -------------------------------
 
+**Important*: along with the SSIMP installation, you will also need to download a file (a database with all positions on different builds) into your `~/reference_panel/` folder. 
+
+
+If this is the **first time** that you download SSIMP, create a folder typing
+```
+cd ~
+mkdir reference_panels
+wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+```
+in your terminal. 
+
+If you had previous versions of SSIMP installed, you **NEED to redownload** the database. 
+```
+wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+```
+
 ## Installation
 [//]: -------------------------------
 
@@ -173,6 +189,11 @@ Copyright 2018.
 [//]: -------------------------------
 Report bugs here: (https://github.com/sinarueeger/ssimp_software/issues)[https://github.com/sinarueeger/ssimp_software/issues]
 
+If you are having trouble with SSIMP versions >= 0.4, make sure that you delete your database in folder `~/reference_panels/database*` and redownload it using the following command
+
+```
+wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+```
 
 <!--## Wiki / FAQ
 [//]: -------------------------------
