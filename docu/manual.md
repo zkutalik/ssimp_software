@@ -85,7 +85,7 @@ Note, that you still need to integrate the shell script content into your schedu
 - Column names are automatically recognised using commonly used names. See subsection below.
 - Odds ratios need to be provided as Z-statistics or, alternatively, be log-transformed into effect sizes (`b`).
 - The minimal columns required are `SNP`, `A1`, `A2`, `Z`. If `Z` is not present, but `P` and `b` are, `Z` is calculated through `P` and `b`. 
-- Missing values should be marked as `NA` or left empty. 
+- Missing values should be marked as `NA` or left empty. Sample size cannot contain `NA`.
 - Positions should match the positions in the reference panel (e.g. both hg19). 
 - It is recommended to provide the sample size (N) and set `--missingness dep`, as incorporating missingness leads to a more accurate estimate. 
 - SNP names should be named so they match the SNP-id in the reference panel. E.g. if the reference panel uses `chr:pos`, the GWAS should have the same SNP identifier.
