@@ -11,17 +11,16 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Current version: 0.4
 [//]: -------------------------------
 
-**Important*: along with the SSIMP installation, you will also need to download a file (a database with all positions on different builds) into your `~/reference_panel/` folder. 
+**Important**: along with the SSIMP installation, you will also need to download a file (a database with all positions on different builds) into your `~/reference_panel/` folder. 
 
 
-If this is the **first time** that you download SSIMP, create a folder typing
+If this is the **first time** that you download SSIMP, create a folder typing the following in your terminal:
 ```
 cd ~
 mkdir reference_panels
 wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 ```
-in your terminal. 
-
+ 
 If you had previous versions of SSIMP installed, you **NEED to redownload** the database. 
 ```
 wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
