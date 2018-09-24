@@ -18,12 +18,12 @@ If this is the **first time** that you download SSIMP, create a folder typing th
 ```
 cd ~
 mkdir reference_panels
-wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 ```
  
 If you had previous versions of SSIMP installed, you **NEED to redownload** the database. 
 ```
-wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 ```
 
 ## Installation
@@ -191,7 +191,7 @@ Report bugs here: (https://github.com/sinarueeger/ssimp_software/issues)[https:/
 If you are having trouble with SSIMP versions >= 0.4, make sure that you delete your database in folder `~/reference_panels/database*` and redownload it using the following command
 
 ```
-wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 ```
 
 <!--## Wiki / FAQ

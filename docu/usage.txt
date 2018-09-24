@@ -92,7 +92,7 @@ if it is available on your machine:
 
 Additionally, download the dataset that allows you fast imputation of single SNPs.
 
-wget https://drive.switch.ch/index.php/s/fcqrO9HWcINS2Qq/download -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 
 You can then pass this directory name to 'ssimp', and specify that only
 the European individuals should be used:
