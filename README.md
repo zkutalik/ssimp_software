@@ -186,7 +186,7 @@ Copyright 2018.
 
 ## Bug report
 [//]: -------------------------------
-Report bugs here: (https://github.com/sinarueeger/ssimp_software/issues)[https://github.com/sinarueeger/ssimp_software/issues]
+Report bugs here: [https://github.com/sinarueeger/ssimp_software/issues](https://github.com/sinarueeger/ssimp_software/issues)
 
 If you are having trouble with SSIMP versions >= 0.4, make sure that you delete your database in folder `~/reference_panels/database*` and redownload it using the following command
 
