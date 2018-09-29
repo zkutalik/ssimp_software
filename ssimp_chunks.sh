@@ -78,7 +78,7 @@ library(dplyr) ## for filter
 
 ## download reference file that contains chr/pos
 ## ----------------------------------------------
-url <-"https://drive.switch.ch/index.php/s/e3MuOYEudU1JbUo/download"
+url <-"https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download"
 file <- "reference_panels/dbsnp_hg20_chr_pos_sorted.txt.gz"
 if(!file.exists(file))
 {
