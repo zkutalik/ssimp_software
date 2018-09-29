@@ -267,7 +267,7 @@ which_build_t estimate_build_of_reference_panel (   string                      
                     try {
                         int rs = utils:: lexical_cast<int>(rr.ID.substr(2));
                         a_few_records.push_back( IDchrmPos{ rs , chrm, rr.pos });
-                        if(a_few_records.size() >= 100)
+                        if(a_few_records.size() >= 1000)
                             break;
                     } catch (std:: invalid_argument &) {
                     }
