@@ -143,20 +143,32 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
 
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
-    cout << "... loading the 1.7GB database of positions under three builds. This will take about a minute.";
-    cout.flush();
-    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"          , getenv("HOME"));
-    std:: ifstream f_database_of_builds(path_to_build_database);
-    if(!f_database_of_builds) {
-        DIE("Necessary file missing ["
-                << path_to_build_database
-                << "]. "
-                <<
-R"(Please download it with the following commands:
+    const char * error_message_suffix = R"(Please download it with the following commands:
 
     cd       ~/reference_panels
     wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
-)"
+)";
+    cout << "... loading the 1.7GB database of positions under three builds. This will take about a minute.";
+    cout.flush();
+    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"          , getenv("HOME"));
+    std:: ifstream f_database_of_builds(path_to_build_database, std::ifstream::ate | std::ifstream::binary);
+    if(f_database_of_builds) {
+        auto const size_of_build_database = f_database_of_builds.tellg();
+        if(size_of_build_database != 1789839360) {
+            DIE("Necessary file has the wrong size (should be 1789839360) ["
+                << path_to_build_database
+                << "]. "
+                << error_message_suffix
+                );
+        }
+        f_database_of_builds.seekg(0);
+    }
+
+    if(!f_database_of_builds) {
+        DIE("Necessary file missing or corrupt ["
+                << path_to_build_database
+                << "]. "
+                << error_message_suffix
                 );
 
     }
