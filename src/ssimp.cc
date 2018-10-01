@@ -718,6 +718,12 @@ int main(int argc, char **argv) {
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
+        {
+            auto count_those_removed = gwas->delete_snps_with_identical_alleles();
+            if(count_those_removed > 0) {
+                cout << "Deleted " << count_those_removed << " SNPs as the two allele names are identical.\n";
+            }
+        }
 
         auto database_of_builds = ssimp:: load_database_of_builds();
         std:: map<int, size_t> database_of_builds_rs_to_offset;

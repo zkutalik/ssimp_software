@@ -352,6 +352,18 @@ struct SimpleGwasFile : public file_reading:: Effects_I
                 ++i;
         }
     }
+    virtual int         delete_snps_with_identical_alleles() {
+        int count_those_removed = 0;
+        for(int i=0; i<utils::ssize(m_each_SNP_and_its_z);) {
+            if(this->get_allele_ref(i) == this->get_allele_alt(i)) {
+                ++count_those_removed;
+                m_each_SNP_and_its_z.erase(m_each_SNP_and_its_z.begin() + i);
+            }
+            else
+                ++i;
+        }
+        return count_those_removed;
+    }
 
     GwasLineSummary  get_gls         (int i)     const {
         assert(i>=0);
