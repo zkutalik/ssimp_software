@@ -353,15 +353,14 @@ struct SimpleGwasFile : public file_reading:: Effects_I
         );
     }
     virtual int         delete_snps_with_identical_alleles() {
-        int count_those_removed = 0;
-        for(int i=0; i<utils::ssize(m_each_SNP_and_its_z);) {
-            if(this->get_allele_ref(i) == this->get_allele_alt(i)) {
-                ++count_those_removed;
-                m_each_SNP_and_its_z.erase(m_each_SNP_and_its_z.begin() + i);
-            }
-            else
-                ++i;
-        }
+        auto delete_after_me = std::remove_if(
+                            m_each_SNP_and_its_z.begin(),
+                            m_each_SNP_and_its_z.end(),
+                            [](auto const & x) {
+                                return x.m_allele_alt == x.m_allele_ref;
+                            });
+        int count_those_removed = m_each_SNP_and_its_z.end() - delete_after_me;
+        m_each_SNP_and_its_z.erase(delete_after_me, m_each_SNP_and_its_z.end());
         return count_those_removed;
     }
 
