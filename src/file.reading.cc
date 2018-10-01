@@ -343,14 +343,25 @@ struct SimpleGwasFile : public file_reading:: Effects_I
             );
     }
     virtual void        delete_snps_with_no_position() {
-        for(int i=0; i<utils::ssize(m_each_SNP_and_its_z);) {
-            if(this->get_chrpos(i) == chrpos{-1,-1}) {
-                assert( (m_each_SNP_and_its_z.begin()+i)->m_chrpos == chrpos({-1,-1}) );
-                m_each_SNP_and_its_z.erase(m_each_SNP_and_its_z.begin() + i);
-            }
-            else
-                ++i;
-        }
+        m_each_SNP_and_its_z.erase(
+            std::remove_if( m_each_SNP_and_its_z.begin(),
+                            m_each_SNP_and_its_z.end(),
+                            [](auto const & x) {
+                                return x.m_chrpos == chrpos{-1,-1};
+                            }),
+            m_each_SNP_and_its_z.end()
+        );
+    }
+    virtual int         delete_snps_with_identical_alleles() {
+        auto delete_after_me = std::remove_if(
+                            m_each_SNP_and_its_z.begin(),
+                            m_each_SNP_and_its_z.end(),
+                            [](auto const & x) {
+                                return x.m_allele_alt == x.m_allele_ref;
+                            });
+        int count_those_removed = m_each_SNP_and_its_z.end() - delete_after_me;
+        m_each_SNP_and_its_z.erase(delete_after_me, m_each_SNP_and_its_z.end());
+        return count_those_removed;
     }
 
     GwasLineSummary  get_gls         (int i)     const {
