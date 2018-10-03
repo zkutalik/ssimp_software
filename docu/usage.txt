@@ -1,14 +1,28 @@
-ssimp   GWASFILE [REFPANEL] IMPUTATIONOUTPUT  [OPTIONS]
-ssimp   --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT 
+ssimp   GWASFILE REFPANEL IMPUTATIONOUTPUT  [OPTIONS]
+ssimp   --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT
 
     GWASFILE                Path to an input file.
+    REFPANEL                Either '1KG/EUR', or a path to a '*.vcf.gz' file.
     IMPUTATIONOUTPUT        Output file, to store the imputation results.
-    REFPANEL                If not specified, defaults to the 503 EUR
-                            individuals in 1KG
+
+
+If you are happy to impute using the EUR population in 1000genomes, then
+run the following command. The first time you run this, it will offer to
+download the necessary data from 1000genomes to your harddrive, into
+'~/reference_panels':
+
+    ssimp gwas.txt 1KG/EUR output.txt
+
+You can add extra options, defined below, for example:
+
+    ssimp gwas.txt 1KG/EUR output.txt --impute.range chr17
 
 For examples, visit https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md
 
 For more details of the method and usage, visit https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md
+
+If you wish to use different reference panel (not 1000genomes), or a population
+other than EUR, then a more complex command line is required.
 
 See below for more details on how to download a reference panel. At least one
 reference panel, with a population structure similar to your GWAS sample, must
