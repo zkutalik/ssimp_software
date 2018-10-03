@@ -12,7 +12,7 @@
     bin/o/mvn/mvn.o
     bin/o/gz/gzstream/gzstream.o
     bin/o/usage_special.o
-    src/libStatGen/libStatGen.a # I need to think of a rule to automatically build this - must talk to the author about including her code
+    src/libStatGen/libStatGen.a # 'libStatGen' code now included, with permission
 {
     echo LINKER:"${LINKER}" | tr '\n' ' '; echo
     echo LD_FLAGS:"${LD_FLAGS}" | tr '\n' ' '; echo
