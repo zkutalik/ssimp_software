@@ -1,28 +1,7 @@
 Versions of SSIMP
 
-
-ssimp-0.1       first release (2017-08-18)
-
-ssimp-0.2       (2018-01-09)
-		efficient imputation of single SNPs
-		added script that allows multiprocessing
-                output has 3 more columns: P.imp, N.imp, bst.imp
-
-ssimp-0.3       (2018-01-20)
-		Enable imputation of chromosome X. 
-
-		If you have been using previous versions of SSIMP, 
-		delete the file 
-		~/reference_panels/database.of.builds.1kg.uk10k.hrc.bin, 
-		and replace it with the new version:
-
-		rm       ~/reference_panels/database.of.builds.1kg.uk10k.hrc.bin
-		cd       ~/reference_panels
-    		wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
-
-ssimp-0.4       (2018-08-09)
-                Bug fixe. See comment in pull request #63.
-                https://github.com/zkutalik/ssimp_software/pull/63
+ssimp-0.5.1     (2018-10-29)
+                - offer to download the 1000genomes if it is requested via --ref
 
 ssimp-0.5       (2018-10-21)
                 Various fixes.
@@ -30,3 +9,26 @@ ssimp-0.5       (2018-10-21)
                 - If the database version is incorrect, give a helpful error message on how to redownload it (PR #69).
                 - To fix build estimation on small chromosomes (e.g. chr 22), use more SNPs (PR #69).
                 - Add a 'Troubleshooting' section to the README.
+
+ssimp-0.4       (2018-08-09)
+                Bug fixe. See comment in pull request #63.
+                https://github.com/zkutalik/ssimp_software/pull/63
+
+ssimp-0.3       (2018-01-20)
+        Enable imputation of chromosome X.
+
+        If you have been using previous versions of SSIMP,
+        delete the file
+        ~/reference_panels/database.of.builds.1kg.uk10k.hrc.bin,
+        and replace it with the new version:
+
+        rm       ~/reference_panels/database.of.builds.1kg.uk10k.hrc.bin
+        cd       ~/reference_panels
+            wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+
+ssimp-0.2       (2018-01-09)
+        efficient imputation of single SNPs
+        added script that allows multiprocessing
+                output has 3 more columns: P.imp, N.imp, bst.imp
+
+ssimp-0.1       first release (2017-08-18)

@@ -465,8 +465,6 @@ void download_1KG_ifneeded() {
 
 #define NICKNAME_FOR_1000_GENOMES "1KG"
 
-    assert(utils:: startsWith(options:: opt_raw_ref, NICKNAME_FOR_1000_GENOMES)); // only in here if the user specified a reference panel as '1KG...'
-
     auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
     auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
     auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"                               , getenv("HOME"));
@@ -607,7 +605,17 @@ int main(int argc, char **argv) {
 
     // But first, check if the relevant directory exists and, if it doesn't
     // exist, explain to the user how to download it
+
+    // If the user specified '1KG/' as the ref panel, then we should download it
     if(utils:: startsWith(options:: opt_raw_ref, NICKNAME_FOR_1000_GENOMES)) {
+        download_1KG_ifneeded();
+    }
+
+    // If they specified the full path to 1000genomes, i.e. via the two strings above, then this means
+    // we should download 1000genomes
+    if( options:: opt_raw_ref.find(".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz") != std::string::npos
+     && options:: opt_raw_ref.find("reference_panels/1000genomes/ALL.chr") != std::string::npos
+     ) {
         download_1KG_ifneeded();
     }
 
