@@ -17,7 +17,7 @@ download the necessary data from 1000genomes to your harddrive, into
 
 You can add extra options, defined below, for example:
 
-    ssimp gwas.txt 1KG/EUR output.txt --impute.range chr17
+    ssimp gwas.txt 1KG/EUR output.txt --impute.range 17
 
 For examples, visit https://github.com/zkutalik/ssimp_software/blob/master/docu/examples.md
 
