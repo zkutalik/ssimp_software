@@ -30,7 +30,7 @@ wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference
 
 You may get assertion errors when running this, even after following the *Installation* Instructions. Please also check the *Bug Reports* section below. Here are a couple of things you can check:
 1) the size of the build database should be `1'789'839'360` bytes: `~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin`. If not, see *Bug Reports* below on how to download an updated version
-2) The simplest way to call this is with: `ssimp gwas/small.random.txt 1KG/EUR output.txt`. Otherwise, you can select the AFR population with: `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`. If you wish to impute only a particular chromosome, you should use `--impute.range chr17`.
+2) The simplest way to call this is with: `ssimp gwas/small.random.txt 1KG/EUR output.txt`. Otherwise, you can select the AFR population with: `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`. If you wish to impute only a particular chromosome, you should use `--impute.range 17`.
 
 
 ## Installation
@@ -124,11 +124,11 @@ will impute the Z-statistics, using a selected reference panel (see section abov
 
 ## Documentation
 [//]: -------------------------------
-Run `ssimp` with no arguments to see the [usage message](https://github.com/zkutalik/ssimp_software/blob/master/docu/usage.txt). 
+Run `ssimp` with no arguments to see the [usage message](https://github.com/zkutalik/ssimp_software/blob/master/doc/usage.txt). 
 
-Check out [examples](https://github.com/zkutalik/ssimp_software/blob/master/docu/examples.md).
+Check out [examples](https://github.com/zkutalik/ssimp_software/blob/master/doc/examples.md).
 
-We also provide a [detailed manual](https://github.com/zkutalik/ssimp_software/blob/master/docu/manual.md) that contains information not present in the usage message.
+We also provide a [detailed manual](https://github.com/zkutalik/ssimp_software/blob/master/doc/manual.md) that contains information not present in the usage message.
 
 
 ## Download 1000 genomes reference panel
@@ -156,7 +156,7 @@ as subset of individuals (here AFR) should be used:
 `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage
-message](https://github.com/zkutalik/ssimp_software/blob/master/docu/usage.txt).
+message](https://github.com/zkutalik/ssimp_software/blob/master/doc/usage.txt).
 
 
 ## Run tests
