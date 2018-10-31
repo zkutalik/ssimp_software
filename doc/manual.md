@@ -5,7 +5,7 @@
 
 ## Minimal example
 [//]: -------------------------------
-The minimal requirements are for `ssimp` to run are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (e.g. `MarkerName`), Z-statistic (e.g. `Z`), reference allele (e.g. `a1`) and risk allele (e.g. `a2`) and at least one row, (2) the path to the reference panel, and (3) the path to the output file.
+The minimal requirements for `ssimp` to run are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (e.g. `MarkerName`), Z-statistic (e.g. `Z`), reference allele (e.g. `a1`) and risk allele (e.g. `a2`) and at least one row, (2) the path to the reference panel, and (3) the path to the output file.
 
 `ssimp my_gwas.txt ~/.refpanel/my_reference_panel.vcf output.txt` 
 
@@ -54,7 +54,7 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 		
 `--missingness [none]` string: `ind` (recommended), `dep`. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. 
 
-`--n.cores [1]` Number of cores to use (will be implemented around November 2017). Have a look at the workaround below.
+`--n.cores [1]` Number of cores for multiprocessing. Not implemented yet, but on our list of things to be done.
 
 ### Multiprocessing
 [//]: -------
@@ -76,8 +76,7 @@ Note, that you still need to integrate the shell script content into your schedu
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs of the first window for sanity checks, see section `output` below).
-- Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](hxamples.md).
-- Its currently not possible to impute the sex chromsomes.
+- Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](examples.md).
 
 
 ## GWAS dataset
@@ -197,7 +196,7 @@ with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We c
 
 ### More background on method
 
-For more details on *summary statistics imputation*, see [Rüeger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/16/203927) or - for a shortened method section - [Rüeger et al. (2017)](https://www.biorxiv.org/content/early/2017/10/18/204560). 
+For more details on *summary statistics imputation*, see [Rüeger et al. (2017)](https://wjournals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1007371. 
 
 Most of our extended method builds on [Pasaniuc et al. (2014)](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416). 
 
@@ -206,8 +205,7 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 ## How to cite SSimp
 [//]: ----------
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2018/02/09/203927)
-
+**Rüeger, S., McDaid, A., Kutalik, Z. (20178).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
 
 ## References
 [//]: -------
@@ -216,6 +214,6 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 
 **Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics* Nature Reviews Genetics. [doi:10.1038/nrg.2016.142](https://www.nature.com/articles/nrg.2016.142)
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2017/10/16/203927)
+**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2018/02/09/203927)
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* bioRxiv. [https://doi.org/10.1101/204560](https://www.biorxiv.org/content/early/2017/10/18/204560)
+**Rüeger, S., McDaid, A., Kutalik, Z. (20178.** *Evaluation and application of summary statistic imputation to discover new height-associated loci* bPLOS Genetics [https://doi.org/10.1371/journal.pgen.1007371

@@ -157,9 +157,7 @@ use a different subpopulation, for example 'pop=TSI' or 'super_pop=EAS'.
 
 If you use this software in your scientific research, please consider citing
 
-Rüeger, S., McDaid, A., Kutalik, Z. (2017). Evaluation and application of summary statistic imputation to discover new height-associated loci. bioRxiv. https://doi.org/10.1101/204560
-
-Rüeger, S., McDaid, A., Kutalik, Z. (2017). Improved imputation of summary statistics for realistic settings. PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
+Rüeger, S., McDaid, A., Kutalik, Z. (2018). Evaluation and application of summary statistic imputation to discover new height-associated loci. PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
 
 Copyright 2018.
 (Aaron McDaid, Sina Rüeger, Zoltán Kutalik, https://github.com/zkutalik/ssimp_software)

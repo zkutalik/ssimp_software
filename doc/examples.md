@@ -191,6 +191,7 @@ Check R-file `doc/sanitycheck_reimputed.R`
 ### Parallelize computation (TBD)
 [//]: -------------------------------
 
+This is not formally implemented, but there is a workaround documented [here](doc/manual.md#compute-chunks).
 
 ### Use your own reference panel
 [//]: -------------------------------
