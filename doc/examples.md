@@ -13,7 +13,7 @@ The minimal requirements are:
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
-For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in the [manual](https://github.com/zkutalik/ssimp_software/blob/master/doc/manual.md).
+For more info regarding automatically column names recognition of the GWAS file, see section `GWAS dataset` in the [manual](manual.md).
 
 
 ### --gwas dataset is gzipped
@@ -30,7 +30,7 @@ If you have a reference panel `REF/myrefpanel{CHR}.vcf.gz` available, use it as 
 
 `ssimp --gwas gwas/small.random.txt` **`--ref REF/myrefpanel{CHR}.vcf.gz`** ` --out output.txt`
 
-For detailed instructions and explanations see detailed instructions in [usage-text](https://github.com/zkutalik/ssimp_software/blob/master/doc/usage.txt).
+For detailed instructions and explanations see detailed instructions in [usage-text](usage.txt).
 
 A **quick solution** is to run `ssimp` without reference panel, but with a shortcut indicating 1KG and a preferred population. This will create a folder called `refpanel` and download 1KG (all populations, not only the selected one).
 
@@ -61,7 +61,7 @@ The header of the GWAS file should either be `SNP  a1  a2  Z` or `SNP  a1  a2  b
 
 ### Impute b, and not Z
 [//]: -------------------------------
-First, impute Z-statistics as shown above, then transform the Z-statistic into `se(b)` and `b` using this [R-function](https://github.com/zkutalik/ssimp_software/blob/master/transform_z_to_b.R).
+First, impute Z-statistics as shown above, then transform the Z-statistic into `se(b)` and `b` using this [R-function](../transform_z_to_b.R).
 
 
 ### Chr and Pos instead of SNP-identifier
@@ -194,4 +194,4 @@ Check R-file `doc/sanitycheck_reimputed.R`
 
 ### Use your own reference panel
 [//]: -------------------------------
-Follow the instructions in [doc/usage](https://github.com/zkutalik/ssimp_software/blob/master/doc/usage.txt).
+Follow the instructions in [doc/usage](usage.txt).

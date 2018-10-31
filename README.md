@@ -121,14 +121,16 @@ It takes roughly ~200 CPU hours to impute to full genome (~20M variants) with 50
 
 will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`.
 
+See more examples [here](doc/examples.md).
+
 
 ## Documentation
 [//]: -------------------------------
-Run `ssimp` with no arguments to see the [usage message](https://github.com/zkutalik/ssimp_software/blob/master/doc/usage.txt). 
+Run `ssimp` with no arguments to see the [usage message](doc/usage.txt). 
 
-Check out [examples](https://github.com/zkutalik/ssimp_software/blob/master/doc/examples.md).
+Check out [examples](doc/examples.md).
 
-We also provide a [detailed manual](https://github.com/zkutalik/ssimp_software/blob/master/doc/manual.md) that contains information not present in the usage message.
+We also provide a [detailed manual](doc/manual.md) that contains information not present in the usage message.
 
 
 ## Download 1000 genomes reference panel
@@ -138,7 +140,7 @@ We also provide a [detailed manual](https://github.com/zkutalik/ssimp_software/b
 
 ### Automatic download
 [//]: -------------------------------
-By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. 
+By running `ssimp` with a special argument - `1KG/[SUPERPOP]` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. `[SUPERPOP]` is any of the following: AFR, AMR, EAS, EUR, SAS. 
 
 Make sure that:
 1) you have `wget` installed and
@@ -153,10 +155,13 @@ It will then download 1000 genomes reference panel **and** a file that enables f
 When using `ssimp` you can then pass this directory name to 'ssimp', and specify that only
 as subset of individuals (here AFR) should be used:
 
-`ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
+`ssimp  gwas/small.random.txt \
+        ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+        output.txt \
+        --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
 
-More info on handling reference panel data can be found starting from line 49 in [usage
-message](https://github.com/zkutalik/ssimp_software/blob/master/doc/usage.txt).
+More info on handling reference panel data can be found in [usage
+message](doc/usage.txt#L65).
 
 
 ## Run tests
