@@ -19,9 +19,9 @@ You can add extra options, defined below, for example:
 
     ssimp gwas.txt 1KG/EUR output.txt --impute.range chr17
 
-For examples, visit https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md
+For examples, visit https://github.com/zkutalik/ssimp_software/blob/master/docu/examples.md
 
-For more details of the method and usage, visit https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md
+For more details of the method and usage, visit https://github.com/zkutalik/ssimp_software/blob/master/docu/manual.md
 
 If you wish to use different reference panel (not 1000genomes), or a population
 other than EUR, then a more complex command line is required.

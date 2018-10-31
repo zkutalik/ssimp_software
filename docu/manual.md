@@ -76,7 +76,7 @@ Note, that you still need to integrate the shell script content into your schedu
 ### Note	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs of the first window for sanity checks, see section `output` below).
-- Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
+- Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](https://github.com/zkutalik/ssimp_software/blob/master/docu/examples.md).
 - Its currently not possible to impute the sex chromsomes.
 
 
@@ -120,7 +120,7 @@ On each chromosome you can only impute variants that are in the range between **
 [//]: -------------------------------
 Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s).
 
-More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+More info on handling reference panel data can be found starting from line 49 in [usage message](https://github.com/zkutalik/ssimp_software/blob/master/docu/usage.txt).
 
 ## Run-time
 [//]: -------------------------------
@@ -193,7 +193,7 @@ If your Z-statistics originated from a linear regression model, the estimated `s
 
 with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We can approximate the sample size of an untyped SNP by multiplying the maximum sample size with its imputation quality `N_u = N_max * r2_pred`. 
 
-[Here](https://github.com/sinarueeger/ssimp_software/blob/master/transform_z_to_b.R) we provide an R-function that automatically transforms imputed Z-statistics into imputed effect sizes.
+[Here](https://github.com/zkutalik/ssimp_software/blob/master/transform_z_to_b.R) we provide an R-function that automatically transforms imputed Z-statistics into imputed effect sizes.
 
 ### More background on method
 

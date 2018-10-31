@@ -43,7 +43,7 @@ We recommend to download the full folder. This will give you access to all toy e
 
 (1) Download
 
-`wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
+`wget https://github.com/zkutalik/ssimp_software/archive/master.zip`
 
 `unzip master.zip`
 
@@ -55,15 +55,15 @@ We recommend to download the full folder. This will give you access to all toy e
 
 Depending on what OS you are on:
 
-`cp compiled/ssimp-linux-0.5 ssimp`
+`cp compiled/ssimp-linux-0.5.1 ssimp`
 
-`cp compiled/ssimp-osx-0.5 ssimp`
+`cp compiled/ssimp-osx-0.5.1 ssimp`
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.5) - static version
+[Linux](compiled/ssimp-linux-0.5.1) - static version
 
-[MacOS](compiled/ssimp-osx-0.5) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
+[MacOS](compiled/ssimp-osx-0.5.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 
 ### Compile from source 
@@ -74,7 +74,7 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
-`wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
+`wget https://github.com/zkutalik/ssimp_software/archive/master.zip`
 
 `unzip master.zip`
 
@@ -124,11 +124,11 @@ will impute the Z-statistics, using a selected reference panel (see section abov
 
 ## Documentation
 [//]: -------------------------------
-Run `ssimp` with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
+Run `ssimp` with no arguments to see the [usage message](https://github.com/zkutalik/ssimp_software/blob/master/docu/usage.txt). 
 
-Check out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
+Check out [examples](https://github.com/zkutalik/ssimp_software/blob/master/docu/examples.md).
 
-We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md) that contains information not present in the usage message.
+We also provide a [detailed manual](https://github.com/zkutalik/ssimp_software/blob/master/docu/manual.md) that contains information not present in the usage message.
 
 
 ## Download 1000 genomes reference panel
@@ -156,7 +156,7 @@ as subset of individuals (here AFR) should be used:
 `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
 
 More info on handling reference panel data can be found starting from line 49 in [usage
-message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+message](https://github.com/zkutalik/ssimp_software/blob/master/docu/usage.txt).
 
 
 ## Run tests
@@ -193,7 +193,7 @@ Copyright 2018.
 
 ## Bug report
 [//]: -------------------------------
-Report bugs here: [https://github.com/sinarueeger/ssimp_software/issues](https://github.com/sinarueeger/ssimp_software/issues)
+Report bugs here: [https://github.com/zkutalik/ssimp_software/issues](https://github.com/zkutalik/ssimp_software/issues)
 
 If you are having trouble with SSIMP versions >= 0.4, make sure that you delete your database in folder `~/reference_panels/database*` and redownload it using the following command
 
