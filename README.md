@@ -8,7 +8,7 @@ This command-line software enables summary statistics imputation (SSimp) for GWA
 The only input needed from the user are the **GWAS summary statistics** and a **reference panel** (e.g. 1000 genomes, needed for LD computation).
 
 
-## Current version: 0.5
+## Current version: 0.5.1
 [//]: -------------------------------
 
 **Important**: along with the SSIMP installation, you will also need to download a file (a database with all positions on different builds) into your `~/reference_panel/` folder. 
@@ -30,7 +30,7 @@ wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference
 
 You may get assertion errors when running this, even after following the *Installation* Instructions. Please also check the *Bug Reports* section below. Here are a couple of things you can check:
 1) the size of the build database should be `1'789'839'360` bytes: `~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin`. If not, see *Bug Reports* below on how to download an updated version
-2) The simplest way to call this is with: `ssimp gwas/small.random.txt 1KG/EUR output.txt`. Otherwise, you can select the AFR population with: `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`. If you wish to impute only a particular chromosome, you should use `--impute.range chr17`.
+2) The simplest way to call this is with: `ssimp gwas/small.random.txt 1KG/EUR output.txt`. Otherwise, you can select the AFR population with: `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`. If you wish to impute only a particular chromosome, you should use `--impute.range 17`.
 
 
 ## Installation
@@ -43,7 +43,7 @@ We recommend to download the full folder. This will give you access to all toy e
 
 (1) Download
 
-`wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
+`wget https://github.com/zkutalik/ssimp_software/archive/master.zip`
 
 `unzip master.zip`
 
@@ -55,15 +55,15 @@ We recommend to download the full folder. This will give you access to all toy e
 
 Depending on what OS you are on:
 
-`cp compiled/ssimp-linux-0.5 ssimp`
+`cp compiled/ssimp-linux-0.5.1 ssimp`
 
-`cp compiled/ssimp-osx-0.5 ssimp`
+`cp compiled/ssimp-osx-0.5.1 ssimp`
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.5) - static version
+[Linux](compiled/ssimp-linux-0.5.1) - static version
 
-[MacOS](compiled/ssimp-osx-0.5) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
+[MacOS](compiled/ssimp-osx-0.5.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 
 ### Compile from source 
@@ -74,7 +74,7 @@ Mac user? You need to install GSL: `brew install gsl`.
 
 (1) Download the zip file and unpack the zip file (or clone the github folder)
 
-`wget https://github.com/sinarueeger/ssimp_software/archive/master.zip`
+`wget https://github.com/zkutalik/ssimp_software/archive/master.zip`
 
 `unzip master.zip`
 
@@ -121,14 +121,16 @@ It takes roughly ~200 CPU hours to impute to full genome (~20M variants) with 50
 
 will impute the Z-statistics, using a selected reference panel (see section above) and generate a file `output.txt`. The txt file assigned to `--gwas` contains at least the following columns: SNP-id, reference allele, risk allele, Z-statistic, and at least one row. The imputed summary statistics are stored in `output.txt`.
 
+See more examples [here](doc/examples.md).
+
 
 ## Documentation
 [//]: -------------------------------
-Run `ssimp` with no arguments to see the [usage message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt). 
+Run `ssimp` with no arguments to see the [usage message](doc/usage.txt). 
 
-Check out [examples](https://github.com/sinarueeger/ssimp_software/blob/master/docu/examples.md).
+Check out [examples](doc/examples.md).
 
-We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_software/blob/master/docu/manual.md) that contains information not present in the usage message.
+We also provide a [detailed manual](doc/manual.md) that contains information not present in the usage message.
 
 
 ## Download 1000 genomes reference panel
@@ -138,7 +140,7 @@ We also provide a [detailed manual](https://github.com/sinarueeger/ssimp_softwar
 
 ### Automatic download
 [//]: -------------------------------
-By running `ssimp` with a special argument - `1KG/SUPER-POP` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. 
+By running `ssimp` with a special argument - `1KG/[SUPERPOP]` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. `[SUPERPOP]` is any of the following: AFR, AMR, EAS, EUR, SAS. 
 
 Make sure that:
 1) you have `wget` installed and
@@ -153,10 +155,13 @@ It will then download 1000 genomes reference panel **and** a file that enables f
 When using `ssimp` you can then pass this directory name to 'ssimp', and specify that only
 as subset of individuals (here AFR) should be used:
 
-`ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
+`ssimp  gwas/small.random.txt \
+        ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+        output.txt \
+        --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
 
-More info on handling reference panel data can be found starting from line 49 in [usage
-message](https://github.com/sinarueeger/ssimp_software/blob/master/docu/usage.txt).
+More info on handling reference panel data can be found in [usage
+message](doc/usage.txt#L65).
 
 
 ## Run tests
@@ -193,7 +198,7 @@ Copyright 2018.
 
 ## Bug report
 [//]: -------------------------------
-Report bugs here: [https://github.com/sinarueeger/ssimp_software/issues](https://github.com/sinarueeger/ssimp_software/issues)
+Report bugs here: [https://github.com/zkutalik/ssimp_software/issues](https://github.com/zkutalik/ssimp_software/issues)
 
 If you are having trouble with SSIMP versions >= 0.4, make sure that you delete your database in folder `~/reference_panels/database*` and redownload it using the following command
 

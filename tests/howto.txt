@@ -1,3 +1,7 @@
 run   
 
 stu @all.tests
+
+or 
+
+stu/stu @all.tests
