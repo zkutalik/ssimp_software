@@ -196,7 +196,7 @@ with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We c
 
 ### More background on method
 
-For more details on *summary statistics imputation*, see [Rüeger et al. (2017)](https://wjournals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1007371. 
+For more details on *summary statistics imputation*, see [Rüeger et al. (2018A)](https://wjournals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1007371). [Rüeger et al. (2018B)](https://doi.org/10.1101/203927) describes a method to manipulate the LD matrix in order to account for ancestry admixture. 
 
 Most of our extended method builds on [Pasaniuc et al. (2014)](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416). 
 
@@ -214,6 +214,6 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 
 **Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics* Nature Reviews Genetics. [doi:10.1038/nrg.2016.142](https://www.nature.com/articles/nrg.2016.142)
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2017).** *Improved imputation of summary statistics for realistic settings* bioRxiv. [https://doi.org/10.1101/203927 ](https://www.biorxiv.org/content/early/2018/02/09/203927)
+**Rüeger, S., McDaid, A., Kutalik, Z. (2018).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371.
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (20178.** *Evaluation and application of summary statistic imputation to discover new height-associated loci* bPLOS Genetics [https://doi.org/10.1371/journal.pgen.1007371
+**Rüeger, S., McDaid, A., Kutalik, Z. (2018).** *Improved imputation of summary statistics for realistic settings* bioRxiv. https://doi.org/10.1101/203927.
