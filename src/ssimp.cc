@@ -141,6 +141,9 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
     return {-1,-1};
 }
 
+#define BUILD_DATABASE_URL   "https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download"
+#define BUILD_DATABASE_LOCAL "database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"
+
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
     const char * error_message_suffix = R"(Please download it with the following commands:
