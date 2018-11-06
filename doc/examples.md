@@ -36,6 +36,8 @@ A **quick solution** is to run `ssimp` without reference panel, but with a short
 
 `ssimp --gwas gwas/small.random.txt` **`--ref 1KG/EUR`** ` --out output.txt`
 
+Where `EUR` can be replaced with any (super) population of 1000 genomes reference panel. 
+
 Then, use it as follows:
 `ssimp --gwas gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1KG/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR`
 
