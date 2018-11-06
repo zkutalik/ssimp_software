@@ -53,17 +53,17 @@ We recommend to download the full folder. This will give you access to all toy e
 
 (3) Rename the binary
 
-Depending on what OS you are on:
+Depending on what OS you are on :
 
-`cp compiled/ssimp-linux-0.5.1 ssimp`
+`cp compiled/ssimp-linux-0.5.2 ssimp`
 
-`cp compiled/ssimp-osx-0.5.1 ssimp`
+`cp compiled/ssimp-osx-0.5.2 ssimp`
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.5.1) - static version
+[Linux](compiled/ssimp-linux-0.5.2) - static version
 
-[MacOS](compiled/ssimp-osx-0.5.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
+[MacOS](compiled/ssimp-osx-0.5.2) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 
 ### Compile from source 
