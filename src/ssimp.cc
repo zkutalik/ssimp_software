@@ -1,4 +1,5 @@
 #include <unistd.h> // for 'chdir' and 'unlink'
+#include <cstdlib> // for 'mkstemp'
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -465,6 +466,8 @@ bool exitWithUsage() {
 
 static
 void download_1KG_ifneeded() {
+    // This function should be rewritten (and then tested again!)
+    // to use the 'offer_to_run_some_commands' logic
 
 #define NICKNAME_FOR_1000_GENOMES "1KG"
 
@@ -555,6 +558,72 @@ It appears that 'wget' does not exist on your system. You should install it and 
     DIE("As described above, 1000genomes reference panel not in the expected location");
 }
 
+template<size_t N>
+static
+void run_some_commands(char const * (&commands)[N]) {
+    // First, creating a temporary file into which to write a script,
+    // which we then run.
+    char tmpfile_name[] = "/tmp/ssimp_commands_to_run_XXXXXX";
+    int ret = mkstemp(tmpfile_name);
+    if(ret == -1) {
+        std::cerr << "Couldn't create temporary file\n";
+        exit(1);
+    }
+
+    ofstream temp_file_for_script(tmpfile_name);
+    temp_file_for_script << "set -ex" << '\n'; // run 'help set' in 'bash' to understand this
+    for(auto one_command : commands) {
+        temp_file_for_script << one_command << '\n';
+    }
+    temp_file_for_script.close();
+
+    system(AMD_FORMATTED_STRING("bash '{0}'", tmpfile_name).c_str())
+        == 0 || DIE("Exiting as the command failed");
+}
+
+template<size_t N>
+static
+void offer_to_run_some_commands(char const * (&commands)[N]) {
+    cout << "To download the necessary data, the following " << N << " commands must be run:\n\n";
+    for(auto one_command : commands) {
+        cout << "\t\t" << one_command << '\n';
+    }
+    cout << "\nRun them now? [Enter 'yes']\n";
+
+    string response;
+    std:: cin >> response;
+    if(response != "yes") {
+        cout << "You did not type 'yes'. Exiting.\n";
+    } else {
+        cout << "Running the commands ...\n";
+        run_some_commands(commands);
+    }
+}
+
+static
+void actually_download_build_database_force() {
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/" BUILD_DATABASE_LOCAL                                , getenv("HOME"));
+
+    char const * commands_that_must_be_run[] = {
+        "mkdir -p ~/reference_panels",
+        "cd       ~/reference_panels",
+        "wget -c -nd    " BUILD_DATABASE_URL " -O " BUILD_DATABASE_LOCAL
+        };
+
+    offer_to_run_some_commands(commands_that_must_be_run);
+}
+
+static
+void download_build_database_if_needed() {
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/" BUILD_DATABASE_LOCAL                                , getenv("HOME"));
+    bool blddb_file_name_already_exists = std:: fopen( blddb_file_name.c_str(), "r" );
+
+    if(blddb_file_name_already_exists)
+        return;
+    else
+        actually_download_build_database_force();
+}
+
 int main(int argc, char **argv) {
     if(argc==1) {
         exitWithUsage();
@@ -564,6 +633,15 @@ int main(int argc, char **argv) {
 
     if(options:: opt_help == 1) {
         exitWithUsage();
+    }
+
+    if(options:: opt_download_build_db || options:: opt_download_1KG) {
+        if(options:: opt_download_build_db)
+            download_build_database_if_needed();
+        if(options:: opt_download_1KG)
+            download_1KG_ifneeded();
+        cout << "Exiting now because you used one of the '--build*' options\n";
+        exit(0);
     }
 
     // There should be exactly zero, or three, non-option arguments:

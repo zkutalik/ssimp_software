@@ -48,6 +48,9 @@ namespace options {
         std:: string            opt_sample_names;
         opt_missingness_t       opt_missingness;
 
+        int                     opt_download_build_db = 0;
+        int                     opt_download_1KG = 0;
+
 
         std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
@@ -73,6 +76,8 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"tags.used.output"   ,  required_argument, 0, 16 },
             {"log"                ,  required_argument, 0, 17 },
             {"missingness"        ,  required_argument, 0, 18 },
+            {"download.build.db"  ,        no_argument, &opt_download_build_db, 1 },
+            {"download.1KG"       ,        no_argument, &opt_download_1KG, 1 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);

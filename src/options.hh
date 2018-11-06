@@ -38,6 +38,9 @@ extern  opt_missingness_t       opt_missingness;
 
 extern  std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
+extern  int                     opt_download_build_db;
+extern  int                     opt_download_1KG;
+
         void                    read_in_all_command_line_options(int argc, char **argv);
         void                    adjust_sample_names_if_it_is_magical();
 
