@@ -1,10 +1,19 @@
-If stu is not installed, use the version in this repository that can be called via stu/stu.
+If stu is not installed, use the version in this repository. It can be built here with 'make stu/stu',
+and then you can use 'stu/stu' instead of 'stu' in the rest of this document
+
+## Version number update?
+Before building the binaries, you probably want to update the version numbers. Currently, this means:
+ - edit the first line of [doc/usage.txt]
+ - edit the 'current version' entry in [README.md]
+ - add a new entry to the top of [VERSION], regarding the changes introduced
+The [doc/usage.txt] should be updated before compilation, as it will be included in the binary
 
 ## on LINUX (e.g. HPC1)
 
 stu bin/ssimp-static   # to build the statically-linked version of the executable
 cp bin/ssimp-static compiled/ssimp-linux-VERSION
 git add compiled/ssimp-linux-VERSION
+git rm  compiled/ssimp-linux-OLDVERSION
 git commit -m "statically-linked executable for LINUX"
 
 
@@ -20,4 +29,5 @@ The 'crt' library was our problem and it appears that Apple refuse to make a sta
 stu/stu bin/ssimp  # to build the statically-linked version of the executable
 cp bin/ssimp compiled/ssimp-osx-VERSION
 git add compiled/ssimp-osx-VERSION
+git  rm compiled/ssimp-osx-OLDVERSION
 git commit -m "executable for OSX"
