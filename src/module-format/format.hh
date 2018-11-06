@@ -31,7 +31,7 @@ namespace utils {
     constexpr compile_time_constant_as_a_type<T, c>     cx_val  = compile_time_constant_as_a_type<T,c>{}; // Consider using my own type here instead of integral_constant?
 } // namespace utils
 
-#define AMD_FORMATTED_STRING(s, ...) format:: do_formatting( [](){ struct local { constexpr static char const * str() { return s; }}; return format:: make_a_char_pack_from_stringy_type<local>::type{}; }() ,__VA_ARGS__)
+#define AMD_FORMATTED_STRING(s, ...) format:: do_formatting( [](){ struct local { constexpr static char const * str() { return s; }}; return typename format:: make_a_char_pack_from_stringy_type<local>::type{}; }() ,__VA_ARGS__)
 
 namespace format {
     struct string_view {
