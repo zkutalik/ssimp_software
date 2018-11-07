@@ -30,7 +30,7 @@ wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference
 
 You may get assertion errors when running this, even after following the *Installation* Instructions. Please also check the *Bug Reports* section below. Here are a couple of things you can check:
 1) the size of the build database should be `1'789'839'360` bytes: `~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin`. If not, see *Bug Reports* below on how to download an updated version
-2) The simplest way to call this is with: `ssimp gwas/small.random.txt 1KG/EUR output.txt`. Otherwise, you can select the AFR population with: `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`. If you wish to impute only a particular chromosome, you should use `--impute.range 17`.
+2) The simplest way to call this is with: `ssimp gwas/small.random.txt 1KG/EUR output.txt`. Otherwise, you can select the any (super) population, e.g. AFR, with: `ssimp gwas/small.random.txt ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz output.txt --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`. If you wish to impute only a particular chromosome, you should use `--impute.range 17`.
 
 
 ## Installation
@@ -53,17 +53,17 @@ We recommend to download the full folder. This will give you access to all toy e
 
 (3) Rename the binary
 
-Depending on what OS you are on:
+Depending on what OS you are on :
 
-`cp compiled/ssimp-linux-0.5.1 ssimp`
+`cp compiled/ssimp-linux-0.5.2 ssimp`
 
-`cp compiled/ssimp-osx-0.5.1 ssimp`
+`cp compiled/ssimp-osx-0.5.2 ssimp`
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.5.1) - static version
+[Linux](compiled/ssimp-linux-0.5.2) - static version
 
-[MacOS](compiled/ssimp-osx-0.5.1) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
+[MacOS](compiled/ssimp-osx-0.5.2) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 
 ### Compile from source 
@@ -140,7 +140,7 @@ We also provide a [detailed manual](doc/manual.md) that contains information not
 
 ### Automatic download
 [//]: -------------------------------
-By running `ssimp` with a special argument - `1KG/[SUPERPOP]` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation. `[SUPERPOP]` is any of the following: AFR, AMR, EAS, EUR, SAS. 
+By running `ssimp` with a special argument - `1KG/[SUPERPOP]` or `1KG/[POP]` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation (e.g. `1KG/AFR`). `[SUPERPOP]` is any of the following: AFR, AMR, EAS, EUR, SAS, look up `[POP]` [here](http://www.internationalgenome.org/data-portal/sample). 
 
 Make sure that:
 1) you have `wget` installed and
@@ -189,9 +189,9 @@ We have used code (with permission, and under the GPL) from [libStatGen](https:/
 
 If you use this software in your scientific research, please consider citing
 
-Rüeger, S., McDaid, A., Kutalik, Z. (2017). Evaluation and application of summary statistic imputation to discover new height-associated loci. PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
+Rüeger, S., McDaid, A., Kutalik, Z. (2018). Evaluation and application of summary statistic imputation to discover new height-associated loci. PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
 
-Rüeger, S., McDaid, A., Kutalik, Z. (2017). Improved imputation of summary statistics for realistic settings. bioRxiv. https://doi.org/10.1101/203927
+Rüeger, S., McDaid, A., Kutalik, Z. (2018). Improved imputation of summary statistics for realistic settings. bioRxiv. https://doi.org/10.1101/203927 
 
 Copyright 2018.
 (Aaron McDaid, Sina Rüeger, Zoltán Kutalik, https://github.com/zkutalik/ssimp_software)
