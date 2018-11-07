@@ -580,6 +580,8 @@ void run_some_commands(char const * (&commands)[N]) {
 
     system(AMD_FORMATTED_STRING("bash '{0}'", tmpfile_name).c_str())
         == 0 || DIE("Exiting as the command failed");
+    int ignored = system(AMD_FORMATTED_STRING("rm   '{0}'", tmpfile_name).c_str());
+    (void) ignored;
 }
 
 template<size_t N>
