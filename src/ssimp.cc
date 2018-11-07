@@ -144,6 +144,7 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
 
 #define BUILD_DATABASE_URL   "https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download"
 #define BUILD_DATABASE_LOCAL "database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"
+#define MINIMUM_NUMBER_OF_TAGS_TO_REIMPUTE 100
 
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
@@ -1147,7 +1148,7 @@ void impute_all_the_regions(   string                                   filename
     }
 
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
-    int number_of_windows_seen_so_far_with_at_least_two_tags = 0; // useful to help decide when to do reimputation
+    int number_of_tags_reimputed_and_printed = 0;
     for(int chrm =  1; chrm <= 23; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
@@ -1390,9 +1391,6 @@ void impute_all_the_regions(   string                                   filename
 
             // We now have at least one tag, and at least one target, so we can proceed
 
-            if  (number_of_tags > 1)
-                ++number_of_windows_seen_so_far_with_at_least_two_tags;
-
             // TODO: I still am including all the tags among the targets - change this?
 
             cout
@@ -1469,7 +1467,7 @@ void impute_all_the_regions(   string                                   filename
 
             bool do_reimputation_in_this_window = false;
             if  (   number_of_tags > 1
-                 && (   number_of_windows_seen_so_far_with_at_least_two_tags == 1 // this is the first such window
+                 && (   number_of_tags_reimputed_and_printed < MINIMUM_NUMBER_OF_TAGS_TO_REIMPUTE
                      ||  options:: opt_reimpute_tags // if true, do reimputation in all such windows, not just the first one
                     )
                 ) {
@@ -1578,6 +1576,7 @@ void impute_all_the_regions(   string                                   filename
                         assert(reimputed_tags_in_this_window.count(target) == 1);
                         Z_reimputed  = reimputed_tags_in_this_window.at(target).first;
                         r2_reimputed = reimputed_tags_in_this_window.at(target).second;
+                        ++number_of_tags_reimputed_and_printed;
                     }
 
                     (*out_stream_ptr)
