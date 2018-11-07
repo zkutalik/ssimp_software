@@ -1,4 +1,5 @@
 #include <unistd.h> // for 'chdir' and 'unlink'
+#include <cstdlib> // for 'mkstemp'
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -141,16 +142,20 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
     return {-1,-1};
 }
 
+#define BUILD_DATABASE_URL   "https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download"
+#define BUILD_DATABASE_LOCAL "database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"
+#define MINIMUM_NUMBER_OF_TAGS_TO_REIMPUTE 100
+
 static
 std:: vector<IDchrmThreePos> load_database_of_builds() {
     const char * error_message_suffix = R"(Please download it with the following commands:
 
     cd       ~/reference_panels
-    wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+    wget -c -nd    ')" BUILD_DATABASE_URL R"(' -O )" BUILD_DATABASE_LOCAL R"(
 )";
     cout << "... loading the 1.7GB database of positions under three builds. This will take about a minute.";
     cout.flush();
-    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"          , getenv("HOME"));
+    std::string path_to_build_database= AMD_FORMATTED_STRING("{0}/reference_panels/" BUILD_DATABASE_LOCAL          , getenv("HOME"));
     std:: ifstream f_database_of_builds(path_to_build_database, std::ifstream::ate | std::ifstream::binary);
     if(f_database_of_builds) {
         auto const size_of_build_database = f_database_of_builds.tellg();
@@ -462,12 +467,14 @@ bool exitWithUsage() {
 
 static
 void download_1KG_ifneeded() {
+    // This function should be rewritten (and then tested again!)
+    // to use the 'offer_to_run_some_commands' logic
 
 #define NICKNAME_FOR_1000_GENOMES "1KG"
 
     auto directory       = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes"                                                        , getenv("HOME"));
     auto panel_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel"          , getenv("HOME"));
-    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"                               , getenv("HOME"));
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/" BUILD_DATABASE_LOCAL                                , getenv("HOME"));
 
     bool directory_already_exists       = opendir( directory.c_str() );
     bool panel_file_name_already_exists = std:: fopen( panel_file_name.c_str(), "r" );
@@ -483,7 +490,7 @@ void download_1KG_ifneeded() {
 Please download it with:
 
     cd       ~/reference_panels
-    wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+    wget -c -nd    ')" BUILD_DATABASE_URL R"(' -O )" BUILD_DATABASE_LOCAL R"(
 )", blddb_file_name));
 
     if(directory_already_exists && !both_files_already_exist) // actually, I don't expect this to ever happen. Except perhaps if the download of 1KG was interrupted part way
@@ -508,7 +515,7 @@ If you have not already downloaded it, and you have 'wget' available on your sys
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'
     wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'
     cd       ~/reference_panels
-    test -f database.of.builds.1kg.uk10k.hrc.2018.01.18.bin || wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+    test -f )" BUILD_DATABASE_LOCAL R"( || wget -c -nd    ')" BUILD_DATABASE_URL R"(' -O )" BUILD_DATABASE_LOCAL R"(
 
 This takes up nearly 15 gigabytes of disk space.
 )";
@@ -527,7 +534,7 @@ It appears that 'wget' exists on your system. Would you like me to run the above
                 ,"cd       ~/reference_panels/1000genomes && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.gz'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.tbi'"
                                                         " && wget -c -nd -r 'ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/*.panel'"
-                ,"cd       ~/reference_panels             && wget -c -nd    'https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download' -O database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"
+                ,"cd       ~/reference_panels             && wget -c -nd    '" BUILD_DATABASE_URL "' -O " BUILD_DATABASE_LOCAL
                     }) {
                 std:: cerr << "Running [" << cmd << "]:\n";
                 int ret = system(cmd);
@@ -552,6 +559,74 @@ It appears that 'wget' does not exist on your system. You should install it and 
     DIE("As described above, 1000genomes reference panel not in the expected location");
 }
 
+template<size_t N>
+static
+void run_some_commands(char const * (&commands)[N]) {
+    // First, creating a temporary file into which to write a script,
+    // which we then run.
+    char tmpfile_name[] = "/tmp/ssimp_commands_to_run_XXXXXX";
+    int ret = mkstemp(tmpfile_name);
+    if(ret == -1) {
+        std::cerr << "Couldn't create temporary file\n";
+        exit(1);
+    }
+
+    ofstream temp_file_for_script(tmpfile_name);
+    temp_file_for_script << "set -ex" << '\n'; // run 'help set' in 'bash' to understand this
+    for(auto one_command : commands) {
+        temp_file_for_script << one_command << '\n';
+    }
+    temp_file_for_script.close();
+
+    system(AMD_FORMATTED_STRING("bash '{0}'", tmpfile_name).c_str())
+        == 0 || DIE("Exiting as the command failed");
+    int ignored = system(AMD_FORMATTED_STRING("rm   '{0}'", tmpfile_name).c_str());
+    (void) ignored;
+}
+
+template<size_t N>
+static
+void offer_to_run_some_commands(char const * (&commands)[N]) {
+    cout << "To download the necessary data, the following " << N << " commands must be run:\n\n";
+    for(auto one_command : commands) {
+        cout << "\t\t" << one_command << '\n';
+    }
+    cout << "\nRun them now? [Enter 'yes']\n";
+
+    string response;
+    std:: cin >> response;
+    if(response != "yes") {
+        cout << "You did not type 'yes'. Exiting.\n";
+    } else {
+        cout << "Running the commands ...\n";
+        run_some_commands(commands);
+    }
+}
+
+static
+void actually_download_build_database_force() {
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/" BUILD_DATABASE_LOCAL                                , getenv("HOME"));
+
+    char const * commands_that_must_be_run[] = {
+        "mkdir -p ~/reference_panels",
+        "cd       ~/reference_panels",
+        "wget -c -nd    " BUILD_DATABASE_URL " -O " BUILD_DATABASE_LOCAL
+        };
+
+    offer_to_run_some_commands(commands_that_must_be_run);
+}
+
+static
+void download_build_database_if_needed() {
+    auto blddb_file_name = AMD_FORMATTED_STRING("{0}/reference_panels/" BUILD_DATABASE_LOCAL                                , getenv("HOME"));
+    bool blddb_file_name_already_exists = std:: fopen( blddb_file_name.c_str(), "r" );
+
+    if(blddb_file_name_already_exists)
+        return;
+    else
+        actually_download_build_database_force();
+}
+
 int main(int argc, char **argv) {
     if(argc==1) {
         exitWithUsage();
@@ -561,6 +636,15 @@ int main(int argc, char **argv) {
 
     if(options:: opt_help == 1) {
         exitWithUsage();
+    }
+
+    if(options:: opt_download_build_db || options:: opt_download_1KG) {
+        if(options:: opt_download_build_db)
+            download_build_database_if_needed();
+        if(options:: opt_download_1KG)
+            download_1KG_ifneeded();
+        cout << "Exiting now because you used one of the '--build*' options\n";
+        exit(0);
     }
 
     // There should be exactly zero, or three, non-option arguments:
@@ -1066,7 +1150,7 @@ void impute_all_the_regions(   string                                   filename
     }
 
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
-    int number_of_windows_seen_so_far_with_at_least_two_tags = 0; // useful to help decide when to do reimputation
+    int number_of_tags_reimputed_and_printed = 0;
     for(int chrm =  1; chrm <= 23; ++chrm) {
         cout.flush(); std::cerr.flush(); // helps with --log
 
@@ -1309,9 +1393,6 @@ void impute_all_the_regions(   string                                   filename
 
             // We now have at least one tag, and at least one target, so we can proceed
 
-            if  (number_of_tags > 1)
-                ++number_of_windows_seen_so_far_with_at_least_two_tags;
-
             // TODO: I still am including all the tags among the targets - change this?
 
             cout
@@ -1388,7 +1469,7 @@ void impute_all_the_regions(   string                                   filename
 
             bool do_reimputation_in_this_window = false;
             if  (   number_of_tags > 1
-                 && (   number_of_windows_seen_so_far_with_at_least_two_tags == 1 // this is the first such window
+                 && (   number_of_tags_reimputed_and_printed < MINIMUM_NUMBER_OF_TAGS_TO_REIMPUTE
                      ||  options:: opt_reimpute_tags // if true, do reimputation in all such windows, not just the first one
                     )
                 ) {
@@ -1497,6 +1578,7 @@ void impute_all_the_regions(   string                                   filename
                         assert(reimputed_tags_in_this_window.count(target) == 1);
                         Z_reimputed  = reimputed_tags_in_this_window.at(target).first;
                         r2_reimputed = reimputed_tags_in_this_window.at(target).second;
+                        ++number_of_tags_reimputed_and_printed;
                     }
 
                     (*out_stream_ptr)

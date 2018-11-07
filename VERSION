@@ -1,5 +1,9 @@
 Versions of SSIMP
 
+(unreleased)    (2018-11-06)
+                - option for '--download.build.db' and '--download.1KG'
+                - fix for issue59: reimpute at least 100 tags. https://github.com/zkutalik/ssimp_software/issues/59
+
 ssimp-0.5.2     (2018-11-02)
                 - various documentation updates
 

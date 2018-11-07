@@ -7,6 +7,16 @@ ssimp   --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT
     REFPANEL                Either '1KG/EUR', or a path to a '*.vcf.gz' file.
     IMPUTATIONOUTPUT        Output file, to store the imputation results.
 
+===================================================================
+NOTE: before using ssimp for the first time, it is necessary to run
+this command as it will download a file to '~/reference_panels':
+    ssimp --download.build.db
+Also, if you plan to use the 1000genomes data, you can run this
+command in order to download it to '~/reference_panels', where
+it will take up nearly 19 Gigabytes:
+    ssimp --download.1KG
+===================================================================
+
 
 If you are happy to impute using the EUR population in 1000genomes, then
 run the following command. The first time you run this, it will offer to
@@ -44,6 +54,9 @@ Options:
     default value (inside []) is used in it place.  For example, if --lambda X
     is not specified, it is equivalent to specifying --lambda "2/sqrt(n)".
 
+    --download.build.db         Download the build database, and exit.
+    --download.1KG              Download the 1000genomes referecne panel (18GB),
+                                and then exit.
     --sample.names  [use all]   Sample IDs of individuals to use in the
                                 reference panel.
     --log           [none]      Store a copy of all console output to this file
@@ -60,6 +73,8 @@ Options:
     --window.width  [1000000]   Core window length
     --flanking.width [1000000]  Flanking space left and right of the core window
     --missingness   [none]      'none' (the default), or 'dep' or 'ind'
+    --reimpute.tags             Reimpute every tag in every window. Otherwise,
+                                only 100 tags are reimputed.
 
 
 Reference panel:
