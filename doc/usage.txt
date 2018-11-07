@@ -1,4 +1,4 @@
-[ssimp-0.5.2     (2018-11-02)]
+[ssimp-0.5.2     (2018-11-07)]
 
 ssimp   GWASFILE REFPANEL IMPUTATIONOUTPUT  [OPTIONS]
 ssimp   --gwas GWASFILE --ref REFPANEL --out IMPUTATIONOUTPUT
