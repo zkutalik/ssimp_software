@@ -373,6 +373,7 @@ namespace ssimp {
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
+                             , double                                   N_max
                              );
 static
 mvn::SquareMatrix apply_lambda_square (mvn:: SquareMatrix copy, double lambda);
@@ -817,6 +818,10 @@ int main(int argc, char **argv) {
 
     if(!options:: opt_raw_ref.empty() && !options:: opt_gwas_filename.empty()) {
         auto gwas         = file_reading:: read_in_a_gwas_file(options:: opt_gwas_filename);
+        double N_max = -1;
+        for(int i = 0; i<gwas->number_of_snps(); ++i ) {
+            N_max = std::max(N_max, gwas->get_N(i));
+        }
         {
             auto count_those_removed = gwas->delete_snps_with_identical_alleles();
             if(count_those_removed > 0) {
@@ -963,7 +968,7 @@ int main(int argc, char **argv) {
 
         // Go through regions, printing how many
         // SNPs there are in each region
-        ssimp:: impute_all_the_regions(options:: opt_raw_ref, gwas);
+        ssimp:: impute_all_the_regions(options:: opt_raw_ref, gwas, N_max);
     }
 }
 
@@ -1083,6 +1088,7 @@ bool    test_if_skip(enum_tag_or_impute_t toi, chrpos l, chrpos u) {
 static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
+                             , double                                   N_max
                              ) {
     gwas->sort_my_entries(); // Sort them by position
     assert(gwas->get_chrpos(0) != (chrpos{-1,-1})); // confirm that all gwas positions are now known
@@ -1150,11 +1156,6 @@ void impute_all_the_regions(   string                                   filename
     PP(options:: opt_window_width
       ,options:: opt_flanking_width
             );
-
-    double N_max = -1;
-    for(int i = 0; i<gwas->number_of_snps(); ++i ) {
-        N_max = std::max(N_max, gwas->get_N(i));
-    }
 
     int N_reference = -1; // to be updated (and printed) when we read in the first row of reference data
     int number_of_tags_reimputed_and_printed = 0;
