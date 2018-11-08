@@ -196,7 +196,14 @@ std:: vector<IDchrmThreePos> load_database_of_builds() {
         int hg20 = read_int(f_database_of_builds);
         assert(f_database_of_builds);
         if(chrom >= 1 && chrom <= 23) { // we just ignore XY for now. TODO: extend this?
-            database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
+            bool include_me = true;
+            if(!options::opt_debug_build_chromosomes_to_load.empty()) {
+                // we must skip chromosomes not in the list
+                if(options::opt_debug_build_chromosomes_to_load.count(chrom) == 0)
+                    include_me = false;
+            }
+            if(include_me)
+                database_of_builds. push_back({ rs, chrom, hg18, hg19, hg20 });
         }
 
         ++chrom_counts[chrom];

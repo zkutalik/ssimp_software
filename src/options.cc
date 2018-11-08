@@ -51,6 +51,8 @@ namespace options {
         int                     opt_download_build_db = 0;
         int                     opt_download_1KG = 0;
 
+        std:: set<int>          opt_debug_build_chromosomes_to_load; // if empty, load all of them
+
 
         std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
@@ -78,6 +80,7 @@ void read_in_all_command_line_options(int argc, char **argv) {
             {"missingness"        ,  required_argument, 0, 18 },
             {"download.build.db"  ,        no_argument, &opt_download_build_db, 1 },
             {"download.1KG"       ,        no_argument, &opt_download_1KG, 1 },
+            {"_debug_build_chr"   ,  required_argument, 0, 19 },
             {0                    ,  0                , 0,  0 } // must have this line of zeroes at the end
         };
         int c = getopt_long(argc, argv, "-", long_options, &long_option_index);
@@ -178,6 +181,10 @@ void read_in_all_command_line_options(int argc, char **argv) {
             else {
                 DIE("--missingness argument ([" << optarg << "]) not understood. Valid values: dep,ind,none");
             }
+        }
+        if (c == 19) {
+            assert(string("_debug_build_chr") == long_options[long_option_index].name);
+            options::opt_debug_build_chromosomes_to_load.insert(utils::lexical_cast<int>(optarg));
         }
     }
 }
