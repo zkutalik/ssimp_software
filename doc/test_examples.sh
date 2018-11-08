@@ -1,6 +1,8 @@
 #!/bin/bash
 
-SSIMP="compiled/ssimp-linux-0.4"
+SSIMP="bin/ssimp"
+
+$SSIMP --download.build.db # because the build database is required for every example
 
 $SSIMP --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt
 
@@ -62,6 +64,7 @@ $SSIMP --gwas gwas/small.random.x.txt --ref ref/sub1KG-tiny/chrX.vcf.gz --out ou
 
 $SSIMP --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.snp <(echo X:18008535 X:18010084 X:18037863 | tr ' ' '\n')
 
+$SSIMP --download.1KG # because the 1000genomes reference panel is needed for the remainder of the examples
 
 ### $SSIMP --gwas gwas/small.random.txt --ref 1KG/EUR --out output.txt
 
