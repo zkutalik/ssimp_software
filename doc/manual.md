@@ -72,10 +72,10 @@ Multiprocessing mode is not implemented, hence to speed up computation we recomm
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.range 22:18000000-22:18100075`
 
-There is an untested bash script called [ssimp.sh`](ssimp.sh) that computes chunks with an R script. 
+There is an untested bash script called [extra/ssimp_chunks.sh`](../extra/ssimp.sh) that computes chunks with an R script. 
 
 
-### Note	
+### Tips	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs of the first window for sanity checks, see section `output` below).
 - Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](examples.md).
@@ -94,6 +94,9 @@ There is an untested bash script called [ssimp.sh`](ssimp.sh) that computes chun
 - If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver.
 
 ### Automatic header recognition
+
+Column names listed above are not case sensitive. E.g. P-value column can be named `p` or `P`.
+
 The column identifying the
 - **SNP-id** should be named: `ID`, `rnpid`, `snpid`, `rsid`, `MarkerName`, `snp`, `id1` or `marker`.
 - **reference allele** should be named: `REF`, `a1`, `Allele1`, `AlleleA` or `other_allele`.
@@ -106,9 +109,6 @@ The column identifying the
 - **Chromosome** should be named: `chr`, `chromosome`, `chrm` or `#CHROM`.
 - **Position** should be named: `POS`,`position` or `BP`.
 
-*Note*
-
-Column names listed above are not case sensitive. E.g. P-value column can be named `p` or `P`.
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
@@ -119,9 +119,8 @@ On each chromosome you can only impute variants that are in the range between **
 
 ## Reference panel
 [//]: -------------------------------
-Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s).
 
-More info on handling reference panel data can be found in [usage message](doc/usage.txt#L65).
+More info on handling reference panel data can be found in [usage message](doc/usage.txt#L77).
 
 ## Run-time
 [//]: -------------------------------
@@ -165,7 +164,7 @@ Note that `z_imp` reports the imputed Z-statistics for SNPs that were imputed (`
 
 The imputation quality (`r2.pred`) can become zero, which results in `N.imp=0` and `bst.imp=inf`.
 
-Check the R-file `doc/sanitycheck_reimputed.R` to find out more about the columns `Z_reimputed`, `r2_reimputed` and `source`.	
+Check the R-file [`extra/sanitycheck_reimputed.R`](../extra/sanitycheck_reimputed.R) to find out more about the columns `Z_reimputed`, `r2_reimputed` and `source`.	
 
 ## Method outline
 [//]: -------------------------------
@@ -198,7 +197,7 @@ with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We c
 
 ### More background on method
 
-For more details on *summary statistics imputation*, see [R??eger et al. (2018A)](https://wjournals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1007371). [R??eger et al. (2018B)](https://doi.org/10.1101/203927) describes a method to manipulate the LD matrix in order to account for ancestry admixture. 
+For more details on *summary statistics imputation*, see [Rüeger et al. (2018A)](https://wjournals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1007371). [Rüeger et al. (2018B)](https://doi.org/10.1101/203927) describes a method to manipulate the LD matrix in order to account for ancestry admixture. 
 
 Most of our extended method builds on [Pasaniuc et al. (2014)](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416). 
 
@@ -207,7 +206,7 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 ## How to cite SSimp
 [//]: ----------
 
-**R??eger, S., McDaid, A., Kutalik, Z. (20178).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
+**Rüeger, S., McDaid, A., Kutalik, Z. (20178).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
 
 ## References
 [//]: -------
@@ -216,6 +215,6 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 
 **Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics* Nature Reviews Genetics. [doi:10.1038/nrg.2016.142](https://www.nature.com/articles/nrg.2016.142)
 
-**R??eger, S., McDaid, A., Kutalik, Z. (2018).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371.
+**Rüeger, S., McDaid, A., Kutalik, Z. (2018).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371.
 
-**R??eger, S., McDaid, A., Kutalik, Z. (2018).** *Improved imputation of summary statistics for realistic settings* bioRxiv. https://doi.org/10.1101/203927.
+**Rüeger, S., McDaid, A., Kutalik, Z. (2018).** *Improved imputation of summary statistics for realistic settings* bioRxiv. https://doi.org/10.1101/203927.
