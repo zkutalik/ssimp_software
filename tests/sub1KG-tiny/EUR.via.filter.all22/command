@@ -7,6 +7,7 @@
     --wind 250000                                                                   \
     --flan 250000                                                                   \
     --lambda 0.01                                                                   \
+    --_debug_build_chr 20 --_debug_build_chr 21 --_debug_build_chr 22               \
     >     "$OUTPUT"
     #--ref "$REF"/tbi/small.vcf.sample.vcf.gz                                        \
     #--ref "$REF"/link.to.1kg.data/ALL.chr19.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
