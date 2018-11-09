@@ -429,6 +429,8 @@ static
     );
 
 
+static
+std:: pair<chrpos,chrpos> parse_range_as_pair_of_chrpos(string const &as_text);
 } // namespace ssimp
 
 static
@@ -694,6 +696,19 @@ int main(int argc, char **argv) {
     //        is looked up in the 1kg panel file. If any of those
     //        strings appears in any of the columns, then that
     //        sample is used.
+
+    // If --impute.range or --tag.range is specified, then we can optimize
+    // by arranging that only the relevant subset of the build database is loaded
+    for(auto * either_impute_or_tag : { &options::opt_impute_range, &options::opt_tag_range }) {
+        if(!either_impute_or_tag->empty()) {
+            auto range_parsed =  ssimp::parse_range_as_pair_of_chrpos(*either_impute_or_tag);
+            int     a_chromosome = range_parsed.first.chr;
+            int  last_chromosome = range_parsed.second.chr;
+            for(;a_chromosome <= last_chromosome; ++a_chromosome) {
+                options::opt_debug_build_chromosomes_to_load.insert(a_chromosome);
+            }
+        }
+    }
 
     // But first, check if the relevant directory exists and, if it doesn't
     // exist, explain to the user how to download it
