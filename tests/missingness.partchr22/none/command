@@ -10,5 +10,4 @@
     --reimpute.tags                                                                 \
     --missingness none                                                              \
     --impute.range 22:18000000-22:19000000                                          \
-    --_debug_build_chr 22                                                           \
     >     "$OUTPUT"

@@ -8,5 +8,5 @@
     --flan 250000                                                                   \
     --lambda 0.01                                                                   \
        --tag.maf  0.01                                                              \
-    --_debug_build_chr 20 --_debug_build_chr 21 --_debug_build_chr 22               \
+    --impute.range 20-22                                                            \
     >     "$OUTPUT"

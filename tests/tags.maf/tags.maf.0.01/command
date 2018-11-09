@@ -6,5 +6,4 @@
     --lambda 0.01                                                                           \
     --tag.maf  0.0100                                                                      \
     --impute.range  chr1-chr2                                                         \
-    --_debug_build_chr 1 --_debug_build_chr 2                                       \
     > "$OUTPUT"
