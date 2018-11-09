@@ -5,15 +5,18 @@
 
 ## Minimal example
 [//]: -------------------------------
-The minimal requirements for `ssimp` to run are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (e.g. `MarkerName`), Z-statistic (e.g. `Z`), reference allele (e.g. `a1`) and risk allele (e.g. `a2`) and at least one row, (2) the path to the reference panel, and (3) the path to the output file.
+The **minimal requirements** for `ssimp` to run are:
+1. GWAS summary statistics stored in a text file with at least the following columns SNP-id (e.g. `MarkerName`), Z-statistic (e.g. `Z`), reference allele (e.g. `a1`) and risk allele (e.g. `a2`) and at least one row. 
+2. The path to the reference panel.
+3. The path to the output file.
 
-`ssimp my_gwas.txt ~/.refpanel/my_reference_panel.vcf output.txt` 
+`ssimp my_gwas.txt ~/reference_panels/my_reference_panel.vcf output.txt` 
 
 will generate a file `output.txt`, containing the imputation results. This is identical to 
 
-`ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
+`ssimp --gwas my_gwas.txt --ref ~/reference_panels/my_reference_panel.vcf --out output.txt`
 	
-An executable example is:
+An **executable example** is:
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
@@ -25,9 +28,13 @@ The options `--gwas`, `--ref` and `--out` are required arguments. Some options (
 
 Note that arguments can be shortenend, e.g. `--wind` instead of `--window.width`.
 
+`--download.build.db`         Download the build database, and exit.
+`--download.1KG` downloads the 1000genomes reference panel (18GB),
+                                and then exit.
+   
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). The same folder should contain also the `.tbi` file(s). Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). The same folder should contain also the `.tbi` file(s). Filename specified as `chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
 
 `--out [no default]` string. Filename to store the imputation results. 
 
@@ -42,7 +49,7 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 `--impute.snp [NULL]` filename to define SNPs to impute (each SNP has a new line, no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (𝜆) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (????) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
 `--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
@@ -196,7 +203,7 @@ with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We c
 
 ### More background on method
 
-For more details on *summary statistics imputation*, see [Rüeger et al. (2018A)](https://wjournals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1007371). [Rüeger et al. (2018B)](https://doi.org/10.1101/203927) describes a method to manipulate the LD matrix in order to account for ancestry admixture. 
+For more details on *summary statistics imputation*, see [R??eger et al. (2018A)](https://wjournals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1007371). [R??eger et al. (2018B)](https://doi.org/10.1101/203927) describes a method to manipulate the LD matrix in order to account for ancestry admixture. 
 
 Most of our extended method builds on [Pasaniuc et al. (2014)](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btu416). 
 
@@ -205,7 +212,7 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 ## How to cite SSimp
 [//]: ----------
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (20178).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
+**R??eger, S., McDaid, A., Kutalik, Z. (20178).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
 
 ## References
 [//]: -------
@@ -214,6 +221,6 @@ We also recommend reading the review on the use of summary statistics by [Pasani
 
 **Pasaniuc, B. and Price, A. L. (2016).** *Dissecting the genetics of complex traits using summary association statistics* Nature Reviews Genetics. [doi:10.1038/nrg.2016.142](https://www.nature.com/articles/nrg.2016.142)
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2018).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371.
+**R??eger, S., McDaid, A., Kutalik, Z. (2018).** *Evaluation and application of summary statistic imputation to discover new height-associated loci* PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371.
 
-**Rüeger, S., McDaid, A., Kutalik, Z. (2018).** *Improved imputation of summary statistics for realistic settings* bioRxiv. https://doi.org/10.1101/203927.
+**R??eger, S., McDaid, A., Kutalik, Z. (2018).** *Improved imputation of summary statistics for realistic settings* bioRxiv. https://doi.org/10.1101/203927.
