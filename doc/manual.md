@@ -45,15 +45,17 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 `--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed.
 
-`--tag.snp [no default]` filename with a list of tag SNPs (each SNP has a new line, no header). For magic in bash see `Note` below.
+`--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
 `--impute.snp [NULL]` filename to define SNPs to impute (each SNP has a new line, no header). For magic in bash see `Note` below.
 
+`--tag.range [no default]` same as `impute.range`, but applied to tag SNPs.
+
+`--tag.maf [0]` same as `impute.maf`, but applied to tag SNPs.
+
+`--tag.snp [no default]`same as `impute.snp`, but applied to tag SNPs.
+
 `--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (????) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
-
-`--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
-
-`--tag.maf [0]` numeric value. Lower MAF limit for tag SNPs: everything above and equal this threshold will be used as tag SNPs. 
 
 `--window.width [1000000]` numeric value. Core window length. See illustration below.
 
@@ -66,19 +68,11 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 ### Multiprocessing
 [//]: -------
-Note that multiprocessing mode is not implemented, hence to speed up computation we recommend splitting up the job to smaller chromosomal chunks using the option `--impute.range`:
+Multiprocessing mode is not implemented, hence to speed up computation we recommend splitting up the job to smaller chromosomal chunks using the option `--impute.range` for smaller chunks or even chromosomes:
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.range 22:18000000-22:18100075`
 
-#### Compute chunks
-These ranges can be computed automatically, by giving your main arguments [`args1`], the number of chunks [`args2`] and the name of the shell script returned [`args3`]. 
-
-`./ssimp_chunks.sh "args1" args2 args3`
-
-For example, run this in your terminal:
-`./ssimp_chunks.sh "bin/ssimp --gwas gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz --ref ref/sub1KG-tiny/chr22.vcf.gz --out output.txt" 100 run_ssimp_array.sh`
-
-Note, that you still need to integrate the shell script content into your scheduler (slurm, bsub, qsub, ...).
+There is an untested bash script called [ssimp.sh`](ssimp.sh) that computes chunks with an R script. 
 
 
 ### Note	
