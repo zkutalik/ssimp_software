@@ -59,7 +59,7 @@ Options:
     --log           [none]      Store a copy of all console output to this file
     --impute.range  [use all]   Position range to be imputed (chr:start-chr:end)
     --impute.maf    [0]         Minimum MAF among SNPs to be imputed
-    --impute.snp    [use all]   List of SNP id???s to be imputed
+    --impute.snp    [use all]   List of SNP id's to be imputed
     --tag.range     [use all]   (same as impute.range, but applied to tag SNPs)
     --tag.maf       [0]         (same as impute.maf,   but applied to tag SNPs)
     --tag.snp       [use all]   (same as impute.snp,   but applied to tag SNPs)
@@ -169,7 +169,7 @@ use a different subpopulation, for example 'pop=TSI' or 'super_pop=EAS'.
 
 If you use this software in your scientific research, please consider citing
 
-R??eger, S., McDaid, A., Kutalik, Z. (2018). Evaluation and application of summary statistic imputation to discover new height-associated loci. PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
+Rüeger, S., McDaid, A., Kutalik, Z. (2018). Evaluation and application of summary statistic imputation to discover new height-associated loci. PLOS Genetics. https://doi.org/10.1371/journal.pgen.1007371
 
 Copyright 2018.
-(Aaron McDaid, Sina R??eger, Zolt??n Kutalik, https://github.com/zkutalik/ssimp_software)
+(Aaron McDaid, Sina Rüeger, Zoltán Kutalik, https://github.com/zkutalik/ssimp_software)

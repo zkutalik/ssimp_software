@@ -120,11 +120,7 @@ On each chromosome you can only impute variants that are in the range between **
 ## Reference panel
 [//]: -------------------------------
 
-More info on handling reference panel data can be found in [usage message](doc/usage.txt#L77).
-
-## Run-time
-[//]: -------------------------------
-To run a genome-wide imputation using 1000 genomes reference panel, roughly 200 CPU hours are needed.
+More info on handling reference panel data can be found in [usage message](doc/usage.txt).
 
 
 ## Technical aspects
@@ -193,7 +189,7 @@ If your Z-statistics originated from a linear regression model, the estimated `s
 
 with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We can approximate the sample size of an untyped SNP by multiplying the maximum sample size with its imputation quality `N_u = N_max * r2_pred`. 
 
-[Here](../transform_z_to_b.R) we provide an R-function that automatically transforms imputed Z-statistics into imputed effect sizes.
+We provide an R-function called [`extra/transform_z_to_b.R`](../extra/transform_z_to_b.R) that automatically transforms imputed Z-statistics into imputed effect sizes.
 
 ### More background on method
 
