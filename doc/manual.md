@@ -61,7 +61,8 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 		
 `--missingness [none]` string: `ind` (recommended), `dep`. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. 
 
-`--n.cores [1]` Number of cores for multiprocessing. Not implemented yet, but on our list of things to be done.
+`--reimpute.tags` reimpute every tag in every window. Otherwise, only 100 tags are reimputed.
+
 
 ### Multiprocessing
 [//]: -------
