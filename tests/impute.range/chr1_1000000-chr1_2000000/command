@@ -5,4 +5,5 @@
     --out "${OUT_IMPUTATIONS}"                                                      \
     --lambda 0.01                                                                   \
     --impute.range  chr1:18040000-chr1:18060000                                     \
+    --_debug_build_chr 1                                                            \
     > "$OUTPUT"

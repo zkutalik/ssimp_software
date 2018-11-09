@@ -9,6 +9,7 @@
     --lambda 0.01                                                                   \
     --reimpute.tags                                                                 \
     --missingness dep                                                              \
+    --_debug_build_chr 19                                                           \
     >     "$OUTPUT"
     #--gwas "$GWAS"/too.big/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz \
     #--gwas "$GWAS"/GIANT_HEIGHT_Wood_et_al_justPARTOFCHR19.tsv                      \

@@ -1,5 +1,8 @@
 Versions of SSIMP
 
+(unreleased)    (???)
+                - (debug) faster testing, with a 'hidden' option _debug_build_chr
+
 ssimp-0.5.2     (2018-11-07)
                 - various documentation updates
                 - option for '--download.build.db' and '--download.1KG'

@@ -8,4 +8,5 @@
     --flan 250000                                                                   \
     --lambda 0.01                                                                   \
     --tag.range 1:18020299-22:18444733                                              \
+    --_debug_build_chr 20 --_debug_build_chr 21 --_debug_build_chr 22               \
     >     "$OUTPUT"

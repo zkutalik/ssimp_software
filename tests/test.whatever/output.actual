@@ -2,13 +2,13 @@ file_name:gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
 ... loading the 1.7GB database of positions under three builds. This will take about a minute.  Loaded.
 Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel
 some_records_from_each_chromosome.size():3'648
-count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 70 , 0 , 0 , 3'568 , 0
+count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 5 , 0 , 0 , 548 , 0
 gwas_all_chrpos.size():0
 count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 0 , 0 , 0 , 0 , 0
 which_build_gwas,which_build_ref:	unknown , hg19_1
-gwas_count_known,gwas_count_unknown:	1'013 , 1
+gwas_count_known,gwas_count_unknown:	189 , 825
 Delete the SNPs with unknown position ...
-gwas->number_of_snps():1'013
+gwas->number_of_snps():189
 options:: opt_window_width,options:: opt_flanking_width:	300'000 , 250'000
 N_reference:2'504
 

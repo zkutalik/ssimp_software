@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <functional>
 #include <vector>
+#include <set>
 #include <memory> // for unique_ptr
 
 namespace options {
@@ -40,6 +41,7 @@ extern  std:: vector<std::function<void(void)>>    list_of_tasks_to_run_at_exit;
 
 extern  int                     opt_download_build_db;
 extern  int                     opt_download_1KG;
+extern  std:: set<int>          opt_debug_build_chromosomes_to_load; // if empty, load all of them
 
         void                    read_in_all_command_line_options(int argc, char **argv);
         void                    adjust_sample_names_if_it_is_magical();
