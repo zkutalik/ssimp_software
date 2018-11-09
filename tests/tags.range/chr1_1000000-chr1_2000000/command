@@ -6,5 +6,4 @@
     --lambda 0.01                                                                   \
     --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
     --tag.range  chr1:18016491-chr1:18490574   \
-    --_debug_build_chr 1                                                            \
     > "$OUTPUT"
