@@ -1,5 +1,15 @@
 #!/usr/bin/env Rscript
 
+# These ranges can be computed automatically, by giving your main arguments [`args1`], the number of chunks [`args2`] and the name of the shell script returned [`args3`]. 
+# 
+# `./ssimp_chunks.sh "args1" args2 args3`
+# 
+# For example, run this in your terminal:
+# `./ssimp_chunks.sh "bin/ssimp --gwas gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz --ref ref/sub1KG-tiny/chr22.vcf.gz --out output.txt" 100 run_ssimp_array.sh`
+# 
+# Note, that you still need to integrate the shell script content into your scheduler.
+# 
+
 ## (A) two functions
 ## ////////////////////
 

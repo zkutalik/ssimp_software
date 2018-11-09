@@ -5,15 +5,18 @@
 
 ## Minimal example
 [//]: -------------------------------
-The minimal requirements for `ssimp` to run are: (1) GWAS summary statistics stored in a text file with at least the following columns SNP-id (e.g. `MarkerName`), Z-statistic (e.g. `Z`), reference allele (e.g. `a1`) and risk allele (e.g. `a2`) and at least one row, (2) the path to the reference panel, and (3) the path to the output file.
+The **minimal requirements** for `ssimp` to run are:
+1. GWAS summary statistics stored in a text file with at least the following columns SNP-id (e.g. `MarkerName`), Z-statistic (e.g. `Z`), reference allele (e.g. `a1`) and risk allele (e.g. `a2`) and at least one row. 
+2. The path to the reference panel.
+3. The path to the output file.
 
-`ssimp my_gwas.txt ~/.refpanel/my_reference_panel.vcf output.txt` 
+`ssimp my_gwas.txt ~/reference_panels/my_reference_panel.vcf output.txt` 
 
 will generate a file `output.txt`, containing the imputation results. This is identical to 
 
-`ssimp --gwas my_gwas.txt --ref ~/.refpanel/my_reference_panel.vcf --out output.txt`
+`ssimp --gwas my_gwas.txt --ref ~/reference_panels/my_reference_panel.vcf --out output.txt`
 	
-An executable example is:
+An **executable example** is:
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt`
 
@@ -25,9 +28,13 @@ The options `--gwas`, `--ref` and `--out` are required arguments. Some options (
 
 Note that arguments can be shortenend, e.g. `--wind` instead of `--window.width`.
 
+`--download.build.db` downloads the build database, and exits.
+
+`--download.1KG` downloads the 1000 genomes reference panel (18GB) and the build database, and then exits.
+
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). The same folder should contain also the `.tbi` file(s). Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
+`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). The same folder should contain also the `.tbi` file(s). Filename specified as `chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
 
 `--out [no default]` string. Filename to store the imputation results. 
 
@@ -38,15 +45,17 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 
 `--impute.range [no default]` Should have the form of `CHR:pos.start-CHR:pos.end`, with `CHR` being the chromosome number, `pos.start` the start position and `pos.end` the end position, e.g. `1:10000-1:30000`. If `CHR`, then the single chromosome `CHR` is imputed. For `CHR-CHR`, a range of chromosomes are imputed, e.g. `1-5` chromosome 1 to chromosome 5 are imputed.
 
-`--tag.snp [no default]` filename with a list of tag SNPs (each SNP has a new line, no header). For magic in bash see `Note` below.
+`--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
 
 `--impute.snp [NULL]` filename to define SNPs to impute (each SNP has a new line, no header). For magic in bash see `Note` below.
 
-`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (𝜆) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
+`--tag.range [no default]` same as `impute.range`, but applied to tag SNPs.
 
-`--impute.maf [0]` numeric value. Lower MAF limit for SNPs to be imputed: everything above and equal this threshold will be imputed.
+`--tag.maf [0]` same as `impute.maf`, but applied to tag SNPs.
 
-`--tag.maf [0]` numeric value. Lower MAF limit for tag SNPs: everything above and equal this threshold will be used as tag SNPs. 
+`--tag.snp [no default]`same as `impute.snp`, but applied to tag SNPs.
+
+`--lambda [2/sqrt(n)]` numeric value or string (`2/sqrt(n)`), n are the number of individuals in the reference panel. Lambda (????) controls the shrinking of the correlation matrix (lambda = 0 applies no shrinking, lambda = 1 turns the correlation matrix into the identity matrix).
 
 `--window.width [1000000]` numeric value. Core window length. See illustration below.
 
@@ -54,26 +63,19 @@ use the sample names in column 'f'. An example of the latter is: `integrated_cal
 		
 `--missingness [none]` string: `ind` (recommended), `dep`. Enables variable sample size approach. `ind` stands for independent, and `dep` for dependent. 
 
-`--n.cores [1]` Number of cores for multiprocessing. Not implemented yet, but on our list of things to be done.
+`--reimpute.tags` reimpute every tag in every window. Otherwise, only 100 tags are reimputed.
+
 
 ### Multiprocessing
 [//]: -------
-Note that multiprocessing mode is not implemented, hence to speed up computation we recommend splitting up the job to smaller chromosomal chunks using the option `--impute.range`:
+Multiprocessing mode is not implemented, hence to speed up computation we recommend splitting up the job to smaller chromosomal chunks using the option `--impute.range` for smaller chunks or even chromosomes:
 
 `ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt --impute.range 22:18000000-22:18100075`
 
-#### Compute chunks
-These ranges can be computed automatically, by giving your main arguments [`args1`], the number of chunks [`args2`] and the name of the shell script returned [`args3`]. 
-
-`./ssimp_chunks.sh "args1" args2 args3`
-
-For example, run this in your terminal:
-`./ssimp_chunks.sh "bin/ssimp --gwas gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz --ref ref/sub1KG-tiny/chr22.vcf.gz --out output.txt" 100 run_ssimp_array.sh`
-
-Note, that you still need to integrate the shell script content into your scheduler (slurm, bsub, qsub, ...).
+There is an untested bash script called [extra/ssimp_chunks.sh`](../extra/ssimp.sh) that computes chunks with an R script. 
 
 
-### Note	
+### Tips	
 [//]: -------
 - If `impute.range` and `impute.snps` are not defined, then all variants in the reference panel are imputed (including the tag SNPs of the first window for sanity checks, see section `output` below).
 - Magic tip in bash to produce a file within the command line: `--impute.snp <(echo rs5753220 rs5753231 | tr ' ' '\n')`. Have a look at the [examples](examples.md).
@@ -92,6 +94,9 @@ Note, that you still need to integrate the shell script content into your schedu
 - If case positions in the GWAS file do not match the reference panel positions, use use LiftOver as a command line tool: http://genome.ucsc.edu/cgi-bin/hgLiftOver.
 
 ### Automatic header recognition
+
+Column names listed above are not case sensitive. E.g. P-value column can be named `p` or `P`.
+
 The column identifying the
 - **SNP-id** should be named: `ID`, `rnpid`, `snpid`, `rsid`, `MarkerName`, `snp`, `id1` or `marker`.
 - **reference allele** should be named: `REF`, `a1`, `Allele1`, `AlleleA` or `other_allele`.
@@ -104,9 +109,6 @@ The column identifying the
 - **Chromosome** should be named: `chr`, `chromosome`, `chrm` or `#CHROM`.
 - **Position** should be named: `POS`,`position` or `BP`.
 
-*Note*
-
-Column names listed above are not case sensitive. E.g. P-value column can be named `p` or `P`.
 
 ## --window.width and --flanking.width
 [//]: -------------------------------
@@ -117,13 +119,8 @@ On each chromosome you can only impute variants that are in the range between **
 
 ## Reference panel
 [//]: -------------------------------
-Filename specified as `ref/chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome. The same folder should contain also the `.tbi` file(s).
 
-More info on handling reference panel data can be found in [usage message](doc/usage.txt#L65).
-
-## Run-time
-[//]: -------------------------------
-To run a genome-wide imputation using 1000 genomes reference panel, roughly 200 CPU hours are needed.
+More info on handling reference panel data can be found in [usage message](doc/usage.txt).
 
 
 ## Technical aspects
@@ -163,7 +160,7 @@ Note that `z_imp` reports the imputed Z-statistics for SNPs that were imputed (`
 
 The imputation quality (`r2.pred`) can become zero, which results in `N.imp=0` and `bst.imp=inf`.
 
-Check the R-file `doc/sanitycheck_reimputed.R` to find out more about the columns `Z_reimputed`, `r2_reimputed` and `source`.	
+Check the R-file [`extra/sanitycheck_reimputed.R`](../extra/sanitycheck_reimputed.R) to find out more about the columns `Z_reimputed`, `r2_reimputed` and `source`.	
 
 ## Method outline
 [//]: -------------------------------
@@ -192,7 +189,7 @@ If your Z-statistics originated from a linear regression model, the estimated `s
 
 with `q_u` being the allele frequency and `N_u` the sample size of SNP `u`. We can approximate the sample size of an untyped SNP by multiplying the maximum sample size with its imputation quality `N_u = N_max * r2_pred`. 
 
-[Here](../transform_z_to_b.R) we provide an R-function that automatically transforms imputed Z-statistics into imputed effect sizes.
+We provide an R-function called [`extra/transform_z_to_b.R`](../extra/transform_z_to_b.R) that automatically transforms imputed Z-statistics into imputed effect sizes.
 
 ### More background on method
 

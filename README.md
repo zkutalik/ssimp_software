@@ -11,19 +11,29 @@ The only input needed from the user are the **GWAS summary statistics** and a **
 ## Current version: 0.5.2
 [//]: -------------------------------
 
-**Important**: along with the SSIMP installation, you will also need to download a file (a database with all positions on different builds) into your `~/reference_panel/` folder. 
+If this is the **first time** that you download SSIMP run the following line:
+```
+ssimp --download.build.db
+```
+
+This will download a database with all positions on different builds.
+
+Alternatively, run the following, if you are planning to use 1000 genomes as the reference panel.
+
+```
+ssimp --download.1KG
+```
+This will also download the build database along with 1000 genomes reference panel.
 
 
-If this is the **first time** that you download SSIMP, create a folder typing the following in your terminal:
+If you had previous versions of SSIMP installed, you **NEED to delete and redownload** the database:
 ```
-cd ~
-mkdir reference_panels
-wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+rm ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+ssimp --download.build.db
 ```
- 
-If you had previous versions of SSIMP installed, you **NEED to redownload** the database. 
+The download option is equivalant to:
 ```
-wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+# wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 ```
 
 ## Troubleshooting
@@ -130,38 +140,22 @@ Run `ssimp` with no arguments to see the [usage message](doc/usage.txt).
 
 Check out [examples](doc/examples.md).
 
-We also provide a [detailed manual](doc/manual.md) that contains information not present in the usage message.
+We also provide a [detailed manual](doc/manual.md) that has overlapping information with the usage message, but is a bit more detailed in more aspects.
 
 
 ## Download 1000 genomes reference panel
 [//]: -------------------------------
 
+Run 
+
+```
+ssimp --download.1KG
+```
+
 **Important!** *Reference panels provided in folder `ref` are toy reference panels for testing and examples and not made to use for proper usage.*
 
-### Automatic download
-[//]: -------------------------------
-By running `ssimp` with a special argument - `1KG/[SUPERPOP]` or `1KG/[POP]` - assigned to the reference panel option, it will automatically download 1000 genomes reference panel and use the specified super population for imputation (e.g. `1KG/AFR`). `[SUPERPOP]` is any of the following: AFR, AMR, EAS, EUR, SAS, look up `[POP]` [here](http://www.internationalgenome.org/data-portal/sample). 
+More info on handling reference panel data can be found in [usage message](doc/usage.txt).
 
-Make sure that:
-1) you have `wget` installed and
-2) no folder `reference_panels` exists.
-
-For example, if we want 1000 genomes to be downloaded and EUR population used for imputation, we type: 
-
-`ssimp gwas/small.random.txt 1KG/EUR output.txt` 
-
-It will then download 1000 genomes reference panel **and** a file that enables fast imputation of single SNPs. 
-
-When using `ssimp` you can then pass this directory name to 'ssimp', and specify that only
-as subset of individuals (here AFR) should be used:
-
-`ssimp  gwas/small.random.txt \
-        ~/reference_panels/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
-        output.txt \
-        --sample.names ~/reference_panels/1000genomes/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=AFR`
-
-More info on handling reference panel data can be found in [usage
-message](doc/usage.txt#L65).
 
 
 ## Run tests
@@ -173,6 +167,7 @@ message](doc/usage.txt#L65).
 
 1. Follow instructions in [this file](compiled/howto.txt).
 2. Update VERSION file.
+3. Add tag with `git pull master && git tag v0.5.2 master && git push --tags`
 
 ## Contributors
 [//]: -------------------------------
