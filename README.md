@@ -26,9 +26,14 @@ ssimp --download.1KG
 This will also download the build database along with 1000 genomes reference panel.
 
 
-If you had previous versions of SSIMP installed, you **NEED to redownload** the database. 
+If you had previous versions of SSIMP installed, you **NEED to delete and redownload** the database:
 ```
-wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+rm ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+ssimp --download.build.db
+```
+The download option is equivalant to:
+```
+# wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 ```
 
 ## Troubleshooting
