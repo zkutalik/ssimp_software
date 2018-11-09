@@ -28,10 +28,10 @@ The options `--gwas`, `--ref` and `--out` are required arguments. Some options (
 
 Note that arguments can be shortenend, e.g. `--wind` instead of `--window.width`.
 
-`--download.build.db`         Download the build database, and exit.
-`--download.1KG` downloads the 1000genomes reference panel (18GB),
-                                and then exit.
-   
+`--download.build.db` downloads the build database, and exits.
+
+`--download.1KG` downloads the 1000 genomes reference panel (18GB) and the build database, and then exits.
+
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
 `--ref [no default]` path to vcf file (same folder should contain the `tbi` file). The same folder should contain also the `.tbi` file(s). Filename specified as `chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
