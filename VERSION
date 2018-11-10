@@ -5,6 +5,7 @@ Versions of SSIMP
                   database for the relevant chromosomes. This applies if
                   --impute.range or --tag.range are specified.
                 - print the version number when running
+                - fix for issue 88
 
 ssimp-0.5.2     (2018-11-07)
                 - various documentation updates

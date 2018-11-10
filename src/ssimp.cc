@@ -1481,7 +1481,6 @@ void impute_all_the_regions(   string                                   filename
                 (void)z;
                 map_of_ref_records_of_tags[tag_refrecord] = z;
             };
-            assert(map_of_ref_records_of_tags.size() == tag_its_.size());
 
             // Compute the correlation matrices
             mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags);
