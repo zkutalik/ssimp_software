@@ -1,5 +1,6 @@
 #include <unistd.h> // for 'chdir' and 'unlink'
 #include <cstdlib> // for 'mkstemp'
+#include <cstring> // for 'strchr'
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -637,6 +638,16 @@ void download_build_database_if_needed() {
         actually_download_build_database_force();
 }
 
+static
+void print_the_version_from_usage_text() {
+    // print the first line of the 'usage_text', as it
+    // will be the version number of 'ssimp'.
+    char const * end_of_first_line = strchr(usage_text, '\n');
+    int length_of_first_line = end_of_first_line - usage_text;
+    auto first_line_of_usage_text = std::string(usage_text).substr(0, length_of_first_line);
+    cout << first_line_of_usage_text << '\n';
+}
+
 int main(int argc, char **argv) {
     if(argc==1) {
         exitWithUsage();
@@ -696,6 +707,8 @@ int main(int argc, char **argv) {
     //        is looked up in the 1kg panel file. If any of those
     //        strings appears in any of the columns, then that
     //        sample is used.
+
+    print_the_version_from_usage_text();
 
     // If --impute.range or --tag.range is specified, then we can optimize
     // by arranging that only the relevant subset of the build database is loaded
