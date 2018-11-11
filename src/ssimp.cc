@@ -1478,7 +1478,6 @@ void impute_all_the_regions(   string                                   filename
             range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
             |action::unzip_foreach|
             [&](auto && tag_refrecord, auto && z) {
-                (void)z;
                 map_of_ref_records_of_tags[tag_refrecord] = z;
             };
 
@@ -1559,9 +1558,6 @@ void impute_all_the_regions(   string                                   filename
             if  (do_reimputation_in_this_window) {
                 reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
             }
-            assert(ssize(reimputed_tags_in_this_window) == 0
-                || ssize(reimputed_tags_in_this_window) == number_of_tags);
-
 
             // Next few lines are for the imputation quality
             auto Cinv_c   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_lambda)  , c_lambda);
