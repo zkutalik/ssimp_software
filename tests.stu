@@ -68,6 +68,7 @@
     rm                    "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out 2>/dev/null || :
     bash "tests/${testname}"/command
 
+    sed -i '/^\[ssimp-.*\]$/d' "$OUTPUT" # delete the line with version info
     if test -e "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out; then
         gprof "${SSIMP}" "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out > "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.txt
         rm               "${PROF_CHANGE_DIR_AT_THE_LAST_MINUTE}"/gmon.out

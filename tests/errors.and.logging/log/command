@@ -13,3 +13,4 @@
     --tag.range chr4-chr5                                                          \
     >     "$OUTPUT" 2> "${COMMANDDIR}"/output.stderr
     touch "$OUT_IMPUTATIONS"
+    sed -i '/^\[ssimp-.*\]$/d' "${COMMANDDIR}"/log.txt # delete the line with version info

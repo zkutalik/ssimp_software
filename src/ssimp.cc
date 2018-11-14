@@ -1,5 +1,6 @@
 #include <unistd.h> // for 'chdir' and 'unlink'
 #include <cstdlib> // for 'mkstemp'
+#include <cstring> // for 'strchr'
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -637,6 +638,16 @@ void download_build_database_if_needed() {
         actually_download_build_database_force();
 }
 
+static
+void print_the_version_from_usage_text() {
+    // print the first line of the 'usage_text', as it
+    // will be the version number of 'ssimp'.
+    char const * end_of_first_line = strchr(usage_text, '\n');
+    int length_of_first_line = end_of_first_line - usage_text;
+    auto first_line_of_usage_text = std::string(usage_text).substr(0, length_of_first_line);
+    cout << first_line_of_usage_text << '\n';
+}
+
 int main(int argc, char **argv) {
     if(argc==1) {
         exitWithUsage();
@@ -696,6 +707,8 @@ int main(int argc, char **argv) {
     //        is looked up in the 1kg panel file. If any of those
     //        strings appears in any of the columns, then that
     //        sample is used.
+
+    print_the_version_from_usage_text();
 
     // If --impute.range or --tag.range is specified, then we can optimize
     // by arranging that only the relevant subset of the build database is loaded
@@ -1465,10 +1478,8 @@ void impute_all_the_regions(   string                                   filename
             range:: zip_val( from:: vector(tag_its_), from:: vector(tag_zs_))
             |action::unzip_foreach|
             [&](auto && tag_refrecord, auto && z) {
-                (void)z;
                 map_of_ref_records_of_tags[tag_refrecord] = z;
             };
-            assert(map_of_ref_records_of_tags.size() == tag_its_.size());
 
             // Compute the correlation matrices
             mvn:: SquareMatrix  C_nolambda  = make_C_tag_tag_matrix(genotypes_for_the_tags);
@@ -1547,9 +1558,6 @@ void impute_all_the_regions(   string                                   filename
             if  (do_reimputation_in_this_window) {
                 reimputed_tags_in_this_window = reimpute_tags_one_by_one(C_lambda, invert_a_matrix(C_lambda), invert_a_matrix(C_lambda), tag_zs_, tag_its_, N_ref, number_of_effective_tests_in_C_nolambda);
             }
-            assert(ssize(reimputed_tags_in_this_window) == 0
-                || ssize(reimputed_tags_in_this_window) == number_of_tags);
-
 
             // Next few lines are for the imputation quality
             auto Cinv_c   =     mvn:: multiply_NoTrans_Trans( invert_a_matrix(C_lambda)  , c_lambda);
