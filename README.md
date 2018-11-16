@@ -8,7 +8,7 @@ This command-line software enables summary statistics imputation (SSimp) for GWA
 The only input needed from the user are the **GWAS summary statistics** and a **reference panel** (e.g. 1000 genomes, needed for LD computation).
 
 
-## Current version: 0.5.3
+## Current version: 0.5.4
 [//]: -------------------------------
 
 If this is the **first time** that you download SSIMP run the following line:
@@ -65,15 +65,15 @@ We recommend to download the full folder. This will give you access to all toy e
 
 Depending on what OS you are on :
 
-`cp compiled/ssimp-linux-0.5.3 ssimp`
+`cp compiled/ssimp-linux-0.5.4 ssimp`
 
-`cp compiled/ssimp-osx-0.5.3 ssimp`
+`cp compiled/ssimp-osx-0.5.4 ssimp`
 
 ### Compiled version (binary)
 
-[Linux](compiled/ssimp-linux-0.5.3) - static version
+[Linux](compiled/ssimp-linux-0.5.4) - static version
 
-[MacOS](compiled/ssimp-osx-0.5.3) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
+[MacOS](compiled/ssimp-osx-0.5.4) - dynamic version. You need to install GSL 1.16 (GNU Scientific Library) from here: [http://ftp.gnu.org/gnu/gsl/](http://ftp.gnu.org/gnu/gsl/).
 
 
 ### Compile from source 
@@ -167,7 +167,8 @@ More info on handling reference panel data can be found in [usage message](doc/u
 
 1. Follow instructions in [this file](compiled/howto.txt).
 2. Update VERSION file.
-3. Add tag with `git pull master && git tag v0.5.3 master && git push --tags`
+3. Make a pull request and merge it.
+4. Add tag with `git pull master && git tag v0.5.4 master && git push --tags`
 
 ## Contributors
 [//]: -------------------------------

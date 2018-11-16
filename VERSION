@@ -1,6 +1,6 @@
 Versions of SSIMP
 
-(unreleased)    (???)
+ssimp-0.5.4     (2018-11-16)
                 - print '(ref)' and '(gwas)' when estimating the builds, so the output is more readable.
                 - stop using the 'DISCARD_FILTERED' to 'libStatGen'. By using
                   it, we were discarding too much from the reference panel.
