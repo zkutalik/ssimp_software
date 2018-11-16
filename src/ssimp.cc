@@ -328,6 +328,7 @@ which_build_t estimate_build_of_reference_panel (   string                      
             six_counts.insert_position(icp.pos, it);
         }
     }
+    cout << "(ref) :";
     six_counts.print();
     return six_counts.which_is_the_most_popular_build();
 }
@@ -359,6 +360,7 @@ estimate_build_of_the_gwas  (   std::shared_ptr<file_reading::Effects_I>    gwas
         if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg19+1} ) == 1) ++six_counts.count_of_hg19_1based;
         if(gwas_all_chrpos.count( chrpos{db_entry.chrom, db_entry.hg20+1} ) == 1) ++six_counts.count_of_hg20_1based;
     }
+    cout << "(gwas):";
     six_counts.print();
 
     if(gwas_all_chrpos.size() == 0) {
