@@ -34,7 +34,7 @@ Note that arguments can be shortenend, e.g. `--wind` instead of `--window.width`
 
 `--gwas [no default]`, path to the GWAS dataset. The file's extension (e.g. `.txt`) does not matter. The delimiter (comma, space or tab) is detected automatically. Common column names are recognised automatically (for details see section `GWAS dataset`). The minimal set of columns that should be provided, are: SNP-id, Z-statistics, reference allele and risk allele. Missings have to be marked as `NA` or left empty.
 
-`--ref [no default]` path to vcf file (same folder should contain the `tbi` file). The same folder should contain also the `.tbi` file(s). Filename specified as `chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
+`--ref [no default]` path to vcf file. The same folder should also contain the corresponding `.tbi` file(s). Filename specified as `chr{CHRM}.vcf.gz`, with `CHRM` as the placeholder if the vcf.gz files are split up for each chromosome, e.g. `--ref ~/reference_panel/1000genomes/ALL.chr{CHRM}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz`.
 
 `--out [no default]` string. Filename to store the imputation results. 
 
