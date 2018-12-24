@@ -10,6 +10,7 @@
 #include <set>
 #include <algorithm>
 #include <iterator>
+#include <gsl/gsl_statistics.h>
 #include <gsl/gsl_statistics_int.h>
 #include <gsl/gsl_vector.h>
 #include<gsl/gsl_blas.h>
@@ -393,11 +394,11 @@ double  adjusted_imputation_quality (double iq_1e8_simple, int N_ref, int number
 
 static
 mvn:: SquareMatrix
-make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags);
+make_C_tag_tag_matrix( vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const & genotypes_for_the_tags);
 static
 mvn:: Matrix make_c_unkn_tags_matrix
-        ( vector<vector<int> const *>      const & genotypes_for_the_tags
-        , vector<vector<int> const *>      const & genotypes_for_the_unks
+        ( vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const & genotypes_for_the_tags
+        , vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const & genotypes_for_the_unks
         , vector<RefRecord const *              > const & tag_its
         , vector<RefRecord const *              > const & unk_its
         );
@@ -1444,14 +1445,14 @@ void impute_all_the_regions(   string                                   filename
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
 
             // Next, actually look up all the relevant SNPs within the reference panel
-            vector<vector<int> const *> genotypes_for_the_tags  = from:: vector(tag_its_) |view::map| [](RefRecord const *rrp) { return &rrp->z12; } |action::collect;
-            vector<vector<int> const *> genotypes_for_the_unks  = from:: vector(unk2_its) |view::map| [](RefRecord const *rrp) { return &rrp->z12; } |action::collect;
+            vector<vector<TYPE_OF_ONE_REF_CELL> const *> genotypes_for_the_tags  = from:: vector(tag_its_) |view::map| [](RefRecord const *rrp) { return &rrp->z12; } |action::collect;
+            vector<vector<TYPE_OF_ONE_REF_CELL> const *> genotypes_for_the_unks  = from:: vector(unk2_its) |view::map| [](RefRecord const *rrp) { return &rrp->z12; } |action::collect;
 
             assert(number_of_tags        == utils:: ssize(genotypes_for_the_tags));
             assert(number_of_all_targets == utils:: ssize(genotypes_for_the_unks));
 
-            static_assert( std:: is_same< vector<vector<int> const *> , decltype(genotypes_for_the_tags) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
-            static_assert( std:: is_same< vector<vector<int> const *> , decltype(genotypes_for_the_unks) >{} ,""); // ints, not doubles, hence gsl_stats_int_correlation
+            static_assert( std:: is_same< vector<vector<TYPE_OF_ONE_REF_CELL> const *> , decltype(genotypes_for_the_tags) >{} ,"");
+            static_assert( std:: is_same< vector<vector<TYPE_OF_ONE_REF_CELL> const *> , decltype(genotypes_for_the_unks) >{} ,"");
 
             assert(!genotypes_for_the_tags.empty());
             assert(!genotypes_for_the_unks.empty());
@@ -1699,7 +1700,7 @@ void impute_all_the_regions(   string                                   filename
 
 static
 mvn:: SquareMatrix
-make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_the_tags) {
+make_C_tag_tag_matrix( vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const & genotypes_for_the_tags) {
     int const number_of_tags = genotypes_for_the_tags.size();
     int const N_ref = genotypes_for_the_tags.at(0)->size();
     assert(N_ref > 0);
@@ -1709,7 +1710,7 @@ make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_th
         for(int l=0; l<number_of_tags; ++l) {
             assert(N_ref        == utils:: ssize(*genotypes_for_the_tags.at(k)));
             assert(N_ref        == utils:: ssize(*genotypes_for_the_tags.at(l)));
-            double c_kl = gsl_stats_int_correlation( &genotypes_for_the_tags.at(k)->front(), 1
+            double c_kl = gsl_stats_correlation( &genotypes_for_the_tags.at(k)->front(), 1
                                                    , &genotypes_for_the_tags.at(l)->front(), 1
                                                    , N_ref );
             if(c_kl > (1.0-1e-10)) { // sometimes it sneaks above one, don't really know how
@@ -1736,8 +1737,8 @@ make_C_tag_tag_matrix( vector<vector<int> const *>      const & genotypes_for_th
 }
 static
 mvn:: Matrix make_c_unkn_tags_matrix
-        ( vector<vector<int> const *>      const & genotypes_for_the_tags
-        , vector<vector<int> const *>      const & genotypes_for_the_unks
+        ( vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const & genotypes_for_the_tags
+        , vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const & genotypes_for_the_unks
         , vector<RefRecord const *              > const & tag_its
         , vector<RefRecord const *              > const & unk_its
         ) {
@@ -1771,15 +1772,15 @@ mvn:: Matrix make_c_unkn_tags_matrix
                     u
             ,   RefRecord const *
                     unk_its_u
-            ,   vector<int> const *
+            ,   vector<TYPE_OF_ONE_REF_CELL> const *
                     calls_at_u_rw
             ) -> void {
-                vector<int> const &  calls_at_u  = *calls_at_u_rw;
+                vector<TYPE_OF_ONE_REF_CELL> const &  calls_at_u  = *calls_at_u_rw;
                 assert(&calls_at_u ==  genotypes_for_the_unks.at(u));
 
                 assert(N_ref        == utils:: ssize(calls_at_k));
                 assert(N_ref        == utils:: ssize(calls_at_u));
-                double c_ku = gsl_stats_int_correlation( &calls_at_k.at(0), 1
+                double c_ku = gsl_stats_correlation( &calls_at_k.at(0), 1
                                                        , &calls_at_u.at(0), 1
                                                        , N_ref );
                 if(c_ku > (1.0-1e-10)) {
