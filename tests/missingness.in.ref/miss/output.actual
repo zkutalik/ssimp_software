@@ -1,0 +1,33 @@
+file_name:gwas/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz
+... loading the 1.7GB database of positions under three builds. This will take about a minute.  Loaded.
+Estimating which build (hg18/hg19/hg37) of the reference panel and the GWAS file, in case it is necessary to modify the GWAS file to match the reference panel
+some_records_from_each_chromosome.size():1'651
+(ref) :count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 4 , 0 , 0 , 182 , 0
+gwas_all_chrpos.size():0
+(gwas):count_of_hg18_0based,count_of_hg19_0based,count_of_hg20_0based,count_of_hg18_1based,count_of_hg19_1based,count_of_hg20_1based:	0 , 0 , 0 , 0 , 0 , 0
+which_build_gwas,which_build_ref:	unknown , hg19_1
+gwas_count_known,gwas_count_unknown:	109 , 905
+Delete the SNPs with unknown position ...
+gwas->number_of_snps():109
+options:: opt_window_width,options:: opt_flanking_width:	250'000 , 250'000
+N_reference:503
+
+chrm4	   18'000'000-18'250'000
+      37 # GWAS     SNPs in this window (with 250'000 flanking)
+      34 # SNPs in both (i.e. useful as tags)
+      45 # target SNPs (anything in narrow window, will include some tags)
+
+chrm4	   18'250'000-18'500'000
+      37 # GWAS     SNPs in this window (with 250'000 flanking)
+      34 # SNPs in both (i.e. useful as tags)
+      39 # target SNPs (anything in narrow window, will include some tags)
+
+chrm5	   18'000'000-18'250'000
+      60 # GWAS     SNPs in this window (with 250'000 flanking)
+      51 # SNPs in both (i.e. useful as tags)
+      50 # target SNPs (anything in narrow window, will include some tags)
+
+chrm5	   18'250'000-18'500'000
+      60 # GWAS     SNPs in this window (with 250'000 flanking)
+      51 # SNPs in both (i.e. useful as tags)
+      52 # target SNPs (anything in narrow window, will include some tags)
