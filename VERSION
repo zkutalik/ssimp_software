@@ -3,6 +3,7 @@ Versions of SSIMP
 (unreleased)    (2018-12-24)
                 - replace missing ref panel samples with the mean of the SNV. And a simple
                   message, per region, of what fraction were replaced
+                - .. and remove a SNV entirely if more than 5% is missing.
 
 ssimp-0.5.4     (2018-11-16)
                 - print '(ref)' and '(gwas)' when estimating the builds, so the output is more readable.
