@@ -16,10 +16,10 @@ chrm22	   18'000'000-18'250'000
       60 # GWAS     SNPs in this window (with 250'000 flanking)
       49 # SNPs in both (i.e. useful as tags)
       49 # target SNPs (anything in narrow window, will include some tags)
-Average rate of missingness among the 102 reference panel SNPs: 1.949e-05
+Average rate of missingness among the 102 reference panel SNPs: 0.0002144
 
 chrm22	   18'250'000-18'500'000
       60 # GWAS     SNPs in this window (with 250'000 flanking)
       49 # SNPs in both (i.e. useful as tags)
       53 # target SNPs (anything in narrow window, will include some tags)
-Average rate of missingness among the 102 reference panel SNPs: 1.949e-05
+Average rate of missingness among the 102 reference panel SNPs: 0.0002144
