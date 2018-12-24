@@ -67,7 +67,9 @@ namespace tbi {
              * This is what we want - http://genome.sph.umich.edu/wiki/LibStatGen:_VCF#Specifying_Discard_Rules
              */
         }
-    double maf_under_missingness(VcfRecord & record) {
+    double af_under_missingness(VcfRecord & record) {
+        // Computes the allele frequency for this reference SNV.
+        //
         // the average of the zeroes and ones, i.e. ignoring the cells that
         // contain -2 (missing data) or -1 (missing X chromosome for male)
         int const N = record.getNumSamples();
@@ -94,7 +96,7 @@ namespace tbi {
         rr.ref      =   record.getRefStr();
         rr.alt      =   record.getAltStr();
         assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
-        auto maf = maf_under_missingness(record);
+        auto maf = af_under_missingness(record);
 
         int const N = record.getNumSamples(); // TODO: verify this is the same in every SNP?
         int missing_in_the_reference_panel = 0;
