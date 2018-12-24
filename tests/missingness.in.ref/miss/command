@@ -1,10 +1,12 @@
-(
-    cd "$REF"/sub1KG-chr22.missing/
-    rm chr22.vcf.gz
-    rm chr22.vcf.gz.tbi
-    bgzip -c chr22.vcf > chr22.vcf.gz
-    tabix -p vcf chr22.vcf.gz
-)
+#(
+#    Some code to remake the .vcf.gz{,.tbi} files:
+#
+#    cd "$REF"/sub1KG-chr22.missing/
+#    rm chr22.vcf.gz
+#    rm chr22.vcf.gz.tbi
+#    bgzip -c chr22.vcf > chr22.vcf.gz
+#    tabix -p vcf chr22.vcf.gz
+#)
 "$SSIMP"                                                                            \
     "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz         \
     "$REF"/sub1KG-chr22.missing/chr22.vcf.gz                                        \
