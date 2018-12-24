@@ -9,6 +9,9 @@
 
 #include <numeric>
 #include <fstream>
+
+constexpr double THRESHOLD_OF_ACCEPTABLE_REF_MISSINGNESS = 0.05;
+
 namespace tbi {
         read_vcf_with_tbi :: read_vcf_with_tbi(std:: string filename, int chromosome) {
             // First, test if 'filename' exists. If not, replace any embedded '{CHRM}' with the chromosome number
@@ -135,6 +138,14 @@ namespace tbi {
         return rr;
     }
     bool    read_vcf_with_tbi:: read_record_into_a_RefRecord(RefRecord &rr) {
+                /* Note that this function calls itself recursively in some
+                 * cases in order to skip a record that isn't desired.
+                 * Therefore, after considering the recursion, its semantics
+                 * are to either:
+                 *  - set rr to a valid record and return true
+                 *  OR
+                 *  - return false if no such record is found
+                 */
                 VcfRecord record;
                 bool b = reader.readRecord(record);
                 if(b && record.getNumAlts() != 1) {
@@ -144,6 +155,8 @@ namespace tbi {
                 }
                 if(b) {
                     rr = tbi:: convert_VcfRecord_to_RefRecord(record);
+                    if(rr.proportion_of_missing_ref_data > THRESHOLD_OF_ACCEPTABLE_REF_MISSINGNESS)
+                        return read_record_into_a_RefRecord(rr);
                 }
                 return b;
     }
