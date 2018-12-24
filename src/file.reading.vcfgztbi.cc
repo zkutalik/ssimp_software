@@ -97,6 +97,7 @@ namespace tbi {
         auto maf = maf_under_missingness(record);
 
         int const N = record.getNumSamples(); // TODO: verify this is the same in every SNP?
+        int missing_in_the_reference_panel = 0;
         rr.z12.reserve(N);
         for(int i=0;i<N;++i) {
             //assert(2==record.getNumGTs(i));
@@ -110,6 +111,8 @@ namespace tbi {
                 //  and  1/-1 becomes 1/1
                 r = l;
             }
+            if(l==-2) // missing in the reference panel - e.g. ".|." in the vcf file
+                ++missing_in_the_reference_panel;
             if(l==-2) // missing in the reference panel - e.g. ".|." in the vcf file
                 l = maf;
             if(r==-2) // missing in the reference panel - e.g. ".|." in the vcf file
@@ -126,6 +129,7 @@ namespace tbi {
         assert(maf <= 0.5);
         //assert(maf <  0.5);
         rr.maf = maf;
+        rr.proportion_of_missing_ref_data = missing_in_the_reference_panel / double(N);
         return rr;
     }
     bool    read_vcf_with_tbi:: read_record_into_a_RefRecord(RefRecord &rr) {

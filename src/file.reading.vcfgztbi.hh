@@ -25,7 +25,8 @@ namespace tbi {
         std::string  ref;
         std::string  alt;
         std::vector<TYPE_OF_ONE_REF_CELL> z12;
-        double          maf; // *Minor allele frequency, i.e. always <= 0.50
+        double       maf; // *Minor allele frequency, i.e. always <= 0.50
+        double       proportion_of_missing_ref_data;
 
         bool operator< (file_reading:: chrpos crps) const {
             return pos < crps.pos;
