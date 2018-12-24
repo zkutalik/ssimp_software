@@ -1117,6 +1117,31 @@ bool    test_if_skip(enum_tag_or_impute_t toi, chrpos l, chrpos u) {
 }
 
 static
+void print_summary_of_ref_missingness(vector<RefRecord> const & all_nearby_ref_data) {
+    // For a given region, with the vector of all the reference SNPs in the region (including
+    // tag SNPs), calculate the average missingess across the region. And then print a message
+    // if the average missingness is non-zero.
+
+    double total_missingness = 0.0;
+    for(auto && x : all_nearby_ref_data)
+        total_missingness += x.proportion_of_missing_ref_data;
+
+    double average_proportion_of_missing_ref_data = total_missingness / all_nearby_ref_data.size();
+    if(average_proportion_of_missing_ref_data>0) {
+        auto old_precision = cout.precision();
+        cout
+            << "Average rate of missingness among the "
+            << all_nearby_ref_data.size()
+            << " reference panel SNPs: "
+            << std::setprecision(4)
+            << average_proportion_of_missing_ref_data
+            << '\n'
+            ;
+        cout.precision(old_precision);
+    }
+}
+
+static
 void impute_all_the_regions(   string                                   filename_of_vcf
                              , file_reading:: GwasFileHandle_NONCONST   gwas
                              , double                                   N_max
@@ -1443,6 +1468,8 @@ void impute_all_the_regions(   string                                   filename
             cout << setw(8) << number_of_snps_in_the_gwas_in_this_region      << " # GWAS     SNPs in this window (with "<<options:: opt_flanking_width<<" flanking)\n";
             cout << setw(8) << number_of_tags                                 << " # SNPs in both (i.e. useful as tags)\n";
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
+
+            print_summary_of_ref_missingness(all_nearby_ref_data);
 
             // Next, actually look up all the relevant SNPs within the reference panel
             vector<vector<TYPE_OF_ONE_REF_CELL> const *> genotypes_for_the_tags  = from:: vector(tag_its_) |view::map| [](RefRecord const *rrp) { return &rrp->z12; } |action::collect;
