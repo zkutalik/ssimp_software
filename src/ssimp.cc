@@ -1356,6 +1356,7 @@ void impute_all_the_regions(   string                                   filename
             vector<double>                          tag_zs_;
             vector<RefRecord const *              > tag_its_;
             vector<double>                          tag_Ns;
+            int number_of_reference_SNVs_skipped_due_to_high_missingness = 0;
             {   // Look for tags in the broad window.
                 // This means moving monotonically through 'all_nearby_ref_data' and
                 // the gwas data in parallel, and identifying suitable 'pairs'
@@ -1378,6 +1379,11 @@ void impute_all_the_regions(   string                                   filename
 
                         // apply --tag.{snps,maf,range}
                         if( test_if_skip( enum_tag_or_impute_t:: TAG, current_ref , chrm) ) {
+                            continue;
+                        }
+
+                        if(current_ref.proportion_of_missing_ref_data > tbi::THRESHOLD_OF_ACCEPTABLE_REF_MISSINGNESS) {
+                            ++ number_of_reference_SNVs_skipped_due_to_high_missingness;
                             continue;
                         }
 
@@ -1470,6 +1476,13 @@ void impute_all_the_regions(   string                                   filename
             cout << setw(8) << number_of_all_targets                          << " # target SNPs (anything in narrow window, will include some tags)\n";
 
             print_summary_of_ref_missingness(tag_its_);
+            if(number_of_reference_SNVs_skipped_due_to_high_missingness>0)
+                cout
+                    << setw(8)
+                    << number_of_reference_SNVs_skipped_due_to_high_missingness
+                    << " # reference SNVs skipped due to having >"
+                    << tbi::THRESHOLD_OF_ACCEPTABLE_REF_MISSINGNESS*100.0
+                    << "% missingness\n";
 
             // Next, actually look up all the relevant SNPs within the reference panel
             vector<vector<TYPE_OF_ONE_REF_CELL> const *> genotypes_for_the_tags  = from:: vector(tag_its_) |view::map| [](RefRecord const *rrp) { return &rrp->z12; } |action::collect;

@@ -9,6 +9,8 @@
 #define TYPE_OF_ONE_REF_CELL double
 
 namespace tbi {
+    constexpr double THRESHOLD_OF_ACCEPTABLE_REF_MISSINGNESS = 0.05;
+
     struct RefRecord;
     struct read_vcf_with_tbi {
         VcfFileReader reader;
