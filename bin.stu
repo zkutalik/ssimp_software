@@ -119,14 +119,6 @@
 
     echo " -O3"
     echo " -Wall -Wextra -std=c++14"
-    if   test "$(whoami)" = 'amcdaid'  \
-           -o "$(whoami)" = 'aaron'
-    then
-           :
-           #echo ' -Werror'
-           #echo " -pg -ggdb                  " # For profiling
-    fi
-
 }
 
 >       bin/o/LINKER
