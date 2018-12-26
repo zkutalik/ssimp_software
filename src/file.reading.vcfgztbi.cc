@@ -9,6 +9,7 @@
 
 #include <numeric>
 #include <fstream>
+
 namespace tbi {
         read_vcf_with_tbi :: read_vcf_with_tbi(std:: string filename, int chromosome) {
             // First, test if 'filename' exists. If not, replace any embedded '{CHRM}' with the chromosome number
@@ -50,7 +51,7 @@ namespace tbi {
             reader.setDiscardRules  (   0
                                     //|   VcfFileReader:: DISCARD_FILTERED // don't use this after all.
                                     //|   VcfFileReader:: DISCARD_NON_PHASED // TODO: Ask SR and ZK if we should include this. This discards '/' doesn't it?
-                                    |   VcfFileReader:: DISCARD_MISSING_GT
+                                    //|   VcfFileReader:: DISCARD_MISSING_GT // As of December 2018, we don't discard SNVs with some missing samples. Instead we replace them with the mean
                                     |   VcfFileReader:: DISCARD_MULTIPLE_ALTS
                                     );
             reader.addDiscardMinMinorAlleleCount(1, NULL); // otherwise, there is no variation and it's not very useful
@@ -67,6 +68,28 @@ namespace tbi {
              * This is what we want - http://genome.sph.umich.edu/wiki/LibStatGen:_VCF#Specifying_Discard_Rules
              */
         }
+    double af_under_missingness(VcfRecord & record) {
+        // Computes the allele frequency for this reference SNV.
+        //
+        // the average of the zeroes and ones, i.e. ignoring the cells that
+        // contain -2 (missing data) or -1 (missing X chromosome for male)
+        int const N = record.getNumSamples();
+        double total_g = 0;
+        int count_g = 0;
+        for(int i=0;i<N;++i) {
+            int l = record.getGT(i, 0);
+            int r = record.getGT(i, 1);
+            if(l>=0) {
+                total_g += l;
+                count_g += 1;
+            }
+            if(r>=0) {
+                total_g += r;
+                count_g += 1;
+            }
+        }
+        return total_g / count_g;
+    }
     RefRecord   convert_VcfRecord_to_RefRecord(VcfRecord & record) {
         RefRecord rr;
         rr.pos      =   record.get1BasedPosition();
@@ -74,8 +97,10 @@ namespace tbi {
         rr.ref      =   record.getRefStr();
         rr.alt      =   record.getAltStr();
         assert(record.getNumAlts() == 1); // The 'DISCARD' rule should already have skipped those with more alts
-        //assert(record.hasAllGenotypeAlleles());
+        auto maf = af_under_missingness(record);
+
         int const N = record.getNumSamples(); // TODO: verify this is the same in every SNP?
+        int missing_in_the_reference_panel = 0;
         rr.z12.reserve(N);
         for(int i=0;i<N;++i) {
             //assert(2==record.getNumGTs(i));
@@ -89,14 +114,16 @@ namespace tbi {
                 //  and  1/-1 becomes 1/1
                 r = l;
             }
-            assert((l | 1) == 1);
-            assert((r | 1) == 1);
+            if(l==-2) // missing in the reference panel - e.g. ".|." in the vcf file
+                ++missing_in_the_reference_panel;
+            if(l==-2) // missing in the reference panel - e.g. ".|." in the vcf file
+                l = maf;
+            if(r==-2) // missing in the reference panel - e.g. ".|." in the vcf file
+                r = maf;
             rr.z12.push_back(l+r);
         }
         assert(N == utils:: ssize(rr.z12));
-        int total_alternative_alleles = std:: accumulate( rr.z12.begin(), rr.z12.end(), 0);
-        double maf = double(total_alternative_alleles) / (2*N);
-        //PP(rr.ID, maf);
+
         assert(maf >= 0.0);
         assert(maf >  0.0);
         assert(maf <= 1.0);
@@ -105,9 +132,18 @@ namespace tbi {
         assert(maf <= 0.5);
         //assert(maf <  0.5);
         rr.maf = maf;
+        rr.proportion_of_missing_ref_data = missing_in_the_reference_panel / double(N);
         return rr;
     }
     bool    read_vcf_with_tbi:: read_record_into_a_RefRecord(RefRecord &rr) {
+                /* Note that this function calls itself recursively in some
+                 * cases in order to skip a record that isn't desired.
+                 * Therefore, after considering the recursion, its semantics
+                 * are to either:
+                 *  - set rr to a valid record and return true
+                 *  OR
+                 *  - return false if no such record is found
+                 */
                 VcfRecord record;
                 bool b = reader.readRecord(record);
                 if(b && record.getNumAlts() != 1) {

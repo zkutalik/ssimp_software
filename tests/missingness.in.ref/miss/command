@@ -1,0 +1,20 @@
+#(
+#    Some code to remake the .vcf.gz{,.tbi} files:
+#
+#    cd "$REF"/sub1KG-chr22.missing/
+#    rm chr22.vcf.gz
+#    rm chr22.vcf.gz.tbi
+#    bgzip -c chr22.vcf > chr22.vcf.gz
+#    tabix -p vcf chr22.vcf.gz
+#)
+"$SSIMP"                                                                            \
+    "$GWAS"/GIANT_HEIGHT_Wood_et_al_2014_publicrelease_HapMapCeuFreq.txt.gz         \
+    "$REF"/sub1KG-chr22.missing/chr22.vcf.gz                                        \
+    "${OUT_IMPUTATIONS}"                                                            \
+    --sample.names "$REF"/link.to.1kg.data/integrated_call_samples_v3.20130502.ALL.panel/sample/super_pop=EUR     \
+    --tags.used.output "${COMMANDDIR}"/tag.data.used.here.tsv                       \
+    --wind 250000                                                                   \
+    --flan 250000                                                                   \
+    --lambda 0.01                                                                   \
+    --tag.range chr22                                                               \
+    >     "$OUTPUT"
