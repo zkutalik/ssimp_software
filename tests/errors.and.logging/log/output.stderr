@@ -1,2 +1,2 @@
 
-Exiting: src/file.reading.cc:380	Error: Can't find file [/nonexistent/../..]
+Exiting: src/file.reading.cc:384	Error: Can't find file [/nonexistent/../..]
