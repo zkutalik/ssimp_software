@@ -456,7 +456,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
             p->m_each_SNP_and_its_z.push_back(gls);
         } catch (std:: invalid_argument &e) {
-            WARNING( "Ignoring this line, problem with the chromosome and/or position ["
+            WARNING( "Ignoring line [" << file_name << ":" << line_number << "], problem with the chromosome and/or position ["
                     << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
                     //<< " chr:" << LOOKUP(hd, chromosome, all_split_up)
                     //<< " pos:" << LOOKUP(hd, position  , all_split_up)
