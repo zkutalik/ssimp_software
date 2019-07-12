@@ -394,11 +394,14 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
     p->m_delimiter            = hd.m_delimiter;
     p->m_header_details       = hd;
 
+    int line_number = 1;
+
     while(1) {
         GwasLineSummary gls;
         getline(f, current_line);
+	++line_number;
         if(!f) {
-            f.eof() || DIE("Error before reaching eof() in this file");
+            f.eof() || DIE("Error before reaching eof() in this file. Line number: " << line_number);
             break;
         }
         auto all_split_up = tokenize(current_line, hd.m_delimiter);
