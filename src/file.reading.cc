@@ -124,6 +124,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 char   decide_delimiter( string      const & header_line );
 
 struct GwasLineSummary {
+    int                      m_gwas_line_number;
     string                   m_SNPname;
     chrpos                   m_chrpos;
     string                   m_allele_alt;
@@ -300,6 +301,9 @@ struct SimpleGwasFile : public file_reading:: Effects_I
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_z.size();
     }
+    virtual int         get_line_number    (int i)     const {
+        return get_gls(i).m_gwas_line_number;
+    }
     virtual std::string get_SNPname        (int i)     const {
         auto const & ols = get_gls(i);
         return ols.m_SNPname;
@@ -400,6 +404,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
         GwasLineSummary gls;
         getline(f, current_line);
 	++line_number;
+	gls.m_gwas_line_number = line_number;
         if(!f) {
             f.eof() || DIE("Error before reaching eof() in this file. Line number: " << line_number);
             break;
