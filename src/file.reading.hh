@@ -76,6 +76,7 @@ std:: ostream& operator<<(std:: ostream &o, chrpos const &c) {
 
 struct AnyFile_I {
     virtual int         number_of_snps     ()        const = 0;
+    virtual int         get_line_number    (int)     const = 0;
     virtual std::string get_SNPname        (int)     const = 0;
     virtual chrpos      get_chrpos         (int)     const = 0;
     virtual std::string get_allele_ref     (int)     const = 0;

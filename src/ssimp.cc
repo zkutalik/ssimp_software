@@ -885,28 +885,33 @@ int main(int argc, char **argv) {
                 gwas->set_chrpos(i, chrpos{-1,-1});
             }
             for(int i = 0; i<gwas->number_of_snps(); ++i ) {
-                auto   gwas_rs      =   gwas->get_SNPname(i);
-                if(gwas_rs.substr(0,2) == "rs") {
-                    int gwas_rs_int = utils:: lexical_cast<int>(gwas_rs.substr(2));
-                    //PP(gwas_rs, gwas_rs_int);
-                    if(1==database_of_builds_rs_to_offset.count(gwas_rs_int)) {
-                        auto offset_into_big_db = database_of_builds_rs_to_offset[gwas_rs_int];
-                        assert(database_of_builds.at(offset_into_big_db).rs == gwas_rs_int);
-                        chrpos new_chrpos = get_one_build(database_of_builds.at(offset_into_big_db), which_build_ref);
-                        if (new_chrpos.pos == -1) {
-                            // we can't do anything here, as we don't know its position.
-                            // This is a SNP which is known in at least one build (hence
-                            // it's in the database), but it's not known in the desired
-                            // build
-                        } else {
-                            assert(new_chrpos != (chrpos{-1,0}));
-                            gwas->set_chrpos(i, new_chrpos);
-                        }
-                    } else {
-                        // not in the database - should we delete it?
-                        // TODO: decide whether to delete or now
-                    }
-                }
+		try {
+		    auto   gwas_rs      =   gwas->get_SNPname(i);
+		    if(gwas_rs.substr(0,2) == "rs") {
+			int gwas_rs_int = utils:: lexical_cast<int>(gwas_rs.substr(2));
+			//PP(gwas_rs, gwas_rs_int);
+			if(1==database_of_builds_rs_to_offset.count(gwas_rs_int)) {
+			    auto offset_into_big_db = database_of_builds_rs_to_offset[gwas_rs_int];
+			    assert(database_of_builds.at(offset_into_big_db).rs == gwas_rs_int);
+			    chrpos new_chrpos = get_one_build(database_of_builds.at(offset_into_big_db), which_build_ref);
+			    if (new_chrpos.pos == -1) {
+				// we can't do anything here, as we don't know its position.
+				// This is a SNP which is known in at least one build (hence
+				// it's in the database), but it's not known in the desired
+				// build
+			    } else {
+				assert(new_chrpos != (chrpos{-1,0}));
+				gwas->set_chrpos(i, new_chrpos);
+			    }
+			} else {
+			    // not in the database - should we delete it?
+			    // TODO: decide whether to delete or now
+			}
+		    }
+		} catch (...) {
+		    std::cerr << "Error in the GWAS file, while reading line " << gwas->get_line_number(i) << ".\n";
+		    throw;
+		}
             }
             for(int i = 0; i<gwas->number_of_snps(); ++i ) { assert(gwas->get_chrpos(i) != (chrpos{-1,0}) ); }
             which_build_gwas = which_build_ref; // we've changed the gwas positions, so we here record that fact

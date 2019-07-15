@@ -124,6 +124,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name);
 char   decide_delimiter( string      const & header_line );
 
 struct GwasLineSummary {
+    int                      m_gwas_line_number;
     string                   m_SNPname;
     chrpos                   m_chrpos;
     string                   m_allele_alt;
@@ -300,6 +301,9 @@ struct SimpleGwasFile : public file_reading:: Effects_I
     virtual int         number_of_snps() const {
         return m_each_SNP_and_its_z.size();
     }
+    virtual int         get_line_number    (int i)     const {
+        return get_gls(i).m_gwas_line_number;
+    }
     virtual std::string get_SNPname        (int i)     const {
         auto const & ols = get_gls(i);
         return ols.m_SNPname;
@@ -394,11 +398,15 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
     p->m_delimiter            = hd.m_delimiter;
     p->m_header_details       = hd;
 
+    int line_number = 1;
+
     while(1) {
         GwasLineSummary gls;
         getline(f, current_line);
+	++line_number;
+	gls.m_gwas_line_number = line_number;
         if(!f) {
-            f.eof() || DIE("Error before reaching eof() in this file");
+            f.eof() || DIE("Error before reaching eof() in this file. Line number: " << line_number);
             break;
         }
         auto all_split_up = tokenize(current_line, hd.m_delimiter);
@@ -413,7 +421,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
                 else { // no 'z' field. Must infer it from 'p' and 'beta', with 'beta' used only for 'direction'
                     auto beta   = utils:: lexical_cast<double> (LOOKUP( hd, effect_beta, all_split_up));
                     auto p      = utils:: lexical_cast<double> (LOOKUP( hd, effect_p   , all_split_up));
-                    (p >= 0 && p <= 1)    || DIE("Your p should be between 0 and 1 [" << p << "]");
+                    (p >= 0 && p <= 1)    || DIE("Your p should be between 0 and 1 [p=" << p << "]. Line number: " << line_number);
                     auto z_undir = gsl_cdf_gaussian_Pinv( p / 2.0 ,1);
                     assert(z_undir <= 0.0);
                     double z;
@@ -453,7 +461,7 @@ GwasFileHandle_NONCONST      read_in_a_gwas_file_simple(std:: string file_name) 
 
             p->m_each_SNP_and_its_z.push_back(gls);
         } catch (std:: invalid_argument &e) {
-            WARNING( "Ignoring this line, problem with the chromosome and/or position ["
+            WARNING( "Ignoring line [" << file_name << ":" << line_number << "], problem with the chromosome and/or position ["
                     << "SNPname:" << LOOKUP(hd, SNPname   , all_split_up)
                     //<< " chr:" << LOOKUP(hd, chromosome, all_split_up)
                     //<< " pos:" << LOOKUP(hd, position  , all_split_up)

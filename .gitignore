@@ -1,3 +1,5 @@
+gmon.txt
+time.and.memory.txt
 reference_panels/
 bin/
 src/libStatGen/general/obj/BaseAsciiMap.o

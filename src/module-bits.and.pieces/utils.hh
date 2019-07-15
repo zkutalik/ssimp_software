@@ -14,6 +14,8 @@
 
 #include "ASSERT.hh"
 
+#define EASYSTRING(...) [&]{std::ostringstream oss1234abcd; oss1234abcd << __VA_ARGS__; return oss1234abcd.str();}()
+
 namespace utils {
 namespace impl {
     template<typename ...T>
@@ -277,7 +279,7 @@ int lexical_cast<int>(std:: string const & s) {
         return d;
     }
     else
-        throw std:: invalid_argument{"can't parse this int"};
+        throw std:: invalid_argument{EASYSTRING("can't parse this int [" << s << "]")};
 }
 template<>
 inline
