@@ -1,5 +1,9 @@
 Versions of SSIMP
 
+
+ssimp-0.5.6     (2019-07-18)
+                - Updating libStatGen library (https://github.com/statgen/libStatGen/issues/17)
+                
 ssimp-0.5.5     (2018-12-26)
                 - replace missing ref panel samples with the mean of the SNV. And a simple
                   message, per region, of what fraction were replaced
