@@ -2,7 +2,8 @@ Versions of SSIMP
 
 
 ssimp-0.5.6     (2019-07-18)
-                - Updating libStatGen library (https://github.com/statgen/libStatGen/issues/17)
+                - Updating libStatGen library (https://github.com/statgen/libStatGen/issues/17).
+		- Changing the computation of the effective number of tests (using now the C matrix without lambda adjustment) see PR #104.
                 
 ssimp-0.5.5     (2018-12-26)
                 - replace missing ref panel samples with the mean of the SNV. And a simple
