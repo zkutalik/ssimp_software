@@ -177,7 +177,7 @@ More info on handling reference panel data can be found in [usage message](doc/u
 
 [Zoltan Kutalik](https://github.com/zkutalik) (supervision, method development)
 
-Ninon Mounier (Bugfix #104)
+Ninon Mounier (Bugfix [#104](https://github.com/zkutalik/ssimp_software/pull/104/files))
 
 We have used code (with permission, and under the GPL) from [libStatGen](https://genome.sph.umich.edu/wiki/C%2B%2B_Library:_libStatGen) and [stu](https://github.com/kunegis/stu).
 
