@@ -1598,7 +1598,7 @@ void impute_all_the_regions(   string                                   filename
             // Compute the imputations
             auto c_Cinv_zs = mvn:: multiply_matrix_by_colvec_giving_colvec(c_lambda, solve_a_matrix (C_lambda, mvn:: make_VecCol(tag_zs_)));
 
-            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_lambda);
+            int number_of_effective_tests_in_C_nolambda = compute_number_of_effective_tests_in_C_nolambda(C_nolambda);
 
             // if necessary, do reimputation
             // TODO: what is the r2 for the reimputation? I'm being 'naive' for now
