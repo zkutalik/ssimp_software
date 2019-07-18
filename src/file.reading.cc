@@ -44,6 +44,11 @@ namespace file_reading {
         ++m_line_number;
         return *this;
     }
+    SNPiterator    &       SNPiterator   :: operator--()        {
+        assert(m_line_number > 0);
+        --m_line_number;
+        return *this;
+    }
     bool                SNPiterator   :: operator==(SNPiterator    const & other) const {
         assert(m_gfh == other.m_gfh);
         return m_line_number == other.m_line_number;
