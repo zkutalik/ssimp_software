@@ -2,6 +2,10 @@ gmon.txt
 time.and.memory.txt
 reference_panels/
 bin/
+stu/stu
+src/libStatGen/bam/obj/
+src/libStatGen/fastq/obj/
+src/libStatGen/glf/obj/
 src/libStatGen/general/obj/BaseAsciiMap.o
 src/libStatGen/general/obj/BaseQualityHelper.o
 src/libStatGen/general/obj/BaseUtilities.o
