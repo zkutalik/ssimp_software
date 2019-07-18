@@ -112,6 +112,7 @@ struct SNPiterator
 
     // operators
     SNPiterator &       operator++();
+    SNPiterator &       operator--();
     bool                operator==(SNPiterator const & other) const;
     bool                operator!=(SNPiterator const & other) const;
     bool                operator< (SNPiterator const & other) const;
