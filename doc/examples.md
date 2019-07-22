@@ -63,7 +63,8 @@ The header of the GWAS file should either be `SNP  a1  a2  Z` or `SNP  a1  a2  b
 
 ### Impute b, and not Z
 [//]: -------------------------------
-First, impute Z-statistics as shown above, then transform the Z-statistic into `se(b)` and `b` using this [R-function](../transform_z_to_b.R).
+First, impute Z-statistics as shown above, then 
+the Z-statistic into `se(b)` and `b` using this [R-function](../transform_z_to_b.R).
 
 
 ### Chr and Pos instead of SNP-identifier
