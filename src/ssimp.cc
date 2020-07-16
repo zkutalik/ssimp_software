@@ -1768,6 +1768,9 @@ make_C_tag_tag_matrix( vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const &
                 assert(c_kl+1.0 >-1e-5);
                 c_kl =-1.0;
             }
+	    
+	    if (isnan(c_kl)) {c_kl=0.0;}
+	    
             assert(c_kl >= -1.0);
             assert(c_kl <=  1.0);
             if(k==l) {
