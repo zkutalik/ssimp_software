@@ -1848,6 +1848,10 @@ mvn:: Matrix make_c_unkn_tags_matrix
                     assert(c_ku+1.0 >-1e-5);
                     c_ku = -1.0;
                 }
+		
+		if (isnan(c_ku)) { //in case of missing correlation values caused by monomorphic SNPs
+			c_ku=0.0;
+	    	} 
 
                 if(tag_its_k == unk_its_u) { // identical pointer value, i.e. same reference entry
                     assert(c_ku ==  1.0);
