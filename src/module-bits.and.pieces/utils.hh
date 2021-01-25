@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <time.h>
 #include <tuple> // for tuple::get
 #include <utility> // for tuple::get
 #include <vector>

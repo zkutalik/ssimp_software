@@ -1,6 +1,8 @@
 #ifndef TIMESTAMP_HH
 #define TIMESTAMP_HH
 
+#include <time.h>
+
 /* 
  * Wrapper around time_t or struct timespec.  There are two variants:
  *   - default:  1-second precision.
