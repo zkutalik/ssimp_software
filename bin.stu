@@ -1,7 +1,9 @@
 @all: @tags bin/ssimp;
 
     bin/ssimp
-:   $[LINKER=bin/o/LINKER]
+:
+    @report_the_compiler_version
+    $[LINKER=bin/o/LINKER]
     $[LD_FLAGS=bin/o/LD_FLAGS]
 
     bin/o/ssimp.o
@@ -119,6 +121,17 @@
 
     echo " -O3"
     echo " -Wall -Wextra -std=c++14"
+}
+
+@report_the_compiler_version
+:   $[CXX_WITH_FLAGS=bin/o/CXX_WITH_FLAGS]
+{
+    echo  ============
+    echo We have found the following C++ compiler on your system.
+    echo This will be used to compile 'ssimp':
+    echo
+    ${CXX_WITH_FLAGS} --version
+    echo  ============
 }
 
 >       bin/o/LINKER

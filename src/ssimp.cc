@@ -1769,7 +1769,7 @@ make_C_tag_tag_matrix( vector<vector<TYPE_OF_ONE_REF_CELL> const *>      const &
                 c_kl =-1.0;
             }
 	    
-	    if (isnan(c_kl)) { //in case of missing correlation values caused by monomorphic SNPs
+	    if (std::isnan(c_kl)) { //in case of missing correlation values caused by monomorphic SNPs
 	    	if (k==l) {
 			c_kl=1.0;
 		}
@@ -1849,7 +1849,7 @@ mvn:: Matrix make_c_unkn_tags_matrix
                     c_ku = -1.0;
                 }
 		
-		if (isnan(c_ku)) { //in case of missing correlation values caused by monomorphic SNPs
+		if (std::isnan(c_ku)) { //in case of missing correlation values caused by monomorphic SNPs
 			c_ku=0.0;
 	    	} 
 
