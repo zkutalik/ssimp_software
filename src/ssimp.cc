@@ -144,7 +144,7 @@ chrpos get_one_build(IDchrmThreePos const & db_entry, which_build_t which_build)
     return {-1,-1};
 }
 
-#define BUILD_DATABASE_URL   "https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download"
+#define BUILD_DATABASE_URL   "https://zenodo.org/records/13222092/files/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin?download=1"
 #define BUILD_DATABASE_LOCAL "database.of.builds.1kg.uk10k.hrc.2018.01.18.bin"
 #define MINIMUM_NUMBER_OF_TAGS_TO_REIMPUTE 100
 
