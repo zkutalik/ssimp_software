@@ -33,7 +33,7 @@ ssimp --download.build.db
 ```
 The download option is equivalant to:
 ```
-# wget https://drive.switch.ch/index.php/s/uOyjAtdvYjxxwZd/download -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
+# wget https://zenodo.org/records/13222092/files/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin?download=1 -O ~/reference_panels/database.of.builds.1kg.uk10k.hrc.2018.01.18.bin
 ```
 
 ## Troubleshooting
