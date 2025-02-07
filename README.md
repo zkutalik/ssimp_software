@@ -156,7 +156,7 @@ ssimp --download.1KG
 
 More info on handling reference panel data can be found in [usage message](doc/usage.txt).
 
-
+**Important!**  The 1KG genotype files hosted on 1000 genomes webiste were updated recently (3/16/21) to v5b. Ssimp does not work with these, you need to download the previous version (v5a) from UCSC: http://hgdownload.cse.ucsc.edu/gbdb/hg19/1000Genomes/phase3/
 
 ## Run tests
 [//]: -------------------------------
