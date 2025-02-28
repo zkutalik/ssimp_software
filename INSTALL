@@ -14,8 +14,11 @@ cd ssimp_software-master
 ## run the makefile (source compilation)
 make
 
+## Download required build database
+bin/ssimp --download.build.db
+
 ## run your first summary statistics imputation on a test file
-bin/ssimp --gwas gwas/small.random.csv --ref ref/small.vcf.sample.vcf.gz --out output.txt
+bin/ssimp --gwas gwas/small.random.txt --ref ref/small.vcf.sample.vcf.gz --out output.txt
 
 ## Do you have a *reference panel* stored somewhere? 
 
